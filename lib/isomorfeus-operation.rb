@@ -11,8 +11,9 @@ if RUBY_ENGINE == 'opal'
   require 'isomorfeus/params/class_methods'
   require 'isomorfeus/validator'
   require 'isomorfeus/operation/class_methods'
-  require 'isomorfeus/operation/mixin'
   require 'isomorfeus/operation'
+  require 'ismo_operation/mixin'
+  require 'ismo_operation/base'
 else
   require 'oj'
   require 'isomorfeus/promise'
@@ -21,10 +22,11 @@ else
   require 'isomorfeus/params/class_methods'
   require 'isomorfeus/validator'
   require 'isomorfeus/operation/class_methods'
-  require 'isomorfeus/operation/mixin'
   require 'isomorfeus/operation'
   require 'isomorfeus/operation/security_guards'
   require 'isomorfeus/handler/operation_handler'
+  require 'ismo_operation/mixin'
+  require 'ismo_operation/base'
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
   if Dir.exist?(File.join('app', 'isomorfeus', 'operations'))
