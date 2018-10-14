@@ -1,4 +1,4 @@
-module IsmoOperation
+module LucidOperation
   module Mixin
     def self.included(base)
       base.include(Isomorfeus::Params::InstanceMethods)
