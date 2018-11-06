@@ -6,6 +6,10 @@ module Isomorfeus
       end
 
       def self.get(object_id)
+        agents[object_id]
+      end
+
+      def self.get!(object_id)
         agents.delete(object_id.to_s)
       end
 

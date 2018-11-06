@@ -1,3 +1,4 @@
+# TODO this needs to be implemented as separate gem, not used for now, keep as reminder
 module Isomorfeus
   module Transport
     class WebSocket

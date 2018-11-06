@@ -252,7 +252,7 @@ module Isomorfeus
       # meant for isomorfeus-resource
       def self.send_request(data)
         post(Isomorfeus.api_path + "?timestamp=#{`Date.now() + Math.random()`}", payload: data).then do |response|
-          `Opal.Isomorfeus.store.native.dispatch({ 'TRANSPORT_RESPONSE': #{response.json} })`
+          `Opal.Isomorfeus.store.native.dispatch(Object.assign(#{response.json}, { type: 'TRANSPORT_RESPONSE' }))`
         end
         nil
       end

@@ -1,12 +1,21 @@
 if RUBY_ENGINE == 'opal'
+  require 'isomorfeus/config'
   require 'isomorfeus/transport/request_agent'
-  require 'isomorfeus/transport/response_processor'
-  require 'isomorfeus/transport/notification_processor'
   require 'isomorfeus/transport/client_drivers'
+  require 'isomorfeus/transport/redux_middleware'
+
+  Isomorfeus::Transport::ReduxMiddleware.add_middleware_to_store
+
+  require 'isomorfeus/transport/reducers'
+
+  Isomorfeus::Transport::Reducers.add_reducers_to_store
+
   require 'isomorfeus/transport'
+  require 'isomorfeus/data_access'
 else
   require 'oj'
   require 'active_support'
+  require 'isomorfeus/config'
   require 'isomorfeus/promise'
   require 'isomorfeus/transport/config'
   require 'isomorfeus/transport/request_agent'
