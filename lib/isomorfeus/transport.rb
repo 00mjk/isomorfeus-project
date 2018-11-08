@@ -1,12 +1,13 @@
 module Isomorfeus
   module Transport
     def self.promise_send(request)
-      if request.has_key?(:agent)
+      if request.has_key?(:agent_id)
+        agent_id = request.delete(:agent_id)
         Isomorfeus.client_transport_driver.send_request('request' => request)
-        Isomorfeus::Transport::RequestAgent.get(request[:agent].keys.first).promise
+        Isomorfeus::Transport::RequestAgent.get(agent_id).promise
       else
         agent = Isomorfeus::Transport::RequestAgent.new
-        Isomorfeus.client_transport_driver.send_request('request' => { agent: { agent.id => request }})
+        Isomorfeus.client_transport_driver.send_request('request' => { agent_id: { agent.id => request }})
         agent.promise
       end
     end

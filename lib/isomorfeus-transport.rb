@@ -1,7 +1,8 @@
 if RUBY_ENGINE == 'opal'
+  require 'json'
   require 'isomorfeus/config'
+  require 'isomorfeus/transport/config'
   require 'isomorfeus/transport/request_agent'
-  require 'isomorfeus/transport/client_drivers'
   require 'isomorfeus/transport/redux_middleware'
 
   Isomorfeus::Transport::ReduxMiddleware.add_middleware_to_store

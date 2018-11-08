@@ -20,9 +20,9 @@ module Isomorfeus
                        end
                        process_request(env['rack.session'].id, user, request_hash)
                      else
-                       process_request(env.session.id, nil, request_hash)
+                       process_request(env['rack.session'].id, nil, request_hash)
                      end
-            Rack::Response.new(Oj.dump(result, symbol_keys: false), 200, 'Content-Type' => 'application/json').finish
+            Rack::Response.new(Oj.dump(result, mode: :rails), 200, 'Content-Type' => 'application/json').finish
           end
         else
           @app.call(env)

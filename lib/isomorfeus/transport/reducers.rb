@@ -10,17 +10,17 @@ module Isomorfeus
           case action[:type]
           when 'TRANSPORT_REQUEST'
             new_state = {}.merge!(prev_state)
-            new_state[:request_count] = prev_state[:request_count] + 1
-            new_state[:requests].merge!(action[:agent_id] => action[:request])
-            new_state[:agents]
+            unless new_state[:request_count]
+              new_state[:request_count] = 0
+              new_state[:requests] = {}
+            end
+            new_state[:request_count] = new_state[:request_count] + 1
+            new_state[:requests].merge!(action[:request])
             new_state
           when 'TRANSPORT_RESPONSE'
             new_state = {}.merge!(prev_state)
-            new_state[:request_count] = prev_state[:request_count] - 1
-            new_state[:requests].delete!(action[:response][:agent_id])
-          when 'INIT'
-            new_state = { request_count: 0, requests: {}}
-            new_state
+            new_state[:request_count] = new_state[:request_count] - 1
+            new_state[:requests].delete!(action[:response].keys.first)
           else
             prev_state
           end
