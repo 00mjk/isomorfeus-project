@@ -30,10 +30,7 @@ module Isomorfeus
       path.inject(request) do |memo, key|
         memo[key] = {}
       end
-
-      agent = Isomorfeus::Transport::RequestAgent.new
-      Isomorfeus.store.dispatch(type: 'TRANSPORT_REQUEST', request: { agent.id => request, agent_id: agent.id })
-      agent.promise
+      Isomorfeus::Transport.promise_send(request)
     end
 
     def self.promise_store(*path, value)
@@ -50,9 +47,7 @@ module Isomorfeus
         end
       end
 
-      agent = Isomorfeus::Transport::RequestAgent.new
-      Isomorfeus.store.dispatch(type: 'TRANSPORT_REQUEST', request: { agent.id => request, agent_id: agent.id })
-      agent.promise
+      Isomorfeus::Transport.promise_send(request)
     end
 
     def self.register_used_store_path(*path)
