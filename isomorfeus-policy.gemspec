@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version      = Isomorfeus::VERSION
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
-  s.homepage     = 'http://isomorfeus.org'
+  s.homepage     = 'http://isomorfeus.com'
   s.summary      = 'Policies for Isomorfeus.'
   s.description  = 'Policies for Isomorfeus.'
 
