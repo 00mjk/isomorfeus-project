@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Ask a question concerning the isomorfeus framework
+about: Ask a question concerning the Isomorfeus framework
 labels: question
 ---
 
