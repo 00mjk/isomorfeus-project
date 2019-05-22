@@ -52,7 +52,7 @@ end
 
 task :ruby_installer_spec do
   pwd = Dir.pwd
-  Dir.chdir(ruby_installer_path)
+  Dir.chdir(path_for('installer'))
   puts `bundle install`
   options = { keep_file_descriptors: false }
   options.define_singleton_method(:keep_file_descriptors?) do
