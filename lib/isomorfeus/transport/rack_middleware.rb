@@ -15,7 +15,8 @@ module Isomorfeus
 
             result = if defined?(Warden::Manager)
                        user = env['warden'].user
-                       if Isomorfeus.transport_middleware_require_user
+                       # TODO check, maybe transport_middleware_require_user can be a proc?
+                       if Isomorfeus.transport_middleware_requires_user
                          return @app.call(env) unless user
                        end
                        process_request(env['rack.session'].id, user, request_hash)

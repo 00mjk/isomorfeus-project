@@ -1,4 +1,4 @@
-module Isomorfeus
+  module Isomorfeus
   module Transport
     # HTTP is used to perform a `XMLHttpRequest` in ruby. It is a simple wrapper
     # around `XMLHttpRequest`
@@ -249,12 +249,10 @@ module Isomorfeus
         "#<HTTP @url=#{@url} @method=#{@method}>"
       end
 
-      # meant for isomorfeus-resource
       def self.send_request(data)
         post(Isomorfeus.api_path + "?timestamp=#{`Date.now() + Math.random()`}", payload: data).then do |response|
-          `Opal.Isomorfeus.store.native.dispatch(Object.assign(#{response.json}, { type: 'TRANSPORT_RESPONSE' }))`
+          Isomorfeus::Transport::Processor.process(response.json)
         end
-        nil
       end
 
       private

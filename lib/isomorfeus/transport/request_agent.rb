@@ -15,11 +15,13 @@ module Isomorfeus
 
       attr_reader :id
       attr_reader :promise
+      attr_reader :request
 
-      def initialize
+      def initialize(request = nil)
         @id = object_id.to_s
         self.class.agents[@id] = self
         @promise = Promise.new
+        @request = request
       end
     end
   end

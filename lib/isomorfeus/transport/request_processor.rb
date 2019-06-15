@@ -2,26 +2,24 @@ module Isomorfeus
   module Transport
     module RequestProcessor
       def process_request(session_id, current_user, request)
-        result = { response: {} }
+        response = { response: { agent_ids: {}} }
 
-        if request.has_key?('request')
-          request['request'].keys.each do |agent_id|
-
-            request['request'][agent_id].keys.each do |key|
+        if request.has_key?('request') && request['request'].has_key?('agent_ids')
+          request['request']['agent_ids'].keys.each do |agent_id|
+            request['request']['agent_ids'][agent_id].keys.each do |key|
               handler = "::#{key.underscore.camelize}Handler".constantize
               if handler
-                result[:response][agent_id] = handler.new.process_request(session_id, current_user, request['request'][agent_id][key])
+                response[:response][:agent_ids][agent_id] = handler.new.process_request(session_id, current_user, request['request']['agent_ids'][agent_id][key], response)
               else
-                result[:response][agent_id] = { error: { key => "No such handler!"}}
+                response[:response][:agent_ids][agent_id] = { error: { key => "No such handler!"}}
               end
             end
-
           end
         else
-          result[:response] = 'No such thing!'
+          response[:response] = 'No such thing!'
         end
 
-        result
+        response
       end
     end
   end
