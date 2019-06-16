@@ -48,12 +48,27 @@ end
 
 task :ruby_specs do
   Rake::Task['ruby_installer_spec'].invoke
+  Rake::Task['ruby_transport_spec'].invoke
 end
 
 task :ruby_installer_spec do
   pwd = Dir.pwd
   Dir.chdir(path_for('installer'))
-  puts `bundle install`
+  system('bundle install')
+  options = { keep_file_descriptors: false }
+  options.define_singleton_method(:keep_file_descriptors?) do
+    false
+  end
+  Bundler::CLI::Exec.new(options, ['rspec']).run
+  Dir.chdir(pwd)
+end
+
+task :ruby_transport_spec do
+  pwd = Dir.pwd
+  Dir.chdir(path_for('transport'))
+  Dir.chdir('test_app')
+  system('yarn install')
+  system('bundle install')
   options = { keep_file_descriptors: false }
   options.define_singleton_method(:keep_file_descriptors?) do
     false
