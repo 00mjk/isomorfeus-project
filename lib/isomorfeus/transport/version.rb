@@ -1,5 +1,5 @@
 module Isomorfeus
   module Transport
-    VERSION = File.read(File.expand_path("../../../../../ISOMORFEUS_VERSION", __dir__)).strip
+    VERSION = '1.0.0.delta6'
   end
 end
