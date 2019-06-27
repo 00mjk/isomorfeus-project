@@ -40,9 +40,14 @@ task default: %w[ruby_specs]
 
 task :build_packages do
   Rake::Task['build_ruby_installer_package'].invoke
+  Rake::Task['build_ruby_transport_package'].invoke
 end
 
 task :build_ruby_installer_package do
+  update_version_and_build_gem_for('installer')
+end
+
+task :build_ruby_transport_package do
   update_version_and_build_gem_for('installer')
 end
 
