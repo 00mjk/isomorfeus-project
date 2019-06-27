@@ -38,6 +38,12 @@ end
 
 task default: %w[ruby_specs]
 
+task :push_ruby_packages do
+  %w[installer transport].each do |mod|
+    system("gem push ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
+  end
+end
+
 task :build_ruby_packages do
   Rake::Task['build_ruby_installer_package'].invoke
   Rake::Task['build_ruby_transport_package'].invoke
@@ -48,7 +54,7 @@ task :build_ruby_installer_package do
 end
 
 task :build_ruby_transport_package do
-  update_version_and_build_gem_for('installer')
+  update_version_and_build_gem_for('transport')
 end
 
 task :ruby_specs do
