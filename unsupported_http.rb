@@ -1,4 +1,4 @@
-  module Isomorfeus
+module Isomorfeus
   module Transport
     # HTTP is used to perform a `XMLHttpRequest` in ruby. It is a simple wrapper
     # around `XMLHttpRequest`
@@ -170,7 +170,7 @@
           }
           xhr.open(this.method.toUpperCase(), this.url);
 
-          var use_csrf = options["$has_key?"]("csrf") ? options["$delete"]("csrf") : true;
+          var use_csrf = options["$key?"]("csrf") ? options["$delete"]("csrf") : true;
           if (use_csrf) {
             var csrf_elements = document.getElementsByName("csrf-token");
             if (csrf_elements.length > 0) {
@@ -181,7 +181,7 @@
           if (payload_to_send !== null && content_type !== null) {
             xhr.setRequestHeader("Content-Type", content_type);
           }
-          if (options["$has_key?"]("headers")) {
+          if (options["$key?"]("headers")) {
             var headers = options['$[]']("headers");
             var keys = headers.$keys();
             var keys_length = keys.length;
@@ -251,7 +251,7 @@
 
       def self.send_request(data)
         post(Isomorfeus.api_path + "?timestamp=#{`Date.now() + Math.random()`}", payload: data).then do |response|
-          Isomorfeus::Transport::Processor.process(response.json)
+          Isomorfeus::Transport::ClientProcessor.process(response.json)
         end
       end
 
