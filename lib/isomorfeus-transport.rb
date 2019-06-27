@@ -1,6 +1,7 @@
 if RUBY_ENGINE == 'opal'
   require 'json'
   require 'isomorfeus/config'
+  require 'isomorfeus/execution_environment'
   require 'isomorfeus/transport/version'
   require 'isomorfeus/transport/config'
   require 'isomorfeus/transport/request_agent'
