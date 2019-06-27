@@ -3,7 +3,15 @@ module LucidChannel
     def self.included(base)
       base.instance_exec do
         def process_message(message)
-          puts "#{self} received: #{message}"
+          if @message_processor
+            @message_processor.call(message)
+          else
+            puts "#{self} received: #{message}, but no processor defined!"
+          end
+        end
+
+        def on_message(&block)
+          @message_processor = block
         end
 
         def send_message(message)

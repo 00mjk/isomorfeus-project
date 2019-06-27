@@ -55,13 +55,37 @@ RSpec.describe 'isomorfeus-transport' do
   end
 
   it 'can unsubscribe from a channel' do
-    result = @doc.await_ruby do
+    sub_result = @doc.await_ruby do
       class TestChannel < LucidChannel::Base
       end
-
+      TestChannel.subscribe
+    end
+    expect(sub_result).to have_key('success')
+    expect(sub_result['success']).to eq('TestChannel')
+    unsub_result = @doc.await_ruby do
       TestChannel.unsubscribe
     end
-    expect(result).to have_key('success')
-    expect(result['success']).to eq('TestChannel')
+    expect(unsub_result).to have_key('success')
+    expect(unsub_result['success']).to eq('TestChannel')
+  end
+
+  it 'can send and receive messages' do
+    @doc.await_ruby do
+      $message = nil
+      class TestChannel < LucidChannel::Base
+        on_message do |message|
+          $message = message
+        end
+      end
+      TestChannel.subscribe
+    end
+    @doc.evaluate_ruby do
+      TestChannel.send_message('cake')
+    end
+    sleep 5
+    result = @doc.evaluate_ruby do
+      $message
+    end
+    expect(result).to eq('cake')
   end
 end
