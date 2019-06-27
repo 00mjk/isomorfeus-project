@@ -38,7 +38,7 @@ end
 
 task default: %w[ruby_specs]
 
-task :build_packages do
+task :build_ruby_packages do
   Rake::Task['build_ruby_installer_package'].invoke
   Rake::Task['build_ruby_transport_package'].invoke
 end
