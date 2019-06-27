@@ -1,6 +1,6 @@
 module Isomorfeus
   module Transport
-    class WebsocketClient
+    class Websocket
       attr_reader :url
 
       if RUBY_ENGINE == 'opal'
@@ -14,14 +14,15 @@ module Isomorfeus
         def initialize(url, protocols = nil)
           @url = url
           @native_websocket = if protocols
-                                `new WebSocket(url, protocols)`
+                                `new Opal.global.WebSocket(url, protocols)`
                               else
-                                `new WebSocket(url)`
+                                `new Opal.global.WebSocket(url)`
                               end
         end
 
         def close
           @native_websocket.JS.close
+          nil
         end
 
         def on_close(&block)
@@ -39,22 +40,17 @@ module Isomorfeus
         def send(data)
           case ready_state
           when OPEN then @native_websocket.JS.send(data)
-          when CONNECTING then _delay { send(data) }
+          when CONNECTING then Isomorfeus::Transport.delay(50) { send(data) }
           when CLOSING then raise SendError.new('Cant send, connection is closing!')
           when CLOSED then raise SendError.new('Cant send, connection is closed!')
           end
         end
-
-        alias send write
+        alias_method :write,  :send
 
         private
 
         def ready_state
           @native_websocket.JS[:readyState]
-        end
-
-        def _delay(&block)
-          `setTimeout(#{block.to_n}, 10)`
         end
       else
         def initialize(url, protocols = nil)
@@ -64,7 +60,6 @@ module Isomorfeus
           port = parsed_url.port
           @socket = TCPSocket.new(host, port)
           @driver = ::WebSocket::Driver.client(self)
-          @driver.on(:message, &method(:internal_on_message))
           @driver.on(:close, &method(:internal_on_close))
 
           @thread = Thread.new do
@@ -104,24 +99,15 @@ module Isomorfeus
         end
 
         def send(data)
-          json = Oj.dump(data, mode: :strict)
-          @driver.text(json)
-        end
-
-        def write(data)
           @socket.write(data)
         end
+        alias_method :write,  :send
 
         private
 
         def internal_on_close(event)
           @on_close_block.call(event)
           @thread.kill
-        end
-
-        def internal_on_message(event)
-          data = Oj.load(event.data, mode: :strict)
-          @on_message_block.call(data)
         end
       end
     end

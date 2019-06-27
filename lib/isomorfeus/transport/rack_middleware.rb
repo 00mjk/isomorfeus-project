@@ -1,30 +1,23 @@
+# frozen_string_literal: true
+
 module Isomorfeus
   module Transport
     class RackMiddleware
-      include Isomorfeus::Transport::RequestProcessor
+      include Isomorfeus::Transport::ServerProcessor
+
+      WS_RESPONSE = [0, {}, []]
 
       def initialize(app)
         @app = app
       end
 
       def call(env)
-        if env['PATH_INFO'] == Isomorfeus.api_path && env['REQUEST_METHOD'] == 'POST'
-          request = Rack::Request.new(env)
-          unless request.body.nil?
-            request_hash = Oj.load(request.body.read, symbol_keys: false)
-
-            result = if defined?(Warden::Manager)
-                       user = env['warden'].user
-                       # TODO check, maybe transport_middleware_require_user can be a proc?
-                       if Isomorfeus.transport_middleware_requires_user
-                         return @app.call(env) unless user
-                       end
-                       process_request(env['rack.session'].id, user, request_hash)
-                     else
-                       process_request(env['rack.session'].id, nil, request_hash)
-                     end
-            Rack::Response.new(Oj.dump(result, mode: :rails), 200, 'Content-Type' => 'application/json').finish
+        if env['PATH_INFO'] == Isomorfeus.api_websocket_path
+          user = defined?(Warden::Manager) ? env['warden'].user : nil
+          if env['rack.upgrade?'] == :websocket
+            env['rack.upgrade'] = Isomorfeus::Transport::ServerSocketProcessor.new(env['rack.session'], user)
           end
+          WS_RESPONSE
         else
           @app.call(env)
         end

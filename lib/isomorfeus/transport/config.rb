@@ -2,17 +2,12 @@ module Isomorfeus
   # available settings
 
   if RUBY_ENGINE == 'opal'
-    add_client_option(:api_path)
-    add_client_option(:client_transport_driver)
-    add_client_option(:transport_notification_channel_prefix, 'isomorfeus-transport-notifications-')
+    add_client_option(:api_websocket_path)
   else
     # defaults
     class << self
-      attr_accessor :api_path
-      attr_accessor :authorization_driver
+      attr_accessor :api_websocket_path
       attr_accessor :middlewares
-      attr_accessor :transport_middleware_requires_user
-      attr_accessor :server_pub_sub_driver
 
       def add_middleware(middleware)
         Isomorfeus.middlewares << middleware unless Isomorfeus.middlewares.include?(middleware)
@@ -40,10 +35,8 @@ module Isomorfeus
         end
       end
     end
-    self.authorization_driver = nil
     self.middlewares = Set.new
-    self.transport_middleware_requires_user = true
   end
 
-  self.api_path = '/isomorfeus/api/endpoint'
+  self.api_websocket_path = '/isomorfeus/api/websocket'
 end
