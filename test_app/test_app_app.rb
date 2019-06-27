@@ -1,5 +1,6 @@
 require_relative 'app_loader'
 require_relative 'owl_init'
+require_relative 'iodine_config'
 
 class TestAppApp < Roda
   extend Isomorfeus::Transport::Middlewares
@@ -9,7 +10,10 @@ class TestAppApp < Roda
   use_isomorfeus_middlewares
   plugin :public, root: 'public'
 
-  def page_content(location)
+  def page_content(env)
+    location = env['REQUEST_PATH']
+    location_host = env['HTTP_HOST']
+    location_scheme = env['rack.url_scheme']
     <<~HTML
       <html>
         <head>
@@ -17,7 +21,7 @@ class TestAppApp < Roda
           #{owl_script_tag 'application.js'}
         </head>
         <body>
-          #{mount_component('TestAppApp', location: location)}
+          #{mount_component('TestAppApp', location: location, location_host: location_host, location_scheme: location_scheme)}
           <div id="test_anchor"></div>
         </body>
       </html>
@@ -42,7 +46,8 @@ class TestAppApp < Roda
           <title>Welcome to TestAppApp</title>
         </head>
         <body>
-          #{mount_component('TestAppApp', location: env['REQUEST_PATH'])}
+          #{mount_component('TestAppApp', location: env['REQUEST_PATH'], location_host: env['HTTP_HOST'],
+                            location_scheme: env['rack.url_scheme'])}
           <div id="test_anchor"></div>
         </body>
       </html>
@@ -50,7 +55,7 @@ class TestAppApp < Roda
     end
 
     r.get do
-      page_content(env['REQUEST_PATH'])
+      page_content(env)
     end
   end
 end

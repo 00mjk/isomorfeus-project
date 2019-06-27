@@ -10,6 +10,8 @@ global.Link = Link;
 global.NavLink = NavLink;
 global.Route = Route;
 global.Switch = Switch;
+import WebSocket from 'ws';
+global.WebSocket = WebSocket;
 // import modules common to browser and server side rendering (ssr)
 // environments from application_common.js
 import './application_common.js';

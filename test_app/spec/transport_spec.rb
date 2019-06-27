@@ -14,21 +14,54 @@ RSpec.describe 'isomorfeus-transport' do
 
   it 'configuration is accessible on the client' do
     result = @doc.evaluate_ruby do
-      Isomorfeus.api_path
+      Isomorfeus.api_websocket_path
     end
-    expect(result).to eq '/isomorfeus/api/endpoint'
-
-    result = @doc.evaluate_ruby do
-      Isomorfeus.transport_notification_channel_prefix
-    end
-    expect(result).to eq 'isomorfeus-transport-notifications-'
+    expect(result).to eq '/isomorfeus/api/websocket'
   end
 
   it 'configuration is accessible on the server' do
-    expect(Isomorfeus.api_path).to eq '/isomorfeus/api/endpoint'
-    expect(Isomorfeus.authorization_driver).to be_nil
-    expect(Isomorfeus.server_pub_sub_driver).to be_nil
-    expect(Isomorfeus.transport_middleware_requires_user).to be true
+    expect(Isomorfeus.api_websocket_path).to eq '/isomorfeus/api/websocket'
     expect(Isomorfeus.middlewares).to include(Isomorfeus::Transport::RackMiddleware)
+  end
+
+  it 'connected during client app boot' do
+    CONNECTING  = 0
+    OPEN        = 1
+    CLOSING     = 2
+    CLOSED      = 3
+    socket_state = nil
+    start = Time.now
+    while socket_state != OPEN do
+      socket_state = @doc.evaluate_ruby do
+        Isomorfeus::Transport.socket.ready_state
+      end
+      if socket_state != OPEN
+        break if Time.now - start > 60
+        sleep 1
+      end
+    end
+    expect(socket_state).to eq(1)
+  end
+
+  it 'can subscribe to a channel' do
+    result = @doc.await_ruby do
+      class TestChannel < LucidChannel::Base
+      end
+
+      TestChannel.subscribe
+    end
+    expect(result).to have_key('success')
+    expect(result['success']).to eq('TestChannel')
+  end
+
+  it 'can unsubscribe from a channel' do
+    result = @doc.await_ruby do
+      class TestChannel < LucidChannel::Base
+      end
+
+      TestChannel.unsubscribe
+    end
+    expect(result).to have_key('success')
+    expect(result['success']).to eq('TestChannel')
   end
 end

@@ -10,11 +10,15 @@ ASSETS_COMPILED ||= system('yarn run production_build')
 
 Isomorfeus::Puppetmaster.download_path = File.join(Dir.pwd, 'download_path_tmp')
 Isomorfeus::Puppetmaster.driver = :chromium
-Isomorfeus::Puppetmaster.server = :puma
+Isomorfeus::Puppetmaster.server = :iodine
 Isomorfeus::Puppetmaster.app = TestAppApp
 Isomorfeus::Puppetmaster.boot_app
 
 RSpec.configure do |config|
   config.include Isomorfeus::Puppetmaster::DSL
-end
 
+  config.after(:suite) do
+    Iodine.stop
+    # sleep 10
+  end
+end
