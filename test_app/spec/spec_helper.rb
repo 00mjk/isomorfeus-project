@@ -19,6 +19,5 @@ RSpec.configure do |config|
 
   config.after(:suite) do
     Iodine.stop
-    # sleep 10
   end
 end
