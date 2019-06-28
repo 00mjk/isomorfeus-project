@@ -70,7 +70,10 @@ task :ruby_installer_spec do
   options.define_singleton_method(:keep_file_descriptors?) do
     false
   end
-  Bundler::CLI::Exec.new(options, ['rspec']).run
+  pid = fork do
+    Bundler::CLI::Exec.new(options, ['rspec']).run
+  end
+  Process.waitpid(pid)
   Dir.chdir(pwd)
 end
 
@@ -84,6 +87,9 @@ task :ruby_transport_spec do
   options.define_singleton_method(:keep_file_descriptors?) do
     false
   end
-  Bundler::CLI::Exec.new(options, ['rspec']).run
+  pid = fork do
+    Bundler::CLI::Exec.new(options, ['rspec']).run
+  end
+  Process.waitpid(pid)
   Dir.chdir(pwd)
 end
