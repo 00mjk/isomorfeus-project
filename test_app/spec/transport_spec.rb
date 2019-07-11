@@ -43,49 +43,100 @@ RSpec.describe 'isomorfeus-transport' do
     expect(socket_state).to eq(1)
   end
 
-  it 'can subscribe to a channel' do
-    result = @doc.await_ruby do
-      class TestChannel < LucidChannel::Base
-      end
-
-      TestChannel.subscribe
-    end
-    expect(result).to have_key('success')
-    expect(result['success']).to eq('TestChannel')
-  end
-
-  it 'can unsubscribe from a channel' do
-    sub_result = @doc.await_ruby do
-      class TestChannel < LucidChannel::Base
-      end
-      TestChannel.subscribe
-    end
-    expect(sub_result).to have_key('success')
-    expect(sub_result['success']).to eq('TestChannel')
-    unsub_result = @doc.await_ruby do
-      TestChannel.unsubscribe
-    end
-    expect(unsub_result).to have_key('success')
-    expect(unsub_result['success']).to eq('TestChannel')
-  end
-
-  it 'can send and receive messages' do
-    @doc.await_ruby do
-      $message = nil
-      class TestChannel < LucidChannel::Base
-        on_message do |message|
-          $message = message
+  context 'simple class name based channel' do
+    it 'can subscribe' do
+      result = @doc.await_ruby do
+        class TestChannel < LucidChannel::Base
         end
+
+        TestChannel.subscribe
       end
-      TestChannel.subscribe
+      expect(result).to have_key('success')
+      expect(result['success']).to eq('TestChannel')
     end
-    @doc.evaluate_ruby do
-      TestChannel.send_message('cake')
+
+    it 'can unsubscribe' do
+      sub_result = @doc.await_ruby do
+        class TestChannel < LucidChannel::Base
+        end
+        TestChannel.subscribe
+      end
+      expect(sub_result).to have_key('success')
+      expect(sub_result['success']).to eq('TestChannel')
+      unsub_result = @doc.await_ruby do
+        TestChannel.unsubscribe
+      end
+      expect(unsub_result).to have_key('success')
+      expect(unsub_result['success']).to eq('TestChannel')
     end
-    sleep 5
-    result = @doc.evaluate_ruby do
-      $message
+
+    it 'can send and receive messages' do
+      @doc.await_ruby do
+        $message = nil
+        class TestChannel < LucidChannel::Base
+          on_message do |message|
+            $message = message
+          end
+        end
+        TestChannel.subscribe
+      end
+      @doc.evaluate_ruby do
+        TestChannel.send_message('cake')
+      end
+      sleep 5
+      result = @doc.evaluate_ruby do
+        $message
+      end
+      expect(result).to eq('cake')
     end
-    expect(result).to eq('cake')
+  end
+
+  context 'custom channel' do
+    it 'can subscribe' do
+      result = @doc.await_ruby do
+        class TestChannel < LucidChannel::Base
+        end
+
+        TestChannel.subscribe('a channel name')
+      end
+      expect(result).to have_key('success')
+      expect(result['success']).to eq('a channel name')
+    end
+
+    it 'can unsubscribe' do
+      sub_result = @doc.await_ruby do
+        class TestChannel < LucidChannel::Base
+        end
+        TestChannel.subscribe('a channel name')
+      end
+      expect(sub_result).to have_key('success')
+      expect(sub_result['success']).to eq('a channel name')
+      unsub_result = @doc.await_ruby do
+        TestChannel.unsubscribe('a channel name')
+      end
+      expect(unsub_result).to have_key('success')
+      expect(unsub_result['success']).to eq('a channel name')
+    end
+
+    it 'can send and receive messages' do
+      @doc.await_ruby do
+        $message = nil
+        class TestChannel < LucidChannel::Base
+          on_message do |channel, message|
+            $channel = channel
+            $message = message
+          end
+        end
+        TestChannel.subscribe('a channel name')
+      end
+      @doc.evaluate_ruby do
+        TestChannel.send_message('a channel name', 'cake')
+      end
+      sleep 5
+      result = @doc.evaluate_ruby do
+        [$channel, $message]
+      end
+      expect(result).to eq(['a channel name', 'cake'])
+    end
   end
 end
