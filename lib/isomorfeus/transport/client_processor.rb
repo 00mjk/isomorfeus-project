@@ -11,7 +11,7 @@ module Isomorfeus
 
       def self.process_notification(notification_hash)
         processor_class = "::#{notification_hash[:notification][:class]}".constantize
-        processor_class.process_message(notification_hash[:notification][:message])
+        processor_class.process_message(notification_hash[:notification][:channel], notification_hash[:notification][:message])
       end
 
       def self.process_response(response_hash)

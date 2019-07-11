@@ -45,7 +45,6 @@ module Isomorfeus
           when CLOSED then raise SendError.new('Cant send, connection is closed!')
           end
         end
-        alias_method :write,  :send
 
         private
 
@@ -101,7 +100,6 @@ module Isomorfeus
         def send(data)
           @socket.write(data)
         end
-        alias_method :write,  :send
 
         private
 
@@ -110,6 +108,8 @@ module Isomorfeus
           @thread.kill
         end
       end
+
+      alias_method :write,  :send
     end
   end
 end

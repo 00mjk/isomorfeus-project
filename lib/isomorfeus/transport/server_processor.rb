@@ -4,6 +4,8 @@ module Isomorfeus
   module Transport
     module ServerProcessor
       def process_request(client, session_id, current_user, request)
+        Thread.current[:isomorfeus_pub_sub_client] = client
+
         response = { response: { agent_ids: {}} }
 
         if request.key?('request') && request['request'].key?('agent_ids')
@@ -18,14 +20,14 @@ module Isomorfeus
             end
           end
         elsif request.key?('notification')
-          if request['notification'].key?('class')
-            client.publish(request['notification']['class'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
+          if request['notification'].key?('channel')
+            client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
           else
             response[:response] = 'No such thing!'
           end
         elsif request.key?('subscribe') && request['subscribe'].key?('agent_ids')
           agent_id = request['subscribe']['agent_ids'].keys.first
-          channel = request['subscribe']['agent_ids'][agent_id]['class']
+          channel = request['subscribe']['agent_ids'][agent_id]['channel']
           if channel
             client.subscribe(channel)
             response[:response][:agent_ids][agent_id] = { success: channel }
@@ -34,7 +36,7 @@ module Isomorfeus
           end
         elsif request.key?('unsubscribe') && request['unsubscribe'].key?('agent_ids')
           agent_id = request['unsubscribe']['agent_ids'].keys.first
-          channel = request['unsubscribe']['agent_ids'][agent_id]['class']
+          channel = request['unsubscribe']['agent_ids'][agent_id]['channel']
           if channel
             client.unsubscribe(channel)
             response[:response][:agent_ids][agent_id] = { success: channel }
