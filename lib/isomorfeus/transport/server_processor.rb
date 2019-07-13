@@ -25,32 +25,44 @@ module Isomorfeus
             end
           end
         elsif request.key?('notification')
-          channel = request['notification']['channel']
-          class_name =  request['notification']['class']
-          if Isomorfeus.valid_channel_class_name?(class_name) && channel
-            client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
-          else
+          begin
+            channel = request['notification']['channel']
+            class_name =  request['notification']['class']
+            if Isomorfeus.valid_channel_class_name?(class_name) && channel
+              client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
+            else
+              response[:response] = 'No such thing!'
+            end
+          rescue
             response[:response] = 'No such thing!'
           end
         elsif request.key?('subscribe') && request['subscribe'].key?('agent_ids')
-          agent_id = request['subscribe']['agent_ids'].keys.first
-          channel = request['subscribe']['agent_ids'][agent_id]['channel']
-          class_name = request['subscribe']['agent_ids'][agent_id]['class']
-          if Isomorfeus.valid_channel_class_name?(class_name) && channel
-            client.subscribe(channel)
-            response[:response][:agent_ids][agent_id] = { success: channel }
-          else
-            response[:response][:agent_ids][agent_id] = { error: "No such thing!"}
+          begin
+            agent_id = request['subscribe']['agent_ids'].keys.first
+            channel = request['subscribe']['agent_ids'][agent_id]['channel']
+            class_name = request['subscribe']['agent_ids'][agent_id]['class']
+            if Isomorfeus.valid_channel_class_name?(class_name) && channel
+              client.subscribe(channel)
+              response[:response][:agent_ids][agent_id] = { success: channel }
+            else
+              response[:response][:agent_ids][agent_id] = { error: "No such thing!"}
+            end
+          rescue
+            response[:response][:agent_ids][agent_id] = { error: { key => 'No such handler!'}}
           end
         elsif request.key?('unsubscribe') && request['unsubscribe'].key?('agent_ids')
-          agent_id = request['unsubscribe']['agent_ids'].keys.first
-          channel = request['unsubscribe']['agent_ids'][agent_id]['channel']
-          class_name = request['unsubscribe']['agent_ids'][agent_id]['class']
-          if Isomorfeus.valid_channel_class_name?(class_name) && channel
-            client.unsubscribe(channel)
-            response[:response][:agent_ids][agent_id] = { success: channel }
-          else
-            response[:response][:agent_ids][agent_id] = { error: 'No such thing!'}
+          begin
+            agent_id = request['unsubscribe']['agent_ids'].keys.first
+            channel = request['unsubscribe']['agent_ids'][agent_id]['channel']
+            class_name = request['unsubscribe']['agent_ids'][agent_id]['class']
+            if Isomorfeus.valid_channel_class_name?(class_name) && channel
+              client.unsubscribe(channel)
+              response[:response][:agent_ids][agent_id] = { success: channel }
+            else
+              response[:response][:agent_ids][agent_id] = { error: 'No such thing!'}
+            end
+          rescue
+            response[:response][:agent_ids][agent_id] = { error: { key => 'No such handler!'}}
           end
         else
           response[:response] = 'No such thing!'
