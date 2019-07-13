@@ -43,7 +43,26 @@ RSpec.describe 'isomorfeus-transport' do
     expect(socket_state).to eq(1)
   end
 
-  it 'registers a channel class a valid channel class name when inherited' do
+  it 'registers a handler class as valid handler class name when inherited' do
+    result = on_server do
+      class TestChannelClassBlaWhateverSuperDuper < LucidHandler::Base
+      end
+      Isomorfeus.valid_handler_class_names
+    end
+    expect(result).to include('TestChannelClassBlaWhateverSuperDuper')
+  end
+
+  it 'registers a handler class as valid handler class name when included' do
+    result = on_server do
+      class WhateverClassAnyThingReallyAnythingBla
+        include LucidHandler::Mixin
+      end
+      Isomorfeus.valid_handler_class_names
+    end
+    expect(result).to include('WhateverClassAnyThingReallyAnythingBla')
+  end
+
+  it 'registers a channel class as valid channel class name when inherited' do
     result = on_server do
       class TestChannelClassBlaWhatever < LucidChannel::Base
       end
@@ -52,7 +71,7 @@ RSpec.describe 'isomorfeus-transport' do
     expect(result).to include('TestChannelClassBlaWhatever')
   end
 
-  it 'registers a channel class a valid channel class name when included' do
+  it 'registers a channel class as valid channel class name when included' do
     result = on_server do
       class WhateverClassAnyThing
         include LucidChannel::Mixin
@@ -61,6 +80,7 @@ RSpec.describe 'isomorfeus-transport' do
     end
     expect(result).to include('WhateverClassAnyThing')
   end
+
   context 'simple class name based channel' do
     it 'can subscribe' do
       on_server do

@@ -12,8 +12,8 @@ module Isomorfeus
           request['request']['agent_ids'].keys.each do |agent_id|
             request['request']['agent_ids'][agent_id].keys.each do |key|
               begin
-                # TODO cache
-                handler = "::#{key.underscore.camelize}Handler".constantize
+                handler_class_name = key.underscore.camelize
+                handler = Isomorfeus.cached_handler_class(handler_class_name) if Isomorfeus.valid_handler_class_name?(handler_class_name)
                 if handler
                   response[:response][:agent_ids][agent_id] = handler.new.process_request(client, session_id, current_user, request['request']['agent_ids'][agent_id][key], response)
                 else

@@ -28,13 +28,14 @@ else
   require 'isomorfeus/transport/server_processor'
   require 'isomorfeus/transport/server_socket_processor'
   require 'isomorfeus/transport/websocket'
-  require 'isomorfeus/handler'
   require 'isomorfeus/transport/rack_middleware'
   require 'isomorfeus/transport/middlewares'
 
   Isomorfeus.add_middleware(Isomorfeus::Transport::RackMiddleware)
   Isomorfeus.valid_channel_class_names
 
+  require 'lucid_handler/mixin'
+  require 'lucid_handler/base'
   require 'lucid_channel/mixin'
   require 'lucid_channel/base'
 

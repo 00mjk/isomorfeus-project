@@ -47,6 +47,29 @@ module Isomorfeus
         class_name = class_name.split('>::').last if class_name.start_with?('#<')
         valid_channel_class_names << class_name
       end
+
+      def valid_handler_class_names
+        @valid_handler_class_names ||= Set.new
+      end
+
+      def valid_handler_class_name?(class_name)
+        valid_handler_class_names.include?(class_name)
+      end
+
+      def add_valid_handler_class(klass)
+        class_name = klass.name
+        class_name = class_name.split('>::').last if class_name.start_with?('#<')
+        valid_handler_class_names << class_name
+      end
+
+      def cached_handler_classes
+        @cached_handler_classes ||= {}
+      end
+
+      def cached_handler_class(class_name)
+        return cached_handler_classes[class_name] if cached_handler_classes.key?(class_name)
+        cached_handler_classes[class_name] = "::#{class_name}".constantize
+      end
     end
     self.middlewares = Set.new
   end
