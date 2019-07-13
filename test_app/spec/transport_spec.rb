@@ -43,8 +43,31 @@ RSpec.describe 'isomorfeus-transport' do
     expect(socket_state).to eq(1)
   end
 
+  it 'registers a channel class a valid channel class name when inherited' do
+    result = on_server do
+      class TestChannelClassBlaWhatever < LucidChannel::Base
+      end
+      Isomorfeus.valid_channel_class_names
+    end
+    expect(result).to include('TestChannelClassBlaWhatever')
+  end
+
+  it 'registers a channel class a valid channel class name when included' do
+    result = on_server do
+      class WhateverClassAnyThing
+        include LucidChannel::Mixin
+      end
+      Isomorfeus.valid_channel_class_names
+    end
+    expect(result).to include('WhateverClassAnyThing')
+  end
   context 'simple class name based channel' do
     it 'can subscribe' do
+      on_server do
+        class TestChannel < LucidChannel::Base
+        end
+      end
+
       result = @doc.await_ruby do
         class TestChannel < LucidChannel::Base
         end
@@ -56,6 +79,11 @@ RSpec.describe 'isomorfeus-transport' do
     end
 
     it 'can unsubscribe' do
+      on_server do
+        class TestChannel < LucidChannel::Base
+        end
+      end
+
       sub_result = @doc.await_ruby do
         class TestChannel < LucidChannel::Base
         end
@@ -71,6 +99,11 @@ RSpec.describe 'isomorfeus-transport' do
     end
 
     it 'can send and receive messages' do
+      on_server do
+        class TestChannel < LucidChannel::Base
+        end
+      end
+
       @doc.await_ruby do
         $message = nil
         class TestChannel < LucidChannel::Base
@@ -93,6 +126,11 @@ RSpec.describe 'isomorfeus-transport' do
 
   context 'custom channel' do
     it 'can subscribe' do
+      on_server do
+        class TestChannel < LucidChannel::Base
+        end
+      end
+
       result = @doc.await_ruby do
         class TestChannel < LucidChannel::Base
         end
@@ -104,6 +142,11 @@ RSpec.describe 'isomorfeus-transport' do
     end
 
     it 'can unsubscribe' do
+      on_server do
+        class TestChannel < LucidChannel::Base
+        end
+      end
+
       sub_result = @doc.await_ruby do
         class TestChannel < LucidChannel::Base
         end
@@ -119,6 +162,11 @@ RSpec.describe 'isomorfeus-transport' do
     end
 
     it 'can send and receive messages' do
+      on_server do
+        class TestChannel < LucidChannel::Base
+        end
+      end
+
       @doc.await_ruby do
         $message = nil
         class TestChannel < LucidChannel::Base

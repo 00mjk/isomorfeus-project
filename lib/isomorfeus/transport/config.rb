@@ -4,7 +4,6 @@ module Isomorfeus
   if RUBY_ENGINE == 'opal'
     add_client_option(:api_websocket_path)
   else
-    # defaults
     class << self
       attr_accessor :api_websocket_path
       attr_accessor :middlewares
@@ -34,9 +33,24 @@ module Isomorfeus
           end
         end
       end
+
+      def valid_channel_class_names
+        @valid_channel_class_names ||= Set.new
+      end
+
+      def valid_channel_class_name?(class_name)
+        valid_channel_class_names.include?(class_name)
+      end
+
+      def add_valid_channel_class(klass)
+        class_name = klass.name
+        class_name = class_name.split('>::').last if class_name.start_with?('#<')
+        valid_channel_class_names << class_name
+      end
     end
     self.middlewares = Set.new
   end
 
+  # defaults
   self.api_websocket_path = '/isomorfeus/api/websocket'
 end

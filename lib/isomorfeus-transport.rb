@@ -30,11 +30,15 @@ else
   require 'isomorfeus/transport/websocket'
   require 'isomorfeus/handler'
   require 'isomorfeus/transport/rack_middleware'
-  Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
-
   require 'isomorfeus/transport/middlewares'
 
   Isomorfeus.add_middleware(Isomorfeus::Transport::RackMiddleware)
+  Isomorfeus.valid_channel_class_names
+
+  require 'lucid_channel/mixin'
+  require 'lucid_channel/base'
+
+  Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
   if Dir.exist?(File.join('app', 'isomorfeus'))
     $LOAD_PATH.unshift(File.expand_path(File.join('app', 'isomorfeus', 'handlers')))

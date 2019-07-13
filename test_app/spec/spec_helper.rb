@@ -8,6 +8,8 @@ require_relative '../test_app_app'
 
 ASSETS_COMPILED ||= system('yarn run production_build')
 
+Iodine.workers = 1 # keep
+
 Isomorfeus::Puppetmaster.download_path = File.join(Dir.pwd, 'download_path_tmp')
 Isomorfeus::Puppetmaster.driver = :chromium
 Isomorfeus::Puppetmaster.server = :iodine
