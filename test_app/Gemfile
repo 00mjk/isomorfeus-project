@@ -13,7 +13,7 @@ gem 'opal-autoloader', '~> 0.0.3'
 
 gem 'isomorfeus-speednode', '~> 0.2.9'
 
-gem 'isomorfeus-redux', '~> 4.0.7'
+gem 'isomorfeus-redux', '~> 4.0.8'
 gem 'isomorfeus-react', '~> 16.8.7'
 gem 'isomorfeus-transport', path: '..'
 
