@@ -18,7 +18,9 @@ module Isomorfeus
         response_hash[:response][:agent_ids].keys.each do |agent_id|
           agent = Isomorfeus::Transport::RequestAgent.get!(agent_id)
           Isomorfeus::Transport.unregister_request_in_progress(agent_id)
-          agent.promise.resolve(agent_response: response_hash[:response][:agent_ids][agent_id], full_response: response_hash)
+          unless agent.promise.realized?
+            agent.promise.resolve(agent_response: response_hash[:response][:agent_ids][agent_id], full_response: response_hash)
+          end
         end
       end
     end
