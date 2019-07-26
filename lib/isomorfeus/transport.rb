@@ -62,6 +62,11 @@ module Isomorfeus
             end
             register_request_in_progress(request, agent.id)
             @socket.send(`JSON.stringify(#{{request: { agent_ids: { agent.id => request }}}.to_n})`)
+            delay(Isomorfeus.on_ssr? ? 8000 : 20000) do
+              unless agent.promise.realized?
+                agent.promise.reject({agent_response: { error: 'Request timeout!' }, full_response: {}})
+              end
+            end
           end
           agent.promise
         end
@@ -112,7 +117,7 @@ module Isomorfeus
         end
 
         def busy?
-          @requests_in_progress.size != 0
+          @requests_in_progress[:requests].size != 0
         end
 
         def requests_in_progress
