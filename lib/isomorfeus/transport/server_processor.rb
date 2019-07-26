@@ -10,17 +10,17 @@ module Isomorfeus
 
         if request.key?('request') && request['request'].key?('agent_ids')
           request['request']['agent_ids'].keys.each do |agent_id|
-            request['request']['agent_ids'][agent_id].keys.each do |key|
+            request['request']['agent_ids'][agent_id].keys.each do |handler_class_name|
               begin
-                handler_class_name = key.underscore.camelize
                 handler = Isomorfeus.cached_handler_class(handler_class_name) if Isomorfeus.valid_handler_class_name?(handler_class_name)
                 if handler
-                  response[:response][:agent_ids][agent_id] = handler.new.process_request(client, session_id, current_user, request['request']['agent_ids'][agent_id][key], response)
+                  result = handler.new.process_request(client, session_id, current_user, request['request']['agent_ids'][agent_id][handler_class_name], response)
+                  response[:response][:agent_ids][agent_id] = result
                 else
-                  response[:response][:agent_ids][agent_id] = { error: { key => 'No such handler!'}}
+                  response[:response][:agent_ids][agent_id] = { error: { handler_class_name => 'No such handler!'}}
                 end
               rescue
-                response[:response][:agent_ids][agent_id] = { error: { key => 'No such handler!'}}
+                response[:response][:agent_ids][agent_id] = { error: { handler_class_name => 'No such handler!'}}
               end
             end
           end
@@ -65,7 +65,7 @@ module Isomorfeus
             response[:response][:agent_ids][agent_id] = { error: { key => 'No such handler!'}}
           end
         else
-          response[:response] = 'No such thing!'
+          response[:response] = { error: 'No such thing!'}
         end
         response
       end
