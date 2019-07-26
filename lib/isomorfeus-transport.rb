@@ -1,3 +1,6 @@
+require 'opal'
+require 'opal-autoloader'
+require 'opal-activesupport'
 if RUBY_ENGINE == 'opal'
   require 'json'
   require 'isomorfeus/config'
@@ -10,6 +13,7 @@ if RUBY_ENGINE == 'opal'
   require 'isomorfeus/transport'
   require 'lucid_channel/mixin'
   require 'lucid_channel/base'
+  Opal::Autoloader.add_load_path('channels')
   Isomorfeus::Transport.init!
 else
   require 'base64'
@@ -41,9 +45,19 @@ else
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
-  if Dir.exist?(File.join('app', 'isomorfeus'))
-    $LOAD_PATH.unshift(File.expand_path(File.join('app', 'isomorfeus', 'handlers')))
-  elsif Dir.exist?(File.join('isomorfeus'))
-    $LOAD_PATH.unshift(File.expand_path(File.join('isomorfeus', 'handlers')))
+  require 'active_support'
+  require 'active_support/dependencies'
+
+  %w[channels handlers].each do |dir|
+    path = if Dir.exist?(File.join('app', 'isomorfeus'))
+             File.expand_path(File.join('app', 'isomorfeus', dir))
+           elsif Dir.exist?(File.join('isomorfeus'))
+             File.expand_path(File.join('isomorfeus', dir))
+           end
+    ActiveSupport::Dependencies.autoload_paths << path if path
+    # we also need to require them all, so classes are registered accordingly
+    Dir.glob("#{path}/**/*.rb").each do |file|
+      require file
+    end
   end
 end
