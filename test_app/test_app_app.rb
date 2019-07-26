@@ -11,7 +11,7 @@ class TestAppApp < Roda
   plugin :public, root: 'public'
 
   def page_content(env)
-    location = env['REQUEST_PATH']
+    location = env['PATH_INFO']
     location_host = env['HTTP_HOST']
     location_scheme = env['rack.url_scheme']
     <<~HTML
@@ -46,7 +46,7 @@ class TestAppApp < Roda
           <title>Welcome to TestAppApp</title>
         </head>
         <body>
-          #{mount_component('TestAppApp', location: env['REQUEST_PATH'], location_host: env['HTTP_HOST'],
+          #{mount_component('TestAppApp', location: env['PATH_INFO'], location_host: env['HTTP_HOST'],
                             location_scheme: env['rack.url_scheme'])}
           <div id="test_anchor"></div>
         </body>
