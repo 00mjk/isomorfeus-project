@@ -14,11 +14,11 @@ Gem::Specification.new do |s|
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']
 
-  s.add_dependency 'activesupport', '~> 5.0'
-  s.add_dependency 'iodine', '~> 0.7.32'
+  s.add_dependency 'activesupport', '~> 5.2'
+  s.add_dependency 'iodine', '~> 0.7.33'
   s.add_dependency 'oj', '>= 3.6'
   s.add_dependency 'opal', '>= 0.11.0'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.8'
-  s.add_dependency 'isomorfeus-react', '~> 16.8.7'
+  s.add_dependency 'isomorfeus-react', '~> 16.8.8'
   s.add_dependency 'websocket-driver', '~> 0.7.0'
 end
