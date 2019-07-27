@@ -9,8 +9,8 @@ module Isomorfeus
         response = { response: { agent_ids: {}} }
 
         if request.key?('request') && request['request'].key?('agent_ids')
-          request['request']['agent_ids'].keys.each do |agent_id|
-            request['request']['agent_ids'][agent_id].keys.each do |handler_class_name|
+          request['request']['agent_ids'].each_key do |agent_id|
+            request['request']['agent_ids'][agent_id].each_key do |handler_class_name|
               begin
                 handler = Isomorfeus.cached_handler_class(handler_class_name) if Isomorfeus.valid_handler_class_name?(handler_class_name)
                 if handler
