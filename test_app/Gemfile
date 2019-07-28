@@ -11,7 +11,7 @@ gem 'opal-activesupport', github: 'janbiedermann/opal-activesupport', branch: 'r
 gem 'opal-webpack-loader', '>= 0.9.2'
 
 gem 'isomorfeus-redux', '~> 4.0.8'
-gem 'isomorfeus-react', '~> 16.8.8'
+gem 'isomorfeus-react', '~> 16.8.9'
 gem 'isomorfeus-transport', path: '..'
 
 group :development do
