@@ -47,6 +47,7 @@ end
 task :build_ruby_packages do
   Rake::Task['build_ruby_installer_package'].invoke
   Rake::Task['build_ruby_transport_package'].invoke
+  Rake::Task['build_ruby_data_package'].invoke
 end
 
 task :build_ruby_installer_package do
@@ -57,9 +58,14 @@ task :build_ruby_transport_package do
   update_version_and_build_gem_for('transport')
 end
 
+task :build_ruby_transport_package do
+  update_version_and_build_gem_for('data')
+end
+
 task :ruby_specs do
   Rake::Task['ruby_installer_spec'].invoke
   Rake::Task['ruby_transport_spec'].invoke
+  Rake::Task['ruby_data_spec'].invoke
 end
 
 task :ruby_installer_spec do
@@ -80,6 +86,23 @@ end
 task :ruby_transport_spec do
   pwd = Dir.pwd
   Dir.chdir(path_for('transport'))
+  Dir.chdir('test_app')
+  system('yarn install')
+  system('bundle install')
+  options = { keep_file_descriptors: false }
+  options.define_singleton_method(:keep_file_descriptors?) do
+    false
+  end
+  pid = fork do
+    Bundler::CLI::Exec.new(options, ['rspec']).run
+  end
+  Process.waitpid(pid)
+  Dir.chdir(pwd)
+end
+
+task :ruby_data_spec do
+  pwd = Dir.pwd
+  Dir.chdir(path_for('data'))
   Dir.chdir('test_app')
   system('yarn install')
   system('bundle install')
