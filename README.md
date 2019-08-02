@@ -1,79 +1,44 @@
 # isomorfeus-operation
 
-## Installation
+there are 3 kinds of Operations:
+- LucidQuickOp
+- LucidOperation
+- LucidLocalOperation
 
-take this from the repo
-then in your shell:
-`$ isomorfeus-operation-installer`
-
-This will create directories and install a default business operations handler in your projects `isomorfeus/handlers` directory or
-`app/isomorfeus/handlers`, depending on your config.
-
-## Usage
-You may modify the installed BusinessHandler, for example enable additional authorization. See the business_handler.rb file.
-Create a business operations class like below, add the business operation class to you config as valid, for security:
-`Isomorfeus.valid_business_class_names = ['earn_money']`
-
-params are used exactly like isomorfeus-react params.
-Place operation in your projects `isomorfeus/operations` directory or
-`app/isomorfeus/operations`, depending on your config.
-
-
-Example Operation:
 ```ruby
-class EarnMoney < Isomorfeus::Business
-  param :user_id
-  param :products
-  param :cc_number
+class MyQuickOp < LucidQuickOp::Base
+  prop :a_prop
 
-  # business speak here:
-  First 'Make sure we have a valid user.'
-  Then 'Check availability of ordered products.'
-  Then 'Get users credit card number.'
-  Finally 'Execute order.'
-
-  # coder speak here:
-  code_for 'Make sure we have a valid user.' do
-    user = Member.find(params.user_id)
-    if user && user.id && user.email != 'joe@evil.com'
-      :user_valid
-    else
-      raise 'Invalid user!'
-    end
-  end
-
-  code_for 'Check availability of ordered products.' do
-    params.products.each do |product|
-      if product
-        :ok
-      else
-        raise 'No such product'
-      end
-    end
-  end
-
-  code_for 'Get users credit card number.' do
-    if params.cc_number
-      :ok
-    else
-      raise 'Scammer alarm!'
-    end
-  end
-
-  code_for 'Execute order.' do
-    # something useful here
-    :final_result
+  op do
+    props.a_prop == 'a_value'
+    # do something
   end
 end
-```
-There also is a `Failed 'Description'` and a `code_for_failed 'Description' { block code here }`.
-There also is a `OneStep 'description` use with `code_for`.
-`First, Then, Finally, OneStep, Failed` all also accept a block.
 
-Execute like:
-```ruby
-params = { user_id: 1, products: [], cc_number: '123456' }
-EarnMoney.run(params).then { |result| puts result } # local run, result is returned
-EarnMoney.run_on_server(params).then { |result| puts result } # remote run on  server, result is returned
-EarnMoney.run_on_client(session_id, params) # remote run on client, run for side effects, result is currently not returned
+MyQuickOp.promise_run(a_prop: 'a_value')
 ```
+
+Quick remote procedure call, always executed on the server.
+LucidOperation too is always executed on the Server. It allows to define Operations in gherkin human language style:
+```
+class MyOperation < LucidOperation::Base
+  prop :a_prop
+
+  procedure <<~TEXT
+     Given a bird
+     When it flies
+     Then be happy
+  TEXT
+
+  Given /a bird/ do
+     props.a_prop == 'a_value'
+  end
+
+  # etc ...
+end
+
+MyOperation.promise_run(a_prop: 'a_value')
+```
+
+LucidLocalOperation is the same as LucidOperation, except its always executed locally, wherever that may be.
+Its barely tested so far and no other docs.
