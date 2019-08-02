@@ -13,8 +13,25 @@ module Isomorfeus
                   begin
                     props = Oj.load(props_json, mode: :strict)
                     props.merge!({pub_sub_client: pub_sub_client, session_id: session_id, current_user: current_user})
-                    operation_result = operation_class.run(props)
-                    result = { success: 'ok' , result: operation_result}
+                    operation_promise = operation_class.run(props)
+                    operation_result = nil
+                    operation_promise = operation_promise.then do |result|
+                      operation_result = result
+                    end
+                    start = Time.now
+                    timeout = false
+                    while !operation_promise.realized?
+                      if (Time.now - start) > 20
+                        timeout = true
+                        break
+                      end
+                      sleep 0.01
+                    end
+                    if timeout
+                      result = { error: 'Timeout' }
+                    else
+                      result = { success: 'ok' , result: operation_result}
+                    end
                   rescue Exception => e
                     result = if Isomorfeus.production?
                                { error: { operation_class_name => 'No such thing!' }}
