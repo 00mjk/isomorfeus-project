@@ -1,87 +1,131 @@
 module LucidOperation
   module Mixin
     def self.included(base)
-      base.include(Isomorfeus::Params::InstanceMethods)
-      base.extend(Isomorfeus::Params::ClassMethods)
-      base.extend(Isomorfeus::Operation::ClassMethods)
-    end
-
-    attr_accessor :props
-
-    def initialize(*params)
-      @on_fail_track = false
-      @props = self.class.validator.default_props
-      errors = if params.any?
-                 self.class.validator.validate(*params)
-               else
-                 self.class.validator.validate({})
-               end
-      raise errors.join("\n") if errors.any?
-      @props.merge!(*params) if params.any?
-      @last_result = Promise.new.resolve(@props)
-    end
-
-    def run!
       if RUBY_ENGINE == 'opal'
-        _opal_run!
+        base.instance_exec do
+          def procedure(gherkin_text)
+          end
+
+          def steps
+          end
+          alias :gherkin :steps
+          alias :ensure_steps :steps
+          alias :failure_steps :steps
+          alias :Given :steps
+          alias :And :steps
+          alias :Then :steps
+          alias :When :steps
+          alias :Ensure :steps
+          alias :Failed :steps
+          alias :If_failing :steps
+          alias :When_failing :steps
+          alias :If_this_failed :steps
+          alias :If_that_failed :steps
+
+          def First(regular_expression, &block)
+            raise "#{self}: First already defined, can only be defined once!" if @first_defined
+            @first_defined = true
+          end
+
+          def Finally(regular_expression, &block)
+            raise "#{self}: Finally already defined, can only be defined once!" if @finally_defined
+            @finally_defined = true
+          end
+        end
       else
-        _ruby_run!
+        Isomorfeus.add_valid_operation_class(base) unless base == LucidOperation::Base
+        base.extend(Isomorfeus::Operation::Mixin)
       end
-    end
 
-    private
+      base.extend(Isomorfeus::Data::PropDeclaration)
 
-    if RUBY_ENGINE == 'opal'
-      def _opal_run!
-        # TODO do setTimeout here
-        # TODO or/and support webworkers
-        _common_run!
-      end
-    else
-      def _ruby_run!
-        # TODO do eventmachine delay here
-        _common_run!
-      end
-    end
-
-    def _common_run!
-      # TODO make this properly work with promises as results of each step
-      promise = Promise.new
-      self.class._pipe.each do |step|
-        @last_result = @last_result.then do |*args|
-          _run_step(step, *args)
-        end.fail do |*args|
-          @on_fail_track = true
-          _run_step(step, *args)
+      if RUBY_ENGINE == 'opal'
+        base.instance_exec do
+          def promise_run(props_hash)
+            validate_props(props_hash)
+            props_json = Isomorfeus::Data::Props.new(props_hash).to_json
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json)
+          end
         end
-      end
-      @last_result.then do |*args|
-        if @on_fail_track
-          promise.reject(args)
-        else
-          promise.resolve(args)
+      else
+        base.instance_exec do
+          def promise_run(props_hash)
+            validate_props(props_hash)
+            self.new(props_hash).promise_run
+          end
         end
-      end.fail do |*args|
-        promise.reject(args)
-      end
-      promise
-    end
 
-    def _run_step(step, *args)
-      block = if @on_fail_track
-                step[1]
-              else
-                step[0]
+        attr_accessor :props
+        attr_accessor :step_result
+
+        def initialize(validated_props_hash)
+          @props = Isomorfeus::Data::Props.new(validated_props_hash)
+        end
+
+        def promise_run
+          promise = Promise.new
+          operation = self
+
+          # steps
+          self.class.gherkin[:steps].each do |gherkin_step|
+            matched = false
+            self.class.steps.each do |step|
+              # step[0] -> regular_expression
+              # step[1] -> block
+              match_data = gherkin_step.match(step[0])
+              if match_data
+                matched = true
+                promise.then do |result|
+                  operation.step_result = result
+                  operation.instance_exec(step[1].call(*match_data))
+                end
               end
+            end
+            raise "No match found for step #{gherkin_step}!" unless matched
+          end
 
-      if block
-        if block.arity.zero?
-          instance_exec(&block)
-        else
-          instance_exec(*args, &block)
+          # fail track
+          self.class.gherkin[:failure].each do |gherkin_step|
+            matched = false
+            self.class.failure_steps.each do |step|
+              # step[0] -> regular_expression
+              # step[1] -> block
+              match_data = gherkin_step.match(step[0])
+              if match_data
+                matched = true
+                promise.fail do |result|
+                  operation.step_result = result
+                  operation.instance_exec(step[1].call(*match_data))
+                end
+              end
+            end
+            raise "No match found for failure step #{gherkin_step}!" unless matched
+          end
+
+          # ensure
+          self.class.gherkin[:ensure].each do |gherkin_step|
+            matched = false
+            self.class.ensure_steps.each do |step|
+              # step[0] -> regular_expression
+              # step[1] -> block
+              match_data = gherkin_step.match(step[0])
+              if match_data
+                matched = true
+
+                promise.then do |result|
+                  operation.step_result = result
+                  operation.instance_exec(step[1].call(*match_data))
+                end.fail do |result|
+                  operation.step_result = result
+                  operation.instance_exec(step[1].call(*match_data))
+                end
+              end
+            end
+            raise "No match found for ensure step #{gherkin_step}!" unless matched
+          end
+
+          promise.resolve(true)
         end
-      else
-        args
       end
     end
   end

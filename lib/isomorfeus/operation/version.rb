@@ -1,5 +1,5 @@
 module Isomorfeus
-  class Operation
-    VERSION = File.read(File.expand_path("../../../../../ISOMORFEUS_VERSION", __dir__)).strip
+  module Operation
+    VERSION = '1.0.0.delta9'
   end
 end

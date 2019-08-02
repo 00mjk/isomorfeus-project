@@ -1,6 +1,6 @@
-module LucidOperation
+module LucidQuickOp
   class Base
-    include LucidOperation::Mixin
+    include LucidQuickOp::Mixin
 
     if RUBY_ENGINE != 'opal'
       def self.inherited(base)
