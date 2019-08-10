@@ -26,6 +26,7 @@ if RUBY_ENGINE == 'opal'
   Isomorfeus::Data::Reducer.add_reducer_to_store
   Opal::Autoloader.add_load_path('data')
 else
+  require 'oj'
   require 'active_support'
   require 'active_support/core_ext/hash'
   require 'isomorfeus/data/handler/array_load_handler'
@@ -37,12 +38,9 @@ else
 
   require 'active_support/dependencies'
 
-  path = if Dir.exist?(File.join('app', 'isomorfeus'))
-           File.expand_path(File.join('app', 'isomorfeus', 'data'))
-         elsif Dir.exist?(File.join('isomorfeus'))
-           File.expand_path(File.join('isomorfeus', 'data'))
-         end
-  ActiveSupport::Dependencies.autoload_paths << path if path
+  path = File.expand_path(File.join('isomorfeus', 'data'))
+
+  ActiveSupport::Dependencies.autoload_paths << path
   # we also need to require them all, so classes are registered accordingly
   Dir.glob("#{path}/**/*.rb").each do |file|
     require file
