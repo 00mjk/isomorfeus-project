@@ -2,7 +2,7 @@ module Isomorfeus
   module Data
     module Reducer
       def self.add_reducer_to_store
-        record_reducer = Redux.create_reducer do |prev_state, action|
+        data_reducer = Redux.create_reducer do |prev_state, action|
           action_type = action[:type]
           if action_type.JS.startsWith('DATA_')
             case action_type
@@ -22,7 +22,7 @@ module Isomorfeus
           end
         end
 
-        Redux::Store.add_reducers(data_state: record_reducer)
+        Redux::Store.add_reducers(data_state: data_reducer)
       end
     end
   end
