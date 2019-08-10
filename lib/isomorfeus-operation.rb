@@ -23,12 +23,9 @@ else
 
   require 'active_support/dependencies'
 
-  path = if Dir.exist?(File.join('app', 'isomorfeus'))
-           File.expand_path(File.join('app', 'isomorfeus', 'operations'))
-         elsif Dir.exist?(File.join('isomorfeus'))
-           File.expand_path(File.join('isomorfeus', 'operations'))
-         end
-  ActiveSupport::Dependencies.autoload_paths << path if path
+  path = File.expand_path(File.join('isomorfeus', 'operations'))
+
+  ActiveSupport::Dependencies.autoload_paths << path
   # we also need to require them all, so classes are registered accordingly
   Dir.glob("#{path}/**/*.rb").each do |file|
     require file
