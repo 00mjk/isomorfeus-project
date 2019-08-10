@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'iodine', '~> 0.7.33'
   s.add_dependency 'oj', '>= 3.6'
   s.add_dependency 'opal', '>= 0.11.0'
-  s.add_dependency 'isomorfeus-redux', '~> 4.0.8'
-  s.add_dependency 'isomorfeus-react', '~> 16.8.9'
+  s.add_dependency 'isomorfeus-redux', '~> 4.0.9'
+  s.add_dependency 'isomorfeus-react', '>= 16.9.0'
   s.add_dependency 'websocket-driver', '~> 0.7.0'
 end
