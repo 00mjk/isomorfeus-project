@@ -2,8 +2,8 @@ module Isomorfeus
   module Operation
     module Mixin
       def procedure(gherkin_text)
-        feature_line = gherkin_text.include?('Operation: ') ? '' : "Operation: #{base.name}\n"
-        scenario_line = feature_line == '' || gherkin_text.include?('Procedure: ') ? '' : "  Procedure: #{base.name} executing"
+        feature_line = gherkin_text.include?('Operation: ') ? '' : "Operation: #{self.name}\n"
+        scenario_line = feature_line == '' || gherkin_text.include?('Procedure: ') ? '' : "  Procedure: #{self.name} executing\n"
         @procedure = feature_line + scenario_line + gherkin_text
       end
 
