@@ -22,7 +22,8 @@ module Isomorfeus
           end
         end
 
-        Redux::Store.add_reducers(data_state: data_reducer)
+        Redux::Store.preloaded_state_merge!(data_state: {})
+        Redux::Store.add_reducer(data_state: data_reducer)
       end
     end
   end
