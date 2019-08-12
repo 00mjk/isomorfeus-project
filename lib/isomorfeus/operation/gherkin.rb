@@ -16,7 +16,7 @@ module Isomorfeus
       ENSURE = /^\s*Ensure (.*)$/
       FINALLY = /^\s*Finally (.*)$/
       IW_FAILING = /^\s*(?:When|If) failing (.*)$/
-      IF_ITT_FAILED = /^\s*If (?:that|this) failed (.*)$/
+      IF_ITT_FAILED = /^\s*If (?:that|this|it) failed (.*)$/
       FAILED = /^\s*Failed (.*)$/
       COMMENT = /^\s*# (.*)$/
       WHITE_SPACE = /^\s*$/
