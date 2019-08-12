@@ -1,6 +1,7 @@
 require 'opal'
 require 'opal-autoloader'
 require 'opal-activesupport'
+require 'isomorfeus-react'
 if RUBY_ENGINE == 'opal'
   require 'json'
   require 'isomorfeus/config'
@@ -14,7 +15,7 @@ if RUBY_ENGINE == 'opal'
   require 'lucid_channel/mixin'
   require 'lucid_channel/base'
   Opal::Autoloader.add_load_path('channels')
-  Isomorfeus::Transport.init!
+  Isomorfeus.add_client_init_class_name('Isomorfeus::Transport')
 else
   require 'base64'
   require 'digest'
