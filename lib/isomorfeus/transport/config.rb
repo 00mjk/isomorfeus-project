@@ -2,7 +2,12 @@ module Isomorfeus
   # available settings
 
   if RUBY_ENGINE == 'opal'
+    def self.add_transport_init_class_name(init_class_name)
+      transport_init_class_names << init_class_name
+    end
+
     add_client_option(:api_websocket_path)
+    add_client_option(:transport_init_class_names, [])
   else
     class << self
       attr_accessor :api_websocket_path

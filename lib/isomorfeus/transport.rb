@@ -8,14 +8,19 @@ module Isomorfeus
           `setTimeout(#{block.to_n}, ms)`
         end
 
-        def init!
+        def init
           @requests_in_progress = { requests: {}, agent_ids: {} }
           @socket = nil
-          connect if Isomorfeus.on_browser?
+          promise_connect if Isomorfeus.on_browser?
+          true
         end
 
-        def connect
-          return if @socket && @socket.ready_state < 2
+        def promise_connect
+          promise = Promise.new
+          if @socket && @socket.ready_state < 2
+            promise.resolve(true)
+            return promise
+          end
           if Isomorfeus.on_browser?
             window_protocol = `window.location.protocol`
             ws_protocol = window_protocol == 'https:' ? 'wss:' : 'ws:'
@@ -34,7 +39,19 @@ module Isomorfeus
             json_hash = `Opal.Hash.$new(JSON.parse(event.data))`
             Isomorfeus::Transport::ClientProcessor.process(json_hash)
           end
-          true
+          @socket.on_open do |event|
+            init_promises = []
+            Isomorfeus.transport_init_class_names.each do |constant|
+              result = constant.constantize.send(:init)
+              init_promises << result if result.class == Promise
+            end
+            if init_promises.size > 0
+              Promise.when(*init_promises).then { promise.resolve(true) }
+            else
+              promise.resolve(true)
+            end
+          end
+          promise
         end
 
         def disconnect
@@ -44,8 +61,15 @@ module Isomorfeus
 
         def promise_send_path(*path, &block)
           request = {}
-          path.inject(request) do |memo, key|
-            memo[key] = {}
+          inject_path = path[0...-1]
+          last_inject_path_el = inject_path.last
+          last_path_el = path.last
+          inject_path.inject(request) do |memo, key|
+            if key == last_inject_path_el
+              memo[key] = last_path_el
+            else
+              memo[key] = {}
+            end
           end
           Isomorfeus::Transport.promise_send_request(request, &block)
         end
