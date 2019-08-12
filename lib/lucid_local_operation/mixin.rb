@@ -25,6 +25,7 @@ module LucidLocalOperation
 
     def promise_run
       promise = Promise.new
+      original_promise = promise
       operation = self
 
       # steps
@@ -36,9 +37,9 @@ module LucidLocalOperation
           match_data = gherkin_step.match(step[0])
           if match_data
             matched = true
-            promise.then do |result|
+            promise = promise.then do |result|
               operation.step_result = result
-              operation.instance_exec(step[1].call(*match_data))
+              operation.instance_exec(*match_data, step[1])
             end
           end
         end
@@ -54,9 +55,9 @@ module LucidLocalOperation
           match_data = gherkin_step.match(step[0])
           if match_data
             matched = true
-            promise.fail do |result|
+            promise = promise.fail do |result|
               operation.step_result = result
-              operation.instance_exec(step[1].call(*match_data))
+              operation.instance_exec(*match_data, step[1])
             end
           end
         end
@@ -73,19 +74,20 @@ module LucidLocalOperation
           if match_data
             matched = true
 
-            promise.then do |result|
+            promise = promise.then do |result|
               operation.step_result = result
-              operation.instance_exec(step[1].call(*match_data))
+              operation.instance_exec(*match_data, step[1])
             end.fail do |result|
               operation.step_result = result
-              operation.instance_exec(step[1].call(*match_data))
+              operation.instance_exec(*match_data, step[1])
             end
           end
         end
         raise "No match found for ensure step #{gherkin_step}!" unless matched
       end
 
-      promise.resolve(true)
+      original_promise.resolve(true)
+      promise
     end
   end
 end

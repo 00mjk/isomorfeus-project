@@ -1,6 +1,8 @@
 module LucidOperation
   module Mixin
     def self.included(base)
+      base.extend(Isomorfeus::Data::PropDeclaration)
+
       if RUBY_ENGINE == 'opal'
         base.instance_exec do
           def procedure(gherkin_text)
@@ -31,23 +33,29 @@ module LucidOperation
             raise "#{self}: Finally already defined, can only be defined once!" if @finally_defined
             @finally_defined = true
           end
+
+          def promise_run(props_hash)
+            validate_props(props_hash)
+            props_json = Isomorfeus::Data::Props.new(props_hash).to_json
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |response|
+              if response[:agent_response].key?(:error)
+                `console.error(#{response[:agent_response][:error].to_n})`
+                raise response[:agent_response][:error]
+              end
+              response[:agent_response][:result]
+            end
+          end
         end
       else
         Isomorfeus.add_valid_operation_class(base) unless base == LucidOperation::Base
         base.extend(Isomorfeus::Operation::Mixin)
-      end
 
-      base.extend(Isomorfeus::Data::PropDeclaration)
-
-      if RUBY_ENGINE == 'opal'
-        base.instance_exec do
-          def promise_run(props_hash)
-            validate_props(props_hash)
-            props_json = Isomorfeus::Data::Props.new(props_hash).to_json
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json)
-          end
+        unless base == LucidOperation::Base
+          base.prop :pub_sub_client, default: nil
+          base.prop :session_id, default: nil
+          base.prop :current_user, default: nil
         end
-      else
+
         base.instance_exec do
           def promise_run(props_hash)
             validate_props(props_hash)
@@ -64,6 +72,7 @@ module LucidOperation
 
         def promise_run
           promise = Promise.new
+          original_promise = promise
           operation = self
 
           # steps
@@ -75,9 +84,9 @@ module LucidOperation
               match_data = gherkin_step.match(step[0])
               if match_data
                 matched = true
-                promise.then do |result|
+                promise = promise.then do |result|
                   operation.step_result = result
-                  operation.instance_exec(step[1].call(*match_data))
+                  operation.instance_exec(*match_data, &step[1])
                 end
               end
             end
@@ -93,9 +102,9 @@ module LucidOperation
               match_data = gherkin_step.match(step[0])
               if match_data
                 matched = true
-                promise.fail do |result|
+                promise = promise.fail do |result|
                   operation.step_result = result
-                  operation.instance_exec(step[1].call(*match_data))
+                  operation.instance_exec(*match_data, &step[1])
                 end
               end
             end
@@ -112,19 +121,20 @@ module LucidOperation
               if match_data
                 matched = true
 
-                promise.then do |result|
+                promise = promise.then do |result|
                   operation.step_result = result
-                  operation.instance_exec(step[1].call(*match_data))
+                  operation.instance_exec(*match_data, &step[1])
                 end.fail do |result|
                   operation.step_result = result
-                  operation.instance_exec(step[1].call(*match_data))
+                  operation.instance_exec(*match_data, &step[1])
                 end
               end
             end
             raise "No match found for ensure step #{gherkin_step}!" unless matched
           end
 
-          promise.resolve(true)
+          original_promise.resolve
+          promise
         end
       end
     end
