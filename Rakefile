@@ -4,6 +4,45 @@ require 'bundler/cli/exec'
 VERSION = File.read('ISOMORFEUS_VERSION').chop
 puts "VERSION #{VERSION}"
 
+JS_PRODUCTION_PACKAGES = %w[
+      opal-webpack-loader
+      react
+      react-dom
+      react-router
+      react-router-dom
+      redux
+      ws
+    ]
+
+JS_DEVELOPMENT_PACKAGES = %w[
+      cache-loader
+      chokidar
+      compression-webpack-plugin
+      css-loader
+      extra-watch-webpack-plugin
+      file-loader
+      jsdom
+      node-sass
+      parallel-webpack
+      puppeteer
+      sass-loader
+      style-loader
+      terser-webpack-plugin
+      webpack
+      webpack-assets-manifest
+      webpack-cli
+      webpack-dev-server
+    ]
+
+JS_PACKAGE_JSON_DIRS = %w[
+  example-apps/basic
+  example-apps/all_component_types
+  isomorfeus-data/test_app
+  isomorfeus-i18n/test_app
+  isomorfeus-operation/test_app
+  isomorfeus-transport/test_app
+]
+
 def build_gem_for(isomorfeus_module)
   `gem build isomorfeus-#{isomorfeus_module}.gemspec`
 end
@@ -161,4 +200,18 @@ task :ruby_transport_spec do
   end
   Process.waitpid(pid)
   Dir.chdir(pwd)
+end
+
+task :update_js_packages do
+  pwd = File.expand_path(Dir.pwd)
+  JS_PACKAGE_JSON_DIRS.each do |dir|
+    Dir.chdir("ruby/#{dir}")
+    JS_PRODUCTION_PACKAGES.each do |package|
+      system("yarn add #{package}")
+    end
+    JS_DEVELOPMENT_PACKAGES.each do |package|
+      system("yarn add #{package} --dev")
+    end
+    Dir.chdir(pwd)
+  end
 end
