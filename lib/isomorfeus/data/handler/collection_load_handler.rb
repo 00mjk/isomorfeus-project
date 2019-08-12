@@ -9,24 +9,23 @@ module Isomorfeus
             if Isomorfeus.valid_collection_class_name?(collection_class_name)
               collection_class = Isomorfeus.cached_collection_class(collection_class_name)
               if collection_class
-                request[collection_class_name].each_key do |props_json|
-                  begin
-                    props = Oj.load(props_json, mode: :strict)
-                    props.merge!({pub_sub_client: pub_sub_client, session_id: session_id, current_user: current_user})
-                    collection = collection_class.load(props)
-                    collection.instance_exec do
-                      collection_class.on_load_block.call(pub_sub_client, session_id, current_user) if collection_class.on_load_block
-                    end
-                    response.deep_merge!(data: collection.to_transport)
-                    response.deep_merge!(data: collection.included_items_to_transport)
-                    result = { success: 'ok' }
-                  rescue Exception => e
-                    result = if Isomorfeus.production?
-                               { error: { collection_class_name => 'No such thing!' }}
-                             else
-                               { error: { collection_class_name => e.message }}
-                             end
+                props_json = request[collection_class_name]
+                begin
+                  props = Oj.load(props_json, mode: :strict)
+                  props.merge!({pub_sub_client: pub_sub_client, session_id: session_id, current_user: current_user})
+                  collection = collection_class.load(props)
+                  collection.instance_exec do
+                    collection_class.on_load_block.call(pub_sub_client, session_id, current_user) if collection_class.on_load_block
                   end
+                  response.deep_merge!(data: collection.to_transport)
+                  response.deep_merge!(data: collection.included_items_to_transport)
+                  result = { success: 'ok' }
+                rescue Exception => e
+                  result = if Isomorfeus.production?
+                             { error: { collection_class_name => 'No such thing!' }}
+                           else
+                             { error: { collection_class_name => "Isomorfeus::Data::Handler::CollectionLoadHandler: #{e.message}" }}
+                           end
                 end
               else
                 result = { error: { collection_class_name => 'No such thing!' }}
