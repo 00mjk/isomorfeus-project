@@ -37,6 +37,10 @@ module Isomorfeus
           @native_websocket.JS[:onmessage] = `function(event) { block.$call(event); }`
         end
 
+        def on_open(&block)
+          @native_websocket.JS[:onopen] = `function(event) { block.$call(event); }`
+        end
+
         def send(data)
           case ready_state
           when OPEN then @native_websocket.JS.send(data)
