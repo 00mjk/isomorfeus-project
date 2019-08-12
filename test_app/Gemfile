@@ -18,8 +18,8 @@ gem 'isomorfeus-i18n', path: '..'
 
 group :development do
   gem 'auto_reloader'
-  gem 'debase', '0.3.0.beta3'
-  gem 'ruby-debug-ide', '0.8.0.beta3'
+  gem 'debase', '0.2.3.beta5'
+  gem 'ruby-debug-ide', '0.7.0.beta7'
 end
 
 group :test do
