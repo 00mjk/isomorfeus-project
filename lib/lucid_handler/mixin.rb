@@ -6,7 +6,7 @@ module LucidHandler
       base.instance_exec do
         def on_request(&block)
           define_method :process_request do |*args|
-            block.call(*args)
+            instance_exec(*args, &block)
           end
         end
       end
