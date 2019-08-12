@@ -34,9 +34,9 @@ module Isomorfeus
                   end
                 rescue Exception => e
                   result = if Isomorfeus.production?
-                             { error: { operation_class_name => e.message }}
+                             { error: { operation_class_name => 'No such thing!' }}
                            else
-                             { error: { operation_class_name => e.message }}
+                             { error: { operation_class_name => "Isomorfeus::Operation::Handler::OperationHandler: #{e.message}" }}
                            end
                 end
               else
