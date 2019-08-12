@@ -16,11 +16,10 @@ gem 'isomorfeus-transport', path: '../../isomorfeus-transport'
 gem 'isomorfeus-data', path: '../../isomorfeus-data'
 gem 'isomorfeus-i18n', path: '..'
 
-gem 'debase', '0.3.0.beta3'
-gem 'ruby-debug-ide', '0.8.0.beta3'
-
 group :development do
   gem 'auto_reloader'
+  gem 'debase', '0.3.0.beta3'
+  gem 'ruby-debug-ide', '0.8.0.beta3'
 end
 
 group :test do
