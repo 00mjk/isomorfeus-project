@@ -36,7 +36,7 @@ RSpec.describe 'LucidTranslation::Mixin' do
     it 'can translate on class level' do
       result = on_server do
         class TestClass
-          include LucidTranslation::Mixin
+          extend LucidTranslation::Mixin
         end
         TestClass._('simple')
       end
