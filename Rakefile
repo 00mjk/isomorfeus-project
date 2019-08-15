@@ -95,7 +95,7 @@ end
 task default: %w[ruby_specs]
 
 task :push_ruby_packages do
-  %w[data i18n installer operation transport].each do |mod|
+  %w[data i18n installer operation policy transport].each do |mod|
     system("gem push ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
   end
 end
