@@ -54,21 +54,11 @@ RSpec.describe 'LucidTranslation::Mixin' do
     end
   end
 
-  context 'on client' do
+  # context 'on client' do
     # before :each do
     #   @doc = visit('/')
     # end
-
-    # it 'can instantiate by inheritance' do
-    #   result = @doc.evaluate_ruby do
-    #     class TestArray < LucidArray::Base
-    #     end
-    #     coll = TestArray.new
-    #     coll.instance_variable_get(:@class_name)
-    #   end
-    #   expect(result).to eq('TestArray')
-    # end
-  end
+  # end
 
   context 'Server Side Rendering' do
     before do
