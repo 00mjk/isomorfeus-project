@@ -51,6 +51,23 @@ def path_for(isomorfeus_module)
   File.join('ruby', "isomorfeus-#{isomorfeus_module}")
 end
 
+def run_spec_for(isomorfeus_module)
+  pwd = Dir.pwd
+  Dir.chdir(path_for(isomorfeus_module))
+  Dir.chdir('test_app')
+  system('yarn install')
+  system('bundle install')
+  options = { keep_file_descriptors: false }
+  options.define_singleton_method(:keep_file_descriptors?) do
+    false
+  end
+  pid = fork do
+    Bundler::CLI::Exec.new(options, ['rspec']).run
+  end
+  Process.waitpid(pid)
+  Dir.chdir(pwd)
+end
+
 def update_version_and_build_gem_for(isomorfeus_module)
   pwd = Dir.pwd
   Dir.chdir(path_for(isomorfeus_module))
@@ -88,6 +105,7 @@ task :build_ruby_packages do
   Rake::Task['build_ruby_i18n_package'].invoke
   Rake::Task['build_ruby_installer_package'].invoke
   Rake::Task['build_ruby_operation_package'].invoke
+  Rake::Task['build_ruby_policy_package'].invoke
   Rake::Task['build_ruby_transport_package'].invoke
 end
 
@@ -107,6 +125,10 @@ task :build_ruby_operation_package do
   update_version_and_build_gem_for('operation')
 end
 
+task :build_ruby_policy_package do
+  update_version_and_build_gem_for('policy')
+end
+
 task :build_ruby_transport_package do
   update_version_and_build_gem_for('transport')
 end
@@ -116,41 +138,16 @@ task :ruby_specs do
   Rake::Task['ruby_data_spec'].invoke
   Rake::Task['ruby_i18n_spec'].invoke
   Rake::Task['ruby_operation_spec'].invoke
+  Rake::Task['ruby_policy_spec'].invoke
   Rake::Task['ruby_transport_spec'].invoke
 end
 
 task :ruby_data_spec do
-  pwd = Dir.pwd
-  Dir.chdir(path_for('data'))
-  Dir.chdir('test_app')
-  system('yarn install')
-  system('bundle install')
-  options = { keep_file_descriptors: false }
-  options.define_singleton_method(:keep_file_descriptors?) do
-    false
-  end
-  pid = fork do
-    Bundler::CLI::Exec.new(options, ['rspec']).run
-  end
-  Process.waitpid(pid)
-  Dir.chdir(pwd)
+  run_spec_for('data')
 end
 
 task :ruby_i18n_spec do
-  pwd = Dir.pwd
-  Dir.chdir(path_for('i18n'))
-  Dir.chdir('test_app')
-  system('yarn install')
-  system('bundle install')
-  options = { keep_file_descriptors: false }
-  options.define_singleton_method(:keep_file_descriptors?) do
-    false
-  end
-  pid = fork do
-    Bundler::CLI::Exec.new(options, ['rspec']).run
-  end
-  Process.waitpid(pid)
-  Dir.chdir(pwd)
+  run_spec_for('i18n')
 end
 
 task :ruby_installer_spec do
@@ -169,37 +166,15 @@ task :ruby_installer_spec do
 end
 
 task :ruby_operation_spec do
-  pwd = Dir.pwd
-  Dir.chdir(path_for('operation'))
-  Dir.chdir('test_app')
-  system('yarn install')
-  system('bundle install')
-  options = { keep_file_descriptors: false }
-  options.define_singleton_method(:keep_file_descriptors?) do
-    false
-  end
-  pid = fork do
-    Bundler::CLI::Exec.new(options, ['rspec']).run
-  end
-  Process.waitpid(pid)
-  Dir.chdir(pwd)
+  run_spec_for('operation')
+end
+
+task :ruby_policy_spec do
+  run_spec_for('policy')
 end
 
 task :ruby_transport_spec do
-  pwd = Dir.pwd
-  Dir.chdir(path_for('transport'))
-  Dir.chdir('test_app')
-  system('yarn install')
-  system('bundle install')
-  options = { keep_file_descriptors: false }
-  options.define_singleton_method(:keep_file_descriptors?) do
-    false
-  end
-  pid = fork do
-    Bundler::CLI::Exec.new(options, ['rspec']).run
-  end
-  Process.waitpid(pid)
-  Dir.chdir(pwd)
+  run_spec_for('transport')
 end
 
 task :update_js_packages do
