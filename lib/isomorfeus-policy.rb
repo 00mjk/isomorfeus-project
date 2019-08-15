@@ -1,58 +1,24 @@
-require 'opal-activesupport'
-require 'isomorfeus-transport'
+require 'opal'
+require 'isomorfeus-redux'
+require 'isomorfeus-react'
+require 'isomorfeus/policy/config'
+require 'lucid_policy/exception'
+require 'isomorfeus/policy/helper'
+require 'lucid_policy/mixin'
+require 'lucid_policy/base'
 
 if RUBY_ENGINE == 'opal'
-  require 'isomorfeus_policy_processor'
-  # nothing else
+  Opal::Autoloader.add_load_path('policies')
 else
-  require 'active_support'
-  require 'oj'
-  require 'isomorfeus/promise'
-  require 'isomorfeus/policy/class_methods'
-  require 'isomorfeus/policy/instance_methods'
-  require 'isomorfeus/policy/definition'
-  require 'isomorfeus/policy'
-  require 'isomorfeus/policy/driver'
-  require 'isomorfeus/policy/config'
-  require 'isomorfeus/handler/policy_handler'
-
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
-  if Dir.exist?(File.join('app', 'isomorfeus', 'policies'))
-    Opal.append_path(File.expand_path(File.join('app', 'isomorfeus', 'policies')))
-    Opal.append_path(File.expand_path(File.join('app', 'isomorfeus'))) unless Opal.paths.include?(File.expand_path(File.join('app', 'isomorfeus')))
-  elsif Dir.exist?(File.join('isomorfeus', 'models'))
-    Opal.append_path(File.expand_path(File.join('isomorfeus', 'policies')))
-    Opal.append_path(File.expand_path(File.join('isomorfeus'))) unless Opal.paths.include?(File.expand_path(File.join('isomorfeus')))
-  end
+  require 'active_support/dependencies'
 
-  if defined?(Rails)
-    module Isomorfeus
-      module Policy
-        class Railtie < Rails::Railtie
-          def delete_first(a, e)
-            a.delete_at(a.index(e) || a.length)
-          end
+  path = File.expand_path(File.join('isomorfeus', 'policies'))
 
-          config.before_configuration do |_|
-            Rails.configuration.tap do |config|
-              config.eager_load_paths += %W(#{config.root}/app/isomorfeus/policies)
-              delete_first config.eager_load_paths, "#{config.root}/app/isomorfeus"
-
-              unless Rails.env.production?
-                config.autoload_paths += %W(#{config.root}/app/isomorfeus/policies)
-                # rails will add everything immediately below app to eager and auto load, so we need to remove it
-                delete_first config.autoload_paths, "#{config.root}/app/isomorfeus"
-              end
-            end
-          end
-        end
-      end
-    end
-  elsif Dir.exist?(File.join('app', 'isomorfeus'))
-    # TODO unless
-    $LOAD_PATH.unshift(File.expand_path(File.join('app', 'isomorfeus', 'policies')))
-  elsif Dir.exist?(File.join('isomorfeus'))
-    $LOAD_PATH.unshift(File.expand_path(File.join('isomorfeus', 'policies')))
+  ActiveSupport::Dependencies.autoload_paths << path
+  # we also need to require them all, so classes are registered accordingly
+  Dir.glob("#{path}/**/*.rb").each do |file|
+    require file
   end
 end

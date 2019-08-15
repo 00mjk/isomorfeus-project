@@ -1,5 +1,5 @@
 module Isomorfeus
   module Policy
-    VERSION = File.read(File.expand_path("../../../../../ISOMORFEUS_VERSION", __dir__)).strip
+    VERSION = '1.0.0.delta11'
   end
 end
