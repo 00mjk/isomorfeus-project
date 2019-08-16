@@ -217,6 +217,7 @@ RSpec.describe 'LucidPolicy' do
       end
       expect(result).to eq([true, true, true])
     end
+
     it 'can use a policy and refine a rule and allows' do
       result = on_server do
         class UserH
@@ -277,6 +278,43 @@ RSpec.describe 'LucidPolicy' do
         [result_for_class, result_for_a_method, result_for_d_method]
       end
       expect(result).to eq([true, true, false])
+    end
+
+    it 'can use several policies with contradicting conditions' do
+      result = on_server do
+        class UserJ
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldnt have"
+          end
+          def run_allowed
+            true
+          end
+        end
+        class TestClassPolicyJ1 < LucidPolicy::Base
+          policy_for UserJ
+          allow Resource
+          with_condition do |user, resource_class, resource_method|
+            !user.validated?
+          end
+        end
+        class TestClassPolicyJ2 < LucidPolicy::Base
+          policy_for UserJ
+          allow Resource
+          with_condition do |user, resource_class, resource_method|
+            user.validated?
+          end
+        end
+        result_for_class = UserJ.new.authorized?(Resource)
+        result_for_a_method = UserJ.new.authorized?(Resource, :run_allowed)
+        result_for_d_method = UserJ.new.authorized?(Resource, :run_denied)
+        [result_for_class, result_for_a_method, result_for_d_method]
+      end
+      expect(result).to eq([true, true, true])
     end
   end
 
@@ -539,6 +577,43 @@ RSpec.describe 'LucidPolicy' do
         [result_for_class, result_for_a_method, result_for_d_method]
       end
       expect(result).to eq([true, true, false])
+    end
+
+    it 'can use several policies with contradicting conditions' do
+      result = @doc.evaluate_ruby do
+        class UserJ
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldnt have"
+          end
+          def run_allowed
+            true
+          end
+        end
+        class TestClassPolicyJ1 < LucidPolicy::Base
+          policy_for UserJ
+          allow Resource
+          with_condition do |user, resource_class, resource_method|
+            !user.validated?
+          end
+        end
+        class TestClassPolicyJ2 < LucidPolicy::Base
+          policy_for UserJ
+          allow Resource
+          with_condition do |user, resource_class, resource_method|
+            user.validated?
+          end
+        end
+        result_for_class = UserJ.new.authorized?(Resource)
+        result_for_a_method = UserJ.new.authorized?(Resource, :run_allowed)
+        result_for_d_method = UserJ.new.authorized?(Resource, :run_denied)
+        [result_for_class, result_for_a_method, result_for_d_method]
+      end
+      expect(result).to eq([true, true, true])
     end
   end
 
