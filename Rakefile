@@ -42,7 +42,21 @@ JS_PACKAGE_JSON_DIRS = %w[
   isomorfeus-operation/test_app
   isomorfeus-transport/test_app
 ]
-
+GEMFILE_DIRS = %w[
+  example-apps/all_component_types
+  example-apps/basic
+  isomorfeus-data
+  isomorfeus-data/test_app
+  isomorfeus-i18n
+  isomorfeus-i18n/test_app
+  isomorfeus-installer
+  isomorfeus-operation
+  isomorfeus-operation/test_app
+  isomorfeus-policy
+  isomorfeus-policy/test_app
+  isomorfeus-transport
+  isomorfeus-transport/test_app
+]
 def build_gem_for(isomorfeus_module)
   `gem build isomorfeus-#{isomorfeus_module}.gemspec`
 end
@@ -175,6 +189,15 @@ end
 
 task :ruby_transport_spec do
   run_spec_for('transport')
+end
+
+task :update_gems do
+  pwd = File.expand_path(Dir.pwd)
+  GEMFILE_DIRS.each do |dir|
+    Dir.chdir("ruby/#{dir}")
+    system("bundle update")
+    Dir.chdir(pwd)
+  end
 end
 
 task :update_js_packages do
