@@ -18,4 +18,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'opal-autoloader', '~> 0.1.0'
   s.add_dependency 'isomorfeus-react', '>= 16.9.2'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.11'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec', '~> 3.8.0'
 end
