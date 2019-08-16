@@ -93,15 +93,14 @@ module LucidPolicy
 
         def _allow_or_deny(allow_or_deny, *classes_and_methods, &block)
           _raise_policy_first unless @the_class
-          self_s = self.to_s
-
+          rule_hash = @the_class.authorization_rules[self.to_s]
           allow_or_deny_or_block = block_given? ? block : allow_or_deny.to_sym
 
           target_classes = []
           target_methods = []
 
           if classes_and_methods.first == :others
-            @the_class.authorization_rules[self_s][:others] = allow_or_deny_or_block
+            rule_hash[:others] = allow_or_deny_or_block
             return
           end
 
@@ -114,14 +113,14 @@ module LucidPolicy
           end
 
           target_classes.each do |target_class|
-            @the_class.authorization_rules[self_s][:classes][target_class] = {} unless @the_class.authorization_rules[self_s][:classes].key?(target_class)
+            rule_hash[:classes][target_class] = {} unless rule_hash[:classes].key?(target_class)
             if allow_or_deny && target_methods.empty?
-              @the_class.authorization_rules[self_s][:classes][target_class][:default] = allow_or_deny_or_block
+              rule_hash[:classes][target_class][:default] = allow_or_deny_or_block
             else
-              @the_class.authorization_rules[self_s][:classes][target_class][:default] = :deny unless @the_class.authorization_rules[self_s][:classes][target_class].key?(:default)
-              @the_class.authorization_rules[self_s][:classes][target_class][:methods] = {} unless @the_class.authorization_rules[self_s][:classes][target_class].key?(:methods)
+              rule_hash[:classes][target_class][:default] = :deny unless rule_hash[:classes][target_class].key?(:default)
+              rule_hash[:classes][target_class][:methods] = {} unless rule_hash[:classes][target_class].key?(:methods)
               target_methods.each do |target_method|
-                @the_class.authorization_rules[self_s][:classes][target_class][:methods][target_method] = allow_or_deny_or_block
+                rule_hash[:classes][target_class][:methods][target_method] = allow_or_deny_or_block
               end
             end
           end
