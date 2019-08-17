@@ -3,7 +3,7 @@
 module Isomorfeus
   module Transport
     module ServerProcessor
-      def process_request(client, session_id, current_user, request)
+      def process_request(client, current_user, request)
         Thread.current[:isomorfeus_pub_sub_client] = client
 
         response = { response: { agent_ids: {}} }
@@ -14,7 +14,7 @@ module Isomorfeus
               begin
                 handler = Isomorfeus.cached_handler_class(handler_class_name) if Isomorfeus.valid_handler_class_name?(handler_class_name)
                 if handler
-                  result = handler.new.process_request(client, session_id, current_user, request['request']['agent_ids'][agent_id][handler_class_name], response)
+                  result = handler.new.process_request(client, current_user, request['request']['agent_ids'][agent_id][handler_class_name], response)
                   response[:response][:agent_ids][agent_id] = result
                 else
                   response[:response][:agent_ids][agent_id] = { error: { handler_class_name => 'No such handler!'}}

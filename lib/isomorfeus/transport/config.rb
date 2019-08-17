@@ -2,19 +2,18 @@ module Isomorfeus
   # available settings
 
   if RUBY_ENGINE == 'opal'
+    add_client_option(:api_websocket_path)
+    add_client_option(:transport_init_class_names, [])
+
     def self.add_transport_init_class_name(init_class_name)
       transport_init_class_names << init_class_name
     end
-
-    add_client_option(:api_websocket_path)
-    add_client_option(:transport_init_class_names, [])
   else
     class << self
       attr_accessor :api_websocket_path
-      attr_accessor :middlewares
 
       def add_middleware(middleware)
-        Isomorfeus.middlewares << middleware unless Isomorfeus.middlewares.include?(middleware)
+        Isomorfeus.middlewares << middleware
       end
 
       def insert_middleware_after(existing_middleware, new_middleware)
@@ -37,6 +36,10 @@ module Isomorfeus
             Isomorfeus.middlewares << new_middleware
           end
         end
+      end
+
+      def middlewares
+        @middlewares ||= Set.new
       end
 
       def valid_channel_class_names
@@ -75,8 +78,15 @@ module Isomorfeus
         return cached_handler_classes[class_name] if cached_handler_classes.key?(class_name)
         cached_handler_classes[class_name] = "::#{class_name}".constantize
       end
+
+      def valid_user_classes
+        @valid_user_classes ||= Set.new
+      end
+
+      def add_valid_user_class(user_class)
+        valid_user_classes << user_class
+      end
     end
-    self.middlewares = Set.new
   end
 
   # defaults

@@ -2,6 +2,10 @@ require 'opal'
 require 'opal-autoloader'
 require 'opal-activesupport'
 require 'isomorfeus-react'
+require 'isomorfeus-policy'
+require 'anonymous'
+require 'isomorfeus/transport/anonymous_policy'
+require 'lucid_authentication/mixin'
 if RUBY_ENGINE == 'opal'
   require 'json'
   require 'isomorfeus/config'
@@ -33,6 +37,7 @@ else
   require 'isomorfeus/transport/server_processor'
   require 'isomorfeus/transport/server_socket_processor'
   require 'isomorfeus/transport/websocket'
+
   require 'isomorfeus/transport/rack_middleware'
   require 'isomorfeus/transport/middlewares'
 

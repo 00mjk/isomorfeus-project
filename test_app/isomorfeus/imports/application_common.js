@@ -1,4 +1,6 @@
 // import javascript modules common to browser and server side rendering environments
+import * as BCryptJS from 'bcryptjs';
+global.BCryptJS = BCryptJS;
 import * as Redux from 'redux';
 global.Redux = Redux;
 import React from 'react';
