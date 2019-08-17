@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LucidOperation
   module Mixin
     def self.included(base)
