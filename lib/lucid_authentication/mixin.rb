@@ -33,7 +33,7 @@ module LucidAuthentication
 
       def promise_deauthentication_with_isomorfeus
         promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'logout', 'logout').then do |response|
-          response[:agent_response].key?(:success) ? true : raise 'Logout failed!'
+          response[:agent_response].key?(:success) ? true : raise('Logout failed!')
         end
       end
     else
