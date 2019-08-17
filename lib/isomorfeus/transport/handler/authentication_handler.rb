@@ -13,7 +13,7 @@ module Isomorfeus
               tries = pub_sub_client.instance_variable_get(:@isomorfeus_authentication_tries)
               tries = 0 unless tries
               tries += 1
-              sleep(tries * tries) if tries > 3
+              sleep(5) if tries > 3
               pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, tries)
               request['login'].each_key do |user_identifier|
                 user = nil
