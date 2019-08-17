@@ -81,6 +81,7 @@ const browser_config = {
         new WebpackAssetsManifest({ publicPath: true, merge: true }), // generate manifest
         new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false, reportsFilename: 'report.html' })
     ],
+    externals: { crypto: 'Crypto' }
 };
 
 const ssr_config = {
@@ -90,7 +91,7 @@ const ssr_config = {
     },
     plugins: [
         new WebpackAssetsManifest({ publicPath: true, merge: true }) // generate manifest
-    ],
+    ]
 };
 
 const web_worker_config = {
@@ -100,7 +101,7 @@ const web_worker_config = {
     },
     plugins: [
         new WebpackAssetsManifest({ publicPath: true, merge: true }) // generate manifest
-    ],
+    ]
 };
 
 const browser = Object.assign({}, common_config, browser_config);
