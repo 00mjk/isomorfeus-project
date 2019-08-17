@@ -57,6 +57,10 @@ module LucidPolicy
           @the_class.authorization_rules[self.to_s] = { classes: {}, conditions: [], others: :deny }
         end
 
+        def all
+          :others
+        end
+
         def allow(*classes_and_methods)
           _raise_allow_deny_first if @refine_used
           _allow_or_deny(:allow, *classes_and_methods)
