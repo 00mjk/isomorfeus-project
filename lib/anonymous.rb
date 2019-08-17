@@ -1,8 +1,5 @@
 class Anonymous < BasicObject
-  def authenticated?
-    false
-  end
-
+  # policy methods get added by Isomorfeus::Transport::AnonymousPolicy
   def id
     'anonymous'
   end
