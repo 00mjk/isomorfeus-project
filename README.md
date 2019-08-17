@@ -19,6 +19,10 @@ Example Policy:
     deny BlaGraph, SuperOperation
 
     deny others # or: allow others
+   
+    # in a otherwise empty policy the following can be used too: 
+    # allow all
+    # deny all
 
     with_condition do |user_or_role_instance, target_class, target_method, *props|
        role.class == AdminRole
