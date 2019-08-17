@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Isomorfeus
   module Data
     module Handler
@@ -13,12 +15,16 @@ module Isomorfeus
                 begin
                   props = Oj.load(props_json, mode: :strict)
                   props.merge!({pub_sub_client: pub_sub_client, session_id: session_id, current_user: current_user})
-                  hash = hash_class.load(props)
-                  hash.instance_exec do
-                    hash_class.on_load_block.call(pub_sub_client, session_id, current_user) if hash_class.on_load_block
+                  if current_user.authorized?(hash_class, :load, *props)
+                    hash = hash_class.load(props)
+                    hash.instance_exec do
+                      hash_class.on_load_block.call(pub_sub_client, session_id, current_user) if hash_class.on_load_block
+                    end
+                    response.deep_merge!(data: hash.to_transport)
+                    result = { success: 'ok' }
+                  else
+                    result = { error: 'Access denied!' }
                   end
-                  response.deep_merge!(data: hash.to_transport)
-                  result = { success: 'ok' }
                 rescue Exception => e
                   result = if Isomorfeus.production?
                              { error: { hash_class_name => 'No such thing!' }}
