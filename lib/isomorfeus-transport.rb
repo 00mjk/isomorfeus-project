@@ -55,15 +55,13 @@ else
   require 'active_support/dependencies'
 
   %w[channels handlers].each do |dir|
-    path = if Dir.exist?(File.join('app', 'isomorfeus'))
-             File.expand_path(File.join('app', 'isomorfeus', dir))
-           elsif Dir.exist?(File.join('isomorfeus'))
-             File.expand_path(File.join('isomorfeus', dir))
-           end
-    ActiveSupport::Dependencies.autoload_paths << path if path
-    # we also need to require them all, so classes are registered accordingly
-    Dir.glob("#{path}/**/*.rb").each do |file|
-      require file
+    path = Dir.exist?(File.join('isomorfeus')) ? File.expand_path(File.join('isomorfeus', dir)) : nil
+    if path
+      ActiveSupport::Dependencies.autoload_paths << path
+      # we also need to require them all, so classes are registered accordingly
+      Dir.glob("#{path}/**/*.rb").each do |file|
+        require file
+      end
     end
   end
 end
