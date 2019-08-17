@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Isomorfeus
   module I18n
     module Handler
