@@ -16,7 +16,6 @@ JS_PRODUCTION_PACKAGES = %w[
 
 JS_DEVELOPMENT_PACKAGES = %w[
       cache-loader
-      chokidar
       compression-webpack-plugin
       css-loader
       extra-watch-webpack-plugin
@@ -48,7 +47,6 @@ GEMFILE_DIRS = %w[
   isomorfeus-data
   isomorfeus-data/test_app
   isomorfeus-i18n
-  isomorfeus-i18n/test_app
   isomorfeus-installer
   isomorfeus-operation
   isomorfeus-operation/test_app
