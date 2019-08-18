@@ -4,7 +4,7 @@ module Isomorfeus
   module Operation
     module Handler
       class OperationHandler < LucidHandler::Base
-        on_request do |pub_sub_client, session_id, current_user, request, response|
+        on_request do |pub_sub_client, current_user, request, response|
           result = { error: 'No such thing' }
           # promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.to_s, props_hash)
           request.each_key do |operation_class_name|
@@ -14,7 +14,7 @@ module Isomorfeus
                 props_json = request[operation_class_name]
                 begin
                   props = Oj.load(props_json, mode: :strict)
-                  props.merge!({pub_sub_client: pub_sub_client, session_id: session_id, current_user: current_user})
+                  props.merge!({pub_sub_client: pub_sub_client, current_user: current_user})
                   if current_user.authorized?(operation_class, :promise_run, *props)
                     operation_promise = operation_class.promise_run(props)
                     if operation_promise.realized?
