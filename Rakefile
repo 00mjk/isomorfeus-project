@@ -189,7 +189,7 @@ task :ruby_operation_spec do
 end
 
 task :ruby_policy_spec do
-  run_spec_for('policy')
+  run_rake_spec_for('policy')
 end
 
 task :ruby_transport_spec do
