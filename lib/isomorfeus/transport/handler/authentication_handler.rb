@@ -3,11 +3,10 @@ module Isomorfeus
     module Handler
       class AuthenticationHandler < LucidHandler::Base
         TIMEOUT = 30
-        attr_reader env
 
         on_request do |pub_sub_client, current_user, request, _response|
           result = { error: 'Authentication failed' }
-          # promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_identifier, user_password_bcrypt)
+          # promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_identifier, user_password)
           request.each_key do |login_or_logout|
             if login_or_logout == 'login'
               tries = pub_sub_client.instance_variable_get(:@isomorfeus_authentication_tries)
@@ -18,7 +17,7 @@ module Isomorfeus
               request['login'].each_key do |user_identifier|
                 user = nil
                 Isomorfeus.valid_user_classes.each do |user_class|
-                  promise = user_class.promise_login(user_identifier, request[user_identifier])
+                  promise = user_class.promise_login(user_identifier, request['login'][user_identifier])
                   unless promise.realized?
                     start = Time.now
                     until promise.realized?
