@@ -193,7 +193,7 @@ task :ruby_policy_spec do
 end
 
 task :ruby_transport_spec do
-  run_spec_for('transport')
+  run_rake_spec_for('transport')
 end
 
 task :update_gems do
