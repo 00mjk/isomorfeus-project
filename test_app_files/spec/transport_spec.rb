@@ -232,7 +232,7 @@ RSpec.describe 'isomorfeus-transport' do
 
     it 'the sample handler processes a request' do
       result = on_server do
-        TestHandler.new.process_request(nil, nil, nil, { test: true })
+        TestHandler.new.process_request(nil, nil, { test: true })
       end
       expect(result).to eq({received_request: { test: true }})
     end
