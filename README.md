@@ -30,6 +30,47 @@ Client and Server:
 Server only:
 - Isomorfeus.middlewares - all the rack middlewares to load
 
+## Authentication
+
+For authentication in isomorfeus there is a class `Anonymous`, so whenever no user is logged in, the anonymous user is passed on to operations or data loads. In my opinion it is more true than no user (nil), because in fact there probably is a user, just the user is unknown. The Anonymous user has a default policy that denies everything, the user will respond to .authorized?(whatever) always with false by default.
+Of  course, the developer can add a Policy easily, to allow certain operations or data loads, or whatever or everything:
+```ruby
+class MyAnonymousPolicy < LucidPolicy::Base
+ policy_for Anonymous
+ allow all
+end
+```
+
+A class representing a user should be a LucidNode and include LucidAuthentication::Mixin:
+```ruby
+class User < LucidNode::Base
+  include LucidAuthentication::Mixin
+  authentication do |user_identifier, user_password_or token|
+    # should return either a User instance or a Promise which reselves to a User instance
+  end
+end
+```
+With that its possible to do on the client (or server):
+```ruby
+User.promise_login(user_identifier, user_password_or_token).then do |user|
+   # do something with user
+end
+```
+or later on:
+```ruby
+user.promise_logout
+```
+The authentication in isomorfeus is prepared for external or alternate authentication schemes, example:
+```ruby
+User.promise_login(user_identifier, token, :facebook).then do |user|
+   # do something with user
+end
+```
+will call:
+```ruby
+User.promise_authentication_with_facebook(user_identifier, token)
+```
+which would have to be implemented.
 
 ## LucidChannel
 
