@@ -12,8 +12,12 @@ module LucidAuthentication
           end
 
           def promise_authentication_with_isomorfeus(user_identifier, user_password)
-            user_password_bcrypt = `Opal.global.BCryptJS.hashSync(user_password);`
-            promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_identifier, user_password_bcrypt).then do |response|
+            if Isomorfeus.production?
+              raise "Connection not secure, can't login" unless Isomorfeus::Transport.socket.url.start_with?('wss:')
+            else
+              `console.warn("Connection not secure, ensure a secure connection in production, otherwise login will fail!")` unless Isomorfeus::Transport.socket.url.start_with?('wss:')
+            end
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_identifier, user_password).then do |response|
               if response[:agent_response].key?(:success)
                 Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: response[:agent_response][:data])
                 class_name = response[:agent_response][:data][:nodes].keys.first
@@ -32,7 +36,7 @@ module LucidAuthentication
       end
 
       def promise_deauthentication_with_isomorfeus
-        promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'logout', 'logout').then do |response|
+        Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'logout', 'logout').then do |response|
           response[:agent_response].key?(:success) ? true : raise('Logout failed!')
         end
       end
@@ -45,12 +49,12 @@ module LucidAuthentication
             @authentication_block = block
           end
 
-          def promise_login(user_identifier, user_password_bcrypt_or_token, scheme = :isomorfeus)
-            send("promise_authentication_with_#{scheme}", user_identifier, user_password_bcrypt_or_token)
+          def promise_login(user_identifier, user_password_or_token, scheme = :isomorfeus)
+            send("promise_authentication_with_#{scheme}", user_identifier, user_password_or_token)
           end
 
-          def promise_authentication_with_isomorfeus(user_identifier, user_password_bcrypt_or_token)
-            promise_or_user = @authentication_block.call(user_identifier, user_password_bcrypt_or_token)
+          def promise_authentication_with_isomorfeus(user_identifier, user_password_or_token)
+            promise_or_user = @authentication_block.call(user_identifier, user_password_or_token)
             if promise_or_user.class == Promise
               promise_or_user
             else
