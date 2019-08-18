@@ -33,13 +33,17 @@ module Isomorfeus
               if channel_class && current_user.authorized?(channel_class, :send_message, channel)
                 client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
               else
-                response[:response][:agent_ids][agent_id] = { error: "Not authorized!"}
+                response[:response] = { error: 'Not authorized!' }
               end
             else
-              response[:response] = 'No such thing!'
+              response[:response] = { error: 'No such thing!' }
             end
-          rescue
-            response[:response] = 'No such thing!'
+          rescue Exception => e
+            response[:response] = if Isomorfeus.production?
+                                    { error: 'No such thing!' }
+                                  else
+                                    { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}" }
+                                  end
           end
         elsif request.key?('subscribe') && request['subscribe'].key?('agent_ids')
           begin
@@ -57,8 +61,12 @@ module Isomorfeus
             else
               response[:response][:agent_ids][agent_id] = { error: "No such thing!"}
             end
-          rescue
-            response[:response][:agent_ids][agent_id] = { error: { key => 'No such handler!'}}
+          rescue Exception => e
+            response[:response][:agent_ids][agent_id] = if Isomorfeus.production?
+                                                          { error: 'No such thing!' }
+                                                        else
+                                                          { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}" }
+                                                        end
           end
         elsif request.key?('unsubscribe') && request['unsubscribe'].key?('agent_ids')
           begin
@@ -76,8 +84,12 @@ module Isomorfeus
             else
               response[:response][:agent_ids][agent_id] = { error: 'No such thing!'}
             end
-          rescue
-            response[:response][:agent_ids][agent_id] = { error: { key => 'No such handler!'}}
+          rescue Exception => e
+            response[:response][:agent_ids][agent_id] = if Isomorfeus.production?
+                                                          { error: 'No such thing!' }
+                                                        else
+                                                          { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}" }
+                                                        end
           end
         else
           response[:response] = { error: 'No such thing!'}
