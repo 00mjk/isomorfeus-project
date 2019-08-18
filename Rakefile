@@ -63,23 +63,6 @@ def path_for(isomorfeus_module)
   File.join('ruby', "isomorfeus-#{isomorfeus_module}")
 end
 
-def run_spec_for(isomorfeus_module)
-  pwd = Dir.pwd
-  Dir.chdir(path_for(isomorfeus_module))
-  Dir.chdir('test_app')
-  system('yarn install')
-  system('bundle install')
-  options = { keep_file_descriptors: false }
-  options.define_singleton_method(:keep_file_descriptors?) do
-    false
-  end
-  pid = fork do
-    Bundler::CLI::Exec.new(options, ['rspec']).run
-  end
-  Process.waitpid(pid)
-  Dir.chdir(pwd)
-end
-
 def run_rake_spec_for(isomorfeus_module)
   pwd = Dir.pwd
   Dir.chdir(path_for(isomorfeus_module))
@@ -162,7 +145,7 @@ task :ruby_specs do
 end
 
 task :ruby_data_spec do
-  run_spec_for('data')
+  run_rake_spec_for('data')
 end
 
 task :ruby_i18n_spec do
