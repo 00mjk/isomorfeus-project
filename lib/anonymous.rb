@@ -1,4 +1,4 @@
-class Anonymous < BasicObject
+class Anonymous
   # policy methods get added by Isomorfeus::Transport::AnonymousPolicy
   def id
     'anonymous'
