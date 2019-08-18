@@ -15,7 +15,7 @@ module Isomorfeus
                 begin
                   props = Oj.load(props_json, mode: :strict)
                   props.merge!({pub_sub_client: pub_sub_client, current_user: current_user})
-                  if current_user.authorized?(array_class, :load, *props)
+                  if current_user.authorized?(collection_class, :load, *props)
                     collection = collection_class.load(props)
                     collection.instance_exec do
                       collection_class.on_load_block.call(pub_sub_client, current_user) if collection_class.on_load_block
