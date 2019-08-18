@@ -29,7 +29,12 @@ module Isomorfeus
             channel = request['notification']['channel']
             class_name =  request['notification']['class']
             if Isomorfeus.valid_channel_class_name?(class_name) && channel
-              client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
+              channel_class = Isomorfeus.cached_channel_class(class_name)
+              if channel_class && current_user.authorized?(channel_class, :send_message, channel)
+                client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
+              else
+                response[:response][:agent_ids][agent_id] = { error: "Not authorized!"}
+              end
             else
               response[:response] = 'No such thing!'
             end
@@ -42,8 +47,13 @@ module Isomorfeus
             channel = request['subscribe']['agent_ids'][agent_id]['channel']
             class_name = request['subscribe']['agent_ids'][agent_id]['class']
             if Isomorfeus.valid_channel_class_name?(class_name) && channel
-              client.subscribe(channel)
-              response[:response][:agent_ids][agent_id] = { success: channel }
+              channel_class = Isomorfeus.cached_channel_class(class_name)
+              if channel_class && current_user.authorized?(channel_class, :subscribe, channel)
+                client.subscribe(channel)
+                response[:response][:agent_ids][agent_id] = { success: channel }
+              else
+                response[:response][:agent_ids][agent_id] = { error: "Not authorized!"}
+              end
             else
               response[:response][:agent_ids][agent_id] = { error: "No such thing!"}
             end
@@ -56,8 +66,13 @@ module Isomorfeus
             channel = request['unsubscribe']['agent_ids'][agent_id]['channel']
             class_name = request['unsubscribe']['agent_ids'][agent_id]['class']
             if Isomorfeus.valid_channel_class_name?(class_name) && channel
-              client.unsubscribe(channel)
-              response[:response][:agent_ids][agent_id] = { success: channel }
+              channel_class = Isomorfeus.cached_channel_class(class_name)
+              if channel_class && current_user.authorized?(channel_class, :unsubscribe, channel)
+                client.unsubscribe(channel)
+                response[:response][:agent_ids][agent_id] = { success: channel }
+              else
+                response[:response][:agent_ids][agent_id] = { error: "Not authorized!"}
+              end
             else
               response[:response][:agent_ids][agent_id] = { error: 'No such thing!'}
             end

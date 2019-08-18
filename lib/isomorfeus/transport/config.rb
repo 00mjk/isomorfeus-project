@@ -42,6 +42,15 @@ module Isomorfeus
         @middlewares ||= Set.new
       end
 
+      def cached_channel_classes
+        @cached_channel_classes ||= {}
+      end
+
+      def cached_channel_class(class_name)
+        return cached_channel_classes[class_name] if cached_channel_classes.key?(class_name)
+        cached_channel_classes[class_name] = "::#{class_name}".constantize
+      end
+
       def valid_channel_class_names
         @valid_channel_class_names ||= Set.new
       end
