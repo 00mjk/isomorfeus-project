@@ -98,7 +98,7 @@ class MyChannel < LucidChannel::Base
 end
 ```
 
-### Sending mesages
+### Sending messages
 ```ruby
 MyChannel.send_message('uiuiui')
 ```
