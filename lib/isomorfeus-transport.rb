@@ -47,6 +47,8 @@ else
   require 'lucid_channel/mixin'
   require 'lucid_channel/base'
 
+  require 'isomorfeus/transport/handler/authentication_handler'
+
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
   require 'active_support'
