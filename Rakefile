@@ -80,6 +80,13 @@ def run_spec_for(isomorfeus_module)
   Dir.chdir(pwd)
 end
 
+def run_rake_spec_for(isomorfeus_module)
+  pwd = Dir.pwd
+  Dir.chdir(path_for(isomorfeus_module))
+  system('rake')
+  Dir.chdir(pwd)
+end
+
 def update_version_and_build_gem_for(isomorfeus_module)
   pwd = Dir.pwd
   Dir.chdir(path_for(isomorfeus_module))
@@ -159,10 +166,7 @@ task :ruby_data_spec do
 end
 
 task :ruby_i18n_spec do
-  pwd = Dir.pwd
-  Dir.chdir(path_for('i18n'))
-  system('rake')
-  Dir.chdir(pwd)
+  run_rake_spec_for('i18n')
 end
 
 task :ruby_installer_spec do
@@ -181,7 +185,7 @@ task :ruby_installer_spec do
 end
 
 task :ruby_operation_spec do
-  run_spec_for('operation')
+  run_rake_spec_for('operation')
 end
 
 task :ruby_policy_spec do
