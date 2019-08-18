@@ -91,7 +91,6 @@ RSpec.describe 'isomorfeus-transport' do
       result = @doc.await_ruby do
         class TestChannel < LucidChannel::Base
         end
-
         TestChannel.subscribe
       end
       expect(result).to have_key('success')
