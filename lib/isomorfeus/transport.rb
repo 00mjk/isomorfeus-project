@@ -32,7 +32,7 @@ module Isomorfeus
           @socket.on_error do
             @socket.close
             delay do
-              Isomorfeus::Transport.connect
+              Isomorfeus::Transport.promise_connect
             end
           end
           @socket.on_message do |event|
