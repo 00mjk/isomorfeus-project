@@ -4,7 +4,7 @@ module Isomorfeus
   module Data
     module Handler
       class HashLoadHandler < LucidHandler::Base
-        on_request do |pub_sub_client, session_id, current_user, request, response|
+        on_request do |pub_sub_client, current_user, request, response|
           result = { error: 'No such thing' }
           # promise_send_path('Isomorfeus::Data::Handler::HashLoadHandler', self.to_s, props_hash)
           request.each_key do |hash_class_name|
@@ -14,11 +14,11 @@ module Isomorfeus
                 props_json = request[hash_class_name]
                 begin
                   props = Oj.load(props_json, mode: :strict)
-                  props.merge!({pub_sub_client: pub_sub_client, session_id: session_id, current_user: current_user})
+                  props.merge!({pub_sub_client: pub_sub_client, current_user: current_user})
                   if current_user.authorized?(hash_class, :load, *props)
                     hash = hash_class.load(props)
                     hash.instance_exec do
-                      hash_class.on_load_block.call(pub_sub_client, session_id, current_user) if hash_class.on_load_block
+                      hash_class.on_load_block.call(pub_sub_client, current_user) if hash_class.on_load_block
                     end
                     response.deep_merge!(data: hash.to_transport)
                     result = { success: 'ok' }

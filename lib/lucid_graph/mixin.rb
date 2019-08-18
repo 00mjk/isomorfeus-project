@@ -486,7 +486,6 @@ module LucidGraph
       else # RUBY_ENGINE
         unless base == LucidGraph::Base
           base.prop :pub_sub_client, default: nil
-          base.prop :session_id, default: nil
           base.prop :current_user, default: nil
         end
 

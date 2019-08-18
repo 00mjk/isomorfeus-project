@@ -4,7 +4,7 @@ module Isomorfeus
   module Data
     module Handler
       class ArrayLoadHandler < LucidHandler::Base
-        on_request do |pub_sub_client, session_id, current_user, request, response|
+        on_request do |pub_sub_client, current_user, request, response|
           result = { error: 'No such thing' }
           # promise_send_path('Isomorfeus::Data::Handler::CollectionLoadHandler', self.to_s, props_hash)
           request.each_key do |array_class_name|
@@ -14,11 +14,11 @@ module Isomorfeus
                 props_json = request[array_class_name]
                 begin
                   props = Oj.load(props_json, mode: :strict)
-                  props.merge!({pub_sub_client: pub_sub_client, session_id: session_id, current_user: current_user})
+                  props.merge!({pub_sub_client: pub_sub_client, current_user: current_user})
                   if current_user.authorized?(array_class, :load, *props)
                     array = array_class.load(props)
                     array.instance_exec do
-                      array_class.on_load_block.call(pub_sub_client, session_id, current_user) if array_class.on_load_block
+                      array_class.on_load_block.call(pub_sub_client, current_user) if array_class.on_load_block
                     end
                     response.deep_merge!(data: array.to_transport)
                     result = { success: 'ok' }
