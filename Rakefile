@@ -159,7 +159,10 @@ task :ruby_data_spec do
 end
 
 task :ruby_i18n_spec do
-  run_spec_for('i18n')
+  pwd = Dir.pwd
+  Dir.chdir(path_for('i18n'))
+  system('rake')
+  Dir.chdir(pwd)
 end
 
 task :ruby_installer_spec do
