@@ -1,4 +1,4 @@
-class AllTypesComponent < LucidMaterial::Component::Base
+class AllTypesComponent < LucidComponent::Base
   include LucidTranslation::Mixin
 
   render do

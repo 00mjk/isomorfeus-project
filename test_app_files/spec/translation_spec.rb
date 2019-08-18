@@ -54,12 +54,6 @@ RSpec.describe 'LucidTranslation::Mixin' do
     end
   end
 
-  # context 'on client' do
-    # before :each do
-    #   @doc = visit('/')
-    # end
-  # end
-
   context 'Server Side Rendering' do
     before do
       @doc = visit('/ssr')
