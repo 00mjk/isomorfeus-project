@@ -1,4 +1,4 @@
-class AllTypesComponent < LucidMaterial::Component::Base
+class AllTypesComponent < LucidComponent::Base
   render do
     a = SimpleArray.load
     DIV "array: #{a.items}"
