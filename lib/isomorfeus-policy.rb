@@ -6,6 +6,8 @@ require 'lucid_policy/exception'
 require 'isomorfeus/policy/helper'
 require 'lucid_policy/mixin'
 require 'lucid_policy/base'
+require 'anonymous'
+require 'isomorfeus/policy/anonymous_policy'
 
 if RUBY_ENGINE == 'opal'
   Opal::Autoloader.add_load_path('policies')
