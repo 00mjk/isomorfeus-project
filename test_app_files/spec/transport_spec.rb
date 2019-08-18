@@ -83,59 +83,43 @@ RSpec.describe 'isomorfeus-transport' do
 
   context 'simple class name based channel' do
     it 'can subscribe' do
-      on_server do
-        class TestChannel < LucidChannel::Base
-        end
-      end
-
       result = @doc.await_ruby do
-        class TestChannel < LucidChannel::Base
-        end
-        TestChannel.subscribe
+        SimpleChannel.subscribe
       end
       expect(result).to have_key('success')
-      expect(result['success']).to eq('TestChannel')
+      expect(result['success']).to eq('SimpleChannel')
     end
 
     it 'can unsubscribe' do
-      on_server do
-        class TestChannel < LucidChannel::Base
-        end
-      end
-
       sub_result = @doc.await_ruby do
-        class TestChannel < LucidChannel::Base
-        end
-        TestChannel.subscribe
+        SimpleChannel.subscribe
       end
       expect(sub_result).to have_key('success')
-      expect(sub_result['success']).to eq('TestChannel')
+      expect(sub_result['success']).to eq('SimpleChannel')
       unsub_result = @doc.await_ruby do
-        TestChannel.unsubscribe
+        SimpleChannel.unsubscribe
       end
       expect(unsub_result).to have_key('success')
-      expect(unsub_result['success']).to eq('TestChannel')
+      expect(unsub_result['success']).to eq('SimpleChannel')
     end
 
     it 'can send and receive messages' do
-      on_server do
-        class TestChannel < LucidChannel::Base
-        end
-      end
-
       @doc.await_ruby do
         $message = nil
-        class TestChannel < LucidChannel::Base
-          on_message do |message|
-            $message = message
-          end
-        end
-        TestChannel.subscribe
+        SimpleChannel.subscribe
       end
       @doc.evaluate_ruby do
-        TestChannel.send_message('cake')
+        SimpleChannel.send_message('cake')
       end
-      sleep 5
+      have_message = false
+      start = Time.now
+      until have_message
+        break if (Time.now - start) > 10
+        sleep 0.1
+        have_message = @doc.evaluate_ruby do
+          $message != nil
+        end
+      end
       result = @doc.evaluate_ruby do
         $message
       end
@@ -145,61 +129,44 @@ RSpec.describe 'isomorfeus-transport' do
 
   context 'custom channel' do
     it 'can subscribe' do
-      on_server do
-        class TestChannel < LucidChannel::Base
-        end
-      end
-
       result = @doc.await_ruby do
-        class TestChannel < LucidChannel::Base
-        end
-
-        TestChannel.subscribe('a channel name')
+        SimpleChannel.subscribe('a channel name')
       end
       expect(result).to have_key('success')
       expect(result['success']).to eq('a channel name')
     end
 
     it 'can unsubscribe' do
-      on_server do
-        class TestChannel < LucidChannel::Base
-        end
-      end
-
       sub_result = @doc.await_ruby do
-        class TestChannel < LucidChannel::Base
-        end
-        TestChannel.subscribe('a channel name')
+        SimpleChannel.subscribe('a channel name')
       end
       expect(sub_result).to have_key('success')
       expect(sub_result['success']).to eq('a channel name')
       unsub_result = @doc.await_ruby do
-        TestChannel.unsubscribe('a channel name')
+        SimpleChannel.unsubscribe('a channel name')
       end
       expect(unsub_result).to have_key('success')
       expect(unsub_result['success']).to eq('a channel name')
     end
 
     it 'can send and receive messages' do
-      on_server do
-        class TestChannel < LucidChannel::Base
-        end
-      end
-
       @doc.await_ruby do
         $message = nil
-        class TestChannel < LucidChannel::Base
-          on_message do |channel, message|
-            $channel = channel
-            $message = message
-          end
-        end
-        TestChannel.subscribe('a channel name')
+        $channel = nil
+        SimpleChannel.subscribe('a channel name')
       end
       @doc.evaluate_ruby do
-        TestChannel.send_message('a channel name', 'cake')
+        SimpleChannel.send_message('a channel name', 'cake')
       end
-      sleep 5
+      have_message = false
+      start = Time.now
+      until have_message
+        break if (Time.now - start) > 10
+        sleep 0.1
+        have_message = @doc.evaluate_ruby do
+          $message != nil
+        end
+      end
       result = @doc.evaluate_ruby do
         [$channel, $message]
       end
