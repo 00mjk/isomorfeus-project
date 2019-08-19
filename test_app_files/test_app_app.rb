@@ -51,7 +51,9 @@ class TestAppApp < Roda
     end
 
     r.get do
-      page_content(env['HTTP_HOST'], env['PATH_INFO'])
+      content = page_content(env['HTTP_HOST'], env['PATH_INFO'])
+      response.status = ssr_response_status
+      content
     end
   end
 end
