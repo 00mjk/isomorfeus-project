@@ -5,7 +5,11 @@ module Isomorfeus
         def self.init
           return if @initializing || initialized?
           @initializing = true
-          Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', :init).then do |response|
+          if Isomorfeus.on_browser?
+            root_element = `document.querySelector('div[data-iso-root]')`
+            Isomorfeus.negotiated_locale = root_element.JS.getAttribute('data-iso-nloc')
+          end
+          Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', :init, Isomorfeus.negotiated_locale).then do |response|
             if response[:agent_response].key?(:error)
               `console.error(#{response[:agent_response][:error].to_n})`
               raise response[:agent_response][:error]

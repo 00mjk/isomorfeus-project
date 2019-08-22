@@ -13,12 +13,16 @@ else
   require 'active_support'
   require 'oj'
   require 'fast_gettext'
+  require 'http_accept_language/parser'
+  require 'http_accept_language/middleware'
   require 'isomorfeus/promise'
   require 'isomorfeus-data'
   require 'isomorfeus/i18n/config'
   require 'isomorfeus/i18n/init'
   require 'lucid_translation/mixin'
   require 'isomorfeus/i18n/handler/locale_handler'
+
+  Isomorfeus.add_middleware(HttpAcceptLanguage::Middleware)
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 

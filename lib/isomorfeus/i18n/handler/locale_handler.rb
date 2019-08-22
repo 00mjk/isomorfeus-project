@@ -11,12 +11,17 @@ module Isomorfeus
           Isomorfeus::I18n::Init.init unless Thread.current[:isomorfeus_i18n_initialized] == true
           result = {}
           # promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, method, [args])
-          if request == 'init'
-            result['data'] = { 'available_locales' => FastGettext.available_locales,
-                               'locale' => FastGettext.locale,
-                               'domain' => FastGettext.text_domain }
-          else
-            request.each_key do |domain|
+          request.each_key do |domain|
+            if domain == 'init'
+              locale = request[domain]
+              result['data'] = { 'available_locales' => FastGettext.available_locales,
+                                 'domain' => FastGettext.text_domain }
+              result['data']['locale'] = if Isomorfeus.available_locales.include?(locale)
+                                           locale
+                                         else
+                                           FastGettext.locale
+                                         end
+            else
               result[domain] = {}
               begin
                 FastGettext.with_domain(domain) do

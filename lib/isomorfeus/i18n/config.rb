@@ -29,6 +29,14 @@ module Isomorfeus
         Isomorfeus.store.dispatch(type: 'I18N_LOAD', data: { locale: locale })
         loc
       end
+
+      def negotiated_locale
+        @negotiated_locale
+      end
+
+      def negotiated_locale=(l)
+        @negotiated_locale = l
+      end
     else
       def available_locales
         @available_locales
