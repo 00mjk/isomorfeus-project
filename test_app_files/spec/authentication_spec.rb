@@ -56,6 +56,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate successfully' do
       result = @doc.await_ruby do
+        Isomorfeus.instance_variable_set(:@production, false) # will fail otherwise, because connection is not secure
         SimpleUser.promise_login('joe_simple', 'my_pass').then do |user|
           user.id
         end
@@ -65,6 +66,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate to failure, password' do
       result = @doc.await_ruby do
+        Isomorfeus.instance_variable_set(:@production, false) # will fail otherwise, because connection is not secure
         SimpleUser.promise_login('joe_simple', 'my_pas').fail do
           true
         end
@@ -74,6 +76,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate to failure, user_id' do
       result = @doc.await_ruby do
+        Isomorfeus.instance_variable_set(:@production, false) # will fail otherwise, because connection is not secure
         SimpleUser.promise_login('joe_simpl', 'my_pass').fail do
           true
         end
