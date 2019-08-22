@@ -11,7 +11,10 @@ class TestAppApp < Roda
   use_isomorfeus_middlewares
   plugin :public, root: 'public'
 
-  def page_content(host, location)
+  def page_content(env, location)
+    locale = env.http_accept_language.preferred_language_from(Isomorfeus.available_locales)
+    locale = env.http_accept_language.compatible_language_from(Isomorfeus.available_locales) unless locale
+    locale = Isomorfeus.locale unless locale
     <<~HTML
       <html>
         <head>
@@ -19,7 +22,7 @@ class TestAppApp < Roda
           #{owl_script_tag 'application.js'}
         </head>
         <body>
-          #{mount_component('TestAppApp', location_host: host, location: location)}
+          #{mount_component('TestAppApp', location_host: env['HTTP_HOST'], location: location, locale: locale)}
         </body>
       </html>
     HTML
@@ -27,7 +30,7 @@ class TestAppApp < Roda
 
   route do |r|
     r.root do
-      page_content(env['HTTP_HOST'], '/')
+      page_content(env, '/')
     end
 
     r.public
@@ -37,13 +40,16 @@ class TestAppApp < Roda
     end
 
     r.get 'ssr' do
+      locale = env.http_accept_language.preferred_language_from(Isomorfeus.available_locales)
+      locale = env.http_accept_language.compatible_language_from(Isomorfeus.available_locales) unless locale
+      locale = Isomorfeus.locale unless locale
       <<~HTML
         <html>
           <head>
             <title>Welcome to TestAppApp</title>
           </head>
           <body>
-            #{mount_component('TestAppApp', location_host: env['HTTP_HOST'],  location: env['PATH_INFO'])}
+            #{mount_component('TestAppApp', location_host: env['HTTP_HOST'], location: env['PATH_INFO'], locale: locale)}
             <div id="test_anchor"></div>
           </body>
         </html>
@@ -51,7 +57,7 @@ class TestAppApp < Roda
     end
 
     r.get do
-      content = page_content(env['HTTP_HOST'], env['PATH_INFO'])
+      content = page_content(env, env['PATH_INFO'])
       response.status = ssr_response_status
       content
     end
