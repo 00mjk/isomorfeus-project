@@ -15,11 +15,11 @@ Gem::Specification.new do |s|
   s.require_paths  = ['lib']
 
   s.add_dependency 'activesupport', '~> 5.2'
-  s.add_dependency 'oj', '>= 3.8.0'
+  s.add_dependency 'oj', '>= 3.9.0'
   s.add_dependency 'opal', '>= 0.11.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'opal-autoloader', '~> 0.1.0'
-  s.add_dependency 'isomorfeus-react', '>= 16.9.7'
+  s.add_dependency 'isomorfeus-react', '>= 16.9.8'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.11'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Operation::VERSION
   s.add_development_dependency 'isomorfeus-installer', Isomorfeus::Operation::VERSION
