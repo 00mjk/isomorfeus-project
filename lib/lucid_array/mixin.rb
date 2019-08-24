@@ -5,7 +5,7 @@ module LucidArray
         Isomorfeus.add_valid_array_class(base) unless base == LucidArray::Base
       end
 
-      base.extend(Isomorfeus::Data::PropDeclaration)
+      base.extend(LucidPropDeclaration::Mixin)
 
       def to_gid
         [@class_name, @props_json]

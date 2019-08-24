@@ -5,7 +5,7 @@ module LucidCollection
         Isomorfeus.add_valid_collection_class(base) unless base == LucidCollection::Base
       end
 
-      base.extend(Isomorfeus::Data::PropDeclaration)
+      base.extend(LucidPropDeclaration::Mixin)
 
       def find_node(attribute_hash = nil, &block)
         if block_given?

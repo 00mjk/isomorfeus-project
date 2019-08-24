@@ -5,7 +5,7 @@ module LucidGraph
         Isomorfeus.add_valid_graph_class(base) unless base == LucidGraph::Base
       end
 
-      base.extend(Isomorfeus::Data::PropDeclaration)
+      base.extend(LucidPropDeclaration::Mixin)
 
       def find_edge(attribute_hash = nil, &block)
         if block_given?

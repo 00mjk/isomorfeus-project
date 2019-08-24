@@ -5,7 +5,7 @@ module LucidHash
         Isomorfeus.add_valid_hash_class(base) unless base == LucidHash::Base
       end
 
-      base.extend(Isomorfeus::Data::PropDeclaration)
+      base.extend(LucidPropDeclaration::Mixin)
 
       def to_gid
         [@class_name, @props_json]
