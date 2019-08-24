@@ -5,7 +5,7 @@ module LucidLocalOperation
         Isomorfeus.add_valid_operation_class(base) unless base == LucidLocalOperation::Base
       end
 
-      base.extend(Isomorfeus::Data::PropDeclaration)
+      base.extend(LucidPropDeclaration::Mixin)
       base.extend(Isomorfeus::Operation::Mixin)
       base.include(Isomorfeus::Operation::PromiseRun)
 

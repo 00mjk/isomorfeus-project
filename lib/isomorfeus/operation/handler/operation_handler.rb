@@ -15,7 +15,7 @@ module Isomorfeus
                 begin
                   props = Oj.load(props_json, mode: :strict)
                   props.merge!({pub_sub_client: pub_sub_client, current_user: current_user})
-                  if current_user.authorized?(operation_class, :promise_run, *props)
+                  if current_user.authorized?(operation_class, :promise_run, props)
                     operation_promise = operation_class.promise_run(props)
                     if operation_promise.realized?
                       result = { success: 'ok' , result: operation_promise.value }

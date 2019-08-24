@@ -1,7 +1,7 @@
 module LucidQuickOp
   module Mixin
     def self.included(base)
-      base.extend(Isomorfeus::Data::PropDeclaration)
+      base.extend(LucidPropDeclaration::Mixin)
 
       if RUBY_ENGINE == 'opal'
         base.instance_exec do
