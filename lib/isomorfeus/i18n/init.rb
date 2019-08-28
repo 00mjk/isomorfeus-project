@@ -20,7 +20,7 @@ module Isomorfeus
         end
 
         def self.initialized?
-          result = Redux.register_and_fetch_by_path(:i18n_state, :available_locales)
+          result = Redux.fetch_by_path(:i18n_state, :available_locales)
           result ? true : false
         end
       else

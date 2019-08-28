@@ -16,7 +16,7 @@ module LucidTranslation
       def _(*keys, &block)
         domain = Isomorfeus.i18n_domain
         locale = Isomorfeus.locale
-        result = Redux.register_and_fetch_by_path(:i18n_state, domain, locale, '_', keys)
+        result = Redux.fetch_by_path(:i18n_state, domain, locale, '_', keys)
         return result if result
         if Isomorfeus::I18n::Init.initialized?
           Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, '_', keys).then do |response|
@@ -33,7 +33,7 @@ module LucidTranslation
       def n_(*keys, count, &block)
         domain = Isomorfeus.i18n_domain
         locale = Isomorfeus.locale
-        result = Redux.register_and_fetch_by_path(:i18n_state, domain, locale, 'n_', keys + [count])
+        result = Redux.fetch_by_path(:i18n_state, domain, locale, 'n_', keys + [count])
         return result if result
         if Isomorfeus::I18n::Init.initialized?
           Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, 'n_', keys + [count]).then do |response|
@@ -58,7 +58,7 @@ module LucidTranslation
       def ns_(*args, &block)
         domain = Isomorfeus.i18n_domain
         locale = Isomorfeus.locale
-        result = Redux.register_and_fetch_by_path(:i18n_state, domain, locale, 'ns_', args)
+        result = Redux.fetch_by_path(:i18n_state, domain, locale, 'ns_', args)
         return result if result
         if Isomorfeus::I18n::Init.initialized?
           Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, 'ns_', args).then do |response|
@@ -76,7 +76,7 @@ module LucidTranslation
         domain = Isomorfeus.i18n_domain
         locale = Isomorfeus.locale
         args = separator ? [namespace, key, separator] : [namespace, key]
-        result = Redux.register_and_fetch_by_path(:i18n_state, domain, locale, 'p_', args)
+        result = Redux.fetch_by_path(:i18n_state, domain, locale, 'p_', args)
         return result if result
         if Isomorfeus::I18n::Init.initialized?
           Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, 'p_', args).then do |response|
@@ -94,7 +94,7 @@ module LucidTranslation
         domain = Isomorfeus.i18n_domain
         locale = Isomorfeus.locale
         args = separator ? [key, separator] : [key]
-        result = Redux.register_and_fetch_by_path(:i18n_state, domain, locale, 's_', args)
+        result = Redux.fetch_by_path(:i18n_state, domain, locale, 's_', args)
         return result if result
         if Isomorfeus::I18n::Init.initialized?
           Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, 's_', args).then do |response|
@@ -130,7 +130,7 @@ module LucidTranslation
         define_method("D#{method}") do |*args, &block|
           domain = Isomorfeus.i18n_domain
           locale = Isomorfeus.locale
-          result = Redux.register_and_fetch_by_path(:i18n_state, domain, locale, "D#{method}", args)
+          result = Redux.fetch_by_path(:i18n_state, domain, locale, "D#{method}", args)
           return result if result
           if Isomorfeus::I18n::Init.initialized?
             Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, "D#{method}", args).then do |response|

@@ -5,12 +5,12 @@ module Isomorfeus
 
     if RUBY_ENGINE == 'opal'
       def available_locales
-        result = Redux.register_and_fetch_by_path(:i18n_state, :available_locales)
+        result = Redux.fetch_by_path(:i18n_state, :available_locales)
         result ? result : ['en']
       end
 
       def i18n_domain
-        result = Redux.register_and_fetch_by_path(:i18n_state, :domain)
+        result = Redux.fetch_by_path(:i18n_state, :domain)
         result ? result : 'app'
       end
 
@@ -20,7 +20,7 @@ module Isomorfeus
       end
 
       def locale
-        result = Redux.register_and_fetch_by_path(:i18n_state, :locale)
+        result = Redux.fetch_by_path(:i18n_state, :locale)
         result ? result : available_locales.first
       end
 
