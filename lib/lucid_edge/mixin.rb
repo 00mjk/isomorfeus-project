@@ -103,7 +103,6 @@ module LucidEdge
         end
 
         def from_as_cid
-          Redux.register_used_store_path(:data_state, :edges, @class_name, @id, :from)
           return @changed_from_cid if @changed_from_cid
           cid = Redux.fetch_by_path(:data_state, :edges, @class_name, @id, :from)
           cid ? cid : nil
@@ -120,14 +119,12 @@ module LucidEdge
         end
 
         def to_as_cid
-          Redux.register_used_store_path(:data_state, :edges, @class_name, @id, :to)
           return @changed_to_cid if @changed_to_cid
           cid = Redux.fetch_by_path(:data_state, :edges, @class_name, @id, :to)
           cid ? cid : nil
         end
 
         def to_transport(*args)
-          Redux.register_used_store_path(:data_state, :edges, @class_name, @id)
           final_attributes = {}
           self.class.attributes.each do |attr|
             next if attr == :id
@@ -141,7 +138,6 @@ module LucidEdge
             attribute_options[name] = options
 
             define_method(name) do
-              Redux.register_used_store_path(:data_state, :edges, @class_name, @id, :attributes, name)
               if changed_attributes.key?(name)
                 changed_attributes[name]
               else
@@ -151,7 +147,6 @@ module LucidEdge
 
             define_method("#{name}=") do |arg|
               validate_attribute!(name, arg)
-              Redux.register_used_store_path(:data_state, :edges, @class_name, @id, :attributes, name)
               changed_attributes.set(name, arg)
             end
           end

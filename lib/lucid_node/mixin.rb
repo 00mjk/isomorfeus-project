@@ -109,7 +109,6 @@ module LucidNode
         end
 
         def to_transport(*args)
-          Redux.register_used_store_path(:data_state, :nodes, @class_name, @id)
           final_attributes = {}
           self.class.attributes.each do |attr|
             next if attr == :id
@@ -123,7 +122,6 @@ module LucidNode
             attribute_options[name] = options
 
             define_method(name) do
-              Redux.register_used_store_path(:data_state, :nodes, @class_name, @id, :attributes, name)
               if changed_attributes.key?(name)
                 changed_attributes[name]
               else
@@ -133,7 +131,6 @@ module LucidNode
 
             define_method("#{name}=") do |arg|
               validate_attribute!(name, arg)
-              Redux.register_used_store_path(:data_state, :nodes, @class_name, @id, :attributes, name)
               changed_attributes.set(name, arg)
             end
           end

@@ -319,7 +319,6 @@ module LucidGraph
 
         def own_edges_as_cids
           path = @store_path + [:edges]
-          Redux.register_used_store_path(*path)
           edge_cids = Redux.fetch_by_path(*path)
           edge_cids ? Set.new(edge_cids) : Set.new
         end
@@ -341,7 +340,6 @@ module LucidGraph
         def included_nodes
           incl_nodes = {}
           path = @store_path + [:included_nodes]
-          Redux.register_used_store_path(*path)
           self.class.included_nodes.each_key do |name|
             node_cid = Redux.fetch_by_path(*(path + [name]))
             incl_nodes[name] = LucidNode::Base.node_from_cid(node_cid) if node_cid
@@ -363,7 +361,6 @@ module LucidGraph
 
         def own_nodes_as_cids
           path = @store_path + [:nodes]
-          Redux.register_used_store_path(*path)
           node_cids = Redux.fetch_by_path(*path)
           node_cids ? Set.new(node_cids) : Set.new
         end
@@ -443,7 +440,6 @@ module LucidGraph
             included_nodes[name] = { class: node_class, anonymous: true, block: block }
             define_method(name) do
               path = @store_path + [:included_nodes, name]
-              Redux.register_used_store_path(*path)
               node_cid = Redux.fetch_by_path(*path)
               node_cid ? self.class.included_nodes[name][:class].node_from_cid(node_cid) : nil
             end
@@ -466,8 +462,6 @@ module LucidGraph
             end
 
             props_json = instance.instance_variable_get(:@props_json)
-
-            Redux.register_used_store_path(:data_state, :graphs, self.name, props_json)
 
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::GraphLoadHandler', self.name, props_json).then do |response|
               if response[:agent_response].key?(:error)

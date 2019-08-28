@@ -105,7 +105,6 @@ module LucidCollection
         end
 
         def find_node_by_id(node_id)
-          Redux.register_used_store_path(*@store_path)
           nodes_as_cids.each do |node_cid|
             return  LucidNode::Base.node_from_cid(node_cid) if node_cid[1] == node_id
           end
@@ -120,7 +119,6 @@ module LucidCollection
         end
 
         def nodes_as_cids
-          Redux.register_used_store_path(*@store_path)
           node_cids = Redux.fetch_by_path(*@store_path)
           node_cids ? node_cids : []
         end
@@ -155,8 +153,6 @@ module LucidCollection
             end
 
             props_json = instance.instance_variable_get(:@props_json)
-
-            Redux.register_used_store_path(:data_state, :collections, self.name, props_json)
 
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::CollectionLoadHandler', self.name, props_json).then do |response|
               if response[:agent_response].key?(:error)

@@ -44,20 +44,17 @@ module LucidHash
 
         def [](name)
           path = @store_path + [@props_json, name]
-          Redux.register_used_store_path(*path)
           result = Redux.fetch_by_path(*path)
           result ? result : nil
         end
 
         def key?(name)
           path = @store_path + [@props_json, name]
-          Redux.register_used_store_path(*path)
           Redux.fetch_by_path(*path) ? true : false
         end
 
         def method_missing(method_name, *args, &block)
           path = @store_path + [@props_json]
-          Redux.register_used_store_path(*path)
           raw_hash = Redux.fetch_by_path(*path)
           if raw_hash
             Hash.new(raw_hash).send(method_name, *args, &block)
@@ -89,8 +86,6 @@ module LucidHash
             end
 
             props_json = instance.instance_variable_get(:@props_json)
-
-            Redux.register_used_store_path(:data_state, :hashes, self.name, props_json)
 
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::HashLoadHandler', self.name, props_json).then do |response|
               if response[:agent_response].key?(:error)

@@ -35,20 +35,17 @@ module LucidArray
         end
 
         def items
-          Redux.register_used_store_path(*@store_path)
           raw_array = Redux.fetch_by_path(*@store_path)
           raw_array ? raw_array : []
         end
 
         def method_missing(method_name, *args, &block)
-          Redux.register_used_store_path(*@store_path)
           raw_array = Redux.fetch_by_path(*@store_path)
           data_array = raw_array ? raw_array : []
           data_array.send(method_name, *args, &block)
         end
 
         def to_transport(inline: false)
-          Redux.register_used_store_path(*@store_path)
           raw_array = Redux.fetch_by_path(*@store_path)
           if inline
             { '_inline' => { @props_json => (raw_array ? raw_array : []) }}
@@ -75,8 +72,6 @@ module LucidArray
             end
 
             props_json = instance.instance_variable_get(:@props_json)
-
-            Redux.register_used_store_path(:data_state, :arrays, self.name, props_json)
 
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::ArrayLoadHandler', self.name, props_json).then do |response|
               if response[:agent_response].key?(:error)
