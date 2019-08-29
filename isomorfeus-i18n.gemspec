@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'opal', '>= 0.11.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'opal-autoloader', '~> 0.1.0'
-  s.add_dependency 'isomorfeus-react', '>= 16.9.17'
+  s.add_dependency 'isomorfeus-react', '>= 16.9.20'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.12'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::I18n::VERSION
   s.add_dependency 'isomorfeus-data', Isomorfeus::I18n::VERSION
