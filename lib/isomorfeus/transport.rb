@@ -112,8 +112,8 @@ module Isomorfeus
             raise 'No socket!' unless @socket
             @socket.send(`JSON.stringify(#{{subscribe: { agent_ids: { agent.id => request }}}.to_n})`)
           end
-          result_promise = agent.promise.then do |response|
-            response[:agent_response]
+          result_promise = agent.promise.then do |agent|
+            agent.response
           end
           if block_given?
             result_promise = result_promise.then do |response|
@@ -133,8 +133,8 @@ module Isomorfeus
             raise 'No socket!' unless @socket
             @socket.send(`JSON.stringify(#{{unsubscribe: { agent_ids: { agent.id => request }}}.to_n})`)
           end
-          result_promise = agent.promise.then do |response|
-            response[:agent_response]
+          result_promise = agent.promise.then do |agent|
+            agent.response
           end
           if block_given?
             result_promise = result_promise.then do |response|

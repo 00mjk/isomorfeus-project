@@ -17,14 +17,19 @@ module LucidAuthentication
             else
               `console.warn("Connection not secure, ensure a secure connection in production, otherwise login will fail!")` unless Isomorfeus::Transport.socket.url.start_with?('wss:')
             end
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_identifier, user_password).then do |response|
-              if response[:agent_response].key?(:success)
-                Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: response[:agent_response][:data])
-                class_name = response[:agent_response][:data][:nodes].keys.first
-                node_id = response[:agent_response][:data][:nodes][class_name].keys.first
-                Isomorfeus.cached_node_class(class_name).new({id: node_id})
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_identifier, user_password).then do |agent|
+              if agent.processed
+                agent.result
               else
-                raise 'Login failed!' # calls .fail
+                agent.processed = true
+                if agent.response.key?(:success)
+                  Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.response[:data])
+                  class_name = agent.response[:data][:nodes].keys.first
+                  node_id = agent.response[:data][:nodes][class_name].keys.first
+                  agent.result = Isomorfeus.cached_node_class(class_name).new({id: node_id})
+                else
+                  raise 'Login failed!' # calls .fail
+                end
               end
             end
           end
@@ -36,8 +41,9 @@ module LucidAuthentication
       end
 
       def promise_deauthentication_with_isomorfeus
-        Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'logout', 'logout').then do |response|
-          response[:agent_response].key?(:success) ? true : raise('Logout failed!')
+        Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'logout', 'logout').then do |agent|
+          agent.processed = true
+          agent.response.key?(:success) ? true : raise('Logout failed!')
         end
       end
     else

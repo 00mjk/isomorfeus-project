@@ -13,6 +13,10 @@ module Isomorfeus
         agents.delete(object_id.to_s)
       end
 
+      attr_accessor :processed
+      attr_accessor :result
+      attr_accessor :response
+      attr_accessor :full_response
       attr_reader :id
       attr_reader :promise
       attr_reader :request

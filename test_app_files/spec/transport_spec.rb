@@ -206,7 +206,9 @@ RSpec.describe 'isomorfeus-transport' do
     it 'the sample handler processes a request from the client' do
       doc = visit('/')
       result = doc.await_ruby do
-        Isomorfeus::Transport.promise_send_request('TestHandler' => {test: true})
+        Isomorfeus::Transport.promise_send_request('TestHandler' => {test: true}).then do |agent|
+          { 'agent_response' => agent.response }
+        end
       end
       expect(result['agent_response']).to eq({ "received_request" => { "test"=>true }})
     end
