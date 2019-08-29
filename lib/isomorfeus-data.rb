@@ -21,7 +21,6 @@ require 'lucid_hash/mixin'
 require 'lucid_hash/base'
 
 if RUBY_ENGINE == 'opal'
-  require 'isomorfeus/data/core_ext/hash/deep_merge'
   require 'isomorfeus/data/reducer'
   Isomorfeus::Data::Reducer.add_reducer_to_store
   Opal::Autoloader.add_load_path('data')
