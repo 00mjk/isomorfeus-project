@@ -1,8 +1,8 @@
 require 'opal-activesupport'
+require 'isomorfeus-redux'
 require 'isomorfeus-transport'
 
 if RUBY_ENGINE == 'opal'
-  require 'isomorfeus/data/core_ext/hash/deep_merge'
   require 'isomorfeus/i18n/config'
   require 'isomorfeus/i18n/reducer'
   Isomorfeus::I18n::Reducer.add_reducer_to_store
