@@ -39,12 +39,17 @@ module LucidOperation
           def promise_run(props_hash)
             validate_props(props_hash)
             props_json = Isomorfeus::Data::Props.new(props_hash).to_json
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |response|
-              if response[:agent_response].key?(:error)
-                `console.error(#{response[:agent_response][:error].to_n})`
-                raise response[:agent_response][:error]
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |agent|
+              if agent.processed
+                agent.result
+              else
+                agent.processed = true
+                if agent.response.key?(:error)
+                  `console.error(#{agent.response[:error].to_n})`
+                  raise agent.response[:error]
+                end
+                agent.result = agent.response[:result]
               end
-              response[:agent_response][:result]
             end
           end
         end
