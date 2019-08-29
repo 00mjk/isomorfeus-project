@@ -87,13 +87,18 @@ module LucidHash
 
             props_json = instance.instance_variable_get(:@props_json)
 
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::HashLoadHandler', self.name, props_json).then do |response|
-              if response[:agent_response].key?(:error)
-                `console.error(#{response[:agent_response][:error].to_n})`
-                raise response[:agent_response][:error]
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::HashLoadHandler', self.name, props_json).then do |agent|
+              if agent.processed
+                agent.result
+              else
+                agent.processed = true
+                if agent.response.key?(:error)
+                  `console.error(#{agent.response[:error].to_n})`
+                  raise agent.response[:error]
+                end
+                Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
+                agent.result = instance
               end
-              Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: response[:full_response][:data])
-              instance
             end
           end
 
