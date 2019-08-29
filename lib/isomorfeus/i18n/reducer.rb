@@ -14,7 +14,7 @@ module Isomorfeus
               end
             when 'I18N_LOAD'
               result = prev_state.deep_merge(action[:data])
-              result
+              result == prev_state ? prev_state : result
             else
               prev_state
             end
