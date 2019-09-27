@@ -111,6 +111,9 @@ module Isomorfeus
         class_name = class_name.split('>::').last if class_name.start_with?('#<')
         valid_hash_class_names << class_name
       end
+
+      attr_accessor :db_server
+      attr_accessor :db
     end
   end
 end
