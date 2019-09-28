@@ -126,7 +126,11 @@ module Isomorfeus
             STDERR.puts "Can't create database '#{database}' (#{e.message}).\nPlease make sure database '#{database}' exists."
           end
         end
-        Arango.current_server.get_database(database)
+        begin
+          Arango.current_server.get_database(database)
+        rescue Exception => e
+          STDERR.puts "Can't connect to database '#{database}' (#{e.message})."
+        end
       end
 
       def arango_configured?
