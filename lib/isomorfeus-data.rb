@@ -1,6 +1,7 @@
 require 'opal'
 require 'opal-autoloader'
 require 'opal-activesupport'
+require 'arango-driver'
 require 'isomorfeus-redux'
 require 'isomorfeus-react'
 require 'isomorfeus-transport'
