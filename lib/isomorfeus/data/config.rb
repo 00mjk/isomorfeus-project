@@ -112,6 +112,27 @@ module Isomorfeus
         valid_hash_class_names << class_name
       end
 
+      def connect_to_arango
+        arango_options = if Isomorfeus.production? then Isomorfeus.arango_production
+                         elsif Isomorfeus.development? then Isomorfeus.arango_development
+                         elsif Isomorfeus.test? then Isomorfeus.arango_test
+                         end
+        database = arango_options.delete(:database)
+        Arango.connect_to(**arango_options)
+        unless Arango.current_server.database_exist?(database)
+          begin
+            Arango.current_server.create_database(database)
+          rescue Exception => e
+            STDERR.puts "Can't create database '#{database}' (#{e.message}).\nPlease make sure database '#{database}' exists."
+          end
+        end
+        Arango.current_server.get_database(database)
+      end
+
+      def arango_configured?
+        Isomorfeus.arango_production && Isomorfeus.arango_development && Isomorfeus.arango_test
+      end
+
       attr_accessor :arango_production
       attr_accessor :arango_development
       attr_accessor :arango_test
