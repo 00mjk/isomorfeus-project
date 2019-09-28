@@ -112,8 +112,9 @@ module Isomorfeus
         valid_hash_class_names << class_name
       end
 
-      attr_accessor :db_server
-      attr_accessor :db
+      attr_accessor :arango_production
+      attr_accessor :arango_development
+      attr_accessor :arango_test
     end
   end
 end
