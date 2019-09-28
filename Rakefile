@@ -17,4 +17,5 @@ task :start_test_app => 'create_test_app' do
   pwd = Dir.pwd
   Dir.chdir('test_app')
   system('env -i PATH=$PATH foreman start')
+  Dir.chdir(pwd)
 end
