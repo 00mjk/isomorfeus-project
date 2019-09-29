@@ -1,3 +1,5 @@
+require 'isomorfeus-data-generic'
+
 class MultiCombinedGraph < LucidGenericGraph::Base
   query do
     node1 = SimpleNode.new(id: 5, simple_attribute: 'simple')

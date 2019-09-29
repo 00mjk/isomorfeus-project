@@ -1,3 +1,5 @@
+require 'isomorfeus-data-generic'
+
 class SimpleGraph < LucidGenericGraph::Base
   query do
     node1 = SimpleNode.new(id: 1, simple_attribute: 'simple')
