@@ -3,7 +3,7 @@ task default: %w[run_test_app_specs]
 task :run_test_app_specs => 'create_test_app' do
   pwd = Dir.pwd
   Dir.chdir('test_app')
-  system('env -i PATH=$PATH bundle exec rspec')
+  system('env -i PATH=$PATH ARANGO_USER=$ARANGO_USER ARANGO_PASSWORD=$ARANGO_PASSWORD bundle exec rspec')
   Dir.chdir(pwd)
   system('rm -rf test_app')
 end
