@@ -117,6 +117,7 @@ module Isomorfeus
                          elsif Isomorfeus.development? then Isomorfeus.arango_development
                          elsif Isomorfeus.test? then Isomorfeus.arango_test
                          end
+        arango_options = {}.merge(arango_options)
         database = arango_options.delete(:database)
         Arango.connect_to(**arango_options)
         unless Arango.current_server.database_exist?(database)
@@ -134,7 +135,7 @@ module Isomorfeus
       end
 
       def arango_configured?
-        Isomorfeus.arango_production && Isomorfeus.arango_development && Isomorfeus.arango_test
+        !!(Isomorfeus.arango_production && Isomorfeus.arango_development && Isomorfeus.arango_test)
       end
 
       attr_accessor :arango_production
