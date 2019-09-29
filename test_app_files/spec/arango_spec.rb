@@ -6,11 +6,11 @@ RSpec.describe 'Arango' do
       Arango.current_server
     end
     STDERR.puts result
-    expect(result).to be truthy
+    expect(result).to be_truthy
     result = on_server do
       Arango.current_database
     end
     STDERR.puts result
-    expect(result).to be truthy
+    expect(result).to be_truthy
   end
 end
