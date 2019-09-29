@@ -50,7 +50,7 @@ RSpec.describe 'LucidCollection' do
         collection = SimpleCollection.load
         collection.to_transport
       end
-      expect(result).to eq("collections"=>{"SimpleCollection"=>{"{}"=>[["SimpleNode", "1"], ["SimpleNode", "2"]]}})
+      expect(result).to eq("generic_collections"=>{"SimpleCollection"=>{"{}"=>[["SimpleNode", "1"], ["SimpleNode", "2"]]}})
     end
 
     it 'can convert the simple collection included items on the server to transport' do
@@ -58,7 +58,7 @@ RSpec.describe 'LucidCollection' do
         collection = SimpleCollection.load
         collection.included_items_to_transport
       end
-      expect(result).to eq("nodes" => {"SimpleNode"=>{"1"=>{"attributes"=>{"simple_attribute"=>"simple"}},
+      expect(result).to eq("generic_nodes" => {"SimpleNode"=>{"1"=>{"attributes"=>{"simple_attribute"=>"simple"}},
                                                       "2"=>{"attributes"=>{"simple_attribute"=>"simple"}}}})
     end
   end
@@ -114,8 +114,8 @@ RSpec.describe 'LucidCollection' do
       state_json = node.get_attribute('data-iso-state')
       state = Oj.load(state_json, mode: :strict)
       expect(state).to have_key('data_state')
-      expect(state['data_state']).to have_key('collections')
-      expect(state['data_state']['collections']).to have_key('SimpleCollection')
+      expect(state['data_state']).to have_key('generic_collections')
+      expect(state['data_state']['generic_collections']).to have_key('SimpleCollection')
       expect(state['application_state']).to have_key('a_value')
     end
 
@@ -126,8 +126,8 @@ RSpec.describe 'LucidCollection' do
       state_json = node.get_attribute('data-iso-state')
       state = Oj.load(state_json, mode: :strict)
       expect(state).to have_key('data_state')
-      expect(state['data_state']).to have_key('collections')
-      expect(state['data_state']['collections']).to have_key('SimpleCollection')
+      expect(state['data_state']).to have_key('generic_collections')
+      expect(state['data_state']['generic_collections']).to have_key('SimpleCollection')
       expect(state['application_state']).to have_key('a_value')
     end
 

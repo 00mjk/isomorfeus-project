@@ -16,8 +16,8 @@ module LucidArray
           @on_load_block
         end
 
-        def query_block
-          @query_block
+        def load_query_block
+          @load_query_block
         end
       end
 
@@ -88,9 +88,7 @@ module LucidArray
             end
           end
 
-          def query
-            nil
-          end
+          def load_query; end
         end
       else # RUBY_ENGINE
         unless base == LucidArray::Base
@@ -135,7 +133,7 @@ module LucidArray
             validate_props(props_hash)
             instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
             instance.instance_exec do
-              @data_array = self.class.query_block.call(props_hash)
+              @data_array = self.class.load_query_block.call(props_hash)
               @loaded = true
             end
             instance
@@ -152,8 +150,8 @@ module LucidArray
             result_promise
           end
 
-          def query(&block)
-            @query_block = block
+          def load_query(&block)
+            @load_query_block = block
           end
         end
       end  # RUBY_ENGINE

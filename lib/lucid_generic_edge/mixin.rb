@@ -94,7 +94,7 @@ module LucidGenericEdge
         end
 
         def loaded?
-          Redux.fetch_by_path(:data_state, :edges, @class_name, @id) ? true : false
+          Redux.fetch_by_path(:data_state, :generic_edges, @class_name, @id) ? true : false
         end
 
         def from
@@ -104,7 +104,7 @@ module LucidGenericEdge
 
         def from_as_cid
           return @changed_from_cid if @changed_from_cid
-          cid = Redux.fetch_by_path(:data_state, :edges, @class_name, @id, :from)
+          cid = Redux.fetch_by_path(:data_state, :generic_edges, @class_name, @id, :from)
           cid ? cid : nil
         end
 
@@ -120,7 +120,7 @@ module LucidGenericEdge
 
         def to_as_cid
           return @changed_to_cid if @changed_to_cid
-          cid = Redux.fetch_by_path(:data_state, :edges, @class_name, @id, :to)
+          cid = Redux.fetch_by_path(:data_state, :generic_edges, @class_name, @id, :to)
           cid ? cid : nil
         end
 
@@ -130,7 +130,7 @@ module LucidGenericEdge
             next if attr == :id
             final_attributes[attr] = send(attr)
           end
-          { 'edges' => { @class_name => { @id => { from: from_as_cid, to: to_as_cid, attributes: final_attributes }}}}
+          { 'generic_edges' => { @class_name => { @id => { from: from_as_cid, to: to_as_cid, attributes: final_attributes }}}}
         end
 
         base.instance_exec do
@@ -141,7 +141,7 @@ module LucidGenericEdge
               if changed_attributes.key?(name)
                 changed_attributes[name]
               else
-                Redux.fetch_by_path(:data_state, :edges, @class_name, @id, :attributes, name)
+                Redux.fetch_by_path(:data_state, :generic_edges, @class_name, @id, :attributes, name)
               end
             end
 
@@ -211,7 +211,7 @@ module LucidGenericEdge
             include_attribute = !self.class.attribute_options[attr][:server_only] if self.class.attribute_options[attr].key?(:server_only)
             final_attributes[attr.to_s] = @attributes[attr] if include_attribute
           end
-          { 'edges' => { @class_name => { @id => { 'from' => from_as_cid, 'to' => to_as_cid, 'attributes' => final_attributes }}}}
+          { 'generic_edges' => { @class_name => { @id => { 'from' => from_as_cid, 'to' => to_as_cid, 'attributes' => final_attributes }}}}
         end
 
         base.instance_exec do

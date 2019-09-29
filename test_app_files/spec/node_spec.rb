@@ -170,7 +170,7 @@ RSpec.describe 'LucidNode' do
         node = TestNodeMixinC.new(id: 10, test_attribute: 'test')
         node.to_transport
       end
-      expect(result).to eq("nodes"=>{"TestNodeMixinC"=>{"10"=>{"attributes"=>{"test_attribute" => "test"}}}})
+      expect(result).to eq("generic_nodes"=>{"TestNodeMixinC"=>{"10"=>{"attributes"=>{"test_attribute" => "test"}}}})
     end
 
     it 'keeps server_only attribute on server' do
@@ -181,7 +181,7 @@ RSpec.describe 'LucidNode' do
         node = TestNodeMixinC.new(id: 10, test_attribute: 'test')
         node.to_transport
       end
-      expect(result).to eq("nodes"=>{"TestNodeMixinC"=>{"10"=>{"attributes"=>{}}}})
+      expect(result).to eq("generic_nodes"=>{"TestNodeMixinC"=>{"10"=>{"attributes"=>{}}}})
     end
   end
 
@@ -350,7 +350,7 @@ RSpec.describe 'LucidNode' do
         node = TestNodeMixinC.new(id: 10, test_attribute: 'test')
         node.to_transport.to_n
       end
-      expect(result).to eq("nodes" => {"TestNodeMixinC" => {"10"=>{"attributes"=>{"test_attribute" => "test"}}}})
+      expect(result).to eq("generic_nodes" => {"TestNodeMixinC" => {"10"=>{"attributes"=>{"test_attribute" => "test"}}}})
     end
   end
 end

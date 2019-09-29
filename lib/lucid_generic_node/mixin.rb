@@ -70,8 +70,8 @@ module LucidGenericNode
       end
 
       base.instance_exec do
-        def query_block
-          @query_block
+        def load_query_block
+          @load_query_block
         end
 
         def attributes
@@ -114,7 +114,7 @@ module LucidGenericNode
             next if attr == :id
             final_attributes[attr] = send(attr)
           end
-          { 'nodes' => { @class_name => { @id => { attributes: final_attributes }}}}
+          { 'generic_nodes' => { @class_name => { @id => { attributes: final_attributes }}}}
         end
 
         base.instance_exec do
@@ -125,7 +125,7 @@ module LucidGenericNode
               if changed_attributes.key?(name)
                 changed_attributes[name]
               else
-                Redux.fetch_by_path(:data_state, :nodes, @class_name, @id, :attributes, name)
+                Redux.fetch_by_path(:data_state, :generic_nodes, @class_name, @id, :attributes, name)
               end
             end
 
@@ -135,9 +135,7 @@ module LucidGenericNode
             end
           end
 
-          def query
-            nil
-          end
+          def load_query; end
         end
       else # RUBY_ENGINE
         def initialize(attributes_hash = nil)
@@ -171,7 +169,7 @@ module LucidGenericNode
             include_attribute = !self.class.attribute_options[attr][:server_only] if self.class.attribute_options[attr].key?(:server_only)
             final_attributes[attr.to_s] = send(attr) if include_attribute
           end
-          { 'nodes' => { @class_name => { @id => { 'attributes' => final_attributes }}}}
+          { 'generic_nodes' => { @class_name => { @id => { 'attributes' => final_attributes }}}}
         end
 
         base.instance_exec do

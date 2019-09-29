@@ -121,8 +121,8 @@ module LucidGenericGraph
         items_hash = {}
         own_edge_cids = own_edges_as_cids
         own_node_cids = own_nodes_as_cids
-        items_hash['edges'] = own_edge_cids.to_a if own_edge_cids.size > 0
-        items_hash['nodes'] = own_node_cids.to_a if own_node_cids.size > 0
+        items_hash['generic_edges'] = own_edge_cids.to_a if own_edge_cids.size > 0
+        items_hash['generic_nodes'] = own_node_cids.to_a if own_node_cids.size > 0
 
         if @included_arrays.size > 0
           items_hash['included_arrays'] = {}
@@ -179,7 +179,7 @@ module LucidGenericGraph
         if inline
           { '_inline' => { @props_json => items_hash }}
         else
-          { 'graphs' => { @class_name => { @props_json => items_hash }}}
+          { 'generic_graphs' => { @class_name => { @props_json => items_hash }}}
         end
       end
 
@@ -252,8 +252,8 @@ module LucidGenericGraph
           @on_load_block
         end
 
-        def query_block
-          @query_block
+        def load_query_block
+          @load_query_block
         end
       end
 
@@ -263,7 +263,7 @@ module LucidGenericGraph
           @props_json = @props.to_json if @props
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-          @store_path = store_path ? store_path : [:data_state, :graphs, @class_name, @props_json]
+          @store_path = store_path ? store_path : [:data_state, :generic_graphs, @class_name, @props_json]
 
           @included_arrays = {}
           self.class.included_arrays.each do |name, options|
@@ -318,7 +318,7 @@ module LucidGenericGraph
         end
 
         def own_edges_as_cids
-          path = @store_path + [:edges]
+          path = @store_path + [:generic_edges]
           edge_cids = Redux.fetch_by_path(*path)
           edge_cids ? Set.new(edge_cids) : Set.new
         end
@@ -360,7 +360,7 @@ module LucidGenericGraph
         end
 
         def own_nodes_as_cids
-          path = @store_path + [:nodes]
+          path = @store_path + [:generic_nodes]
           node_cids = Redux.fetch_by_path(*path)
           node_cids ? Set.new(node_cids) : Set.new
         end
@@ -478,9 +478,7 @@ module LucidGenericGraph
             end
           end
 
-          def query
-            nil
-          end
+          def load_query; end
         end
       else # RUBY_ENGINE
         unless base == LucidGenericGraph::Base
@@ -621,7 +619,7 @@ module LucidGenericGraph
             validate_props(props_hash)
             instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
             instance.instance_exec do
-              nodes, edges = self.class.query_block.call(props_hash)
+              nodes, edges = self.class.load_query_block.call(props_hash)
               @nodes = Set.new(nodes)
               @edges = Set.new(edges)
               self.class.included_arrays.each do |name, options|
@@ -660,8 +658,8 @@ module LucidGenericGraph
             result_promise
           end
 
-          def query(&block)
-            @query_block = block
+          def load_query(&block)
+            @load_query_block = block
           end
         end
       end # RUBY_ENGINE

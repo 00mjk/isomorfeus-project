@@ -1,7 +1,7 @@
 require 'isomorfeus-data-generic'
 
 class CombinedGraph < LucidGenericGraph::Base
-  query do
+  load_query do
     node1 = SimpleNode.new(id: 3, simple_attribute: 'simple')
     node2 = SimpleNode.new(id: 4, simple_attribute: 'simple')
     edge = SimpleEdge.new(id: 2, from: node1, to: node2, simple_attribute: 'simple')

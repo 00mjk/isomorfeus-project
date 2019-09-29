@@ -174,7 +174,7 @@ RSpec.describe 'LucidEdge' do
         edge = TestEdgeMixinC.new(id: 10, from: node1, to: node2, test_attribute: 'test')
         edge.to_transport
       end
-      expect(result).to eq("edges"=>{"TestEdgeMixinC"=>{"10"=>{"from"=>["TestNode","11"],"to"=>["TestNode","12"],
+      expect(result).to eq("generic_edges"=>{"TestEdgeMixinC"=>{"10"=>{"from"=>["TestNode","11"],"to"=>["TestNode","12"],
                                                                "attributes"=>{"test_attribute"=>"test"}}}})
     end
 
@@ -186,7 +186,7 @@ RSpec.describe 'LucidEdge' do
         node = TestEdgeMixinC.new(id: 10, test_attribute: 'test')
         node.to_transport
       end
-      expect(result).to eq("edges"=>{"TestEdgeMixinC"=>{"10"=>{"from"=>nil,"to"=>nil,"attributes"=>{}}}})
+      expect(result).to eq("generic_edges"=>{"TestEdgeMixinC"=>{"10"=>{"from"=>nil,"to"=>nil,"attributes"=>{}}}})
     end
   end
 
@@ -359,7 +359,7 @@ RSpec.describe 'LucidEdge' do
         edge = TestEdgeMixinC.new(id: 10, from: node1, to: node2, test_attribute: 'test')
         edge.to_transport.to_n
       end
-      expect(result).to eq("edges" => { "TestEdgeMixinC" => {"10"=>{"from" => ["TestNode", "11"], "to" => ["TestNode", "12"],
+      expect(result).to eq("generic_edges" => { "TestEdgeMixinC" => {"10"=>{"from" => ["TestNode", "11"], "to" => ["TestNode", "12"],
                                                                  "attributes"=>{"test_attribute" => "test"}}}})
     end
   end

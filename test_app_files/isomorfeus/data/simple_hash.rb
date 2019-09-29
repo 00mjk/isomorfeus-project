@@ -1,5 +1,5 @@
 class SimpleHash < LucidHash::Base
-  query do
+  load_query do
     { simple_key: 'simple_value' }
   end
 end

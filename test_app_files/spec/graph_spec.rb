@@ -52,8 +52,8 @@ RSpec.describe 'LucidGraph' do
         graph = SimpleGraph.load
         graph.to_transport
       end
-      expect(result).to eq("graphs"=>{"SimpleGraph"=>{"{}"=>{"edges"=>[["SimpleEdge", "1"]],
-                                                             "nodes"=>[["SimpleNode", "1"], ["SimpleNode", "2"]]}}})
+      expect(result).to eq("generic_graphs"=>{"SimpleGraph"=>{"{}"=>{"generic_edges"=>[["SimpleEdge", "1"]],
+                                                                     "generic_nodes"=>[["SimpleNode", "1"], ["SimpleNode", "2"]]}}})
     end
 
     it 'can converts a simple graphs included items on the server to transport' do
@@ -61,13 +61,11 @@ RSpec.describe 'LucidGraph' do
         graph = SimpleGraph.load
         graph.included_items_to_transport
       end
-      expect(result).to eq("edges" => {
-                             "SimpleEdge"=>{"1"=>{"attributes"=>{"simple_attribute"=>"simple"},
-                                                  "from"=>["SimpleNode", "1"],
-                                                  "to"=>["SimpleNode", "2"]}}},
-                           "nodes" => {"SimpleNode"=>{
-                             "1"=>{"attributes"=>{"simple_attribute"=>"simple"}},
-                             "2"=>{"attributes"=>{"simple_attribute"=>"simple"}}
+      expect(result).to eq("generic_edges" => { "SimpleEdge"=>{"1"=>{"attributes"=>{"simple_attribute"=>"simple"},
+                                                                     "from"=>["SimpleNode", "1"],
+                                                                     "to"=>["SimpleNode", "2"]}}},
+                           "generic_nodes" => {"SimpleNode"=>{ "1"=>{"attributes"=>{"simple_attribute"=>"simple"}},
+                                                               "2"=>{"attributes"=>{"simple_attribute"=>"simple"}}
                            }})
     end
   end

@@ -1,5 +1,5 @@
 class SimpleArray < LucidArray::Base
-  query do
+  load_query do
     [1, 2, 3]
   end
 end

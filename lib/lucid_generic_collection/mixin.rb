@@ -72,7 +72,7 @@ module LucidGenericCollection
         if inline
           { '_inline' => { @props_json => nodes_as_cids }}
         else
-          { 'collections' => { @class_name => { @props_json => nodes_as_cids }}}
+          { 'generic_collections' => { @class_name => { @props_json => nodes_as_cids }}}
         end
       end
 
@@ -89,8 +89,8 @@ module LucidGenericCollection
           @on_load_block
         end
 
-        def query_block
-          @query_block
+        def load_query_block
+          @load_query_block
         end
       end
 
@@ -101,7 +101,7 @@ module LucidGenericCollection
           @store_path = store_path
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-          @store_path = store_path ? store_path : [:data_state, :collections, @class_name, @props_json]
+          @store_path = store_path ? store_path : [:data_state, :generic_collections, @class_name, @props_json]
         end
 
         def loaded?
@@ -110,7 +110,7 @@ module LucidGenericCollection
 
         def find_node_by_id(node_id)
           nodes_as_cids.each do |node_cid|
-            return  LucidGenericNode::Base.node_from_cid(node_cid) if node_cid[1] == node_id
+            return LucidGenericNode::Base.node_from_cid(node_cid) if node_cid[1] == node_id
           end
           nil
         end
@@ -173,9 +173,7 @@ module LucidGenericCollection
             end
           end
 
-          def query
-            nil
-          end
+          def load_query; end
         end
       else # RUBY_ENGINE
         unless base == LucidGenericCollection::Base
@@ -218,7 +216,7 @@ module LucidGenericCollection
             validate_props(props_hash)
             instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
             instance.instance_exec do
-              @nodes = self.class.query_block.call(props_hash)
+              @nodes = self.class.load_query_block.call(props_hash)
               @loaded = true
             end
             instance
@@ -235,8 +233,8 @@ module LucidGenericCollection
             result_promise
           end
 
-          def query(&block)
-            @query_block = block
+          def load_query(&block)
+            @load_query_block = block
           end
         end
       end  # RUBY_ENGINE
