@@ -1,4 +1,4 @@
-class SimpleUser < LucidNode::Base
+class SimpleUser < LucidGenericNode::Base
   include LucidAuthentication::Mixin
 
   authentication do |user_id, user_pass|
