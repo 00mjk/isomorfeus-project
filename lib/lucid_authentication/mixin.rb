@@ -24,8 +24,12 @@ module LucidAuthentication
                 agent.processed = true
                 if agent.response.key?(:success)
                   Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.response[:data])
-                  class_name = agent.response[:data][:nodes].keys.first
-                  node_id = agent.response[:data][:nodes][class_name].keys.first
+                  if agent.response[:data].key?(:nodes)
+                    # TODO Arango support
+                  elsif agent.response[:data].key?(:generic_nodes)
+                    class_name = agent.response[:data][:generic_nodes].keys.first
+                    node_id = agent.response[:data][:generic_nodes][class_name].keys.first
+                  end
                   agent.result = Isomorfeus.cached_node_class(class_name).new({id: node_id})
                 else
                   raise 'Login failed!' # calls .fail
