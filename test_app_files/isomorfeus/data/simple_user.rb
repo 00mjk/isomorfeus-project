@@ -1,3 +1,5 @@
+require 'isomorfeus-data-generic'
+
 class SimpleUser < LucidGenericNode::Base
   include LucidAuthentication::Mixin
 
