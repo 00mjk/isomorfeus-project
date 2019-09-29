@@ -1,8 +1,8 @@
-module LucidCollection
+module LucidGenericCollection
   module Mixin
     def self.included(base)
       if RUBY_ENGINE != 'opal'
-        Isomorfeus.add_valid_collection_class(base) unless base == LucidCollection::Base
+        Isomorfeus.add_valid_collection_class(base) unless base == LucidGenericCollection::Base
       end
 
       base.extend(LucidPropDeclaration::Mixin)
@@ -110,7 +110,7 @@ module LucidCollection
 
         def find_node_by_id(node_id)
           nodes_as_cids.each do |node_cid|
-            return  LucidNode::Base.node_from_cid(node_cid) if node_cid[1] == node_id
+            return  LucidGenericNode::Base.node_from_cid(node_cid) if node_cid[1] == node_id
           end
           nil
         end
@@ -119,7 +119,7 @@ module LucidCollection
           # maybe use a node cache, maybe not:
           # - pro node cache: maybe faster
           # - contra node cache: js garbage collection fails because references are kept forever, memory usage just grows and grows
-          nodes_as_cids.map { |node_cid| LucidNode::Base.node_from_cid(node_cid) }
+          nodes_as_cids.map { |node_cid| LucidGenericNode::Base.node_from_cid(node_cid) }
         end
 
         def nodes_as_cids
@@ -178,7 +178,7 @@ module LucidCollection
           end
         end
       else # RUBY_ENGINE
-        unless base == LucidCollection::Base
+        unless base == LucidGenericCollection::Base
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: nil
         end

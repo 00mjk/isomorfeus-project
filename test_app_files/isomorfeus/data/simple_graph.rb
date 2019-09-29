@@ -1,4 +1,4 @@
-class SimpleGraph < LucidGraph::Base
+class SimpleGraph < LucidGenericGraph::Base
   query do
     node1 = SimpleNode.new(id: 1, simple_attribute: 'simple')
     node2 = SimpleNode.new(id: 2, simple_attribute: 'simple')

@@ -13,7 +13,7 @@
 #   my_node.validate_attribute!(attr, value)
 #   my_node.to_transport
 
-module LucidNode
+module LucidGenericNode
   module Mixin
     def self.included(base)
       attr_reader :id

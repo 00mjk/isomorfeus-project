@@ -4,7 +4,7 @@ RSpec.describe 'LucidCollection' do
   context 'on server' do
     it 'can instantiate by inheritance' do
       result = on_server do
-        class TestCollection < LucidCollection::Base
+        class TestCollection < LucidGenericCollection::Base
         end
         coll = TestCollection.new
         coll.instance_variable_get(:@class_name)
@@ -15,7 +15,7 @@ RSpec.describe 'LucidCollection' do
     it 'can instantiate by mixin' do
       result = on_server do
         class TestCollection
-          include LucidCollection::Mixin
+          include LucidGenericCollection::Mixin
         end
         coll = TestCollection.new
         coll.instance_variable_get(:@class_name)
@@ -70,7 +70,7 @@ RSpec.describe 'LucidCollection' do
 
     it 'can instantiate by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestCollection < LucidCollection::Base
+        class TestCollection < LucidGenericCollection::Base
         end
         coll = TestCollection.new
         coll.instance_variable_get(:@class_name)
@@ -81,7 +81,7 @@ RSpec.describe 'LucidCollection' do
     it 'can instantiate by mixin' do
       result = @doc.evaluate_ruby do
         class TestCollectionM
-          include LucidCollection::Mixin
+          include LucidGenericCollection::Mixin
         end
         coll = TestCollectionM.new
         coll.instance_variable_get(:@class_name)

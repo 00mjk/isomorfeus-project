@@ -1,6 +1,6 @@
-module LucidGraph
+module LucidGenericGraph
   class Base
-    include LucidGraph::Mixin
+    include LucidGenericGraph::Mixin
 
     if RUBY_ENGINE != 'opal'
       def self.inherited(base)

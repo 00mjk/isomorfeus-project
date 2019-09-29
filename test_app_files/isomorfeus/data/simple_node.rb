@@ -1,3 +1,3 @@
-class SimpleNode < LucidNode::Base
+class SimpleNode < LucidGenericNode::Base
   attribute :simple_attribute
 end

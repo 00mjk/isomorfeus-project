@@ -1,4 +1,4 @@
-module LucidEdge
+module LucidGenericEdge
   module Mixin
     def self.included(base)
       attr_reader :id
@@ -99,7 +99,7 @@ module LucidEdge
 
         def from
           cid = from_as_cid
-          cid ? LucidNode::Base.node_from_cid(cid) : nil
+          cid ? LucidGenericNode::Base.node_from_cid(cid) : nil
         end
 
         def from_as_cid
@@ -115,7 +115,7 @@ module LucidEdge
 
         def to
           cid = to_as_cid
-          cid ? LucidNode::Base.node_from_cid(cid) : nil
+          cid ? LucidGenericNode::Base.node_from_cid(cid) : nil
         end
 
         def to_as_cid
@@ -182,7 +182,7 @@ module LucidEdge
 
         def from
           from_cid = from_as_cid
-          from_cid ? LucidNode::Base.node_from_cid(from_cid) : nil
+          from_cid ? LucidGenericNode::Base.node_from_cid(from_cid) : nil
         end
 
         def from_as_cid
@@ -196,7 +196,7 @@ module LucidEdge
 
         def to
           to_cid = to_as_cid
-          to_cid ? LucidNode::Base.node_from_cid(to_cid) : nil
+          to_cid ? LucidGenericNode::Base.node_from_cid(to_cid) : nil
         end
 
         def to_as_cid

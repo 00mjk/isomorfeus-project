@@ -4,7 +4,7 @@ RSpec.describe 'LucidGraph' do
   context 'on server' do
     it 'can instantiate by inheritance' do
       result = on_server do
-        class TestGraph < LucidGraph::Base
+        class TestGraph < LucidGenericGraph::Base
         end
         graph = TestGraph.new
         graph.instance_variable_get(:@class_name)
@@ -15,7 +15,7 @@ RSpec.describe 'LucidGraph' do
     it 'can instantiate by mixin' do
       result = on_server do
         class TestGraph
-          include LucidGraph::Mixin
+          include LucidGenericGraph::Mixin
         end
         graph = TestGraph.new
         graph.instance_variable_get(:@class_name)
@@ -79,7 +79,7 @@ RSpec.describe 'LucidGraph' do
 
     it 'can instantiate by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestGraph < LucidGraph::Base
+        class TestGraph < LucidGenericGraph::Base
         end
         graph = TestGraph.new
         graph.instance_variable_get(:@class_name)
@@ -90,7 +90,7 @@ RSpec.describe 'LucidGraph' do
     it 'can instantiate by mixin' do
       result = @doc.evaluate_ruby do
         class TestGraphM
-          include LucidGraph::Mixin
+          include LucidGenericGraph::Mixin
         end
         graph = TestGraphM.new
         graph.instance_variable_get(:@class_name)

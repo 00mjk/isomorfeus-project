@@ -1,6 +1,6 @@
-module LucidCollection
+module LucidGenericCollection
   class Base
-    include LucidCollection::Mixin
+    include LucidGenericCollection::Mixin
 
     if RUBY_ENGINE != 'opal'
       def self.inherited(base)

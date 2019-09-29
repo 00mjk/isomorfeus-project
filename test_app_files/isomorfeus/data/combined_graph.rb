@@ -1,4 +1,4 @@
-class CombinedGraph < LucidGraph::Base
+class CombinedGraph < LucidGenericGraph::Base
   query do
     node1 = SimpleNode.new(id: 3, simple_attribute: 'simple')
     node2 = SimpleNode.new(id: 4, simple_attribute: 'simple')

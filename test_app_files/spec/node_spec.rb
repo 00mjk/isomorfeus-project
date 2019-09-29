@@ -4,7 +4,7 @@ RSpec.describe 'LucidNode' do
   context 'on the server' do
     it 'can instantiate a node by inheritance' do
       result = on_server do
-        class TestNodeBase < LucidNode::Base
+        class TestNodeBase < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeBase.new(test_attribute: 'test_value')
@@ -16,7 +16,7 @@ RSpec.describe 'LucidNode' do
     it 'can instantiate a node by mixin' do
       result = on_server do
         class TestNodeMixin
-          include LucidNode::Mixin
+          include LucidGenericNode::Mixin
           attribute :test_attribute
         end
         node = TestNodeMixin.new(test_attribute: 'test_value')
@@ -27,7 +27,7 @@ RSpec.describe 'LucidNode' do
 
     it 'verifies attribute class' do
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         node = TestNodeMixinC.new(test_attribute: 'test_value')
@@ -35,7 +35,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq('String')
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -46,7 +46,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -61,7 +61,7 @@ RSpec.describe 'LucidNode' do
 
     it 'verifies if attribute is_a' do
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, is_a: Enumerable
         end
         node = TestNodeMixinC.new(test_attribute: ['test_value'])
@@ -69,7 +69,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq('Array')
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -80,7 +80,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -95,7 +95,7 @@ RSpec.describe 'LucidNode' do
 
     it 'uses a default value' do
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, default: 10
         end
         node = TestNodeMixinC.new
@@ -106,7 +106,7 @@ RSpec.describe 'LucidNode' do
 
     it 'reports a change' do
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeMixinC.new(test_attribute: 10)
@@ -114,7 +114,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to be(false)
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeMixinC.new(test_attribute: 10)
@@ -126,7 +126,7 @@ RSpec.describe 'LucidNode' do
 
     it 'converts to cid' do
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeMixinC.new(id: 10)
@@ -137,7 +137,7 @@ RSpec.describe 'LucidNode' do
 
     it 'can validate a attribute' do
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         node = TestNodeMixinC.new
@@ -145,7 +145,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         node = TestNodeMixinC.new
@@ -153,7 +153,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         node = TestNodeMixinC.new
@@ -164,7 +164,7 @@ RSpec.describe 'LucidNode' do
 
     it 'converts to transport' do
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeMixinC.new(id: 10, test_attribute: 'test')
@@ -175,7 +175,7 @@ RSpec.describe 'LucidNode' do
 
     it 'keeps server_only attribute on server' do
       result = on_server do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, server_only: true
         end
         node = TestNodeMixinC.new(id: 10, test_attribute: 'test')
@@ -192,7 +192,7 @@ RSpec.describe 'LucidNode' do
 
     it 'can instantiate a node by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestNodeBase < LucidNode::Base
+        class TestNodeBase < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeBase.new(test_attribute: 'test_value')
@@ -204,7 +204,7 @@ RSpec.describe 'LucidNode' do
     it 'can instantiate a node by mixin' do
       result = @doc.evaluate_ruby do
         class TestNodeMixin
-          include LucidNode::Mixin
+          include LucidGenericNode::Mixin
           attribute :test_attribute
         end
         node = TestNodeMixin.new(test_attribute: 'test_value')
@@ -215,7 +215,7 @@ RSpec.describe 'LucidNode' do
 
     it 'verifies attribute class' do
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         node = TestNodeMixinC.new(test_attribute: 'test_value')
@@ -223,7 +223,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -234,7 +234,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -249,7 +249,7 @@ RSpec.describe 'LucidNode' do
 
     it 'verifies if attribute is_a' do
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, is_a: Enumerable
         end
         node = TestNodeMixinC.new(test_attribute: ['test_value'])
@@ -257,7 +257,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq('Array')
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -268,7 +268,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -283,7 +283,7 @@ RSpec.describe 'LucidNode' do
 
     it 'uses a default value' do
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, default: 10
         end
         node = TestNodeMixinC.new
@@ -295,7 +295,7 @@ RSpec.describe 'LucidNode' do
     it 'reports a change' do
       # usually node data is taken from the store, thus instantiating a node with attributes declares them as changed
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeMixinC.new(test_attribute: 10)
@@ -306,7 +306,7 @@ RSpec.describe 'LucidNode' do
 
     it 'converts to cid' do
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeMixinC.new(id: 10)
@@ -317,7 +317,7 @@ RSpec.describe 'LucidNode' do
 
     it 'can validate a attribute' do
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         node = TestNodeMixinC.new
@@ -325,7 +325,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         node = TestNodeMixinC.new
@@ -333,7 +333,7 @@ RSpec.describe 'LucidNode' do
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute, class: String
         end
         node = TestNodeMixinC.new
@@ -344,7 +344,7 @@ RSpec.describe 'LucidNode' do
 
     it 'converts to transport' do
       result = @doc.evaluate_ruby do
-        class TestNodeMixinC < LucidNode::Base
+        class TestNodeMixinC < LucidGenericNode::Base
           attribute :test_attribute
         end
         node = TestNodeMixinC.new(id: 10, test_attribute: 'test')

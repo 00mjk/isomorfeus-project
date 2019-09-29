@@ -1,8 +1,8 @@
-module LucidGraph
+module LucidGenericGraph
   module Mixin
     def self.included(base)
       if RUBY_ENGINE != 'opal'
-        Isomorfeus.add_valid_graph_class(base) unless base == LucidGraph::Base
+        Isomorfeus.add_valid_graph_class(base) unless base == LucidGenericGraph::Base
       end
 
       base.extend(LucidPropDeclaration::Mixin)
@@ -308,7 +308,7 @@ module LucidGraph
         end
 
         def edges
-          edges_as_cids.map { |edge_cid| LucidEdge::Base.edge_from_cid(edge_cid) }
+          edges_as_cids.map { |edge_cid| LucidGenericEdge::Base.edge_from_cid(edge_cid) }
         end
 
         def edges_as_cids
@@ -325,14 +325,14 @@ module LucidGraph
 
         def find_edge_by_id(edge_id)
           edges_as_cids.each do |edge_cid|
-            return  LucidNode::Base.edge_from_cid(edge_cid) if edge_cid[1] == edge_id
+            return  LucidGenericNode::Base.edge_from_cid(edge_cid) if edge_cid[1] == edge_id
           end
           nil
         end
 
         def find_node_by_id(node_id)
           nodes_as_cids.each do |node_cid|
-            return  LucidNode::Base.node_from_cid(node_cid) if node_cid[1] == node_id
+            return  LucidGenericNode::Base.node_from_cid(node_cid) if node_cid[1] == node_id
           end
           nil
         end
@@ -342,13 +342,13 @@ module LucidGraph
           path = @store_path + [:included_nodes]
           self.class.included_nodes.each_key do |name|
             node_cid = Redux.fetch_by_path(*(path + [name]))
-            incl_nodes[name] = LucidNode::Base.node_from_cid(node_cid) if node_cid
+            incl_nodes[name] = LucidGenericNode::Base.node_from_cid(node_cid) if node_cid
           end
           incl_nodes
         end
 
         def nodes
-          nodes_as_cids.map { |node_cid| LucidNode::Base.node_from_cid(node_cid) }
+          nodes_as_cids.map { |node_cid| LucidGenericNode::Base.node_from_cid(node_cid) }
         end
 
         def nodes_as_cids
@@ -401,7 +401,7 @@ module LucidGraph
             included_collections[name] = if collection_class
                                            { class: collection_class }
                                          else
-                                           new_class = Class.new(LucidCollection::Base)
+                                           new_class = Class.new(LucidGenericCollection::Base)
                                            new_class.instance_exec(&block)
                                            { anonymous: true, class: new_class }
                                          end
@@ -414,7 +414,7 @@ module LucidGraph
             included_graphs[name] = if graph_class
                                       { class: graph_class }
                                     else
-                                      new_class = Class.new(LucidGraph::Base)
+                                      new_class = Class.new(LucidGenericGraph::Base)
                                       new_class.instance_exec(&block)
                                       { anonymous: true, class: new_class }
                                     end
@@ -483,7 +483,7 @@ module LucidGraph
           end
         end
       else # RUBY_ENGINE
-        unless base == LucidGraph::Base
+        unless base == LucidGenericGraph::Base
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: nil
         end
@@ -575,7 +575,7 @@ module LucidGraph
             included_collections[name] = if collection_class
                                            { class: collection_class }
                                          else
-                                           new_class = Class.new(LucidCollection::Base)
+                                           new_class = Class.new(LucidGenericCollection::Base)
                                            new_class.instance_exec(&block)
                                            { anonymous: true, class: new_class }
                                          end
@@ -588,7 +588,7 @@ module LucidGraph
             included_graphs[name] = if graph_class
                                       { class: graph_class }
                                     else
-                                      new_class = Class.new(LucidGraph::Base)
+                                      new_class = Class.new(LucidGenericGraph::Base)
                                       new_class.instance_exec(&block)
                                       { anonymous: true, class: new_class }
                                     end
