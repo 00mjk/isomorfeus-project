@@ -1,7 +1,7 @@
 require_relative 'app_loader'
 require_relative 'owl_init'
+require_relative 'arango_config'
 require_relative 'iodine_config'
-
 
 class TestAppApp < Roda
   extend Isomorfeus::Transport::Middlewares
