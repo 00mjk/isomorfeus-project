@@ -10,8 +10,6 @@ before_script:
   - echo arangodb3 arangodb3/password_again password root | sudo debconf-set-selections
   - sudo dpkg -i arangodb3_3.5.0-1_amd64.deb
 env:
-  - LC_ALL=en_US.UTF-8
-  - ARANGO_USER=root
-  - ARANGO_PASSWORD=root
+  - LC_ALL=en_US.UTF-8 ARANGO_USER=root ARANGO_PASSWORD=root
 notifications:
   slack: isomorfeus:fkfbTBlQTpTgXaF7e0YOjWCG
