@@ -196,13 +196,6 @@ RSpec.describe 'isomorfeus-transport' do
       expect(result).to include(:process_request)
     end
 
-    it 'the sample handler processes a request' do
-      result = on_server do
-        TestHandler.new.process_request(nil, nil, { test: true })
-      end
-      expect(result).to eq({received_request: { test: true }})
-    end
-
     it 'the sample handler processes a request from the client' do
       doc = visit('/')
       result = doc.await_ruby do

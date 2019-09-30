@@ -11,5 +11,9 @@ module LucidHandler
         end
       end
     end
+
+    def resolving?
+      false
+    end
   end
 end

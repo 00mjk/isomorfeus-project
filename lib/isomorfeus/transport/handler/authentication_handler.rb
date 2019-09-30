@@ -4,20 +4,20 @@ module Isomorfeus
       class AuthenticationHandler < LucidHandler::Base
         TIMEOUT = 30
 
-        on_request do |pub_sub_client, current_user, request, _response|
+        on_request do |pub_sub_client, current_user, response_agent|
           result = { error: 'Authentication failed' }
           # promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_identifier, user_password)
-          request.each_key do |login_or_logout|
+          response_agent.request.each_key do |login_or_logout|
             if login_or_logout == 'login'
               tries = pub_sub_client.instance_variable_get(:@isomorfeus_authentication_tries)
               tries = 0 unless tries
               tries += 1
-              sleep(5) if tries > 3
+              sleep(5) if tries > 3 # TODO, this needs a better solution (store data in user)
               pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, tries)
-              request['login'].each_key do |user_identifier|
+              response_agent.request['login'].each_key do |user_identifier|
                 user = nil
                 Isomorfeus.valid_user_classes.each do |user_class|
-                  promise = user_class.promise_login(user_identifier, request['login'][user_identifier])
+                  promise = user_class.promise_login(user_identifier, response_agent.request['login'][user_identifier])
                   unless promise.realized?
                     start = Time.now
                     until promise.realized?
@@ -31,7 +31,7 @@ module Isomorfeus
                 if user
                   pub_sub_client.instance_variable_set(:@isomorfeus_user, user)
                   pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
-                  result = { success: 'ok', data: user.to_transport }
+                  response_agent.agent_result = { success: 'ok', data: user.to_transport }
                 end
               end
             elsif login_or_logout == 'logout'
@@ -46,11 +46,10 @@ module Isomorfeus
                 end
               ensure
                 pub_sub_client.instance_variable_set(:@isomorfeus_user, nil)
-                result = { success: 'ok' }
+                response_agent.agent_result = { success: 'ok' }
               end
             end
           end
-          result
         end
       end
     end
