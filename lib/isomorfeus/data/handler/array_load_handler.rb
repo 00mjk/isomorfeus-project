@@ -4,14 +4,13 @@ module Isomorfeus
   module Data
     module Handler
       class ArrayLoadHandler < LucidHandler::Base
-        on_request do |pub_sub_client, current_user, request, response|
-          result = { error: 'No such thing' }
+        on_request do |pub_sub_client, current_user, response_agent|
           # promise_send_path('Isomorfeus::Data::Handler::CollectionLoadHandler', self.to_s, props_hash)
-          request.each_key do |array_class_name|
+          response_agent.request.each_key do |array_class_name|
             if Isomorfeus.valid_array_class_name?(array_class_name)
               array_class = Isomorfeus.cached_array_class(array_class_name)
               if array_class
-                props_json = request[array_class_name]
+                props_json = response_agent.request[array_class_name]
                 begin
                   props = Oj.load(props_json, mode: :strict)
                   props.merge!({pub_sub_client: pub_sub_client, current_user: current_user})
@@ -20,26 +19,25 @@ module Isomorfeus
                     array.instance_exec do
                       array_class.on_load_block.call(pub_sub_client, current_user) if array_class.on_load_block
                     end
-                    response.deep_merge!(data: array.to_transport)
-                    result = { success: 'ok' }
+                    response_agent.outer_result = { data: array.to_transport }
+                    response_agent.agent_result = { success: 'ok' }
                   else
-                    result = { error: 'Access denied!' }
+                    response_agent.error = { error: 'Access denied!' }
                   end
                 rescue Exception => e
-                  result = if Isomorfeus.production?
-                             { error: { array_class_name => 'No such thing!' }}
-                           else
-                             { error: { array_class_name => "Isomorfeus::Data::Handler::ArrayLoadHandler: #{e.message}" }}
-                           end
+                  response_agent.error = if Isomorfeus.production?
+                                           { error: { array_class_name => 'No such thing!' }}
+                                         else
+                                           { error: { array_class_name => "Isomorfeus::Data::Handler::ArrayLoadHandler: #{e.message}" }}
+                                         end
                 end
               else
-                result = { error: { array_class_name => 'No such thing!' }}
+                response_agent.error = { error: { array_class_name => 'No such thing!' }}
               end
             else
-              result = { error: { array_class_name => 'No such thing!' }}
+              response_agent.error = { error: { array_class_name => 'No such thing!' }}
             end
           end
-          result
         end
       end
     end
