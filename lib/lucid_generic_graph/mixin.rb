@@ -463,7 +463,7 @@ module LucidGenericGraph
 
             props_json = instance.instance_variable_get(:@props_json)
 
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::GraphLoadHandler', self.name, props_json).then do |agent|
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::Generic', 'load', 'graph', self.name, props_json).then do |agent|
               if agent.processed
                 agent.result
               else

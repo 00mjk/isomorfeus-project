@@ -158,7 +158,7 @@ module LucidGenericCollection
 
             props_json = instance.instance_variable_get(:@props_json)
 
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::CollectionLoadHandler', self.name, props_json).then do |agent|
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::Generic', 'load', 'collection', self.name, props_json).then do |agent|
               if agent.processed
                 agent.result
               else

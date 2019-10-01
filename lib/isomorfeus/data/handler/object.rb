@@ -3,9 +3,9 @@
 module Isomorfeus
   module Data
     module Handler
-      class ArrayLoadHandler < LucidHandler::Base
+      class Object < LucidHandler::Base
         on_request do |pub_sub_client, current_user, response_agent|
-          # promise_send_path('Isomorfeus::Data::Handler::CollectionLoadHandler', self.to_s, props_hash)
+          # promise_send_path('Isomorfeus::Data::Handler::Object', action, object_hash)
           response_agent.request.each_key do |array_class_name|
             if Isomorfeus.valid_array_class_name?(array_class_name)
               array_class = Isomorfeus.cached_array_class(array_class_name)

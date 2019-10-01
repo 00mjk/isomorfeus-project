@@ -1,10 +1,10 @@
-module LucidArray
+module LucidStorableObject
   class Base
-    include LucidArray::Mixin
+    include LucidStorableObject::Mixin
 
     if RUBY_ENGINE != 'opal'
       def self.inherited(base)
-        Isomorfeus.add_valid_array_class(base)
+        Isomorfeus.add_valid_storable_object_class(base)
 
         base.prop :pub_sub_client, default: nil
         base.prop :current_user, default: nil

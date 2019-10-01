@@ -7,8 +7,8 @@ require 'isomorfeus-transport'
 
 require 'isomorfeus/data/config'
 require 'isomorfeus/data/props'
-require 'lucid_array/mixin'
-require 'lucid_array/base'
+require 'lucid_storable_object/mixin'
+require 'lucid_storable_object/base'
 require 'lucid_hash/mixin'
 require 'lucid_hash/base'
 
@@ -29,10 +29,9 @@ else
   require 'lucid_generic_collection/base'
   require 'lucid_generic_graph/mixin'
   require 'lucid_generic_graph/base'
-  require 'isomorfeus/data/handler/array_load_handler'
-  require 'isomorfeus/data/handler/collection_load_handler'
-  require 'isomorfeus/data/handler/graph_load_handler'
-  require 'isomorfeus/data/handler/hash_load_handler'
+  require 'isomorfeus/data/handler/object'
+  require 'isomorfeus/data/handler/generic'
+  require 'isomorfeus/data/handler/arango'
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 

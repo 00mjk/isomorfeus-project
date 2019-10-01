@@ -1,8 +1,8 @@
-module LucidArray
+module LucidStorableObject
   module Mixin
     def self.included(base)
       if RUBY_ENGINE != 'opal'
-        Isomorfeus.add_valid_array_class(base) unless base == LucidArray::Base
+        Isomorfeus.add_valid_storable_object_class(base) unless base == LucidStorableObject::Base
       end
 
       base.extend(LucidPropDeclaration::Mixin)
@@ -73,7 +73,7 @@ module LucidArray
 
             props_json = instance.instance_variable_get(:@props_json)
 
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::ArrayLoadHandler', self.name, props_json).then do |agent|
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::Generic', self.name, props_json).then do |agent|
               if agent.processed
                 agent.result
               else
