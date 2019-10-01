@@ -2,7 +2,7 @@ module LucidGenericCollection
   module Mixin
     def self.included(base)
       if RUBY_ENGINE != 'opal'
-        Isomorfeus.add_valid_collection_class(base) unless base == LucidGenericCollection::Base
+        Isomorfeus.add_valid_generic_collection_class(base) unless base == LucidGenericCollection::Base
       end
 
       base.extend(LucidPropDeclaration::Mixin)
@@ -158,7 +158,7 @@ module LucidGenericCollection
 
             props_json = instance.instance_variable_get(:@props_json)
 
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::Generic', 'load', 'collection', self.name, props_json).then do |agent|
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Data::Handler::Generic', 'collection', self.name, 'load', props_json).then do |agent|
               if agent.processed
                 agent.result
               else

@@ -25,14 +25,14 @@ RSpec.describe 'LucidCollection' do
 
     it 'the collection load handler is a valid handler'  do
       result = on_server do
-        Isomorfeus.valid_handler_class_name?('Isomorfeus::Data::Handler::CollectionLoadHandler')
+        Isomorfeus.valid_handler_class_name?('Isomorfeus::Data::Handler::Generic')
       end
       expect(result).to be true
     end
 
     it 'the simple collection is a valid collection class' do
       result = on_server do
-        Isomorfeus.valid_collection_class_name?('SimpleCollection')
+        Isomorfeus.valid_generic_collection_class_name?('SimpleCollection')
       end
       expect(result).to be true
     end
