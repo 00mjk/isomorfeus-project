@@ -70,18 +70,18 @@ module Isomorfeus
         valid_array_class_names << class_name
       end
 
-      def valid_collection_class_names
-        @valid_collection_class_names ||= Set.new
+      def valid_generic_collection_class_names
+        @valid_generic_collection_class_names ||= Set.new
       end
 
-      def valid_collection_class_name?(class_name)
-        valid_collection_class_names.include?(class_name)
+      def valid_generic_collection_class_name?(class_name)
+        valid_generic_collection_class_names.include?(class_name)
       end
 
-      def add_valid_collection_class(klass)
+      def add_valid_generic_collection_class(klass)
         class_name = klass.name
         class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        valid_collection_class_names << class_name
+        valid_generic_collection_class_names << class_name
       end
 
       def valid_graph_class_names
@@ -120,6 +120,21 @@ module Isomorfeus
         arango_options = {}.merge(arango_options)
         database = arango_options.delete(:database)
         Arango.connect_to(**arango_options)
+        begin
+          Arango.current_server.get_database(database)
+        rescue Exception => e
+          raise "Can't connect to database '#{database}' (#{e.message})."
+        end
+      end
+
+      def prepare_arango_database
+        arango_options = if Isomorfeus.production? then Isomorfeus.arango_production
+                         elsif Isomorfeus.development? then Isomorfeus.arango_development
+                         elsif Isomorfeus.test? then Isomorfeus.arango_test
+                         end
+        arango_options = {}.merge(arango_options)
+        database = arango_options.delete(:database)
+        Arango.connect_to(**arango_options)
         unless Arango.current_server.database_exist?(database)
           begin
             Arango.current_server.create_database(database)
@@ -131,6 +146,12 @@ module Isomorfeus
           Arango.current_server.get_database(database)
         rescue Exception => e
           raise "Can't connect to database '#{database}' (#{e.message})."
+        end
+        unless Arango.current_database.collection_exist?('IsomorfeusSessions')
+          Arango.current_database.create_collection('IsomorfeusSessions')
+        end
+        unless Arango.current_database.collection_exist?('IsomorfeusObjectStore')
+          Arango.current_database.create_collection('IsomorfeusObjectStore')
         end
       end
 
