@@ -91,7 +91,7 @@ module LucidStorableObject
           def load_query; end
         end
       else # RUBY_ENGINE
-        unless base == LucidArray::Base
+        unless base == LucidStorableObject::Base
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: nil
         end
