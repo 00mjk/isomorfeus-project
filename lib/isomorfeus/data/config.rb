@@ -147,6 +147,7 @@ module Isomorfeus
         rescue Exception => e
           raise "Can't connect to database '#{database}' (#{e.message})."
         end
+        Arango.current_server.install_opal_module(database)
         unless Arango.current_database.collection_exist?('IsomorfeusSessions')
           Arango.current_database.create_collection('IsomorfeusSessions')
         end
