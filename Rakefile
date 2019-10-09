@@ -1,9 +1,12 @@
+require 'bundler'
 task default: %w[run_test_app_specs]
 
 task :run_test_app_specs => 'create_test_app' do
   pwd = Dir.pwd
   Dir.chdir('test_app')
-  system('env -i PATH=$PATH ARANGO_USER=$ARANGO_USER ARANGO_PASSWORD=$ARANGO_PASSWORD bundle exec rspec')
+  Bundler.with_original_env do
+    system('bundle exec rspec')
+  end
   Dir.chdir(pwd)
   system('rm -rf test_app')
 end
@@ -16,6 +19,8 @@ end
 task :start_test_app => 'create_test_app' do
   pwd = Dir.pwd
   Dir.chdir('test_app')
-  system('env -i PATH=$PATH foreman start')
+  Bundler.with_original_env do
+    system('foreman start')
+  end
   Dir.chdir(pwd)
 end
