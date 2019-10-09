@@ -1,14 +1,14 @@
 module Isomorfeus
   # available settings
   class << self
-    # def cached_array_classes
-    #   @cached_array_classes ||= {}
-    # end
-    #
-    # def cached_array_class(class_name)
-    #   return cached_array_classes[class_name] if cached_array_classes.key?(class_name)
-    #   cached_array_classes[class_name] = "::#{class_name}".constantize
-    # end
+    def cached_composable_graph_classes
+      @cached_composable_graph_classes ||= {}
+    end
+
+    def cached_composable_graph_class(class_name)
+      return cached_composable_graph_classes[class_name] if cached_composable_graph_classes.key?(class_name)
+      cached_composable_graph_classes[class_name] = "::#{class_name}".constantize
+    end
 
     def cached_generic_collection_classes
       @cached_generic_collection_classes ||= {}
@@ -28,31 +28,13 @@ module Isomorfeus
       cached_generic_edge_classes[class_name] = "::#{class_name}".constantize
     end
 
-    def cached_composable_graph_classes
-      @cached_composable_graph_classes ||= {}
+    def cached_generic_node_classes
+      @cached_generic_node_classes ||= {}
     end
 
-    def cached_composable_graph_class(class_name)
-      return cached_composable_graph_classes[class_name] if cached_composable_graph_classes.key?(class_name)
-      cached_composable_graph_classes[class_name] = "::#{class_name}".constantize
-    end
-
-    def cached_hash_classes
-      @cached_hash_classes ||= {}
-    end
-
-    def cached_hash_class(class_name)
-      return cached_hash_classes[class_name] if cached_hash_classes.key?(class_name)
-      cached_hash_classes[class_name] = "::#{class_name}".constantize
-    end
-
-    def cached_node_classes
-      @cached_node_classes ||= {}
-    end
-
-    def cached_node_class(class_name)
-      return cached_node_classes[class_name] if cached_node_classes.key?(class_name)
-      cached_node_classes[class_name] = "::#{class_name}".constantize
+    def cached_generic_node_class(class_name)
+      return cached_generic_node_classes[class_name] if cached_generic_node_classes.key?(class_name)
+      cached_generic_node_classes[class_name] = "::#{class_name}".constantize
     end
 
     if RUBY_ENGINE != 'opal'
@@ -65,9 +47,7 @@ module Isomorfeus
       end
 
       def add_valid_storable_object_class(klass)
-        class_name = klass.name
-        class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        valid_array_class_names << class_name
+        valid_array_class_names << data_class_name(klass)
       end
 
       def valid_generic_collection_class_names
@@ -79,37 +59,43 @@ module Isomorfeus
       end
 
       def add_valid_generic_collection_class(klass)
-        class_name = klass.name
-        class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        valid_generic_collection_class_names << class_name
+        valid_generic_collection_class_names << data_class_name(klass)
       end
 
-      def valid_graph_class_names
-        @valid_graph_class_names ||= Set.new
+      def valid_composable_graph_class_names
+        @valid_composable_graph_class_names ||= Set.new
       end
 
-      def valid_graph_class_name?(class_name)
-        valid_graph_class_names.include?(class_name)
+      def valid_composable_graph_class_name?(class_name)
+        valid_composable_graph_class_names.include?(class_name)
       end
 
-      def add_valid_graph_class(klass)
-        class_name = klass.name
-        class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        valid_graph_class_names << class_name
+      def add_valid_composable_graph_class(klass)
+        valid_composable_graph_class_names << data_class_name(klass)
       end
 
-      def valid_hash_class_names
-        @valid_hash_class_names ||= Set.new
+      def valid_generic_edge_class_names
+        @valid_generic_edge_class_names ||= Set.new
       end
 
-      def valid_hash_class_name?(class_name)
-        valid_hash_class_names.include?(class_name)
+      def valid_generic_edge_class_name?(class_name)
+        valid_generic_edge_class_names.include?(class_name)
       end
 
-      def add_valid_hash_class(klass)
-        class_name = klass.name
-        class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        valid_hash_class_names << class_name
+      def add_valid_generic_edge_class(klass)
+        valid_generic_edge_class_names << data_class_name(klass)
+      end
+
+      def valid_generic_node_class_names
+        @valid_generic_node_class_names ||= Set.new
+      end
+
+      def valid_generic_node_class_name?(class_name)
+        valid_generic_node_class_names.include?(class_name)
+      end
+
+      def add_valid_generic_node_class(klass)
+        valid_generic_node_class_names << data_class_name(klass)
       end
 
       def connect_to_arango
@@ -137,7 +123,7 @@ module Isomorfeus
         Arango.connect_to(**arango_options)
         db = nil
         begin
-          opened_db= Arango.current_server.get_database(database)
+          opened_db = Arango.current_server.get_database(database)
           db = opened_db.name
         rescue Exception => e
           db = nil
@@ -174,6 +160,14 @@ module Isomorfeus
       attr_accessor :arango_production
       attr_accessor :arango_development
       attr_accessor :arango_test
+
+      private
+
+      def data_class_name(klass)
+        class_name = klass.name
+        class_name = class_name.split('>::').last if class_name.start_with?('#<')
+        class_name
+      end
     end
   end
 end
