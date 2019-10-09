@@ -30,6 +30,8 @@ module LucidAuthentication
                     class_name = agent.response[:data][:generic_nodes].keys.first
                     node_id = agent.response[:data][:generic_nodes][class_name].keys.first
                   end
+                  # TODO set session cookie
+                  # agent.response[:session_cookie]
                   agent.result = Isomorfeus.cached_node_class(class_name).new({id: node_id})
                 else
                   raise 'Login failed!' # calls .fail

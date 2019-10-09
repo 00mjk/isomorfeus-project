@@ -12,7 +12,7 @@ module Isomorfeus
               tries = pub_sub_client.instance_variable_get(:@isomorfeus_authentication_tries)
               tries = 0 unless tries
               tries += 1
-              sleep(5) if tries > 3 # TODO, this needs a better solution (store data in user)
+              sleep(5) if tries > 3 # TODO, this needs a better solution (store data in user/session)
               pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, tries)
               response_agent.request['login'].each_key do |user_identifier|
                 user = nil
@@ -31,6 +31,7 @@ module Isomorfeus
                 if user
                   pub_sub_client.instance_variable_set(:@isomorfeus_user, user)
                   pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
+                  # TODO store session in db and supply session cookie: session_cookie: uuid or so
                   response_agent.agent_result = { success: 'ok', data: user.to_transport }
                 end
               end

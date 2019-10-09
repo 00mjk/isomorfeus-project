@@ -12,6 +12,7 @@ module Isomorfeus
       def call(env)
         if env['PATH_INFO'] == Isomorfeus.api_websocket_path
           if env['rack.upgrade?'] == :websocket
+            # TODO get session cookie
             env['rack.upgrade'] = Isomorfeus::Transport::ServerSocketProcessor.new
           end
           WS_RESPONSE
