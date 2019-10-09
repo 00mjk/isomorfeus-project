@@ -1,8 +1,8 @@
-module LucidGenericGraph
+module LucidComposableGraph
   module Mixin
     def self.included(base)
       if RUBY_ENGINE != 'opal'
-        Isomorfeus.add_valid_graph_class(base) unless base == LucidGenericGraph::Base
+        Isomorfeus.add_valid_composable_graph_class(base) unless base == LucidComposableGraph::Base
       end
 
       base.extend(LucidPropDeclaration::Mixin)

@@ -7,10 +7,6 @@ module LucidGenericCollection
 
       base.extend(LucidPropDeclaration::Mixin)
 
-      def arango_name
-        self.to_s
-      end
-
       def find_node(attribute_hash = nil, &block)
         if block_given?
           nodes.each do |node|

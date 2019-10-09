@@ -9,7 +9,7 @@ module Isomorfeus
           response_agent.request.each_key do |action|
             if action == 'load'
               response_agent.request[action].each_key do |type|
-                if %w[collection graph node edge].include?(type)
+                if %w[collection graph document edge].include?(type)
                   response_agent.request.each_key do |type_class_name|
                     if Isomorfeus.send("valid_#{type}_class_name?", type_class_name)
                       type_class = Isomorfeus.send("cached_#{type}_class", type_class_name)
