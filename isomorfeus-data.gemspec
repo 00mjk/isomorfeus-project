@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']
 
-  s.add_dependency 'activesupport', '~> 5.2'
-  s.add_dependency 'arango-driver', '3.5.0.alpha0'
+  s.add_dependency 'activesupport', '~> 6.0'
+  s.add_dependency 'arango-driver', '~> 3.5.0.alpha1'
   s.add_dependency 'oj', '>= 3.9.0'
   s.add_dependency 'opal', '>= 0.11.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
