@@ -135,18 +135,29 @@ module Isomorfeus
         arango_options = {}.merge(arango_options)
         database = arango_options.delete(:database)
         Arango.connect_to(**arango_options)
-        unless Arango.current_server.database_exist?(database)
+        db = nil
+        begin
+          opened_db= Arango.current_server.get_database(database)
+          db = opened_db.name
+        rescue Exception => e
+          db = nil
+          unless e.message.include?('database not found')
+            raise "Can't check if database '#{database}' exists."
+          end
+        end
+        unless db
           begin
             Arango.current_server.create_database(database)
           rescue Exception => e
             raise "Can't create database '#{database}' (#{e.message}).\nPlease make sure database '#{database}' exists."
           end
+          begin
+            Arango.current_server.get_database(database)
+          rescue Exception => e
+            raise "Can't connect to database '#{database}' (#{e.message})."
+          end
         end
-        begin
-          Arango.current_server.get_database(database)
-        rescue Exception => e
-          raise "Can't connect to database '#{database}' (#{e.message})."
-        end
+
         Arango.current_server.install_opal_module(database)
         unless Arango.current_database.collection_exist?('IsomorfeusSessions')
           Arango.current_database.create_collection('IsomorfeusSessions')

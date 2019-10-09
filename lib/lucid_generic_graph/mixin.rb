@@ -384,19 +384,6 @@ module LucidGenericGraph
         end
 
         base.instance_exec do
-          def include_array(name, array_class = nil, &block)
-            included_arrays[name] = if array_class
-                                      { class: array_class }
-                                    else
-                                      new_class = Class.new(LucidArray::Base)
-                                      new_class.instance_exec(&block)
-                                      { anonymous: true, class: new_class }
-                                    end
-            define_method(name) do
-              @included_arrays[name]
-            end
-          end
-
           def include_collection(name, collection_class = nil, &block)
             included_collections[name] = if collection_class
                                            { class: collection_class }
@@ -420,19 +407,6 @@ module LucidGenericGraph
                                     end
             define_method(name) do
               @included_graphs[name]
-            end
-          end
-
-          def include_hash(name, hash_class = nil, &block)
-            included_hashes[name] = if hash_class
-                                      { class: hash_class }
-                                    else
-                                      new_class = Class.new(LucidHash::Base)
-                                      new_class.instance_exec(&block)
-                                      { anonymous: true, class: new_class }
-                                    end
-            define_method(name) do
-              @included_hashes[name]
             end
           end
 
@@ -556,19 +530,6 @@ module LucidGenericGraph
         base.instance_exec do
           attr_accessor :included_nodes
 
-          def include_array(name, array_class = nil, &block)
-            included_arrays[name] = if array_class
-                                           { class: array_class }
-                                         else
-                                           new_class = Class.new(LucidArray::Base)
-                                           new_class.instance_exec(&block)
-                                           { anonymous: true, class: new_class }
-                                         end
-            define_method(name) do
-              @included_arrays[name]
-            end
-          end
-
           def include_collection(name, collection_class = nil, &block)
             included_collections[name] = if collection_class
                                            { class: collection_class }
@@ -592,19 +553,6 @@ module LucidGenericGraph
                                     end
             define_method(name) do
               @included_graphs[name]
-            end
-          end
-
-          def include_hash(name, hash_class = nil, &block)
-            included_hashes[name] = if hash_class
-                                      { class: hash_class }
-                                    else
-                                      new_class = Class.new(LucidHash::Base)
-                                      new_class.instance_exec(&block)
-                                      { anonymous: true, class: new_class }
-                                    end
-            define_method(name) do
-              @included_hashes[name]
             end
           end
 

@@ -8,11 +8,9 @@ class MultiCombinedGraph < LucidGenericGraph::Base
     [[node1, node2], [edge]]
   end
 
-  include_array :simple_array, SimpleArray
   include_collection :simple_collection, SimpleCollection
   include_graph :simple_graph, SimpleGraph
   include_graph :combined_graph, CombinedGraph
-  include_hash :simple_hash, SimpleHash
   include_node :simple_node, SimpleNode do
     { id: '9', simple_attribute: 'yeah, yeah, yeah, a test' }
   end
