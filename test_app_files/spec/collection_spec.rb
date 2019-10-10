@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidCollection' do
+RSpec.describe 'LucidGenericCollection' do
   context 'on server' do
     it 'can instantiate by inheritance' do
       result = on_server do

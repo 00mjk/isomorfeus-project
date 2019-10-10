@@ -6,8 +6,8 @@ module LucidGenericEdge
       def self.inherited(base)
         Isomorfeus.add_valid_generic_edge_class(base)
 
-        base.prop :pub_sub_client, default: nil
-        base.prop :current_user, default: nil
+        # base.prop :pub_sub_client, default: nil
+        # base.prop :current_user, default: nil
       end
     end
   end

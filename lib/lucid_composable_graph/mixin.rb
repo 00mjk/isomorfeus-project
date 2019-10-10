@@ -401,7 +401,7 @@ module LucidComposableGraph
             included_graphs[name] = if graph_class
                                       { class: graph_class }
                                     else
-                                      new_class = Class.new(LucidGenericGraph::Base)
+                                      new_class = Class.new(LucidComposableGraph::Base)
                                       new_class.instance_exec(&block)
                                       { anonymous: true, class: new_class }
                                     end
@@ -455,7 +455,7 @@ module LucidComposableGraph
           def load_query; end
         end
       else # RUBY_ENGINE
-        unless base == LucidGenericGraph::Base
+        unless base == LucidComposableGraph::Base
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: nil
         end
@@ -547,7 +547,7 @@ module LucidComposableGraph
             included_graphs[name] = if graph_class
                                       { class: graph_class }
                                     else
-                                      new_class = Class.new(LucidGenericGraph::Base)
+                                      new_class = Class.new(LucidComposableGraph::Base)
                                       new_class.instance_exec(&block)
                                       { anonymous: true, class: new_class }
                                     end

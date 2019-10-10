@@ -83,7 +83,7 @@ module LucidGenericNode
         end
 
         def node_from_cid(cid)
-          Isomorfeus.cached_node_class(cid[0]).new({id: cid[1]})
+          Isomorfeus.cached_generic_node_class(cid[0]).new({id: cid[1]})
         end
       end
 
