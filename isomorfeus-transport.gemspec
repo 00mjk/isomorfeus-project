@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'oj', '>= 3.9.0'
   s.add_dependency 'opal', '>= 0.11.0'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.14'
-  s.add_dependency 'isomorfeus-react', '>= 16.10.6'
+  s.add_dependency 'isomorfeus-react', '>= 16.10.8'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
   s.add_dependency 'websocket-driver', '~> 0.7.0'
   s.add_development_dependency 'isomorfeus-installer', Isomorfeus::Transport::VERSION
