@@ -99,7 +99,7 @@ module LucidGenericEdge
 
         def from
           cid = from_as_cid
-          cid ? LucidGenericNode::Base.node_from_cid(cid) : nil
+          cid ? LucidGenericDocument::Base.node_from_cid(cid) : nil
         end
 
         def from_as_cid
@@ -115,7 +115,7 @@ module LucidGenericEdge
 
         def to
           cid = to_as_cid
-          cid ? LucidGenericNode::Base.node_from_cid(cid) : nil
+          cid ? LucidGenericDocument::Base.node_from_cid(cid) : nil
         end
 
         def to_as_cid
@@ -182,7 +182,7 @@ module LucidGenericEdge
 
         def from
           from_cid = from_as_cid
-          from_cid ? LucidGenericNode::Base.node_from_cid(from_cid) : nil
+          from_cid ? LucidGenericDocument::Base.node_from_cid(from_cid) : nil
         end
 
         def from_as_cid
@@ -196,7 +196,7 @@ module LucidGenericEdge
 
         def to
           to_cid = to_as_cid
-          to_cid ? LucidGenericNode::Base.node_from_cid(to_cid) : nil
+          to_cid ? LucidGenericDocument::Base.node_from_cid(to_cid) : nil
         end
 
         def to_as_cid

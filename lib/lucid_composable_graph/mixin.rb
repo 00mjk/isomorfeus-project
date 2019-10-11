@@ -325,14 +325,14 @@ module LucidComposableGraph
 
         def find_edge_by_id(edge_id)
           edges_as_cids.each do |edge_cid|
-            return  LucidGenericNode::Base.edge_from_cid(edge_cid) if edge_cid[1] == edge_id
+            return  LucidGenericDocument::Base.edge_from_cid(edge_cid) if edge_cid[1] == edge_id
           end
           nil
         end
 
         def find_node_by_id(node_id)
           nodes_as_cids.each do |node_cid|
-            return  LucidGenericNode::Base.node_from_cid(node_cid) if node_cid[1] == node_id
+            return  LucidGenericDocument::Base.node_from_cid(node_cid) if node_cid[1] == node_id
           end
           nil
         end
@@ -342,13 +342,13 @@ module LucidComposableGraph
           path = @store_path + [:included_nodes]
           self.class.included_nodes.each_key do |name|
             node_cid = Redux.fetch_by_path(*(path + [name]))
-            incl_nodes[name] = LucidGenericNode::Base.node_from_cid(node_cid) if node_cid
+            incl_nodes[name] = LucidGenericDocument::Base.node_from_cid(node_cid) if node_cid
           end
           incl_nodes
         end
 
         def nodes
-          nodes_as_cids.map { |node_cid| LucidGenericNode::Base.node_from_cid(node_cid) }
+          nodes_as_cids.map { |node_cid| LucidGenericDocument::Base.node_from_cid(node_cid) }
         end
 
         def nodes_as_cids

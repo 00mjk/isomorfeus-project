@@ -1,5 +1,5 @@
 require 'isomorfeus-data-generic'
 
-class SimpleNode < LucidGenericNode::Base
+class SimpleNode < LucidGenericDocument::Base
   attribute :simple_attribute
 end

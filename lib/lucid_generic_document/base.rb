@@ -1,6 +1,6 @@
-module LucidGenericNode
+module LucidGenericDocument
   class Base
-    include LucidGenericNode::Mixin
+    include LucidGenericDocument::Mixin
 
     if RUBY_ENGINE != 'opal'
       def self.inherited(base)
