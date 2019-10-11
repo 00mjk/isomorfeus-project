@@ -1,6 +1,6 @@
 require 'isomorfeus-data-generic'
 
-class SimpleUser < LucidGenericNode::Base
+class SimpleUser < LucidGenericDocument::Base
   include LucidAuthentication::Mixin
 
   authentication do |user_id, user_pass|

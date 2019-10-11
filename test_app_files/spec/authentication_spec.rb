@@ -4,7 +4,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
   context 'on server' do
     it 'can mixin' do
       result = on_server do
-        class MyUser < LucidGenericNode::Base
+        class MyUser < LucidGenericDocument::Base
           include LucidAuthentication::Mixin
         end
 
@@ -45,7 +45,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can mixin' do
       result = @doc.evaluate_ruby do
-        class MyUser < LucidGenericNode::Base
+        class MyUser < LucidGenericDocument::Base
           include LucidAuthentication::Mixin
         end
 

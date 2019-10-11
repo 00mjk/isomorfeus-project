@@ -43,7 +43,7 @@ end
 
 A class representing a user should be a LucidNode and include LucidAuthentication::Mixin:
 ```ruby
-class User < LucidGenericNode::Base
+class User < LucidGenericDocument::Base
   include LucidAuthentication::Mixin
   authentication do |user_identifier, user_password_or token|
     # should return either a User instance or a Promise which reselves to a User instance
