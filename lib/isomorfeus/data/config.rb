@@ -6,6 +6,7 @@ module Isomorfeus
     end
 
     def cached_composable_graph_class(class_name)
+      return "::#{class_name}".constantize if Isomorfeus.development?
       return cached_composable_graph_classes[class_name] if cached_composable_graph_classes.key?(class_name)
       cached_composable_graph_classes[class_name] = "::#{class_name}".constantize
     end
@@ -15,6 +16,7 @@ module Isomorfeus
     end
 
     def cached_generic_collection_class(class_name)
+      return "::#{class_name}".constantize if Isomorfeus.development?
       return cached_generic_collection_classes[class_name] if cached_generic_collection_classes.key?(class_name)
       cached_generic_collection_classes[class_name] = "::#{class_name}".constantize
     end
@@ -24,6 +26,7 @@ module Isomorfeus
     end
 
     def cached_generic_edge_class(class_name)
+      return "::#{class_name}".constantize if Isomorfeus.development?
       return cached_generic_edge_classes[class_name] if cached_generic_edge_classes.key?(class_name)
       cached_generic_edge_classes[class_name] = "::#{class_name}".constantize
     end
@@ -33,6 +36,7 @@ module Isomorfeus
     end
 
     def cached_generic_node_class(class_name)
+      return "::#{class_name}".constantize if Isomorfeus.development?
       return cached_generic_node_classes[class_name] if cached_generic_node_classes.key?(class_name)
       cached_generic_node_classes[class_name] = "::#{class_name}".constantize
     end
