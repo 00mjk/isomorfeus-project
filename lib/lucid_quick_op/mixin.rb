@@ -30,7 +30,7 @@ module LucidQuickOp
 
         unless base == LucidQuickOp::Base
           base.prop :pub_sub_client, default: nil
-          base.prop :current_user, default: nil
+          base.prop :current_user, default: Anonymous.new
         end
 
         base.instance_exec do
