@@ -5,6 +5,7 @@ module Isomorfeus
     end
 
     def cached_operation_class(class_name)
+      return "::#{class_name}".constantize if Isomorfeus.development?
       return cached_operation_classes[class_name] if cached_operation_classes.key?(class_name)
       cached_operation_classes[class_name] = "::#{class_name}".constantize
     end
