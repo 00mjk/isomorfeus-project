@@ -7,7 +7,7 @@ module LucidComposableGraph
         Isomorfeus.add_valid_composable_graph_class(base)
 
         base.prop :pub_sub_client, default: nil
-        base.prop :current_user, default: nil
+        base.prop :current_user, default: Anonymous.new
       end
     end
   end

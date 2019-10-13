@@ -7,7 +7,7 @@ module LucidGenericCollection
         Isomorfeus.add_valid_generic_collection_class(base)
 
         base.prop :pub_sub_client, default: nil
-        base.prop :current_user, default: nil
+        base.prop :current_user, default: Anonymous.new
       end
     end
   end

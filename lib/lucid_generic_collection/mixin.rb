@@ -174,7 +174,7 @@ module LucidGenericCollection
       else # RUBY_ENGINE
         unless base == LucidGenericCollection::Base
           base.prop :pub_sub_client, default: nil
-          base.prop :current_user, default: nil
+          base.prop :current_user, default: Anonymous.new
         end
 
         def initialize(store_path: nil, validated_props: nil)
