@@ -1,5 +1,3 @@
-require 'opal-activesupport'
-require 'isomorfeus-redux'
 require 'isomorfeus-transport'
 
 if RUBY_ENGINE == 'opal'
