@@ -14,7 +14,7 @@ else
 
   require 'zeitwerk'
   Isomorfeus.zeitwerk = Zeitwerk::Loader.new
-  Isomorfeus.zeitwerk_mutex = Mutex.new
+  Isomorfeus.zeitwerk_mutex = Mutex.new if Isomorfeus.development?
 
   path = File.expand_path(File.join('isomorfeus', 'policies'))
 
