@@ -1,5 +1,3 @@
-#require 'opal'
-#require 'isomorfeus-redux'
 require 'isomorfeus-react'
 require 'isomorfeus/policy/config'
 require 'lucid_policy/exception'
@@ -14,13 +12,11 @@ if RUBY_ENGINE == 'opal'
 else
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
-  require 'active_support/dependencies'
+  require 'zeitwerk'
+  Isomorfeus.zeitwerk = Zeitwerk::Loader.new
+  Isomorfeus.zeitwerk_mutex = Mutex.new
 
   path = File.expand_path(File.join('isomorfeus', 'policies'))
 
-  ActiveSupport::Dependencies.autoload_paths << path
-  # we also need to require them all, so classes are registered accordingly
-  Dir.glob("#{path}/**/*.rb").each do |file|
-    require file
-  end
+  Isomorfeus.zeitwerk.push_dir(path)
 end
