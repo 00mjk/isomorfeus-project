@@ -47,6 +47,7 @@ module Isomorfeus
       end
 
       def cached_channel_class(class_name)
+        return "::#{class_name}".constantize if Isomorfeus.development?
         return cached_channel_classes[class_name] if cached_channel_classes.key?(class_name)
         cached_channel_classes[class_name] = "::#{class_name}".constantize
       end
@@ -84,6 +85,7 @@ module Isomorfeus
       end
 
       def cached_handler_class(class_name)
+        return "::#{class_name}".constantize if Isomorfeus.development?
         return cached_handler_classes[class_name] if cached_handler_classes.key?(class_name)
         cached_handler_classes[class_name] = "::#{class_name}".constantize
       end
