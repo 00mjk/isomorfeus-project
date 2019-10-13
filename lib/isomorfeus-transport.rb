@@ -1,7 +1,3 @@
-require 'opal'
-require 'opal-autoloader'
-require 'opal-activesupport'
-require 'isomorfeus-react'
 require 'isomorfeus-policy'
 require 'lucid_authentication/mixin'
 if RUBY_ENGINE == 'opal'
@@ -42,7 +38,6 @@ else
   require 'isomorfeus/transport/middlewares'
 
   Isomorfeus.add_middleware(Isomorfeus::Transport::RackMiddleware)
-  Isomorfeus.valid_channel_class_names
 
   require 'lucid_handler/mixin'
   require 'lucid_handler/base'
@@ -53,17 +48,10 @@ else
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
-  require 'active_support'
-  require 'active_support/dependencies'
-
   %w[channels handlers].each do |dir|
     path = Dir.exist?(File.join('isomorfeus')) ? File.expand_path(File.join('isomorfeus', dir)) : nil
-    if path
-      ActiveSupport::Dependencies.autoload_paths << path
-      # we also need to require them all, so classes are registered accordingly
-      Dir.glob("#{path}/**/*.rb").each do |file|
-        require file
-      end
+    if path && Dir.exist?(path)
+      Isomorfeus.zeitwerk.push_dir(path)
     end
   end
 end

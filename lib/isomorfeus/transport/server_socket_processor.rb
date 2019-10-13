@@ -4,6 +4,12 @@ module Isomorfeus
       include Isomorfeus::Transport::ServerProcessor
 
       def on_message(client, data)
+        if Isomorfeus.development?
+          Isomorfeus.zeitwerk_mutex.synchronize do
+            Isomorfeus.zeitwerk.reload
+            STDERR.puts "SSP reloading!"
+          end
+        end
         request_hash = Oj.load(data, mode: :strict)
         handler_instance_cache = {}
         response_agent_array = []
