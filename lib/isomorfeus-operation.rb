@@ -1,8 +1,3 @@
-require 'opal'
-require 'opal-autoloader'
-require 'opal-activesupport'
-require 'isomorfeus-redux'
-require 'isomorfeus-react'
 require 'isomorfeus-transport'
 require 'isomorfeus/operation/config'
 require 'isomorfeus/operation/gherkin'
@@ -16,20 +11,16 @@ require 'lucid_operation/mixin'
 require 'lucid_operation/base'
 
 if RUBY_ENGINE == 'opal'
-  Opal::Autoloader.add_load_path('data')
+  Opal::Autoloader.add_load_path('operations')
 else
   require 'oj'
   require 'isomorfeus/operation/handler/operation_handler'
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
-  require 'active_support/dependencies'
+  # require 'active_support/dependencies'
 
   path = File.expand_path(File.join('isomorfeus', 'operations'))
 
-  ActiveSupport::Dependencies.autoload_paths << path
-  # we also need to require them all, so classes are registered accordingly
-  Dir.glob("#{path}/**/*.rb").each do |file|
-    require file
-  end
+  Isomorfeus.zeitwerk.push_dir(path)
 end
