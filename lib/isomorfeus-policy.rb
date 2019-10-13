@@ -1,5 +1,5 @@
-require 'opal'
-require 'isomorfeus-redux'
+#require 'opal'
+#require 'isomorfeus-redux'
 require 'isomorfeus-react'
 require 'isomorfeus/policy/config'
 require 'lucid_policy/exception'
