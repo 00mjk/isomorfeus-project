@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths  = ['lib']
 
+  s.add_dependency 'concurrent-ruby', '~> 1.1.0'
   s.add_dependency 'opal', '>= 1.0.0'
   s.add_dependency 'opal-autoloader', '~> 0.1.0'
   s.add_dependency 'isomorfeus-react', '>= 16.10.11'
