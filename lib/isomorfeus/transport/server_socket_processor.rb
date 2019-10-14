@@ -5,10 +5,10 @@ module Isomorfeus
 
       def on_message(client, data)
         if Isomorfeus.development?
-          Isomorfeus.zeitwerk_mutex.synchronize do
+          Isomorfeus.zeitwerk_lock.with_write_lock do
             Isomorfeus.zeitwerk.reload
-            STDERR.puts "SSP reloading!"
           end
+          Isomorfeus.zeitwerk_lock.acquire_read_lock
         end
         request_hash = Oj.load(data, mode: :strict)
         handler_instance_cache = {}
@@ -22,6 +22,8 @@ module Isomorfeus
           result.deep_merge!(response_agent.result)
         end
         client.write Oj.dump(result, mode: :strict)
+      ensure
+        Isomorfeus.zeitwerk_lock.release_read_lock if Isomorfeus.development?
       end
 
       def on_close(client)
