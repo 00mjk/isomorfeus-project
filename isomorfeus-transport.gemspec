@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.require_paths  = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.0'
-  s.add_dependency 'iodine', '~> 0.7.34'
+  s.add_dependency 'iodine', '~> 0.7.35'
   s.add_dependency 'oj', '>= 3.9.0'
   s.add_dependency 'opal', '>= 1.0.0'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.16'
