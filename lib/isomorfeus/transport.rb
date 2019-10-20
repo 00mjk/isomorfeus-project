@@ -24,7 +24,7 @@ module Isomorfeus
           if Isomorfeus.on_browser?
             window_protocol = `window.location.protocol`
             ws_protocol = window_protocol == 'https:' ? 'wss:' : 'ws:'
-            ws_url = "#{ws_protocol}#{`window.location.host`}#{Isomorfeus.api_websocket_path}"
+            ws_url = "#{ws_protocol}//#{`window.location.host`}#{Isomorfeus.api_websocket_path}"
           else
             ws_url = Isomorfeus::TopLevel.transport_ws_url
           end
