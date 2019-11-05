@@ -11,7 +11,7 @@ require 'lucid_operation/mixin'
 require 'lucid_operation/base'
 
 if RUBY_ENGINE == 'opal'
-  Opal::Autoloader.add_load_path('operations')
+  Isomorfeus.zeitwerk.push_dir('operations')
 else
   require 'oj'
   require 'isomorfeus/operation/handler/operation_handler'
