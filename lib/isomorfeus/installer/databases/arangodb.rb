@@ -9,6 +9,5 @@ module Isomorfeus
 end
 
 Isomorfeus::Installer.add_database('arangodb',
-                                   gems: [ { name: 'isomorfeus-record', version: "~> #{Isomorfeus::Installer::VERSION}" },
-                                           { name: 'isomorfeus-record-arango', version: "~> #{Isomorfeus::Installer::VERSION}" } ],
+                                   gems: [ { name: 'arango-driver', version: "~> 3.5.0.alpha0" } ],
                                    installer: Isomorfeus::Installer::Databases::ArangoDB)
