@@ -17,7 +17,7 @@ require 'lucid_composable_graph/base'
 if RUBY_ENGINE == 'opal'
   require 'isomorfeus/data/reducer'
   Isomorfeus::Data::Reducer.add_reducer_to_store
-  Opal::Autoloader.add_load_path('data')
+  Isomorfeus.zeitwerk.push_dir('data')
 else
   require 'oj'
   require 'active_support'
