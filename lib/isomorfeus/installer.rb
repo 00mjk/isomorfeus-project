@@ -173,6 +173,7 @@ module Isomorfeus
                   webpack_config_path('debug.js'))
       create_file_from_template('production.js.erb', webpack_config_path('production.js'), {})
       create_file_from_template('development.js.erb', webpack_config_path('development.js'), {})
+      create_file_from_template('development_ssr.js.erb', webpack_config_path('development_ssr.js'), {})
       create_file_from_template('debug.js.erb', webpack_config_path('debug.js'), {})
     end
 
