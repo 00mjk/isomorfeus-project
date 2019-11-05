@@ -114,8 +114,8 @@ module Isomorfeus
     end
 
     def self.create_directories
-      # no created: channels handlers
-      %w[components data imports locales operations policies server styles].each do |isomorfeus_dir|
+      # no created: handlers
+      %w[channels components data imports locales operations policies server styles].each do |isomorfeus_dir|
         create_directory(File.join(isomorfeus_path, isomorfeus_dir))
       end
       create_directory('spec')
