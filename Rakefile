@@ -47,7 +47,7 @@ GEMFILE_DIRS = %w[
   isomorfeus-data
   isomorfeus-data/test_app
   isomorfeus-i18n
-  isomorfeus-installer
+  isomorfeus
   isomorfeus-operation
   isomorfeus-operation/test_app
   isomorfeus-policy
@@ -97,9 +97,10 @@ end
 task default: %w[ruby_specs]
 
 task :push_ruby_packages do
-  %w[data i18n installer operation policy transport].each do |mod|
+  %w[data i18n operation policy transport].each do |mod|
     system("gem push ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
   end
+  system("gem push ruby/isomorfeus/isomorfeus-#{VERSION}.gem")
 end
 
 task :build_ruby_packages do
@@ -120,7 +121,23 @@ task :build_ruby_i18n_package do
 end
 
 task :build_ruby_installer_package do
-  update_version_and_build_gem_for('installer')
+  pwd = Dir.pwd
+  Dir.chdir(File.join('ruby', "isomorfeus"))
+  File.open("lib/isomorfeus/version.rb", 'rt+') do |f|
+    out = ''
+    f.each_line do |line|
+      if /\sVERSION/.match?(line)
+        out << line.sub(/VERSION = ['"][\w.-]+['"]/, "VERSION = '#{VERSION}'" )
+      else
+        out << line
+      end
+    end
+    f.truncate(0)
+    f.pos = 0
+    f.write(out)
+  end
+  `gem build isomorfeus.gemspec`
+  Dir.chdir(pwd)
 end
 
 task :build_ruby_operation_package do
@@ -154,7 +171,7 @@ end
 
 task :ruby_installer_spec do
   pwd = Dir.pwd
-  Dir.chdir(path_for('installer'))
+  Dir.chdir(File.join('ruby', "isomorfeus"))
   system('bundle install')
   options = { keep_file_descriptors: false }
   options.define_singleton_method(:keep_file_descriptors?) do
