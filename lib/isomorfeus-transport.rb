@@ -49,8 +49,8 @@ else
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
   %w[channels handlers server].each do |dir|
-    path = Dir.exist?(File.join('isomorfeus')) ? File.expand_path(File.join('isomorfeus', dir)) : nil
-    if path && Dir.exist?(path)
+    path =  File.expand_path(File.join('isomorfeus', dir))
+    if Dir.exist?(path)
       Isomorfeus.zeitwerk.push_dir(path)
     end
   end
