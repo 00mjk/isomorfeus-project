@@ -8,17 +8,10 @@ require 'anonymous'
 require 'isomorfeus/policy/anonymous_policy'
 
 if RUBY_ENGINE == 'opal'
-  Opal::Autoloader.add_load_path('policies')
+  Isomorfeus.zeitwerk.push_dir('policies')
 else
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
-  require 'concurrent'
-  require 'zeitwerk'
-
-  Isomorfeus.zeitwerk = Zeitwerk::Loader.new
-  Isomorfeus.zeitwerk_lock = Concurrent::ReentrantReadWriteLock.new if Isomorfeus.development?
-
   path = File.expand_path(File.join('isomorfeus', 'policies'))
-
   Isomorfeus.zeitwerk.push_dir(path)
 end
