@@ -191,7 +191,7 @@ module Isomorfeus
         if source_dir
           data_hash[i_module] = i_module == isomorfeus_module ? "path: '..'" : "path: '../../#{i_module.to_s.tr('_', '-')}'"
         else
-          data_hash[i_module] = "'~> #{Isomorfeus::Installer::VERSION}'"
+          data_hash[i_module] = "'~> #{Isomorfeus::VERSION}'"
         end
       end
       create_file_from_template('Gemfile.erb', 'Gemfile', data_hash)

@@ -104,7 +104,7 @@ RSpec.describe 'isomorfeus installer' do
       gemfile = File.read('Gemfile')
       new_gemfile_lines = []
       gemfile.lines.each do |line|
-        if line.start_with?("gem 'isomorfeus-") && line.include?(Isomorfeus::Installer::VERSION)
+        if line.start_with?("gem 'isomorfeus-") && line.include?(Isomorfeus::VERSION)
           new_line_items = line.split(',')
           gem_name = line.split("'")[1]
           new_line_items[1] = "path: '../../../../#{gem_name}'"
@@ -175,7 +175,7 @@ RSpec.describe 'isomorfeus installer' do
       gemfile = File.read('Gemfile')
       new_gemfile_lines = []
       gemfile.lines.each do |line|
-        if line.start_with?("gem 'isomorfeus-") && line.include?(Isomorfeus::Installer::VERSION)
+        if line.start_with?("gem 'isomorfeus-") && line.include?(Isomorfeus::VERSION)
           new_line_items = line.split(',')
           gem_name = line.split("'")[1]
           new_line_items[1] = "path: '../../../../#{gem_name}'"
