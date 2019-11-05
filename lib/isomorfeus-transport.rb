@@ -12,7 +12,7 @@ if RUBY_ENGINE == 'opal'
   require 'isomorfeus/transport'
   require 'lucid_channel/mixin'
   require 'lucid_channel/base'
-  Opal::Autoloader.add_load_path('channels')
+  Isomorfeus.zeitwerk.push_dir('channels')
   Isomorfeus.add_client_init_class_name('Isomorfeus::Transport')
 else
   require 'base64'
