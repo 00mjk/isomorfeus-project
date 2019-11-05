@@ -11,9 +11,6 @@ module Isomorfeus
     end
 
     if RUBY_ENGINE != 'opal'
-      attr_accessor :zeitwerk
-      attr_accessor :zeitwerk_lock
-
       def valid_policy_class_names
         @valid_policy_class_names ||= Set.new
       end
