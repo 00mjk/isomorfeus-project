@@ -13,7 +13,7 @@ end
 
 task :create_test_app do
   system('rm -rf test_app')
-  system('../isomorfeus-installer/bin/isomorfeus test_app -m operation -s test_app_files')
+  system('../isomorfeus/bin/isomorfeus test_app -m operation -s test_app_files')
 end
 
 task :start_test_app => 'create_test_app' do
