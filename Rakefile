@@ -1,7 +1,9 @@
 require 'bundler'
+require 'cowsay'
 task default: %w[run_test_app_specs]
 
 task :run_test_app_specs => 'create_test_app' do
+  puts Cowsay.say "Testing #{File.dirname(__FILE__).split('/').last.upcase}. NO chance for bugs!", "Ghostbusters"
   pwd = Dir.pwd
   Dir.chdir('test_app')
   Bundler.with_original_env do
