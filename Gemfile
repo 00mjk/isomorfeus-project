@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+gem 'cowsay'
 gem 'isomorfeus-i18n', path: '../isomorfeus-i18n'
 gem 'isomorfeus', path: '../isomorfeus'
 gem 'isomorfeus-operation', path: '../isomorfeus-operation'
