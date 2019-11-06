@@ -2,13 +2,13 @@ dist: bionic
 lanugage: ruby
 rvm: 2.6.3
 script: rake
-before_install: nvm install 10.16.3
+before_install: nvm install 12.13.0
 before_script:
   - curl https://download.arangodb.com/arangodb35/DEBIAN/Release.key | sudo apt-key add -
-  - wget https://download.arangodb.com/arangodb35/Community/Linux/arangodb3_3.5.0-1_amd64.deb
+  - wget https://download.arangodb.com/arangodb35/Community/Linux/arangodb3_3.5.1-1_amd64.deb
   - echo arangodb3 arangodb3/password password root | sudo debconf-set-selections
   - echo arangodb3 arangodb3/password_again password root | sudo debconf-set-selections
-  - sudo dpkg -i arangodb3_3.5.0-1_amd64.deb
+  - sudo dpkg -i arangodb3_3.5.1-1_amd64.deb
 env:
   - LC_ALL=en_US.UTF-8 ARANGO_USER=root ARANGO_PASSWORD=root
 notifications:
