@@ -5,6 +5,8 @@ module Isomorfeus
     module Handler
       class Generic < LucidHandler::Base
         # responsible for loading:
+        # LucidArray
+        # LucidHash
         # LucidGenericEdge
         # LucidGenericNode
         # LucidGenericCollection
@@ -12,7 +14,7 @@ module Isomorfeus
         def process_request(pub_sub_client, current_user, response_agent)
           # promise_send_path('Isomorfeus::Data::Handler::Generic', type, self.to_s, action, props_hash)
           response_agent.request.each_key do |type|
-            if %w[collection node edge].include?(type)
+            if %w[collection node edge array hash].include?(type)
               response_agent.request[type].each_key do |type_class_name|
                 if Isomorfeus.send("valid_generic_#{type}_class_name?", type_class_name)
                   type_class = Isomorfeus.send("cached_generic_#{type}_class", type_class_name)
@@ -56,6 +58,21 @@ module Isomorfeus
         end
 
         def process_store(pub_sub_client, current_user, response_agent, type, type_class, type_class_name, action)
+          props_json = response_agent.request[type][type_class_name][action]
+          props = Oj.load(props_json, mode: :strict)
+          props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
+          if current_user.authorized?(type_class, :store, *props)
+            stored_type = type_class.new(props).store
+            stored_type.instance_exec do
+              type_class.on_store_block.call(pub_sub_client, current_user) if type_class.on_store_block
+            end
+            response_agent.outer_result = { data: stored_type.to_transport }
+            response_agent.agent_result = { success: 'ok' }
+          else response_agent.error = { error: 'Access denied!' }
+          end
+        end
+
+        def process_destroy(pub_sub_client, current_user, response_agent, type, type_class, type_class_name, action)
           props_json = response_agent.request[type][type_class_name][action]
           props = Oj.load(props_json, mode: :strict)
           props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
