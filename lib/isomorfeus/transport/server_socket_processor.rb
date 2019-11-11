@@ -5,8 +5,10 @@ module Isomorfeus
 
       def on_message(client, data)
         if Isomorfeus.development?
-          Isomorfeus.zeitwerk_lock.with_write_lock do
+          write_lock = Isomorfeus.zeitwerk_lock.try_write_lock
+          if write_lock
             Isomorfeus.zeitwerk.reload
+            Isomorfeus.zeitwerk_lock.release_write_lock
           end
           Isomorfeus.zeitwerk_lock.acquire_read_lock
         end
