@@ -1,6 +1,11 @@
 module LucidGenericEdge
   module Mixin
     def self.included(base)
+      base.include(Enumerable)
+      base.extend(LucidPropDeclaration::Mixin)
+      base.extend(Isomorfeus::Data::GenericClassApi)
+      base.include(Isomorfeus::Data::GenericInstanceApi)
+
       attr_reader :id
 
       def ==(other_node)
@@ -93,10 +98,6 @@ module LucidGenericEdge
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
         end
 
-        def loaded?
-          Redux.fetch_by_path(:data_state, :generic_edges, @class_name, @id) ? true : false
-        end
-
         def from
           cid = from_as_cid
           cid ? LucidGenericDocument::Base.node_from_cid(cid) : nil
@@ -152,6 +153,12 @@ module LucidGenericEdge
           end
         end
       else # RUBY_ENGINE
+        unless base == LucidGenericEdge::Base
+          Isomorfeus.add_valid_generic_edge_class(base)
+          base.prop :pub_sub_client, default: nil
+          base.prop :current_user, default: Anonymous.new
+        end
+
         def initialize(attributes_hash = nil)
           attributes_hash = {} unless attributes_hash
           given_attributes = Isomorfeus::Data::Props.new(attributes_hash)
@@ -174,10 +181,6 @@ module LucidGenericEdge
           @changed_to_cid = nil
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-        end
-
-        def loaded?
-          true
         end
 
         def from

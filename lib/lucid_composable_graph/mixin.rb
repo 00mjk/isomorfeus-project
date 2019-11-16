@@ -1,120 +1,18 @@
 module LucidComposableGraph
   module Mixin
+    # TODO nodes -> documents
+    # TODO include -> compose dsl
+    # TODO inline store path
     def self.included(base)
-      if RUBY_ENGINE != 'opal'
-        Isomorfeus.add_valid_composable_graph_class(base) unless base == LucidComposableGraph::Base
-      end
-
       base.extend(LucidPropDeclaration::Mixin)
+      base.extend(Isomorfeus::Data::GenericClassApi)
+      base.include(Isomorfeus::Data::GenericInstanceApi)
+      base.include(LucidComposableGraph::Finders)
 
-      def find_edge(attribute_hash = nil, &block)
-        if block_given?
-          edges.each do |edge|
-            return edge if block.call(edge)
-          end
-        else
-          edge_class = attribute_hash.delete(:class)
-          is_a_module = attribute_hash.delete(:is_a)
-          edges.each do |edge|
-            if edge_class
-              next unless edge.class == edge_class
-            end
-            if is_a_module
-              next unless edge.is_a?(is_a_module)
-            end
-            found = true
-            attribute_hash.each do |k,v|
-              found &&= (node[k] == v)
-              break unless found
-            end
-            return edge if found
-          end
+      base.instance_exec do
+        def _handler_type
+          'graph'
         end
-        nil
-      end
-
-      def find_edges(attribute_hash = nil, &block)
-        found_edges = Set.new
-        if block_given?
-          edges.each do |edge|
-            found_edges << edge if block.call(edge)
-          end
-        else
-          edge_class = attribute_hash.delete(:class)
-          is_a_module = attribute_hash.delete(:is_a)
-          edges.each do |edge|
-            if edge_class
-              next unless edge.class == edge_class
-            end
-            if is_a_module
-              next unless edge.is_a?(is_a_module)
-            end
-            found = true
-            attribute_hash.each do |k,v|
-              found &&= (node[k] == v)
-              break unless found
-            end
-            found_edges << edge if found
-          end
-        end
-        found_edges
-      end
-
-      def find_node(attribute_hash = nil, &block)
-        if block_given?
-          nodes.each do |node|
-            return node if block.call(node)
-          end
-        else
-          node_class = attribute_hash.delete(:class)
-          is_a_module = attribute_hash.delete(:is_a)
-          nodes.each do |node|
-            if node_class
-              next unless node.class == node_class
-            end
-            if is_a_module
-              next unless node.is_a?(is_a_module)
-            end
-            found = true
-            attribute_hash.each do |k,v|
-              found &&= (node[k] == v)
-              break unless found
-            end
-            return node if found
-          end
-        end
-        nil
-      end
-
-      def find_nodes(attribute_hash = nil, &block)
-        found_nodes = Set.new
-        if block_given?
-          nodes.each do |node|
-            found_nodes << node if block.call(node)
-          end
-        else
-          node_class = attribute_hash.delete(:class)
-          is_a_module = attribute_hash.delete(:is_a)
-          nodes.each do |node|
-            if node_class
-              next unless node.class == node_class
-            end
-            if is_a_module
-              next unless node.is_a?(is_a_module)
-            end
-            found = true
-            attribute_hash.each do |k,v|
-              found &&= (node[k] == v)
-              break unless found
-            end
-            found_nodes << node if found
-          end
-        end
-        found_nodes
-      end
-
-      def to_gid
-        [@class_name, @props_json]
       end
 
       def to_transport(inline: false)
@@ -128,10 +26,10 @@ module LucidComposableGraph
           items_hash['included_arrays'] = {}
           @included_arrays.each do |name, instance|
             items_hash['included_arrays'][name.to_s] = if self.class.included_arrays[name].key?(:anonymous)
-                                                    instance.to_transport(inline: true)
-                                                  else
-                                                    instance.to_gid
-                                                  end
+                                                          instance.to_transport(inline: true)
+                                                        else
+                                                          instance.to_cid
+                                                        end
           end
         end
 
@@ -139,10 +37,10 @@ module LucidComposableGraph
           items_hash['included_collections'] = {}
           @included_collections.each do |name, instance|
             items_hash['included_collections'][name.to_s] = if self.class.included_collections[name].key?(:anonymous)
-                                                         instance.to_transport(inline: true)
-                                                       else
-                                                         instance.to_gid
-                                                       end
+                                                               instance.to_transport(inline: true)
+                                                             else
+                                                               instance.to_cid
+                                                             end
           end
         end
 
@@ -150,10 +48,10 @@ module LucidComposableGraph
           items_hash['included_graphs'] = {}
           @included_graphs.each do |name, instance|
             items_hash['included_graphs'][name.to_s] = if self.class.included_graphs[name].key?(:anonymous)
-                                                    instance.to_transport(inline: true)
-                                                  else
-                                                    instance.to_gid
-                                                  end
+                                                          instance.to_transport(inline: true)
+                                                        else
+                                                          instance.to_cid
+                                                        end
           end
         end
 
@@ -161,10 +59,10 @@ module LucidComposableGraph
           items_hash['included_hashes'] = {}
           @included_hashes.each do |name, instance|
             items_hash['included_hashes'][name.to_s] = if self.class.included_hashes[name].key?(:anonymous)
-                                                    instance.to_transport(inline: true)
-                                                  else
-                                                    instance.to_gid
-                                                  end
+                                                          instance.to_transport(inline: true)
+                                                        else
+                                                          instance.to_cid
+                                                        end
           end
         end
 
@@ -176,11 +74,8 @@ module LucidComposableGraph
           end
         end
 
-        if inline
-          { '_inline' => { @props_json => items_hash }}
-        else
-          { 'generic_graphs' => { @class_name => { @props_json => items_hash }}}
-        end
+        first_key = inline ? '_inline' : 'composable_graphs'
+        { first_key => { @class_name => { @key => items_hash }}}
       end
 
       def included_items_to_transport
@@ -247,23 +142,13 @@ module LucidComposableGraph
         def included_nodes
           @included_nodes ||= {}
         end
-
-        def on_load_block
-          @on_load_block
-        end
-
-        def load_query_block
-          @load_query_block
-        end
       end
 
       if RUBY_ENGINE == 'opal'
-        def initialize(store_path: nil, validated_props: nil)
-          @props = validated_props
-          @props_json = @props.to_json if @props
+        def initialize(key)
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-          @store_path = store_path ? store_path : [:data_state, :generic_graphs, @class_name, @props_json]
+          @store_path = [:data_state, :composable_graphs, @class_name, @key]
 
           @included_arrays = {}
           self.class.included_arrays.each do |name, options|
@@ -301,10 +186,6 @@ module LucidComposableGraph
                                        options[:class].new(validated_props: @props)
                                      end
           end
-        end
-
-        def loaded?
-          Redux.fetch_by_path(*@store_path) ? true : false
         end
 
         def edges
@@ -426,9 +307,6 @@ module LucidComposableGraph
             instance
           end
 
-          def on_load(&block)
-          end
-
           def promise_load(props_hash = {}, instance = nil)
             unless instance
               validate_props(props_hash)
@@ -452,18 +330,17 @@ module LucidComposableGraph
             end
           end
 
-          def load_query; end
         end
       else # RUBY_ENGINE
         unless base == LucidComposableGraph::Base
+          Isomorfeus.add_valid_composable_graph_class(base)
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: Anonymous.new
         end
 
-        def initialize(store_path: nil, validated_props: nil)
-          @props = validated_props
-          @props_json = @props.to_json if @props
-          @loaded = false
+        def initialize(key)
+          @key = key
+          @_loaded = false
           @included_arrays = {}
           @included_collections = {}
           @included_hashes = {}
@@ -471,10 +348,6 @@ module LucidComposableGraph
           @included_nodes = {}
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-        end
-
-        def loaded?
-          @loaded
         end
 
         def edges
@@ -595,19 +468,11 @@ module LucidComposableGraph
             instance
           end
 
-          def on_load(&block)
-            @on_load_block = block
-          end
-
           def promise_load(props_hash = {}, instance = nil)
             instance = self.load(props_hash)
             result_promise = Promise.new
             result_promise.resolve(instance)
             result_promise
-          end
-
-          def load_query(&block)
-            @load_query_block = block
           end
         end
       end # RUBY_ENGINE

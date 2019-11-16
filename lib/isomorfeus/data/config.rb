@@ -42,30 +42,20 @@ module Isomorfeus
     end
 
     if RUBY_ENGINE != 'opal'
-      def valid_storable_object_class_names
+      # array
+      def valid_array_class_names
         @valid_array_class_names ||= Set.new
       end
 
-      def valid_storable_object_class_name?(class_name)
+      def valid_array_class_name?(class_name)
         valid_array_class_names.include?(class_name)
       end
 
-      def add_valid_storable_object_class(klass)
+      def add_valid_array_class(klass)
         valid_array_class_names << data_class_name(klass)
       end
 
-      def valid_generic_collection_class_names
-        @valid_generic_collection_class_names ||= Set.new
-      end
-
-      def valid_generic_collection_class_name?(class_name)
-        valid_generic_collection_class_names.include?(class_name)
-      end
-
-      def add_valid_generic_collection_class(klass)
-        valid_generic_collection_class_names << data_class_name(klass)
-      end
-
+      # composable graph
       def valid_composable_graph_class_names
         @valid_composable_graph_class_names ||= Set.new
       end
@@ -78,6 +68,85 @@ module Isomorfeus
         valid_composable_graph_class_names << data_class_name(klass)
       end
 
+      # document
+      def valid_document_class_names
+        @valid_document_class_names ||= Set.new
+      end
+
+      def valid_document_class_name?(class_name)
+        valid_document_class_names.include?(class_name)
+      end
+
+      def add_valid_document_class(klass)
+        valid_document_class_names << data_class_name(klass)
+      end
+
+      # document collection
+      def valid_document_collection_class_names
+        @valid_document_collection_class_names ||= Set.new
+      end
+
+      def valid_document_collection_class_name?(class_name)
+        valid_document_collection_class_names.include?(class_name)
+      end
+
+      def add_valid_document_collection_class(klass)
+        valid_document_collection_class_names << data_class_name(klass)
+      end
+
+      # edge
+      def valid_edge_class_names
+        @valid_edge_class_names ||= Set.new
+      end
+
+      def valid_edge_class_name?(class_name)
+        valid_edge_class_names.include?(class_name)
+      end
+
+      def add_valid_edge_class(klass)
+        valid_edge_class_names << data_class_name(klass)
+      end
+
+      # edge collection
+      def valid_edge_collection_class_names
+        @valid_edge_collection_class_names ||= Set.new
+      end
+
+      def valid_edge_collection_class_name?(class_name)
+        valid_edge_collection_class_names.include?(class_name)
+      end
+
+      def add_valid_edge_collection_class(klass)
+        valid_edge_collection_class_names << data_class_name(klass)
+      end
+
+      # generic collection
+      def valid_generic_collection_class_names
+        @valid_generic_collection_class_names ||= Set.new
+      end
+
+      def valid_generic_collection_class_name?(class_name)
+        valid_generic_collection_class_names.include?(class_name)
+      end
+
+      def add_valid_generic_collection_class(klass)
+        valid_generic_collection_class_names << data_class_name(klass)
+      end
+
+      # generic document
+      def valid_generic_document_class_names
+        @valid_generic_document_class_names ||= Set.new
+      end
+
+      def valid_generic_document_class_name?(class_name)
+        valid_generic_document_class_names.include?(class_name)
+      end
+
+      def add_valid_generic_document_class(klass)
+        valid_generic_document_class_names << data_class_name(klass)
+      end
+
+      # generic edge
       def valid_generic_edge_class_names
         @valid_generic_edge_class_names ||= Set.new
       end
@@ -90,16 +159,56 @@ module Isomorfeus
         valid_generic_edge_class_names << data_class_name(klass)
       end
 
-      def valid_generic_node_class_names
-        @valid_generic_node_class_names ||= Set.new
+      # graph
+      def valid_graph_class_names
+        @valid_graph_class_names ||= Set.new
       end
 
-      def valid_generic_node_class_name?(class_name)
-        valid_generic_node_class_names.include?(class_name)
+      def valid_graph_class_name?(class_name)
+        valid_graph_class_names.include?(class_name)
       end
 
-      def add_valid_generic_node_class(klass)
-        valid_generic_node_class_names << data_class_name(klass)
+      def add_valid_graph_class(klass)
+        valid_graph_class_names << data_class_name(klass)
+      end
+
+      # hash
+      def valid_hash_class_names
+        @valid_hash_class_names ||= Set.new
+      end
+
+      def valid_hash_class_name?(class_name)
+        valid_hash_class_names.include?(class_name)
+      end
+
+      def add_valid_hash_class(klass)
+        valid_hash_class_names << data_class_name(klass)
+      end
+
+      # remote object
+      def valid_remote_object_class_names
+        @valid_remote_object_class_names ||= Set.new
+      end
+
+      def valid_remote_object_class_name?(class_name)
+        valid_remote_object_class_names.include?(class_name)
+      end
+
+      def add_valid_remote_object_class(klass)
+        valid_remote_object_class_names << data_class_name(klass)
+      end
+
+      # storable object
+      def valid_storable_object_class_names
+        @valid_storable_object_class_names ||= Set.new
+      end
+
+      def valid_storable_object_class_name?(class_name)
+        valid_storable_object_class_names.include?(class_name)
+      end
+
+      def add_valid_storable_object_class(klass)
+        valid_storable_object_class_names << data_class_name(klass)
       end
 
       def connect_to_arango

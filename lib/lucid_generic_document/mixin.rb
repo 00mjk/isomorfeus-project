@@ -15,8 +15,18 @@
 
 module LucidGenericDocument
   module Mixin
+    # TODO node -> document
     def self.included(base)
-      attr_reader :id
+      base.include(Enumerable)
+      base.extend(LucidPropDeclaration::Mixin)
+      base.extend(Isomorfeus::Data::GenericClassApi)
+      base.include(Isomorfeus::Data::GenericInstanceApi)
+
+      base.instance_exec do
+        def _handler_type
+          'graph'
+        end
+      end
 
       def ==(other_node)
         eql?(other_node)
@@ -70,10 +80,6 @@ module LucidGenericDocument
       end
 
       base.instance_exec do
-        def load_query_block
-          @load_query_block
-        end
-
         def attributes
           attribute_options.keys
         end
@@ -104,10 +110,6 @@ module LucidGenericDocument
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
         end
 
-        def loaded?
-          Redux.fetch_by_path(:data_state, :node, @class_name, :instances, @id) ? true : false
-        end
-
         def to_transport(*args)
           final_attributes = {}
           self.class.attributes.each do |attr|
@@ -134,10 +136,14 @@ module LucidGenericDocument
               changed_attributes.set(name, arg)
             end
           end
-
-          def load_query; end
         end
       else # RUBY_ENGINE
+        unless base == LucidGenericDocument::Base
+          Isomorfeus.add_valid_generic_document_class(base)
+          base.prop :pub_sub_client, default: nil
+          base.prop :current_user, default: Anonymous.new
+        end
+
         def initialize(attributes_hash = nil)
           attributes_hash = {} unless attributes_hash
           given_attributes = Isomorfeus::Data::Props.new(attributes_hash)
@@ -155,10 +161,6 @@ module LucidGenericDocument
           @id = "new_#{object_id}" if @id.empty?
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-        end
-
-        def loaded?
-          true
         end
 
         def to_transport(*args)

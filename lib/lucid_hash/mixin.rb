@@ -2,30 +2,19 @@ module LucidHash
   module Mixin
     def self.included(base)
       if RUBY_ENGINE != 'opal'
-        Isomorfeus.add_valid_hash_class(base) unless base == LucidHash::Base
+
       end
 
+      base.include(Enumerable)
       base.extend(LucidPropDeclaration::Mixin)
-
-      def to_gid
-        [@class_name, @props_json]
-      end
+      base.extend(Isomorfeus::Data::GenericClassApi)
+      base.include(Isomorfeus::Data::GenericInstanceApi)
 
       def to_transport(inline: false)
         if inline
           { '_inline' => { @props_json => to_h }}
         else
           { 'hashes' => { @class_name => { @props_json => to_h }}}
-        end
-      end
-
-      base.instance_exec do
-        def on_load_block
-          @on_load_block
-        end
-
-        def query_block
-          @query_block
         end
       end
 
@@ -36,10 +25,6 @@ module LucidHash
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @store_path = store_path ? store_path : [:data_state, :hashes, @class_name]
-        end
-
-        def loaded?
-          Redux.fetch_by_path(*(@store_path + [@props_json])) ? true : false
         end
 
         def [](name)
@@ -76,9 +61,6 @@ module LucidHash
             instance
           end
 
-          def on_load(&block)
-          end
-
           def promise_load(props_hash = {}, instance = nil)
             unless instance
               validate_props(props_hash)
@@ -101,27 +83,20 @@ module LucidHash
               end
             end
           end
-
-          def query
-            nil
-          end
         end
       else # RUBY_ENGINE
         unless base == LucidHash::Base
+          Isomorfeus.add_valid_hash_class(base)
           base.prop :pub_sub_client, default: nil
-          base.prop :current_user, default: nil
+          base.prop :current_user, default: Anonymous.new
         end
 
         def initialize(store_path: nil, validated_props: nil)
           @props = validated_props
           @props_json = @props.to_json if @props
-          @loaded = false
+          @_loaded = false
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-        end
-
-        def loaded?
-          @loaded
         end
 
         def [](name)
@@ -147,19 +122,11 @@ module LucidHash
             instance
           end
 
-          def on_load(&block)
-            @on_load_block = block
-          end
-
           def promise_load(props_hash = {}, instance = nil)
             instance = self.load(props_hash)
             result_promise = Promise.new
             result_promise.resolve(instance)
             result_promise
-          end
-
-          def query(&block)
-            @query_block = block
           end
         end
       end  # RUBY_ENGINE

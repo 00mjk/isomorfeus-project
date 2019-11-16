@@ -1,11 +1,11 @@
 module LucidStorableObject
   module Mixin
+    # TODO on revision conflict
     def self.included(base)
-      if RUBY_ENGINE != 'opal'
-        Isomorfeus.add_valid_storable_object_class(base) unless base == LucidStorableObject::Base
-      end
-
+      base.include(Enumerable)
       base.extend(LucidPropDeclaration::Mixin)
+      base.extend(Isomorfeus::Data::GenericClassApi)
+      base.include(Isomorfeus::Data::GenericInstanceApi)
 
       def to_gid
         [@class_name, @props_json]
@@ -92,6 +92,7 @@ module LucidStorableObject
         end
       else # RUBY_ENGINE
         unless base == LucidStorableObject::Base
+          Isomorfeus.add_valid_storable_object_class(base)
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: Anonymous.new
         end
