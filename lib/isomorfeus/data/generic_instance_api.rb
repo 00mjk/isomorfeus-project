@@ -47,10 +47,18 @@ module Isomorfeus
         end
         alias promise_create promise_store
 
+        def changed?
+          Redux.fetch_by_path(*@_changed_store_path) ? true : false
+        end
+
         def loaded?
-          @_loaded ||= (Redux.fetch_by_path(*@_store_path) ? true : false)
+          @_loaded ||= (Redux.fetch_by_path(*@_loaded_store_path) ? true : false)
         end
       else
+        def changed?
+          @_changed
+        end
+
         def loaded?
           @_loaded
         end
