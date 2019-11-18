@@ -5,12 +5,12 @@ module Isomorfeus
       if RUBY_ENGINE == 'opal'
         def create(key, *things)
           instance = new(key, *things)
-          instance.promise_store
+          instance.promise_save
           instance
         end
 
         def promise_create(key, *things)
-          new(key, *things).promise_store
+          new(key, *things).promise_save
         end
 
         def destroy(key)
@@ -80,13 +80,13 @@ module Isomorfeus
         def execute_destroy(_); end
         def execute_load(_); end
         def execute_query(_); end
-        def execute_store(_); end
+        def execute_save(_); end
 
         # callbacks
         def on_destroy(_); end
         def on_load(_); end
         def on_query(_); end
-        def on_store(_); end
+        def on_save(_); end
       else
         def promise_create(key, *things)
           instance = self.create(key, *things)
@@ -133,8 +133,8 @@ module Isomorfeus
           @_query_block = block
         end
 
-        def execute_store(&block)
-          @_store_block = block
+        def execute_save(&block)
+          @_save_block = block
         end
 
         # callbacks
@@ -154,8 +154,8 @@ module Isomorfeus
           @_on_query_block = block
         end
 
-        def on_store(&block)
-          @_on_store_block = block
+        def on_save(&block)
+          @_on_save_block = block
         end
       end
     end

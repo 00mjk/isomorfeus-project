@@ -32,14 +32,14 @@ module Isomorfeus
           self.class.promise_load(@key, self)
         end
 
-        def store
-          promise_store
+        def save
+          promise_save
           self
         end
-        alias create store
+        alias create save
 
-        def promise_store
-          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::GenericHandler', _handler_type, self.name, 'store', to_transport).then do |agent|
+        def promise_save
+          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::GenericHandler', _handler_type, self.name, 'save', to_transport).then do |agent|
             if agent.processed
               agent.result
             else
@@ -53,7 +53,7 @@ module Isomorfeus
             end
           end
         end
-        alias promise_create promise_store
+        alias promise_create promise_save
 
         def changed?
           Redux.fetch_by_path(*@_changed_store_path) ? true : false
