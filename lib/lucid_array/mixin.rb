@@ -28,6 +28,10 @@ module LucidArray
         end
       end
 
+      def _validate_element(el)
+        Isomorfeus::Data::ElementValidator.new(@class_name, el, @el_con).validate!
+      end
+
       if RUBY_ENGINE == 'opal'
         def initialize(key:, elements: nil)
           @key = key.to_s
@@ -35,15 +39,13 @@ module LucidArray
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @_store_path = [:data_state, @class_name, @key]
           @_changed_store_path = [:data_state, :changed, @class_name, @key]
-          el_con = self.class.element_conditions
-          @_validate_elements = el_con ? true : false
+          @el_con = self.class.element_conditions
+          @_validate_elements = @el_con ? true : false
           elements = [] unless elements
           if @_validate_elements
-            elements.each do |e|
-              Isomorfeus::Data::ElementValidator.new(@class_name, e, el_con).validate!
-            end
+            elements.each { |e| _validate_element(e) }
           end
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => elements},
+          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => elements },
                                                                changed: { @class_name => { @key => false }}})
         end
 
@@ -70,7 +72,7 @@ module LucidArray
         end
 
         def <<(element)
-          Isomorfeus::Data::ElementValidator.new(@class_name, element, self.class.element_conditions).validate! if @_validate_elements
+          _validate_element(element) if @_validate_elements
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array << element
           _update_array(raw_array)
@@ -82,7 +84,7 @@ module LucidArray
         end
 
         def []=(idx, element)
-          Isomorfeus::Data::ElementValidator.new(@class_name, element, self.class.element_conditions).validate! if @_validate_elements
+          _validate_element(element) if @_validate_elements
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array[idx] = element
           _update_array(raw_array)
@@ -191,6 +193,9 @@ module LucidArray
         end
 
         def push(*elements)
+          if @_validate_elements
+            elements.each { |element| _validate_element(element) }
+          end
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.push(*elements)
           _update_array(raw_array)
@@ -293,9 +298,7 @@ module LucidArray
           @_validate_elements = el_con ? true : false
           elements = [] unless elements
           if @_validate_elements
-            elements.each do |e|
-              Isomorfeus::Data::ElementValidator.new(@class_name, e, el_con).validate!
-            end
+            elements.each { |e| _validate_element(e) }
           end
           @_raw_array = elements
         end
@@ -315,13 +318,13 @@ module LucidArray
         end
 
         def <<(element)
-          Isomorfeus::Data::ElementValidator.new(@class_name, element, self.class.element_conditions).validate! if @_validate_elements
+          _validate_element(element) if @_validate_elements
           @_changed = true
           @_raw_array << element
         end
 
         def []=(idx, element)
-          Isomorfeus::Data::ElementValidator.new(@class_name, element, self.class.element_conditions).validate! if @_validate_elements
+          _validate_element(element) if @_validate_elements
           @_changed = true
           @_raw_array[idx] = element
         end
@@ -415,6 +418,9 @@ module LucidArray
         end
 
         def push(*elements)
+          if @_validate_elements
+            elements.each { |element| _validate_element(element) }
+          end
           @_raw_array.push(*elements)
           @_changed = true
           self
