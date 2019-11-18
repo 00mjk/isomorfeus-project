@@ -1,6 +1,14 @@
 module Isomorfeus
   module Data
     module GenericInstanceApi
+      def key
+        @key
+      end
+
+      def key=(k)
+        @key = k.to_s
+      end
+
       def to_cid
         [@class_name, @key]
       end
