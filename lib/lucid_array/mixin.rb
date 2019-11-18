@@ -150,7 +150,7 @@ module LucidArray
 
         def filter!(&block)
           raw_array = Redux.fetch_by_path(*@_store_path)
-          result = raw_array.filter(&block)
+          result = raw_array.filter!(&block)
           return nil if result.nil?
           _update_array(raw_array)
           self
@@ -355,7 +355,6 @@ module LucidArray
 
         def delete(element, &block)
           result = @_raw_array.delete(element, &block)
-          return nil if result.nil?
           @_changed = true
           result
         end
