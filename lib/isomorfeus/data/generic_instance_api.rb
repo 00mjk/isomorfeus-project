@@ -50,17 +50,9 @@ module Isomorfeus
         def changed?
           Redux.fetch_by_path(*@_changed_store_path) ? true : false
         end
-
-        def loaded?
-          @_loaded ||= (Redux.fetch_by_path(*@_loaded_store_path) ? true : false)
-        end
       else
         def changed?
           @_changed
-        end
-
-        def loaded?
-          @_loaded
         end
       end
     end
