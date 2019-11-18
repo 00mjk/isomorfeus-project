@@ -29,28 +29,27 @@ module LucidArray
       end
 
       if RUBY_ENGINE == 'opal'
-        def initialize(key, array_of_elements = nil)
+        def initialize(key:, elements: nil)
           @key = key.to_s
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @_store_path = [:data_state, @class_name, @key]
           @_changed_store_path = [:data_state, :changed, @class_name, @key]
-          @_loaded_store_path = [:data_state, :loaded, @class_name, @key]
           el_con = self.class.element_conditions
           @_validate_elements = el_con ? true : false
-          array_of_elements = [] unless array_of_elements
+          elements = [] unless elements
           if @_validate_elements
-            array_of_elements.each do |e|
+            elements.each do |e|
               Isomorfeus::Data::ElementValidator.new(@class_name, e, el_con).validate!
             end
           end
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => array_of_elements},
-                                                               changed: { @class_name => { @key => false }},
-                                                               loaded: { @class_name => { @key => false }}})
+          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => elements},
+                                                               changed: { @class_name => { @key => false }}})
         end
 
-        def _dispatch_changes(raw_array)
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => raw_array}, changed: { @class_name => { @key => true }}})
+        def _update_array(raw_array)
+          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => raw_array},
+                                                               changed: { @class_name => { @key => true }}})
         end
 
         def each(&block)
@@ -74,7 +73,7 @@ module LucidArray
           Isomorfeus::Data::ElementValidator.new(@class_name, element, self.class.element_conditions).validate! if @_validate_elements
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array << element
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           result
         end
 
@@ -86,19 +85,19 @@ module LucidArray
           Isomorfeus::Data::ElementValidator.new(@class_name, element, self.class.element_conditions).validate! if @_validate_elements
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array[idx] = element
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           element
         end
 
         def clear
-          _dispatch_changes([])
+          _update_array([])
           self
         end
 
         def collect!(&block)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.collect!(&block)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
@@ -106,14 +105,14 @@ module LucidArray
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.compact!(&block)
           return nil if result.nil?
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def concat(*args)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.concat(*args)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
@@ -121,7 +120,7 @@ module LucidArray
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.delete(element, &block)
           return nil if result.nil?
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           result
         end
 
@@ -129,21 +128,21 @@ module LucidArray
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.delete_at(idx)
           return nil if result.nil?
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           result
         end
 
         def delete_if(&block)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.delete_if(&block)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def fill(*args, &block)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.fill(*args, &block)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
@@ -151,7 +150,7 @@ module LucidArray
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.filter(&block)
           return nil if result.nil?
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
@@ -159,42 +158,42 @@ module LucidArray
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.flatten!(level)
           return nil if result.nil?
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def insert(*args)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.insert(*args)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def keep_if(&block)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.keep_if(&block)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def map!(&block)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.map!(&block)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def pop(n = nil)
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.pop(n)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           result
         end
 
         def push(*elements)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.push(*elements)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
         alias append push
@@ -203,21 +202,21 @@ module LucidArray
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.reject!(&block)
           return nil if result.nil?
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def reverse!
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.reverse!
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def rotate!(count = 1)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.rotate!(count = 1)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
@@ -225,56 +224,56 @@ module LucidArray
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.select!(&block)
           return nil if result.nil?
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def shift(n = nil)
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.shift(n)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           result
         end
 
         def shuffle!(*args)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.shuffle!(*args)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def slice!(*args)
           raw_array = Redux.fetch_by_path(*@_store_path)
           result = raw_array.slice!(*args)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           result
         end
 
         def sort!(&block)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.sort!(&block)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def sort_by!(&block)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.sort_by!(&block)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def uniq!(&block)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.uniq!(&block)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
 
         def unshift(*args)
           raw_array = Redux.fetch_by_path(*@_store_path)
           raw_array.unshift(*args)
-          _dispatch_changes(raw_array)
+          _update_array(raw_array)
           self
         end
         alias prepend unshift
@@ -285,21 +284,20 @@ module LucidArray
           base.prop :current_user, default: Anonymous.new
         end
 
-        def initialize(key, array_of_elements = nil)
+        def initialize(key:, elements: nil)
           @key = key.to_s
-          @_loaded = false
           @_changed = false
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           el_con = self.class.element_conditions
           @_validate_elements = el_con ? true : false
-          array_of_elements = [] unless array_of_elements
+          elements = [] unless elements
           if @_validate_elements
-            array_of_elements.each do |e|
+            elements.each do |e|
               Isomorfeus::Data::ElementValidator.new(@class_name, e, el_con).validate!
             end
           end
-          @_raw_array = array_of_elements
+          @_raw_array = elements
         end
 
         def each(&block)
