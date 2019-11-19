@@ -9,7 +9,7 @@ module Isomorfeus
         @key = k.to_s
       end
 
-      def to_cid
+      def to_sid
         [@class_name, @key]
       end
 
@@ -58,9 +58,17 @@ module Isomorfeus
         def changed?
           Redux.fetch_by_path(*@_changed_store_path) ? true : false
         end
+
+        def revision
+          Redux.fetch_by_path(*@_revision_store_path)
+        end
       else
         def changed?
           @_changed
+        end
+
+        def revision
+          @_revision
         end
       end
     end
