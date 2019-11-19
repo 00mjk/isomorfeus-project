@@ -176,7 +176,7 @@ RSpec.describe 'LucidHash' do
     it 'verifies attribute :test, class' do
       result = @doc.evaluate_ruby do
         class TestHashC < LucidHash::Base
-          attribute test, class: String
+          attribute :test, class: String
         end
         hash = TestHashC.new(key: 3, attributes: { test: 'a_string' })
         hash.test.class.name
@@ -184,7 +184,7 @@ RSpec.describe 'LucidHash' do
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
         class TestHashC < LucidHash::Base
-          attribute test, class: String
+          attribute :test, class: String
         end
         begin
           TestHashC.new(key: 4, attributes: { test: 1 })
