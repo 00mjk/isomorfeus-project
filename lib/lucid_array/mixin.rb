@@ -33,12 +33,13 @@ module LucidArray
       end
 
       if RUBY_ENGINE == 'opal'
-        def initialize(key:, elements: nil)
+        def initialize(key:, revision: nil, elements: nil)
           @key = key.to_s
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @_store_path = [:data_state, @class_name, @key]
           @_changed_store_path = [:data_state, :changed, @class_name, @key]
+          @_revision_store_path = [:data_state, :revision, @class_name, @key]
           @el_con = self.class.element_conditions
           @_validate_elements = @el_con ? true : false
           elements = [] unless elements
@@ -46,7 +47,8 @@ module LucidArray
             elements.each { |e| _validate_element(e) }
           end
           Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => elements },
-                                                               changed: { @class_name => { @key => false }}})
+                                                               changed: { @class_name => { @key => false }},
+                                                               revision: { @class_name => { @key => revision }}})
         end
 
         def _update_array(raw_array)
@@ -289,13 +291,14 @@ module LucidArray
           base.prop :current_user, default: Anonymous.new
         end
 
-        def initialize(key:, elements: nil)
+        def initialize(key:, revision: nil, elements: nil)
           @key = key.to_s
+          @_revision = revision
           @_changed = false
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-          el_con = self.class.element_conditions
-          @_validate_elements = el_con ? true : false
+          @el_con = self.class.element_conditions
+          @_validate_elements = @el_con ? true : false
           elements = [] unless elements
           if @_validate_elements
             elements.each { |e| _validate_element(e) }
