@@ -19,7 +19,7 @@ module LucidHash
         end
 
         def valid_attribute?(attr_name, attr_value)
-          return true unless @attribute_options
+          return true unless @attribute_conditions
           Isomorfeus::Props::Validator.new(self.name, attr_name, attr_value, attribute_conditions[attr_name]).validate!
         rescue
           false
@@ -41,33 +41,42 @@ module LucidHash
             attribute_conditions[name] = options
 
             define_method(name) do
-              path = @store_path + [name]
+              path = @_store_path + [name]
               result = Redux.fetch_by_path(*path)
-              result ? result : nil
+              if result
+                result
+              elsif !@_default_proc
+                @_default
+              else
+                @_default_proc.call(self, name)
+              end
             end
 
-            define_method("#{name}=") do |arg|
-              _validate_attribute(name, arg) if @_validate_attributes
-              @attributes.set(name, arg)
+            define_method("#{name}=") do |val|
+              _validate_attribute(name, val) if @_validate_attributes
+              _update_attribute(name, val)
+              val
             end
           end
         end
 
-        def initialize(key:, attributes: nil, default: nil, &block)
-          @default = default
-          @default_proc = block
+        def initialize(key:, revision: nil,  attributes: nil, default: nil, &block)
+          @_default = default
+          @_default_proc = block
           @key = key.to_s
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @_store_path = [:data_state, @class_name, @key]
           @_changed_store_path = [:data_state, :changed, @class_name, @key]
+          @_revision_store_path = [:data_state, :revision, @class_name, @key]
           @_validate_attributes = self.class.attribute_conditions.any?
           attributes = {} unless attributes
           if @_validate_attributes
             attributes.each { |a,v| _validate_attribute(a, v) }
           end
           Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => attributes },
-                                                               changed: { @class_name => { @key => false }}})
+                                                               changed: { @class_name => { @key => false }},
+                                                               revision: { @class_name => { @key => revision }}})
         end
 
         def _update_attribute(attr_name, attr_val)
@@ -86,12 +95,11 @@ module LucidHash
         end
 
         def [](name)
-          path = @store_path + [name]
+          path = @_store_path + [name]
           result = Redux.fetch_by_path(*path)
           return result if result
-          return @default unless @default_proc
-          @default_proc.call(self, name)
-          Redux.fetch_by_path(*path)
+          return @_default unless @_default_proc
+          @_default_proc.call(self, name)
         end
 
         def []=(name, val)
@@ -124,13 +132,26 @@ module LucidHash
           result
         end
 
-        def method_missing(name, *args, &block)
+        def method_missing(method_name, *args, &block)
           raw_attributes = Redux.fetch_by_path(*@_store_path)
-          Hash.new(raw_attributes).send(name, *args, &block)
+          hash = Hash.new(raw_attributes)
+          if method_name.end_with?('=')
+            val = args[0]
+            _validate_attribute(method_name, val) if @_validate_attributes
+            _update_attribute(method_name, val)
+          elsif args.size == 0 && hash.key?(method_name)
+            path = @_store_path + [method_name]
+            result = Redux.fetch_by_path(*path)
+            return result if result
+            return @_default unless @_default_proc
+            @_default_proc.call(self, method_name)
+          else
+            hash.send(name, *args, &block)
+          end
         end
 
         def key?(name)
-          path = @store_path + [name]
+          path = @_store_path + [name]
           Redux.fetch_by_path(*path) ? true : false
         end
         alias has_key? key?
@@ -185,7 +206,7 @@ module LucidHash
         end
 
         def to_h
-          raw_hash = Redux.fetch_by_path(*@store_path)
+          raw_hash = Redux.fetch_by_path(*@_tore_path)
           raw_hash ? Hash.new(raw_hash) : {}
         end
 
@@ -204,6 +225,14 @@ module LucidHash
           _update_array(raw_hash)
           self
         end
+
+        def update(*args)
+          raw_attributes = Redux.fetch_by_path(*@_store_path)
+          raw_hash = Hash.new(raw_attributes)
+          raw_hash.update(*args)
+          _update_array(raw_hash)
+          self
+        end
       else # RUBY_ENGINE
         unless base == LucidHash::Base
           Isomorfeus.add_valid_hash_class(base)
@@ -211,8 +240,25 @@ module LucidHash
           base.prop :current_user, default: Anonymous.new
         end
 
-        def initialize(key:, attributes: nil)
+        base.instance_exec do
+          def attribute(name, options = {})
+            attribute_conditions[name] = options
+
+            define_method(name) do
+              @_raw_attributes[name]
+            end
+
+            define_method("#{name}=") do |val|
+              _validate_attribute(name, val) if @_validate_attributes
+              @_changed = true
+              @_raw_attributes[name] = val
+            end
+          end
+        end
+
+        def initialize(key:, revision: nil, attributes: nil)
           @key = key.to_s
+          @_revision = revision
           @_changed = false
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -264,7 +310,16 @@ module LucidHash
         end
 
         def method_missing(method_name, *args, &block)
-          @_raw_attributes.send(method_name, *args, &block)
+          if method_name.end_with?('=')
+            val = args[0]
+            _validate_attribute(name, val) if @_validate_attributes
+            @_changed = true
+            @_raw_attributes[name] = val
+          elsif args.size == 0 && @_raw_attributes.key?(method_name)
+            @_raw_attributes[method_name]
+          else
+            @_raw_attributes.send(method_name, *args, &block)
+          end
         end
 
         def merge!(*args)
@@ -312,6 +367,12 @@ module LucidHash
 
         def transform_values!(&block)
           @_raw_attributes.transform_values!(&block)
+          @_changed = true
+          self
+        end
+
+        def update(*args)
+          @_raw_attributes.update(*args)
           @_changed = true
           self
         end
