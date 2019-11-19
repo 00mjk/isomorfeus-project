@@ -6,7 +6,7 @@ RSpec.describe 'LucidArray' do
       result = on_server do
         class TestArrayBase < LucidArray::Base
         end
-        array = TestArrayBase.new(1, [1, 2])
+        array = TestArrayBase.new(key: 1, elements: [1, 2])
         array.count
       end
       expect(result).to eq(2)
@@ -17,7 +17,7 @@ RSpec.describe 'LucidArray' do
         class TestArrayMixin
           include LucidArray::Mixin
         end
-        array = TestArrayMixin.new(2, [1, 2, 3])
+        array = TestArrayMixin.new(key: 2, elements: [1, 2, 3])
         array.count
       end
       expect(result).to eq(3)
@@ -28,7 +28,7 @@ RSpec.describe 'LucidArray' do
         class TestArrayC < LucidArray::Base
           elements class: String
         end
-        array = TestArrayC.new(3, ['test'])
+        array = TestArrayC.new(key: 3, elements: ['test'])
         array[0].class.name
       end
       expect(result).to eq('String')
@@ -37,7 +37,7 @@ RSpec.describe 'LucidArray' do
           elements class: String
         end
         begin
-          TestArrayC.new(4, [1])
+          TestArrayC.new(key: 4, elements: [1])
         rescue
           'exception thrown'
         end
@@ -48,7 +48,7 @@ RSpec.describe 'LucidArray' do
           elements class: String
         end
         begin
-          array = TestArrayC.new(5)
+          array = TestArrayC.new(key: 5)
           array[1] = 10
         rescue
           'exception thrown'
@@ -62,7 +62,7 @@ RSpec.describe 'LucidArray' do
         class TestArrayD < LucidArray::Base
           element is_a: String
         end
-        array = TestArrayD.new(5, ['test'])
+        array = TestArrayD.new(key: 5, elements: ['test'])
         array[0].class.name
       end
       expect(result).to eq('String')
@@ -71,7 +71,7 @@ RSpec.describe 'LucidArray' do
           element is_a: String
         end
         begin
-          TestArrayD.new(6, [1])
+          TestArrayD.new(key: 6, elements: [1])
         rescue
           'exception thrown'
         end
@@ -82,7 +82,7 @@ RSpec.describe 'LucidArray' do
           element is_a: String
         end
         begin
-          node = TestArrayD.new(7)
+          node = TestArrayD.new(key: 7)
           node[0] = 10
         rescue
           'exception thrown'
@@ -95,14 +95,14 @@ RSpec.describe 'LucidArray' do
       result = on_server do
         class TestArrayE < LucidArray::Base
         end
-        array = TestArrayE.new(8)
+        array = TestArrayE.new(key: 8)
         array.changed?
       end
       expect(result).to be(false)
       result = on_server do
         class TestArrayE < LucidArray::Base
         end
-        array = TestArrayE.new(9)
+        array = TestArrayE.new(key: 9)
         array[0] = 20
         array.changed?
       end
@@ -113,8 +113,8 @@ RSpec.describe 'LucidArray' do
       result = on_server do
         class TestArrayE < LucidArray::Base
         end
-        array = TestArrayE.new(10)
-        array.to_cid
+        array = TestArrayE.new(key: 10)
+        array.to_sid
       end
       expect(result).to eq(['TestArrayE', '10'])
     end
@@ -140,7 +140,7 @@ RSpec.describe 'LucidArray' do
       result = on_server do
         class TestArrayG < LucidArray::Base
         end
-        array = TestArrayG.new(13, [1, 2, 3])
+        array = TestArrayG.new(key: 13, elements: [1, 2, 3])
         array.to_transport
       end
       expect(result).to eq("arrays"=>{"TestArrayG"=>{"13"=>[1, 2, 3]}})
@@ -156,7 +156,7 @@ RSpec.describe 'LucidArray' do
       result = @doc.evaluate_ruby do
         class TestArrayBase < LucidArray::Base
         end
-        array = TestArrayBase.new(1, [1, 2])
+        array = TestArrayBase.new(key: 1, elements: [1, 2])
         array.count
       end
       expect(result).to eq(2)
@@ -167,7 +167,7 @@ RSpec.describe 'LucidArray' do
         class TestArrayMixin
           include LucidArray::Mixin
         end
-        array = TestArrayMixin.new(2, [1, 2, 3])
+        array = TestArrayMixin.new(key: 2, elements: [1, 2, 3])
         array.count
       end
       expect(result).to eq(3)
@@ -178,7 +178,7 @@ RSpec.describe 'LucidArray' do
         class TestArrayC < LucidArray::Base
           elements class: String
         end
-        array = TestArrayC.new(3, ['test'])
+        array = TestArrayC.new(key: 3, elements: ['test'])
         array[0].class.name
       end
       expect(result).to eq('String')
@@ -187,7 +187,7 @@ RSpec.describe 'LucidArray' do
           elements class: String
         end
         begin
-          TestArrayC.new(4, [1])
+          TestArrayC.new(key: 4, elements: [1])
         rescue
           'exception thrown'
         end
@@ -198,7 +198,7 @@ RSpec.describe 'LucidArray' do
           elements class: String
         end
         begin
-          array = TestArrayC.new(5)
+          array = TestArrayC.new(key: 5)
           array[1] = 10
         rescue
           'exception thrown'
@@ -212,7 +212,7 @@ RSpec.describe 'LucidArray' do
         class TestArrayD < LucidArray::Base
           element is_a: String
         end
-        array = TestArrayD.new(5, ['test'])
+        array = TestArrayD.new(key: 5, elements: ['test'])
         array[0].class.name
       end
       expect(result).to eq('String')
@@ -221,7 +221,7 @@ RSpec.describe 'LucidArray' do
           element is_a: String
         end
         begin
-          TestArrayD.new(6, [1])
+          TestArrayD.new(key: 6, elements: [1])
         rescue
           'exception thrown'
         end
@@ -232,7 +232,7 @@ RSpec.describe 'LucidArray' do
           element is_a: String
         end
         begin
-          node = TestArrayD.new(7)
+          node = TestArrayD.new(key: 7)
           node[0] = 10
         rescue
           'exception thrown'
@@ -245,14 +245,14 @@ RSpec.describe 'LucidArray' do
       result = @doc.evaluate_ruby do
         class TestArrayE < LucidArray::Base
         end
-        array = TestArrayE.new(8)
+        array = TestArrayE.new(key: 8)
         array.changed?
       end
       expect(result).to be(false)
       result = @doc.evaluate_ruby do
         class TestArrayE < LucidArray::Base
         end
-        array = TestArrayE.new(9)
+        array = TestArrayE.new(key: 9)
         array[0] = 20
         array.changed?
       end
@@ -263,8 +263,8 @@ RSpec.describe 'LucidArray' do
       result = @doc.evaluate_ruby do
         class TestArrayE < LucidArray::Base
         end
-        array = TestArrayE.new(10)
-        array.to_cid
+        array = TestArrayE.new(key: 10)
+        array.to_sid
       end
       expect(result).to eq(['TestArrayE', '10'])
     end
@@ -290,7 +290,7 @@ RSpec.describe 'LucidArray' do
       result = @doc.evaluate_ruby do
         class TestArrayG < LucidArray::Base
         end
-        array = TestArrayG.new(13, [1, 2, 3])
+        array = TestArrayG.new(key: 13, elements: [1, 2, 3])
         JSON.dump(array.to_transport)
       end
       expect(JSON.parse(result)).to eq("arrays"=>{"TestArrayG"=>{"13"=>[1, 2, 3]}})
