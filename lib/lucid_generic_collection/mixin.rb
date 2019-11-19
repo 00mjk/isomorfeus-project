@@ -119,7 +119,7 @@ module LucidGenericCollection
         end
 
         def nodes_as_cids
-          nodes.map { |node| node.to_cid }
+          nodes.map { |node| node.to_sid }
         end
 
         base.instance_exec do

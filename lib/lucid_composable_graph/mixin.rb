@@ -28,7 +28,7 @@ module LucidComposableGraph
             items_hash['included_arrays'][name.to_s] = if self.class.included_arrays[name].key?(:anonymous)
                                                           instance.to_transport(inline: true)
                                                         else
-                                                          instance.to_cid
+                                                          instance.to_sid
                                                         end
           end
         end
@@ -39,7 +39,7 @@ module LucidComposableGraph
             items_hash['included_collections'][name.to_s] = if self.class.included_collections[name].key?(:anonymous)
                                                                instance.to_transport(inline: true)
                                                              else
-                                                               instance.to_cid
+                                                               instance.to_sid
                                                              end
           end
         end
@@ -50,7 +50,7 @@ module LucidComposableGraph
             items_hash['included_graphs'][name.to_s] = if self.class.included_graphs[name].key?(:anonymous)
                                                           instance.to_transport(inline: true)
                                                         else
-                                                          instance.to_cid
+                                                          instance.to_sid
                                                         end
           end
         end
@@ -61,7 +61,7 @@ module LucidComposableGraph
             items_hash['included_hashes'][name.to_s] = if self.class.included_hashes[name].key?(:anonymous)
                                                           instance.to_transport(inline: true)
                                                         else
-                                                          instance.to_cid
+                                                          instance.to_sid
                                                         end
           end
         end
@@ -70,7 +70,7 @@ module LucidComposableGraph
         if incl_nodes.size > 0
           items_hash['included_nodes'] = {}
           incl_nodes.each do |name, instance|
-            items_hash['included_nodes'][name.to_s] = instance.to_cid
+            items_hash['included_nodes'][name.to_s] = instance.to_sid
           end
         end
 
@@ -236,7 +236,7 @@ module LucidComposableGraph
           node_cids = own_nodes_as_cids
           @included_graphs.each_value { |graph| node_cids += graph.nodes_as_cids }
           @included_collections.each_value { |collection| node_cids += collection.nodes_as_cids }
-          included_nodes.each_value { |node| node_cids << node.to_cid }
+          included_nodes.each_value { |node| node_cids << node.to_sid }
           node_cids
         end
 
@@ -353,7 +353,7 @@ module LucidComposableGraph
         def edges
           all_edges = @edges.to_a
           @included_graphs.each_value { |graph| all_edges += graph.edges }
-          all_edges.uniq!(&:to_cid)
+          all_edges.uniq!(&:to_sid)
           all_edges
         end
 
@@ -362,7 +362,7 @@ module LucidComposableGraph
         end
 
         def own_edges_as_cids
-          @edges.map(&:to_cid).uniq
+          @edges.map(&:to_sid).uniq
         end
 
         def nodes
@@ -370,7 +370,7 @@ module LucidComposableGraph
           @included_graphs.each_value { |graph| all_nodes += graph.nodes }
           @included_collections.each_value { |collection| all_nodes += collection.nodes }
           included_nodes.each_value { |node| all_nodes << node }
-          all_nodes.uniq!(&:to_cid)
+          all_nodes.uniq!(&:to_sid)
           all_nodes
         end
 
@@ -379,7 +379,7 @@ module LucidComposableGraph
         end
 
         def own_nodes_as_cids
-          @nodes.map(&:to_cid).uniq
+          @nodes.map(&:to_sid).uniq
         end
 
         def method_missing(method_name, *args, &block)

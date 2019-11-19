@@ -50,7 +50,7 @@ module LucidGenericDocument
         changed_attributes.any?
       end
 
-      def to_cid
+      def to_sid
         [@class_name, @id]
       end
 

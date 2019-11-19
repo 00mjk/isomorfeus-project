@@ -31,11 +31,11 @@ module LucidGenericEdge
       end
 
       def to=(node)
-        @changed_to_cid = node.to_cid
+        @changed_to_sid = node.to_sid
         node
       end
 
-      def to_cid
+      def to_sid
         [@class_name, @id]
       end
 
@@ -92,8 +92,8 @@ module LucidGenericEdge
           end
           @id = attributes_hash[:id].to_s
           @id = "new_#{object_id}" if @id.empty?
-          @changed_from_cid = attributes_hash[:from]&.to_cid
-          @changed_to_cid = attributes_hash[:to]&.to_cid
+          @changed_from_cid = attributes_hash[:from]&.to_sid
+          @changed_to_sid = attributes_hash[:to]&.to_sid
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
         end
@@ -110,7 +110,7 @@ module LucidGenericEdge
         end
 
         def from=(node)
-          @changed_from_cid = node.to_cid
+          @changed_from_cid = node.to_sid
           node
         end
 
@@ -120,7 +120,7 @@ module LucidGenericEdge
         end
 
         def to_as_cid
-          return @changed_to_cid if @changed_to_cid
+          return @changed_to_sid if @changed_to_sid
           cid = Redux.fetch_by_path(:data_state, :generic_edges, @class_name, @id, :to)
           cid ? cid : nil
         end
@@ -175,10 +175,10 @@ module LucidGenericEdge
           @attributes = Isomorfeus::Data::Props.new(valid_attributes_hash)
           @id = @attributes[:id].to_s
           @id = "new_#{object_id}" if @id.empty?
-          @from_cid = given_attributes[:from]&.to_cid
+          @from_cid = given_attributes[:from]&.to_sid
           @changed_from_cid = nil
-          @to_cid = given_attributes[:to]&.to_cid
-          @changed_to_cid = nil
+          @to_sid = given_attributes[:to]&.to_sid
+          @changed_to_sid = nil
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
         end
@@ -193,17 +193,17 @@ module LucidGenericEdge
         end
 
         def from=(node)
-          @changed_from_cid = node.to_cid
+          @changed_from_cid = node.to_sid
           node
         end
 
         def to
-          to_cid = to_as_cid
-          to_cid ? LucidGenericDocument::Base.node_from_cid(to_cid) : nil
+          to_sid = to_as_cid
+          to_sid ? LucidGenericDocument::Base.node_from_cid(to_sid) : nil
         end
 
         def to_as_cid
-          @changed_to_cid ? @changed_to_cid : @to_cid
+          @changed_to_sid ? @changed_to_sid : @to_sid
         end
 
         def to_transport(*args)
