@@ -26,9 +26,8 @@ module LucidHash
         end
       end
 
-      def to_transport(inline: false)
-        first_key = inline ? '_inline' : 'hashes'
-        { first_key => { @class_name => { @key => to_h }}}
+      def to_transport
+        { @class_name => { @key => to_h }}
       end
 
       def _validate_attribute(attr_name, attr_val)
@@ -207,7 +206,8 @@ module LucidHash
 
         def to_h
           raw_hash = Redux.fetch_by_path(*@_tore_path)
-          raw_hash ? Hash.new(raw_hash) : {}
+          hash = raw_hash ? Hash.new(raw_hash) : {}
+          hash.merge(_revision: revision)
         end
 
         def transform_keys!(&block)
@@ -356,7 +356,7 @@ module LucidHash
         end
 
         def to_h
-          @_raw_attributes.to_h.transform_keys { |k| k.to_s }
+          @_raw_attributes.to_h.merge(_revision: @_revision).transform_keys { |k| k.to_s }
         end
 
         def transform_keys!(&block)
