@@ -61,10 +61,9 @@ module LucidArray
           raw_array.each(&block)
         end
 
-        def to_transport(inline: false)
+        def to_transport
           raw_array = Redux.fetch_by_path(*@_store_path)
-          first_key = inline ? '_inline' : 'arrays'
-          { first_key => { @class_name => { @key => raw_array }}}
+          { @class_name => { @key => raw_array }}
         end
 
         # Array methods
