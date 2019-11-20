@@ -54,8 +54,8 @@ module LucidGenericCollection
     end
 
     def find_node_by_id(node_id)
-      nodes_as_cids.each do |node_cid|
-        return LucidGenericDocument::Base.node_from_cid(node_cid) if node_cid[1] == node_id
+      nodes_as_sids.each do |node_sid|
+        return LucidGenericDocument::Base.node_from_sid(node_sid) if node_sid[1] == node_id
       end
       nil
     end

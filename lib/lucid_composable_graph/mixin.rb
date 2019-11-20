@@ -17,10 +17,10 @@ module LucidComposableGraph
 
       def to_transport(inline: false)
         items_hash = {}
-        own_edge_cids = own_edges_as_cids
-        own_node_cids = own_nodes_as_cids
-        items_hash['generic_edges'] = own_edge_cids.to_a if own_edge_cids.size > 0
-        items_hash['generic_nodes'] = own_node_cids.to_a if own_node_cids.size > 0
+        own_edge_sids = own_edges_as_sids
+        own_node_sids = own_nodes_as_sids
+        items_hash['generic_edges'] = own_edge_sids.to_a if own_edge_sids.size > 0
+        items_hash['generic_nodes'] = own_node_sids.to_a if own_node_sids.size > 0
 
         if @included_arrays.size > 0
           items_hash['included_arrays'] = {}
@@ -189,31 +189,31 @@ module LucidComposableGraph
         end
 
         def edges
-          edges_as_cids.map { |edge_cid| LucidGenericEdge::Base.edge_from_cid(edge_cid) }
+          edges_as_sids.map { |edge_sid| LucidGenericEdge::Base.edge_from_sid(edge_sid) }
         end
 
-        def edges_as_cids
-          edge_cids = own_edges_as_cids
-          @included_graphs.each_value { |graph| edge_cids += graph.edges_as_cids }
-          edge_cids
+        def edges_as_sids
+          edge_sids = own_edges_as_sids
+          @included_graphs.each_value { |graph| edge_sids += graph.edges_as_sids }
+          edge_sids
         end
 
-        def own_edges_as_cids
+        def own_edges_as_sids
           path = @store_path + [:generic_edges]
-          edge_cids = Redux.fetch_by_path(*path)
-          edge_cids ? Set.new(edge_cids) : Set.new
+          edge_sids = Redux.fetch_by_path(*path)
+          edge_sids ? Set.new(edge_sids) : Set.new
         end
 
         def find_edge_by_id(edge_id)
-          edges_as_cids.each do |edge_cid|
-            return  LucidGenericDocument::Base.edge_from_cid(edge_cid) if edge_cid[1] == edge_id
+          edges_as_sids.each do |edge_sid|
+            return  LucidGenericDocument::Base.edge_from_sid(edge_sid) if edge_sid[1] == edge_id
           end
           nil
         end
 
         def find_node_by_id(node_id)
-          nodes_as_cids.each do |node_cid|
-            return  LucidGenericDocument::Base.node_from_cid(node_cid) if node_cid[1] == node_id
+          nodes_as_sids.each do |node_sid|
+            return  LucidGenericDocument::Base.node_from_sid(node_sid) if node_sid[1] == node_id
           end
           nil
         end
@@ -222,28 +222,28 @@ module LucidComposableGraph
           incl_nodes = {}
           path = @store_path + [:included_nodes]
           self.class.included_nodes.each_key do |name|
-            node_cid = Redux.fetch_by_path(*(path + [name]))
-            incl_nodes[name] = LucidGenericDocument::Base.node_from_cid(node_cid) if node_cid
+            node_sid = Redux.fetch_by_path(*(path + [name]))
+            incl_nodes[name] = LucidGenericDocument::Base.node_from_sid(node_sid) if node_sid
           end
           incl_nodes
         end
 
         def nodes
-          nodes_as_cids.map { |node_cid| LucidGenericDocument::Base.node_from_cid(node_cid) }
+          nodes_as_sids.map { |node_sid| LucidGenericDocument::Base.node_from_sid(node_sid) }
         end
 
-        def nodes_as_cids
-          node_cids = own_nodes_as_cids
-          @included_graphs.each_value { |graph| node_cids += graph.nodes_as_cids }
-          @included_collections.each_value { |collection| node_cids += collection.nodes_as_cids }
-          included_nodes.each_value { |node| node_cids << node.to_sid }
-          node_cids
+        def nodes_as_sids
+          node_sids = own_nodes_as_sids
+          @included_graphs.each_value { |graph| node_sids += graph.nodes_as_sids }
+          @included_collections.each_value { |collection| node_sids += collection.nodes_as_sids }
+          included_nodes.each_value { |node| node_sids << node.to_sid }
+          node_sids
         end
 
-        def own_nodes_as_cids
+        def own_nodes_as_sids
           path = @store_path + [:generic_nodes]
-          node_cids = Redux.fetch_by_path(*path)
-          node_cids ? Set.new(node_cids) : Set.new
+          node_sids = Redux.fetch_by_path(*path)
+          node_sids ? Set.new(node_sids) : Set.new
         end
 
         def method_missing(method_name, *args, &block)
@@ -295,8 +295,8 @@ module LucidComposableGraph
             included_nodes[name] = { class: node_class, anonymous: true, block: block }
             define_method(name) do
               path = @store_path + [:included_nodes, name]
-              node_cid = Redux.fetch_by_path(*path)
-              node_cid ? self.class.included_nodes[name][:class].node_from_cid(node_cid) : nil
+              node_sid = Redux.fetch_by_path(*path)
+              node_sid ? self.class.included_nodes[name][:class].node_from_sid(node_sid) : nil
             end
           end
 
@@ -357,11 +357,11 @@ module LucidComposableGraph
           all_edges
         end
 
-        def edges_as_cids
+        def edges_as_sids
           edges.map { |edge| [edge.class.name, edge.id] }
         end
 
-        def own_edges_as_cids
+        def own_edges_as_sids
           @edges.map(&:to_sid).uniq
         end
 
@@ -374,11 +374,11 @@ module LucidComposableGraph
           all_nodes
         end
 
-        def nodes_as_cids
+        def nodes_as_sids
           nodes.map { |node| [node.class.name, node.id] }
         end
 
-        def own_nodes_as_cids
+        def own_nodes_as_sids
           @nodes.map(&:to_sid).uniq
         end
 

@@ -17,7 +17,7 @@ module LucidGenericCollection
 
       def to_transport(inline: false)
         first_key = inline ? '_inline' : 'generic_collections'
-        { first_key => { @class_name => { @key => nodes_as_cids }}}
+        { first_key => { @class_name => { @key => nodes_as_sids }}}
       end
 
       def included_items_to_transport
@@ -40,12 +40,12 @@ module LucidGenericCollection
           # maybe use a node cache, maybe not:
           # - pro node cache: maybe faster
           # - contra node cache: js garbage collection fails because references are kept forever, memory usage just grows and grows
-          nodes_as_cids.map { |node_cid| LucidGenericDocument::Base.node_from_cid(node_cid) }
+          nodes_as_sids.map { |node_sid| LucidGenericDocument::Base.node_from_sid(node_sid) }
         end
 
-        def nodes_as_cids
-          node_cids = Redux.fetch_by_path(*@store_path)
-          node_cids ? node_cids : []
+        def nodes_as_sids
+          node_sids = Redux.fetch_by_path(*@store_path)
+          node_sids ? node_sids : []
         end
 
         def method_missing(method_name, *args, &block)
@@ -118,7 +118,7 @@ module LucidGenericCollection
           end
         end
 
-        def nodes_as_cids
+        def nodes_as_sids
           nodes.map { |node| node.to_sid }
         end
 

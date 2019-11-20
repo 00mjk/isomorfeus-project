@@ -73,8 +73,8 @@ module LucidGenericEdge
           @attribute_options ||= { id: {} }
         end
 
-        def edge_from_cid(cid)
-          Isomorfeus.cached_edge_class(cid[0]).new({id: cid[1]})
+        def edge_from_sid(sid)
+          Isomorfeus.cached_edge_class(sid[0]).new({id: sid[1]})
         end
       end
 
@@ -92,34 +92,34 @@ module LucidGenericEdge
           end
           @id = attributes_hash[:id].to_s
           @id = "new_#{object_id}" if @id.empty?
-          @changed_from_cid = attributes_hash[:from]&.to_sid
+          @changed_from_sid = attributes_hash[:from]&.to_sid
           @changed_to_sid = attributes_hash[:to]&.to_sid
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
         end
 
         def from
-          cid = from_as_cid
-          cid ? LucidGenericDocument::Base.node_from_cid(cid) : nil
+          sid = from_as_sid
+          sid ? LucidGenericDocument::Base.node_from_sid(sid) : nil
         end
 
-        def from_as_cid
-          return @changed_from_cid if @changed_from_cid
+        def from_as_sid
+          return @changed_from_sid if @changed_from_sid
           cid = Redux.fetch_by_path(:data_state, :generic_edges, @class_name, @id, :from)
           cid ? cid : nil
         end
 
         def from=(node)
-          @changed_from_cid = node.to_sid
+          @changed_from_sid = node.to_sid
           node
         end
 
         def to
-          cid = to_as_cid
-          cid ? LucidGenericDocument::Base.node_from_cid(cid) : nil
+          sid = to_as_sid
+          sid ? LucidGenericDocument::Base.node_from_sid(sid) : nil
         end
 
-        def to_as_cid
+        def to_as_sid
           return @changed_to_sid if @changed_to_sid
           cid = Redux.fetch_by_path(:data_state, :generic_edges, @class_name, @id, :to)
           cid ? cid : nil
@@ -131,7 +131,7 @@ module LucidGenericEdge
             next if attr == :id
             final_attributes[attr] = send(attr)
           end
-          { 'generic_edges' => { @class_name => { @id => { from: from_as_cid, to: to_as_cid, attributes: final_attributes }}}}
+          { 'generic_edges' => { @class_name => { @id => { from: from_as_sid, to: to_as_sid, attributes: final_attributes }}}}
         end
 
         base.instance_exec do
@@ -175,8 +175,8 @@ module LucidGenericEdge
           @attributes = Isomorfeus::Data::Props.new(valid_attributes_hash)
           @id = @attributes[:id].to_s
           @id = "new_#{object_id}" if @id.empty?
-          @from_cid = given_attributes[:from]&.to_sid
-          @changed_from_cid = nil
+          @from_sid = given_attributes[:from]&.to_sid
+          @changed_from_sid = nil
           @to_sid = given_attributes[:to]&.to_sid
           @changed_to_sid = nil
           @class_name = self.class.name
@@ -184,25 +184,25 @@ module LucidGenericEdge
         end
 
         def from
-          from_cid = from_as_cid
-          from_cid ? LucidGenericDocument::Base.node_from_cid(from_cid) : nil
+          from_sid = from_as_sid
+          from_sid ? LucidGenericDocument::Base.node_from_sid(from_sid) : nil
         end
 
-        def from_as_cid
-          @changed_from_cid ? @changed_from_cid : @from_cid
+        def from_as_sid
+          @changed_from_sid ? @changed_from_sid : @from_sid
         end
 
         def from=(node)
-          @changed_from_cid = node.to_sid
+          @changed_from_sid = node.to_sid
           node
         end
 
         def to
-          to_sid = to_as_cid
-          to_sid ? LucidGenericDocument::Base.node_from_cid(to_sid) : nil
+          to_sid = to_as_sid
+          to_sid ? LucidGenericDocument::Base.node_from_sid(to_sid) : nil
         end
 
-        def to_as_cid
+        def to_as_sid
           @changed_to_sid ? @changed_to_sid : @to_sid
         end
 
@@ -214,7 +214,7 @@ module LucidGenericEdge
             include_attribute = !self.class.attribute_options[attr][:server_only] if self.class.attribute_options[attr].key?(:server_only)
             final_attributes[attr.to_s] = @attributes[attr] if include_attribute
           end
-          { 'generic_edges' => { @class_name => { @id => { 'from' => from_as_cid, 'to' => to_as_cid, 'attributes' => final_attributes }}}}
+          { 'generic_edges' => { @class_name => { @id => { 'from' => from_as_sid, 'to' => to_as_sid, 'attributes' => final_attributes }}}}
         end
 
         base.instance_exec do
