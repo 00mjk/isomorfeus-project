@@ -1,7 +1,6 @@
 module Isomorfeus
   module Data
     module GenericClassApi
-      # execute
       if RUBY_ENGINE == 'opal'
         def create(key, *things)
           instance = new(key, *things)
