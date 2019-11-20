@@ -21,10 +21,6 @@ module LucidGenericDocument
         end
       end
 
-      def attribute?(name)
-        self.class.attribute_conditions.key?(name)
-      end
-
       def _validate_attribute(attr_name, attr_val)
         Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
       end
