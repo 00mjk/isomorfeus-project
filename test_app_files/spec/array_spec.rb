@@ -143,7 +143,7 @@ RSpec.describe 'LucidArray' do
         array = TestArrayG.new(key: 13, elements: [1, 2, 3])
         array.to_transport
       end
-      expect(result).to eq("arrays"=>{"TestArrayG"=>{"13"=>[1, 2, 3]}})
+      expect(result).to eq("TestArrayG"=>{"13"=>[1, 2, 3]})
     end
   end
 
@@ -293,7 +293,7 @@ RSpec.describe 'LucidArray' do
         array = TestArrayG.new(key: 13, elements: [1, 2, 3])
         JSON.dump(array.to_transport)
       end
-      expect(JSON.parse(result)).to eq("arrays"=>{"TestArrayG"=>{"13"=>[1, 2, 3]}})
+      expect(JSON.parse(result)).to eq("TestArrayG"=>{"13"=>[1, 2, 3]})
     end
   end
 end

@@ -38,158 +38,169 @@ module LucidArray
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @_store_path = [:data_state, @class_name, @key]
-          @_changed_store_path = [:data_state, :changed, @class_name, @key]
+          @_changed_array = nil
           @_revision_store_path = [:data_state, :revision, @class_name, @key]
+          @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
           @el_con = self.class.element_conditions
           @_validate_elements = @el_con ? true : false
           elements = [] unless elements
           if @_validate_elements
             elements.each { |e| _validate_element(e) }
           end
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => elements },
-                                                               changed: { @class_name => { @key => false }},
-                                                               revision: { @class_name => { @key => revision }}})
+          raw_array = Redux.fetch_by_path(*@_store_path)
+          if `raw_array === null`
+            @_changed_array = !elements ? [] : elements
+          elsif raw_array && !elements.nil? && raw_array != elements
+            @_changed_array = elements
+          end
         end
 
-        def _update_array(raw_array)
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => raw_array},
-                                                               changed: { @class_name => { @key => true }}})
+        def _get_array
+          return @_changed_array if @_changed_array
+          Redux.fetch_by_path(*@_store_path)
+        end
+
+        def changed?
+          !!@_changed_array
+        end
+
+        def revision
+          @_revision
         end
 
         def each(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
-          raw_array.each(&block)
+          _get_array.each(&block)
         end
 
         def to_transport
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           { @class_name => { @key => raw_array }}
         end
 
         # Array methods
         def method_missing(method_name, *args, &block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.send(method_name, *args, &block)
         end
 
         def <<(element)
           _validate_element(element) if @_validate_elements
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array << element
-          _update_array(raw_array)
+          @_changed_array = raw_array
           result
         end
 
         def [](idx)
-          Redux.fetch_by_path(*@_store_path)[idx]
+          _get_array[idx]
         end
 
         def []=(idx, element)
           _validate_element(element) if @_validate_elements
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array[idx] = element
-          _update_array(raw_array)
+          @_changed_array = raw_array
           element
         end
 
         def clear
-          _update_array([])
+          @_changed_array = []
           self
         end
 
         def collect!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.collect!(&block)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def compact!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.compact!(&block)
           return nil if result.nil?
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def concat(*args)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.concat(*args)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def delete(element, &block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.delete(element, &block)
           return nil if result.nil?
-          _update_array(raw_array)
+          @_changed_array = raw_array
           result
         end
 
         def delete_at(idx)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.delete_at(idx)
           return nil if result.nil?
-          _update_array(raw_array)
+          @_changed_array = raw_array
           result
         end
 
         def delete_if(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.delete_if(&block)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def fill(*args, &block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.fill(*args, &block)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def filter!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.filter!(&block)
           return nil if result.nil?
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def flatten!(level = nil)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.flatten!(level)
           return nil if result.nil?
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def insert(*args)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.insert(*args)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def keep_if(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.keep_if(&block)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def map!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.map!(&block)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def pop(n = nil)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.pop(n)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           result
         end
 
@@ -197,89 +208,89 @@ module LucidArray
           if @_validate_elements
             elements.each { |element| _validate_element(element) }
           end
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.push(*elements)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
         alias append push
 
         def reject!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.reject!(&block)
           return nil if result.nil?
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def reverse!
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.reverse!
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def rotate!(count = 1)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.rotate!(count = 1)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def select!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.select!(&block)
           return nil if result.nil?
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def shift(n = nil)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.shift(n)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           result
         end
 
         def shuffle!(*args)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.shuffle!(*args)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def slice!(*args)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           result = raw_array.slice!(*args)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           result
         end
 
         def sort!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.sort!(&block)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def sort_by!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.sort_by!(&block)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def uniq!(&block)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.uniq!(&block)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
 
         def unshift(*args)
-          raw_array = Redux.fetch_by_path(*@_store_path)
+          raw_array = _get_array
           raw_array.unshift(*args)
-          _update_array(raw_array)
+          @_changed_array = raw_array
           self
         end
         alias prepend unshift
@@ -305,13 +316,20 @@ module LucidArray
           @_raw_array = elements
         end
 
+        def changed?
+          @_changed
+        end
+
+        def revision
+          @_revision
+        end
+
         def each(&block)
           @_raw_array.each(&block)
         end
 
         def to_transport(inline: false)
-          first_key = inline ? '_inline' : 'arrays'
-          { first_key => { @class_name => { @key => @_raw_array }}}
+          { @class_name => { @key => @_raw_array }}
         end
 
         # Array methods
