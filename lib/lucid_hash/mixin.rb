@@ -40,8 +40,7 @@ module LucidHash
             attribute_conditions[name] = options
 
             define_method(name) do
-              path = @_store_path + [name]
-              result = Redux.fetch_by_path(*path)
+              result = _get_attribute(name)
               if result
                 result
               elsif !@_default_proc
@@ -53,7 +52,7 @@ module LucidHash
 
             define_method("#{name}=") do |val|
               _validate_attribute(name, val) if @_validate_attributes
-              _update_attribute(name, val)
+              @_changed_attributes[name] = val
               val
             end
           end
@@ -66,36 +65,51 @@ module LucidHash
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @_store_path = [:data_state, @class_name, @key]
-          @_changed_store_path = [:data_state, :changed, @class_name, @key]
+          @_changed_attributes = {}
           @_revision_store_path = [:data_state, :revision, @class_name, @key]
+          @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
           @_validate_attributes = self.class.attribute_conditions.any?
           attributes = {} unless attributes
           if @_validate_attributes
             attributes.each { |a,v| _validate_attribute(a, v) }
           end
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => attributes },
-                                                               changed: { @class_name => { @key => false }},
-                                                               revision: { @class_name => { @key => revision }}})
+          raw_attributes = Redux.fetch_by_path(*@_store_path)
+          if `raw_attributes === null`
+            @_changed_attributes = !attributes ? {} : attributes
+          elsif raw_attributes && !attributes.nil? && raw_attributes != attributes
+            @_changed_attributes = attributes
+          end
         end
 
-        def _update_attribute(attr_name, attr_val)
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => { attr_name => attr_val }},
-                                                               changed: { @class_name => { @key => true }}})
+        def _get_attribute(name)
+          return @_changed_attributes[name] if @_changed_attributes && @_changed_attributes.key?(name)
+          path = @_store_path + [name]
+          result = Redux.fetch_by_path(*path)
+          return nil if `result === null`
+          result
         end
 
-        def _update_attributes(hash)
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => hash},
-                                                               changed: { @class_name => { @key => true }}})
+        def _get_attributes
+          raw_attributes = Redux.fetch_by_path(*@_store_path)
+          hash = Hash.new(raw_attributes)
+          hash.merge!(@_changed_attributes) if @_changed_attributes
+          hash
+        end
+
+        def changed?
+          @_changed_attributes.any?
+        end
+
+        def revision
+          @_revision
         end
 
         def each(&block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          Hash.new(raw_attributes).each(&block)
+          _get_attributes.each(&block)
         end
 
         def [](name)
-          path = @_store_path + [name]
-          result = Redux.fetch_by_path(*path)
+          result = _get_attribute(name)
           return result if result
           return @_default unless @_default_proc
           @_default_proc.call(self, name)
@@ -103,134 +117,111 @@ module LucidHash
 
         def []=(name, val)
           _validate_attribute(name, val) if @_validate_attributes
-          _update_attribute(name, val)
+          @_changed_attributes[name] = val
           val
         end
 
         def compact!
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          result = Hash.new(raw_attributes).compact!
+          result = _get_attributes.compact!
           return nil if result.nil?
-          _update_attributes(result)
+          @_changed_attributes = result
           self
         end
 
         def delete(name)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          hash = Hash.new(raw_attributes)
+          hash = _get_attributes
           result = hash.delete(name)
-          _update_attributes(hash)
+          @_changed_attributes = hash
           result
         end
 
         def delete_if(&block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
-          result = raw_hash.delete_if(&block)
-          _update_attributes(raw_hash)
+          hash = _get_attributes
+          result = hash.delete_if(&block)
+          @_changed_attributes = hash
           result
         end
 
         def method_missing(method_name, *args, &block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          hash = Hash.new(raw_attributes)
           if method_name.end_with?('=')
             val = args[0]
             _validate_attribute(method_name, val) if @_validate_attributes
-            _update_attribute(method_name, val)
+            @_changed_attributes[method_name] = val
           elsif args.size == 0 && hash.key?(method_name)
-            path = @_store_path + [method_name]
-            result = Redux.fetch_by_path(*path)
+            result = _get_attribute(method_name)
             return result if result
             return @_default unless @_default_proc
             @_default_proc.call(self, method_name)
           else
+            hash = _get_attributes
             hash.send(name, *args, &block)
           end
         end
 
         def key?(name)
-          path = @_store_path + [name]
-          Redux.fetch_by_path(*path) ? true : false
+          _get_attribute(method_name) ? true : false
         end
         alias has_key? key?
 
         def keep_if(&block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
+          raw_hash = _get_attributes
           raw_hash.keep_if(&block)
           _update_array(raw_hash)
           self
         end
 
         def merge!(*args)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
-          raw_hash.merge!(*args)
-          _update_attributes(raw_hash)
+          @_changed_attributes = _get_attributes.merge!(*args)
           self
         end
 
         def reject!(&block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
-          result = raw_hash.reject!(&block)
+          hash = _get_attributes
+          result = hash.reject!(&block)
           return nil if result.nil?
-          _update_attributes(raw_hash)
+          @_changed_attributes = hash
           self
         end
 
         def select!(&block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
-          result = raw_hash.select!(&block)
+          hash = _get_attributes
+          result = ash.select!(&block)
           return nil if result.nil?
-          _update_attributes(raw_hash)
+          @_changed_attributes = hash
           self
         end
         alias filter! select!
 
         def shift
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
-          result = raw_hash.shift
-          _update_array(raw_hash)
+          hash = _get_attributes
+          result = hash.shift
+          @_changed_attributes = hash
           result
         end
 
         def store(name, val)
           _validate_attribute(name, val) if @_validate_attributes
-          _update_attribute(name, val)
+          @_changed_attributes[name] = val
           val
         end
 
         def to_h
-          raw_hash = Redux.fetch_by_path(*@_tore_path)
-          hash = raw_hash ? Hash.new(raw_hash) : {}
+          hash = _get_attributes
           hash.merge(_revision: revision)
         end
 
         def transform_keys!(&block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
-          raw_hash.transform_keys!(&block)
-          _update_array(raw_hash)
+          @_changed_attributes = _get_attributes.transform_keys!(&block)
           self
         end
 
         def transform_values!(&block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
-          raw_hash.transform_values!(&block)
-          _update_array(raw_hash)
+          @_changed_attributes = _get_attributes.transform_values!(&block)
           self
         end
 
         def update(*args)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          raw_hash = Hash.new(raw_attributes)
-          raw_hash.update(*args)
-          _update_array(raw_hash)
+          @_changed_attributes = _get_attributes.update(*args)
           self
         end
       else # RUBY_ENGINE
@@ -268,6 +259,14 @@ module LucidHash
             attributes.each { |a,v| _validate_attribute(a, v) }
           end
           @_raw_attributes = attributes
+        end
+
+        def changed?
+          @_changed
+        end
+
+        def revision
+          @_revision
         end
 
         def each(&block)
