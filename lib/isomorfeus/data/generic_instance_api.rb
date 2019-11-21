@@ -54,23 +54,9 @@ module Isomorfeus
           end
         end
         alias promise_create promise_save
+      else # RUBY_ENGINE
 
-        def changed?
-          Redux.fetch_by_path(*@_changed_store_path) ? true : false
-        end
-
-        def revision
-          Redux.fetch_by_path(*@_revision_store_path)
-        end
-      else
-        def changed?
-          @_changed
-        end
-
-        def revision
-          @_revision
-        end
-      end
+      end # RUBY_ENGINE
     end
   end
 end
