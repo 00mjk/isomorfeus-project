@@ -275,7 +275,7 @@ RSpec.describe 'LucidGenericDocument' do
         document = TestDocumentMixinC.new(key: 23, attributes: { test_attribute: 10 })
         document.changed?
       end
-      expect(result).to be(false)
+      expect(result).to be(true)
       result = @doc.evaluate_ruby do
         class TestDocumentMixinC < LucidGenericDocument::Base
           attribute :test_attribute

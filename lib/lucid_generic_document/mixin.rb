@@ -31,21 +31,12 @@ module LucidGenericDocument
             attribute_conditions[name] = options
 
             define_method(name) do
-              path = @_store_path + [name]
-              result = Redux.fetch_by_path(*path)
-              if result
-                result
-              elsif !@_default_proc
-                @_default
-              else
-                @_default_proc.call(self, name)
-              end
+              _get_attribute(name)
             end
 
             define_method("#{name}=") do |val|
               _validate_attribute(name, val)
-              _update_attribute(name, val)
-              val
+              @_changed_attributes[name] = val
             end
           end
         end
@@ -55,46 +46,57 @@ module LucidGenericDocument
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @_store_path = [:data_state, @class_name, @key]
-          @_changed_store_path = [:data_state, :changed, @class_name, @key]
+          @_changed_attributes = {}
           @_revision_store_path = [:data_state, :revision, @class_name, @key]
+          @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
           attributes = {} unless attributes
           attributes.each { |a,v| _validate_attribute(a, v) }
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => attributes },
-                                                               changed: { @class_name => { @key => false }},
-                                                               revision: { @class_name => { @key => revision }}})
+          raw_attributes = Redux.fetch_by_path(*@_store_path)
+          if `raw_attributes === null`
+            @_changed_attributes = !attributes ? {} : attributes
+          elsif raw_attributes && !attributes.nil? && Hash.new(raw_attributes) != attributes
+            @_changed_attributes = attributes
+          end
         end
 
-        def _update_attribute(attr_name, attr_val)
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => { attr_name => attr_val }},
-                                                               changed: { @class_name => { @key => true }}})
+        def _get_attribute(name)
+          return @_changed_attributes[name] if @_changed_attributes.key?(name)
+          path = @_store_path + [name]
+          result = Redux.fetch_by_path(*path)
+          return nil if `result === null`
+          result
         end
 
-        def _update_attributes(hash)
-          Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: { @class_name => { @key => hash},
-                                                               changed: { @class_name => { @key => true }}})
+        def _get_attributes
+          raw_attributes = Redux.fetch_by_path(*@_store_path)
+          hash = Hash.new(raw_attributes)
+          hash.merge!(@_changed_attributes) if @_changed_attributes
+          hash
+        end
+
+        def changed?
+          @_changed_attributes.any?
+        end
+
+        def revision
+          @_revision
         end
 
         def each(&block)
-          raw_attributes = Redux.fetch_by_path(*@_store_path)
-          Hash.new(raw_attributes).each(&block)
+          _get_attributes.each(&block)
         end
 
         def [](name)
-          path = @_store_path + [name]
-          result = Redux.fetch_by_path(*path)
-          return result if result
-          nil
+          _get_attribute(name)
         end
 
         def []=(name, val)
           _validate_attribute(name, val)
-          _update_attribute(name, val)
-          val
+          @_changed_attributes[name] = val
         end
 
         def to_transport
-          raw_hash = Redux.fetch_by_path(*@_store_path)
-          hash = raw_hash ? Hash.new(raw_hash) : {}
+          hash = _get_attributes
           hash.merge!(_revision: revision)
           { @class_name => { @key => hash }}
         end
@@ -133,6 +135,14 @@ module LucidGenericDocument
             attributes.each { |a,v| _validate_attribute(a, v) }
           end
           @_raw_attributes = attributes
+        end
+
+        def changed?
+          @_changed
+        end
+
+        def revision
+          @_revision
         end
 
         def each(&block)
