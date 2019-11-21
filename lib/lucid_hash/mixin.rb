@@ -53,7 +53,6 @@ module LucidHash
             define_method("#{name}=") do |val|
               _validate_attribute(name, val) if @_validate_attributes
               @_changed_attributes[name] = val
-              val
             end
           end
         end
@@ -76,13 +75,13 @@ module LucidHash
           raw_attributes = Redux.fetch_by_path(*@_store_path)
           if `raw_attributes === null`
             @_changed_attributes = !attributes ? {} : attributes
-          elsif raw_attributes && !attributes.nil? && raw_attributes != attributes
+          elsif raw_attributes && !attributes.nil? && Hash.new(raw_attributes) != attributes
             @_changed_attributes = attributes
           end
         end
 
         def _get_attribute(name)
-          return @_changed_attributes[name] if @_changed_attributes && @_changed_attributes.key?(name)
+          return @_changed_attributes[name] if @_changed_attributes.key?(name)
           path = @_store_path + [name]
           result = Redux.fetch_by_path(*path)
           return nil if `result === null`
@@ -118,7 +117,6 @@ module LucidHash
         def []=(name, val)
           _validate_attribute(name, val) if @_validate_attributes
           @_changed_attributes[name] = val
-          val
         end
 
         def compact!
@@ -185,7 +183,7 @@ module LucidHash
 
         def select!(&block)
           hash = _get_attributes
-          result = ash.select!(&block)
+          result = hash.select!(&block)
           return nil if result.nil?
           @_changed_attributes = hash
           self
