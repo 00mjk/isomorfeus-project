@@ -73,8 +73,7 @@ module LucidArray
         end
 
         def to_transport
-          raw_array = _get_array
-          { @class_name => { @key => raw_array }}
+          { @class_name => { @key => _get_array }}
         end
 
         # Array methods
@@ -115,9 +114,9 @@ module LucidArray
           self
         end
 
-        def compact!(&block)
+        def compact!
           raw_array = _get_array
-          result = raw_array.compact!(&block)
+          result = raw_array.compact!
           return nil if result.nil?
           @_changed_array = raw_array
           self
@@ -232,7 +231,7 @@ module LucidArray
 
         def rotate!(count = 1)
           raw_array = _get_array
-          raw_array.rotate!(count = 1)
+          raw_array.rotate!(count)
           @_changed_array = raw_array
           self
         end
@@ -328,7 +327,7 @@ module LucidArray
           @_raw_array.each(&block)
         end
 
-        def to_transport(inline: false)
+        def to_transport
           { @class_name => { @key => @_raw_array }}
         end
 
@@ -360,8 +359,8 @@ module LucidArray
           self
         end
 
-        def compact!(&block)
-          result = @_raw_array.compact!(&block)
+        def compact!
+          result = @_raw_array.compact!
           return nil if result.nil?
           @_changed = true
           self
@@ -460,7 +459,7 @@ module LucidArray
         end
 
         def rotate!(count = 1)
-          @_raw_array.rotate!(count = 1)
+          @_raw_array.rotate!(count)
           @_changed = true
           self
         end
