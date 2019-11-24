@@ -41,3 +41,18 @@ my_node = MyNode.new(id: '12', name: 'Flintstone', pass: '1234')
 my_node.name # => 'Flintstone'
 my_node.pass # => '1234' on server
 my_node.pass # => nil on client```
+
+# api
+# class:
+#   attribute :my_attribute, server_only: false|true, class: ClassName, is_a: ClassName, default: value, validate: block
+#   my_document.class.attributes
+#   my_document.class.attribute_options
+# instance:
+#   my_document.my_attribute
+#   my_document.my_attribute = value
+#   my_document.changed_attributes
+#   my_document.changed?
+#   my_document.loaded?
+#   my_document.valid_attribute?(attr, value)
+#   my_document.validate_attribute!(attr, value)
+#   my_document.to_transport

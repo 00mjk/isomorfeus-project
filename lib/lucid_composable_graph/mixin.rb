@@ -26,10 +26,10 @@ module LucidComposableGraph
           items_hash['included_arrays'] = {}
           @included_arrays.each do |name, instance|
             items_hash['included_arrays'][name.to_s] = if self.class.included_arrays[name].key?(:anonymous)
-                                                          instance.to_transport(inline: true)
-                                                        else
-                                                          instance.to_sid
-                                                        end
+                                                         instance.to_transport(inline: true)
+                                                       else
+                                                         instance.to_sid
+                                                       end
           end
         end
 
@@ -37,10 +37,10 @@ module LucidComposableGraph
           items_hash['included_collections'] = {}
           @included_collections.each do |name, instance|
             items_hash['included_collections'][name.to_s] = if self.class.included_collections[name].key?(:anonymous)
-                                                               instance.to_transport(inline: true)
-                                                             else
-                                                               instance.to_sid
-                                                             end
+                                                              instance.to_transport(inline: true)
+                                                            else
+                                                              instance.to_sid
+                                                            end
           end
         end
 
@@ -48,10 +48,10 @@ module LucidComposableGraph
           items_hash['included_graphs'] = {}
           @included_graphs.each do |name, instance|
             items_hash['included_graphs'][name.to_s] = if self.class.included_graphs[name].key?(:anonymous)
-                                                          instance.to_transport(inline: true)
-                                                        else
-                                                          instance.to_sid
-                                                        end
+                                                         instance.to_transport(inline: true)
+                                                       else
+                                                         instance.to_sid
+                                                       end
           end
         end
 
@@ -59,10 +59,10 @@ module LucidComposableGraph
           items_hash['included_hashes'] = {}
           @included_hashes.each do |name, instance|
             items_hash['included_hashes'][name.to_s] = if self.class.included_hashes[name].key?(:anonymous)
-                                                          instance.to_transport(inline: true)
-                                                        else
-                                                          instance.to_sid
-                                                        end
+                                                         instance.to_transport(inline: true)
+                                                       else
+                                                         instance.to_sid
+                                                       end
           end
         end
 
@@ -153,8 +153,7 @@ module LucidComposableGraph
           @included_arrays = {}
           self.class.included_arrays.each do |name, options|
             @included_arrays[name] = if options.key?(:anonymous)
-                                       options[:class].new(store_path: @store_path + [:included_arrays, name, :_inline],
-                                                           validated_props: @props)
+                                       options[:class].new(store_path: @store_path + [:included_arrays, name, :_inline], validated_props: @props)
                                      else
                                        options[:class].new(validated_props: @props)
                                      end
@@ -162,8 +161,7 @@ module LucidComposableGraph
           @included_collections = {}
           self.class.included_collections.each do |name, options|
             @included_collections[name] = if options.key?(:anonymous)
-                                            options[:class].new(store_path: @store_path + [:included_arrays, name, :_inline],
-                                                                validated_props: @props)
+                                            options[:class].new(store_path: @store_path + [:included_arrays, name, :_inline], validated_props: @props)
                                           else
                                             options[:class].new(validated_props: @props)
                                           end
@@ -171,8 +169,7 @@ module LucidComposableGraph
           @included_graphs = {}
           self.class.included_graphs.each do |name, options|
             @included_graphs[name] = if options.key?(:anonymous)
-                                       options[:class].new(store_path: @store_path + [:included_arrays, name, :_inline],
-                                                           validated_props: @props)
+                                       options[:class].new(store_path: @store_path + [:included_arrays, name, :_inline], validated_props: @props)
                                      else
                                        options[:class].new(validated_props: @props)
                                      end
@@ -180,8 +177,7 @@ module LucidComposableGraph
           @included_hashes = {}
           self.class.included_hashes.each do |name, options|
             @included_hashes[name] = if options.key?(:anonymous)
-                                       options[:class].new(store_path: @store_path + [:included_arrays, name, :_inline],
-                                                           validated_props: @props)
+                                       options[:class].new(store_path: @store_path + [:included_arrays, name, :_inline], validated_props: @props)
                                      else
                                        options[:class].new(validated_props: @props)
                                      end
