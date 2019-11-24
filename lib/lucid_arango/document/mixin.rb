@@ -61,7 +61,6 @@ module LucidArango
           def initialize(key:, revision: nil,  attributes: nil)
             @key = key.to_s
             @class_name = self.class.name
-            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key]
             @_changed_store_path = [:data_state, :changed, @class_name, @key]
             @_revision_store_path = [:data_state, :revision, @class_name, @key]

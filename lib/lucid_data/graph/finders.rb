@@ -56,7 +56,7 @@ module LucidData
 
       def find_node_by_id(node_id)
         nodes_as_sids.each do |node_sid|
-          return LucidGenericDocument::Base.node_from_sid(node_sid) if node_sid[1] == node_id
+          return LucidData::Node::Base.node_from_sid(node_sid) if node_sid[1] == node_id
         end
         nil
       end

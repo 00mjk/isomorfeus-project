@@ -4,7 +4,7 @@ RSpec.describe 'LucidEdge' do
   context 'on the server' do
     it 'can instantiate a edge by inheritance' do
       result = on_server do
-        class TestEdgeBase < LucidGenericEdge::Base
+        class TestEdgeBase < LucidData::Edge::Base
           attribute :test_attribute
         end
         edge = TestEdgeBase.new(test_attribute: 'test_value')
@@ -16,7 +16,7 @@ RSpec.describe 'LucidEdge' do
     it 'can instantiate a edge by mixin' do
       result = on_server do
         class TestEdgeMixin
-          include LucidGenericEdge::Mixin
+          include LucidData::Edge::Mixin
           attribute :test_attribute
         end
         edge = TestEdgeMixin.new(test_attribute: 'test_value')
@@ -27,7 +27,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'verifies attribute class' do
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         edge = TestEdgeMixinC.new(test_attribute: 'test_value')
@@ -35,7 +35,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq('String')
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -46,7 +46,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -61,7 +61,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'verifies if attribute is_a' do
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         edge = TestEdgeMixinC.new(test_attribute: ['test_value'])
@@ -69,7 +69,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq('Array')
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -80,7 +80,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -95,7 +95,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'uses a default value' do
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, default: 10
         end
         edge = TestEdgeMixinC.new
@@ -106,7 +106,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'reports a change' do
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         edge = TestEdgeMixinC.new(test_attribute: 10)
@@ -114,7 +114,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to be(false)
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         edge = TestEdgeMixinC.new(test_attribute: 10)
@@ -126,7 +126,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'converts to cid' do
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         edge = TestEdgeMixinC.new(id: 10)
@@ -137,7 +137,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'can validate a attribute' do
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         edge = TestEdgeMixinC.new
@@ -145,7 +145,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         edge = TestEdgeMixinC.new
@@ -153,7 +153,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         edge = TestEdgeMixinC.new
@@ -164,10 +164,10 @@ RSpec.describe 'LucidEdge' do
 
     it 'converts to transport' do
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
-        class TestNode < LucidGenericDocument::Base
+        class TestNode < LucidData::Node::Base
         end
         node1 = TestNode.new(id: 11)
         node2 = TestNode.new(id: 12)
@@ -180,7 +180,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'keeps server_only attribute on server' do
       result = on_server do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, server_only: true
         end
         node = TestEdgeMixinC.new(id: 10, test_attribute: 'test')
@@ -197,7 +197,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'can instantiate a edge by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestEdgeBase < LucidGenericEdge::Base
+        class TestEdgeBase < LucidData::Edge::Base
           attribute :test_attribute
         end
         edge = TestEdgeBase.new(test_attribute: 'test_value')
@@ -209,7 +209,7 @@ RSpec.describe 'LucidEdge' do
     it 'can instantiate a edge by mixin' do
       result = @doc.evaluate_ruby do
         class TestEdgeMixin
-          include LucidGenericEdge::Mixin
+          include LucidData::Edge::Mixin
           attribute :test_attribute
         end
         edge = TestEdgeMixin.new(test_attribute: 'test_value')
@@ -220,7 +220,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'verifies attribute class' do
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         edge = TestEdgeMixinC.new(test_attribute: 'test_value')
@@ -228,7 +228,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -239,7 +239,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -254,7 +254,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'verifies if attribute is_a' do
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         edge = TestEdgeMixinC.new(test_attribute: ['test_value'])
@@ -262,7 +262,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq('Array')
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -273,7 +273,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -288,7 +288,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'uses a default value' do
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, default: 10
         end
         edge = TestEdgeMixinC.new
@@ -300,7 +300,7 @@ RSpec.describe 'LucidEdge' do
     it 'reports a change' do
       # usually edge data is taken from the store, thus instantiating a edge with attributes declares them as changed
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         edge = TestEdgeMixinC.new(test_attribute: 10)
@@ -311,7 +311,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'converts to cid' do
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         edge = TestEdgeMixinC.new(id: 10)
@@ -322,7 +322,7 @@ RSpec.describe 'LucidEdge' do
 
     it 'can validate a attribute' do
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         edge = TestEdgeMixinC.new
@@ -330,7 +330,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         edge = TestEdgeMixinC.new
@@ -338,7 +338,7 @@ RSpec.describe 'LucidEdge' do
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         edge = TestEdgeMixinC.new
@@ -349,10 +349,10 @@ RSpec.describe 'LucidEdge' do
 
     it 'converts to transport' do
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
-        class TestNode < LucidGenericDocument::Base
+        class TestNode < LucidData::Node::Base
         end
         node1 = TestNode.new(id: 11)
         node2 = TestNode.new(id: 12)

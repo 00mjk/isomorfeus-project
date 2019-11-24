@@ -26,7 +26,6 @@ module LucidStorableObject
           @props = validated_props
           @props_json = @props.to_json if @props
           @class_name = self.class.name
-          @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @store_path = store_path ? store_path : [:data_state, :arrays, @class_name, @props_json]
         end
 
@@ -102,7 +101,6 @@ module LucidStorableObject
           @props_json = @props.to_json if @props
           @loaded = false
           @class_name = self.class.name
-          @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
         end
 
         def loaded?

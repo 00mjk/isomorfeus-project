@@ -147,7 +147,6 @@ module LucidComposableGraph
       if RUBY_ENGINE == 'opal'
         def initialize(key)
           @class_name = self.class.name
-          @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @store_path = [:data_state, :composable_graphs, @class_name, @key]
 
           @included_arrays = {}
@@ -185,7 +184,7 @@ module LucidComposableGraph
         end
 
         def edges
-          edges_as_sids.map { |edge_sid| LucidGenericEdge::Base.edge_from_sid(edge_sid) }
+          edges_as_sids.map { |edge_sid| LucidData::Edge::Base.edge_from_sid(edge_sid) }
         end
 
         def edges_as_sids
@@ -202,14 +201,14 @@ module LucidComposableGraph
 
         def find_edge_by_id(edge_id)
           edges_as_sids.each do |edge_sid|
-            return  LucidGenericDocument::Base.edge_from_sid(edge_sid) if edge_sid[1] == edge_id
+            return  LucidData::Node::Base.edge_from_sid(edge_sid) if edge_sid[1] == edge_id
           end
           nil
         end
 
         def find_node_by_id(node_id)
           nodes_as_sids.each do |node_sid|
-            return  LucidGenericDocument::Base.node_from_sid(node_sid) if node_sid[1] == node_id
+            return  LucidData::Node::Base.node_from_sid(node_sid) if node_sid[1] == node_id
           end
           nil
         end
@@ -219,13 +218,13 @@ module LucidComposableGraph
           path = @store_path + [:included_nodes]
           self.class.included_nodes.each_key do |name|
             node_sid = Redux.fetch_by_path(*(path + [name]))
-            incl_nodes[name] = LucidGenericDocument::Base.node_from_sid(node_sid) if node_sid
+            incl_nodes[name] = LucidData::Node::Base.node_from_sid(node_sid) if node_sid
           end
           incl_nodes
         end
 
         def nodes
-          nodes_as_sids.map { |node_sid| LucidGenericDocument::Base.node_from_sid(node_sid) }
+          nodes_as_sids.map { |node_sid| LucidData::Node::Base.node_from_sid(node_sid) }
         end
 
         def nodes_as_sids
@@ -265,7 +264,7 @@ module LucidComposableGraph
             included_collections[name] = if collection_class
                                            { class: collection_class }
                                          else
-                                           new_class = Class.new(LucidGenericCollection::Base)
+                                           new_class = Class.new(LucidData::Collection::Base)
                                            new_class.instance_exec(&block)
                                            { anonymous: true, class: new_class }
                                          end
@@ -343,7 +342,6 @@ module LucidComposableGraph
           @included_graphs = {}
           @included_nodes = {}
           @class_name = self.class.name
-          @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
         end
 
         def edges
@@ -403,7 +401,7 @@ module LucidComposableGraph
             included_collections[name] = if collection_class
                                            { class: collection_class }
                                          else
-                                           new_class = Class.new(LucidGenericCollection::Base)
+                                           new_class = Class.new(LucidData::Collection::Base)
                                            new_class.instance_exec(&block)
                                            { anonymous: true, class: new_class }
                                          end

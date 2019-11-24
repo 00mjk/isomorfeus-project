@@ -58,7 +58,7 @@ module LucidData
             document = arg
           else
             sid = arg
-            document = LucidGenericDocument.instance_from_sid(sid)
+            document = LucidData::Node.instance_from_sid(sid)
           end
           [document, sid]
         end
@@ -79,8 +79,7 @@ module LucidData
           def initialize(key:, revision: nil, documents: nil, elements: nil, edges: nil)
             @key = key.to_s
             @class_name = self.class.name
-            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @store_path = [:data_state, @class_name, @key]
+            @_store_path = [:data_state, @class_name, @key]
             @_changed_collection = nil
             @_revision_store_path = [:data_state, :revision, @class_name, @key]
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
@@ -114,7 +113,7 @@ module LucidData
           end
 
           def documents
-            documents_as_sids.map { |node_sid| LucidGenericDocument::Base.document_from_sid(node_sid) }
+            documents_as_sids.map { |node_sid| LucidData::Node::Base.document_from_sid(node_sid) }
           end
           alias edges documents
           alias nodes documents
@@ -207,7 +206,7 @@ module LucidData
             result = raw_collection.delete_at(idx)
             return nil if result.nil?
             @_changed_collection = raw_collection
-            LucidGenericDocument.instance_from_sid(result)
+            LucidData::Node.instance_from_sid(result)
           end
 
           def delete_if(&block)
@@ -255,7 +254,7 @@ module LucidData
             raw_collection = _get_collection
             result = raw_collection.pop(n)
             @_changed_collection = raw_collection
-            LucidGenericDocument.instance_from_sid(result)
+            LucidData::Node.instance_from_sid(result)
           end
 
           def push(*documents)
@@ -305,7 +304,7 @@ module LucidData
             raw_collection = _get_collection
             result = raw_collection.shift(n)
             @_changed_collection = raw_collection
-            LucidGenericDocument.instance_from_sid(result)
+            LucidData::Node.instance_from_sid(result)
           end
 
           def shuffle!(*args)
@@ -358,8 +357,8 @@ module LucidData
           end
           alias prepend unshift
         else # RUBY_ENGINE
-          unless base == LucidGenericCollection::Base
-            Isomorfeus.add_valid_generic_collection_class(base) unless base == LucidGenericCollection::Base
+          unless base == LucidData::Collection::Base
+            Isomorfeus.add_valid_generic_collection_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
           end
@@ -369,7 +368,6 @@ module LucidData
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
-            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @doc_con = self.class.document_conditions
             @_validate_documents = @doc_con ? true : false
             documents = documents || elements ||edges
@@ -390,7 +388,7 @@ module LucidData
 
           def documents
             @_raw_collection.map do |sid|
-              LucidGenericDocument.instance_from_sid(sid)
+              LucidData::Node.instance_from_sid(sid)
             end
           end
 
@@ -517,10 +515,10 @@ module LucidData
             @_changed = true
             if n > 0
               result.map do |sid|
-                LucidGenericDocument.instance_from_sid(sid)
+                LucidData::Node.instance_from_sid(sid)
               end
             else
-              LucidGenericDocument.instance_from_sid(result)
+              LucidData::Node.instance_from_sid(result)
             end
           end
 
@@ -567,7 +565,7 @@ module LucidData
           def shift(n = nil)
             result = @_raw_collection.shift(n)
             @_changed = true
-            LucidGenericDocument.instance_from_sid(result)
+            LucidData::Node.instance_from_sid(result)
           end
 
           def shuffle!(*args)

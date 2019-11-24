@@ -45,7 +45,6 @@ module LucidData
           def initialize(key:, revision: nil, from:, to:, attributes: nil)
             @key = key.to_s
             @class_name = self.class.name
-            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key, :attributes]
             @_from_path = [:data_state, @class_name, @key, :from]
             @_to_path = [:data_state, @class_name, @key, :to]
@@ -111,7 +110,7 @@ module LucidData
           def from
             return @_from_instance if @_from_instance
             sid = @_changed_from ? @_changed_from : Redux.fetch_by_path(@_from_path)
-            @_from_instance = LucidGenericDocument::Base.document_from_sid(sid)
+            @_from_instance = LucidData::Node::Base.document_from_sid(sid)
           end
 
           def from=(document)
@@ -120,14 +119,14 @@ module LucidData
               @_from_instance = document
             else
               @_changed_from = document
-              @_from_instance = LucidGenericDocument::Base.document_from_sid(document)
+              @_from_instance = LucidData::Node::Base.document_from_sid(document)
             end
           end
 
           def to
             return @_to_instance if @_to_instance
             sid = @_changed_to ? @_changed_to : Redux.fetch_by_path(@_to_path)
-            @_to_instance = LucidGenericDocument::Base.document_from_sid(sid)
+            @_to_instance = LucidData::Node::Base.document_from_sid(sid)
           end
 
           def to=(document)
@@ -136,7 +135,7 @@ module LucidData
               @_to_instance = document
             else
               @_changed_to = document
-              @_to_instance = LucidGenericDocument::Base.document_from_sid(document)
+              @_to_instance = LucidData::Node::Base.document_from_sid(document)
             end
           end
 
@@ -147,7 +146,7 @@ module LucidData
                                          _revision: revision }}}
           end
         else # RUBY_ENGINE
-          unless base == LucidGenericEdge::Base
+          unless base == LucidData::Edge::Base
             Isomorfeus.add_valid_generic_edge_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
@@ -174,7 +173,6 @@ module LucidData
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
-            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
@@ -216,7 +214,7 @@ module LucidData
           def from
             return @_from_instance if @_from_instance
             sid = @_changed_from ? @_changed_from : @_raw_from
-            @_from_instance = LucidGenericDocument::Base.document_from_sid(sid)
+            @_from_instance = LucidData::Node::Base.document_from_sid(sid)
           end
 
           def from=(document)
@@ -225,14 +223,14 @@ module LucidData
               @_from_instance = document
             else
               @_changed_from = document
-              @_from_instance = LucidGenericDocument::Base.document_from_sid(document)
+              @_from_instance = LucidData::Node::Base.document_from_sid(document)
             end
           end
 
           def to
             return @_to_instance if @_to_instance
             sid = @_changed_to ? @_changed_to : @_raw_to
-            @_to_instance = LucidGenericDocument::Base.document_from_sid(sid)
+            @_to_instance = LucidData::Node::Base.document_from_sid(sid)
           end
 
           def to=(document)
@@ -241,7 +239,7 @@ module LucidData
               @_to_instance = document
             else
               @_changed_to = document
-              @_to_instance = LucidGenericDocument::Base.document_from_sid(document)
+              @_to_instance = LucidData::Node::Base.document_from_sid(document)
             end
           end
 

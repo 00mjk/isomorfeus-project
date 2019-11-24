@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidGenericEdge' do
+RSpec.describe 'LucidData::Edge' do
   context 'on the server' do
     it 'can instantiate a document by inheritance' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeBase < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeBase < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeBase.new(key: 1, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test_value' })
@@ -16,9 +16,9 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'can instantiate a document by mixin' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
+        class TestDocumentBase < LucidData::Node::Base; end
         class TestEdgeMixin
-          include LucidGenericEdge::Mixin
+          include LucidData::Edge::Mixin
           attribute :test_attribute
         end
         document = TestEdgeMixin.new(key: 2, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test_value' })
@@ -29,8 +29,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'verifies attribute class' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         document = TestEdgeMixinC.new(key: 3, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test_value' })
@@ -38,8 +38,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to eq('String')
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -50,8 +50,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -66,8 +66,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'verifies if attribute is_a' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         document = TestEdgeMixinC.new(key: 6, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: ['test_value'] })
@@ -75,8 +75,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to eq('Array')
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -87,8 +87,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -103,8 +103,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'reports a change' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 9, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 10 })
@@ -112,8 +112,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to be(false)
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 10, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 10 })
@@ -125,8 +125,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'converts to sid' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 11, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2))
@@ -137,24 +137,24 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'can validate a attribute' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         TestEdgeMixinC.valid_attribute?(:test_attribute, 10)
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         TestEdgeMixinC.valid_attribute?(:test, '10')
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         TestEdgeMixinC.valid_attribute?(:test_attribute, '10')
@@ -164,8 +164,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'converts to transport' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 12, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test'})
@@ -179,8 +179,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'keeps server_only attribute on server' do
       result = on_server do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, server_only: true
         end
         document = TestEdgeMixinC.new(key: 13, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test' })
@@ -200,8 +200,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'can instantiate a document by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeBase < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeBase < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeBase.new(key: 14, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test_value' })
@@ -212,9 +212,9 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'can instantiate a document by mixin' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
+        class TestDocumentBase < LucidData::Node::Base; end
         class TestEdgeMixin
-          include LucidGenericEdge::Mixin
+          include LucidData::Edge::Mixin
           attribute :test_attribute
         end
         document = TestEdgeMixin.new(key: 15, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test_value' })
@@ -225,8 +225,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'verifies attribute class' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         document = TestEdgeMixinC.new(key: 16, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test_value' })
@@ -234,8 +234,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -246,8 +246,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -262,8 +262,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'verifies if attribute is_a' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         document = TestEdgeMixinC.new(key: 19, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: ['test_value'] })
@@ -271,8 +271,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to eq('Array')
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -283,8 +283,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -299,8 +299,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'reports a change' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 23, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 10 })
@@ -308,8 +308,8 @@ RSpec.describe 'LucidGenericEdge' do
       end
       expect(result).to be(true)
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 23, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 10 })
@@ -321,8 +321,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'converts to sid' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 24, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2))
@@ -333,21 +333,21 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'can validate a attribute' do
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         TestEdgeMixinC.valid_attribute?(:test_attribute, 10)
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         TestEdgeMixinC.valid_attribute?(:test, '10')
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute, class: String
         end
         TestEdgeMixinC.valid_attribute?(:test_attribute, '10')
@@ -357,8 +357,8 @@ RSpec.describe 'LucidGenericEdge' do
 
     it 'converts to transport' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidGenericDocument::Base; end
-        class TestEdgeMixinC < LucidGenericEdge::Base
+        class TestDocumentBase < LucidData::Node::Base; end
+        class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 28, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 'test' })
