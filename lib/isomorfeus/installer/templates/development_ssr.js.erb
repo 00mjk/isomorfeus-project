@@ -45,7 +45,10 @@ const common_config = {
                 use: [ "style-loader", "css-loader",
                     {
                         loader: "sass-loader",
-                        options: { includePaths: [path.resolve(__dirname, '../isomorfeus/styles')] }
+                        options: {
+                            sassOptions: { includePaths: [path.resolve(__dirname, '../isomorfeus/styles')] },
+                            sourceMap: false
+                        }
                     }
                 ]
             },

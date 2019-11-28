@@ -29,7 +29,7 @@ const common_config = {
                     {
                         loader: "sass-loader",
                         options: {
-                            includePath: [path.resolve(__dirname, '../isomorfeus/styles')],
+                            sassOptions: { includePaths: [path.resolve(__dirname, '../isomorfeus/styles')] },
                             sourceMap: false
                         }
                     }
