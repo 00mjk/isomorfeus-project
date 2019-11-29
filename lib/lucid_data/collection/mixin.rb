@@ -79,6 +79,7 @@ module LucidData
           def initialize(key:, revision: nil, documents: nil, elements: nil, edges: nil)
             @key = key.to_s
             @class_name = self.class.name
+            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key]
             @_changed_collection = nil
             @_revision_store_path = [:data_state, :revision, @class_name, @key]
@@ -358,7 +359,7 @@ module LucidData
           alias prepend unshift
         else # RUBY_ENGINE
           unless base == LucidData::Collection::Base
-            Isomorfeus.add_valid_generic_collection_class(base)
+            Isomorfeus.add_valid_data_collection_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
           end
@@ -368,6 +369,7 @@ module LucidData
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
+            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @doc_con = self.class.document_conditions
             @_validate_documents = @doc_con ? true : false
             documents = documents || elements ||edges

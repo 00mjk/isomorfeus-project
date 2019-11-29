@@ -45,6 +45,7 @@ module LucidData
           def initialize(key:, revision: nil, from:, to:, attributes: nil)
             @key = key.to_s
             @class_name = self.class.name
+            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key, :attributes]
             @_from_path = [:data_state, @class_name, @key, :from]
             @_to_path = [:data_state, @class_name, @key, :to]
@@ -147,7 +148,7 @@ module LucidData
           end
         else # RUBY_ENGINE
           unless base == LucidData::Edge::Base
-            Isomorfeus.add_valid_generic_edge_class(base)
+            Isomorfeus.add_valid_data_edge_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
           end
@@ -173,6 +174,7 @@ module LucidData
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
+            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes

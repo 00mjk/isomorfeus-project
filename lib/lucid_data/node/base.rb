@@ -5,7 +5,7 @@ module LucidData
 
       if RUBY_ENGINE != 'opal'
         def self.inherited(base)
-          Isomorfeus.add_valid_generic_document_class(base)
+          Isomorfeus.add_valid_data_node_class(base)
 
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: Anonymous.new

@@ -68,6 +68,7 @@ module LucidData
           def initialize(key:, revision: nil, node_collection: nil, edge_collection: nil, attributes: nil)
             @key = key.to_s
             @class_name = self.class.name
+            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key, :attributes]
             @_edge_collection_path = [:data_state, @class_name, @key, :edge_collection]
             @_node_collection_path = [:data_state, @class_name, @key, :node_collection]
@@ -136,7 +137,7 @@ module LucidData
           end
         else # RUBY_ENGINE
           unless base == LucidData::Graph::Base
-            Isomorfeus.add_valid_generic_collection_class(base)
+            Isomorfeus.add_valid_data_collection_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
           end
@@ -162,6 +163,7 @@ module LucidData
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
+            @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_edge_collection = edge_collection
             @_node_collection = node_collection
           end

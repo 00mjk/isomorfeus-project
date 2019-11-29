@@ -147,8 +147,8 @@ module LucidComposableGraph
       if RUBY_ENGINE == 'opal'
         def initialize(key)
           @class_name = self.class.name
+          @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
           @store_path = [:data_state, :composable_graphs, @class_name, @key]
-
           @included_arrays = {}
           self.class.included_arrays.each do |name, options|
             @included_arrays[name] = if options.key?(:anonymous)
@@ -342,6 +342,7 @@ module LucidComposableGraph
           @included_graphs = {}
           @included_nodes = {}
           @class_name = self.class.name
+          @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
         end
 
         def edges
