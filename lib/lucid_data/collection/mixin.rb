@@ -92,8 +92,8 @@ module LucidData
               documents.each { |e| _validate_document(e) }
             end
             raw_documents = _collection_to_sids(documents)
-            raw_array = Redux.fetch_by_path(*@_store_path)
-            if `raw_collection === null` || raw_array != raw_documents
+            raw_collection = Redux.fetch_by_path(*@_store_path)
+            if `raw_collection === null` || raw_collection != raw_documents
               @_changed_collection = raw_documents
             end
           end
