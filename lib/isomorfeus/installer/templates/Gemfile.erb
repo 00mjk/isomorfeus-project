@@ -18,6 +18,10 @@ gem 'isomorfeus-i18n', <%= isomorfeus_i18n %>
 gem 'isomorfeus-data', <%= isomorfeus_data %>
 gem 'isomorfeus-operation', <%= isomorfeus_operation %>
 
+group :development do
+  gem 'pry', '~> 0.12.2'
+end
+
 group :test do
   gem 'rspec', '~> 3.8.0'
   gem 'isomorfeus-puppetmaster', '~> 0.3.0'
