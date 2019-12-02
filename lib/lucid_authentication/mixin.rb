@@ -17,23 +17,22 @@ module LucidAuthentication
             else
               `console.warn("Connection not secure, ensure a secure connection in production, otherwise login will fail!")` unless Isomorfeus::Transport.socket.url.start_with?('wss:')
             end
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_identifier, user_password).then do |agent|
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', self.name, user_identifier, user_password).then do |agent|
               if agent.processed
                 agent.result
               else
                 agent.processed = true
                 if agent.response.key?(:success)
                   Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.response[:data])
-                  if agent.response[:data].key?(:nodes)
-                    # TODO Arango support
-                  elsif agent.response[:data].key?(:generic_nodes)
-                    class_name = agent.response[:data][:generic_nodes].keys.first
-                    node_id = agent.response[:data][:generic_nodes][class_name].keys.first
-                  end
+                  class_name = agent.response[:data].keys.first
+                  key = agent.response[:data][class_name].keys.first
+
                   # TODO set session cookie
                   # agent.response[:session_cookie]
-                  agent.result = Isomorfeus.cached_node_class(class_name).new({id: node_id})
+                  agent.result = Isomorfeus.cached_data_class(class_name).new(key: key)
                 else
+                  error = agent.response[:error]
+                  `console.err(error)` if error
                   raise 'Login failed!' # calls .fail
                 end
               end

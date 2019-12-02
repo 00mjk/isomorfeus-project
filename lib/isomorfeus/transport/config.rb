@@ -61,9 +61,7 @@ module Isomorfeus
       end
 
       def add_valid_channel_class(klass)
-        class_name = klass.name
-        class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        valid_channel_class_names << class_name
+        valid_channel_class_names << raw_class_name(klass)
       end
 
       def valid_handler_class_names
@@ -75,9 +73,7 @@ module Isomorfeus
       end
 
       def add_valid_handler_class(klass)
-        class_name = klass.name
-        class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        valid_handler_class_names << class_name
+        valid_handler_class_names << raw_class_name(klass)
       end
 
       def cached_handler_classes
@@ -90,12 +86,32 @@ module Isomorfeus
         cached_handler_classes[class_name] = "::#{class_name}".constantize
       end
 
-      def valid_user_classes
-        @valid_user_classes ||= Set.new
+      def valid_user_class_names
+        @valid_user_class_names ||= Set.new
       end
 
-      def add_valid_user_class(user_class)
-        valid_user_classes << user_class
+      def valid_user_class_name?(class_name)
+        valid_user_class_names.include?(class_name)
+      end
+
+      def add_valid_user_class(klass)
+        valid_user_class_names << raw_class_name(klass)
+      end
+
+      def cached_user_classes
+        @cached_user_classes ||= {}
+      end
+
+      def cached_user_class(class_name)
+        return "::#{class_name}".constantize if Isomorfeus.development?
+        return cached_user_classes[class_name] if cached_user_classes.key?(class_name)
+        cached_user_classes[class_name] = "::#{class_name}".constantize
+      end
+
+      def raw_class_name(klass)
+        class_name = klass.name
+        class_name = class_name.split('>::').last if class_name.start_with?('#<')
+        class_name
       end
     end
   end

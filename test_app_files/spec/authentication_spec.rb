@@ -4,7 +4,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
   context 'on server' do
     it 'can mixin' do
       result = on_server do
-        class MyUser < LucidGenericDocument::Base
+        class MyUser < LucidData::Document::Base
           include LucidAuthentication::Mixin
         end
 
@@ -16,7 +16,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
     it 'can authenticate successfully' do
       result = on_server do
         promise = SimpleUser.promise_login('joe_simple', 'my_pass')
-        promise.value.id
+        promise.value.key
       end
       expect(result).to eq('123')
     end
@@ -45,7 +45,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can mixin' do
       result = @doc.evaluate_ruby do
-        class MyUser < LucidGenericDocument::Base
+        class MyUser < LucidData::Document::Base
           include LucidAuthentication::Mixin
         end
 
@@ -57,7 +57,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
     it 'can authenticate successfully' do
       result = @doc.await_ruby do
         SimpleUser.promise_login('joe_simple', 'my_pass').then do |user|
-          user.id
+          user.key
         end
       end
       expect(result).to eq('123')
