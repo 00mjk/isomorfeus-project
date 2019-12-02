@@ -20,6 +20,6 @@ Isomorfeus::Installer.module_directories.each do |mod_dir|
   end
 end
 
-require_relative '../lib/isomorfeus/installer/cli'
+require_relative '../lib/isomorfeus/cli'
 
 puts Cowsay.say "Testing ISOMORFEUS INSTALLER. NO chance for bugs!", "Ghostbusters"
