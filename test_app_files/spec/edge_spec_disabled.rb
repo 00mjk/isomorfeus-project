@@ -167,7 +167,7 @@ RSpec.describe 'LucidEdge' do
         class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidData::Document::Base
         end
         node1 = TestNode.new(id: 11)
         node2 = TestNode.new(id: 12)
@@ -352,7 +352,7 @@ RSpec.describe 'LucidEdge' do
         class TestEdgeMixinC < LucidData::Edge::Base
           attribute :test_attribute
         end
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidData::Document::Base
         end
         node1 = TestNode.new(id: 11)
         node2 = TestNode.new(id: 12)

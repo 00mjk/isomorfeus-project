@@ -11,10 +11,6 @@ module LucidData
         base.include(LucidData::Collection::Finders)
 
         base.instance_exec do
-          def _handler_type
-            'collection'
-          end
-
           def documents(validate_hash = {})
             @document_conditions = validate_hash
           end
@@ -58,13 +54,13 @@ module LucidData
             document = arg
           else
             sid = arg
-            document = LucidData::Node.instance_from_sid(sid)
+            document = Isomorfeus.instance_from_sid(sid)
           end
           [document, sid]
         end
 
         def to_transport
-          { @class_name => { @key => nodes_as_sids }}
+          { @class_name => { @key => documents_as_sids }}
         end
 
         def included_items_to_transport
@@ -76,7 +72,7 @@ module LucidData
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, documents: nil, elements: nil, edges: nil)
+          def initialize(key:, revision: nil, documents: nil, elements: nil, edges: nil, nodes: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -86,15 +82,19 @@ module LucidData
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
             @doc_con = self.class.document_conditions
             @_validate_documents = @el_con ? true : false
-            documents = documents || elements ||edges
-            documents = [] unless documents
-            if @_validate_documents
-              documents.each { |e| _validate_document(e) }
-            end
-            raw_documents = _collection_to_sids(documents)
-            raw_collection = Redux.fetch_by_path(*@_store_path)
-            if `raw_collection === null` || raw_collection != raw_documents
-              @_changed_collection = raw_documents
+            documents = documents || elements || edges || nodes
+            loaded = loaded?
+            if documents && loaded
+              if @_validate_documents
+                documents.each { |e| _validate_document(e) }
+              end
+              raw_documents = _collection_to_sids(documents)
+              raw_collection = Redux.fetch_by_path(*@_store_path)
+              if raw_collection != raw_documents
+                @_changed_collection = raw_documents
+              end
+            elsif !loaded
+              @_changed_collection = []
             end
           end
 
@@ -103,6 +103,10 @@ module LucidData
             collection = Redux.fetch_by_path(*@_store_path)
             return collection if collection
             []
+          end
+
+          def _load_from_store!
+            @_changed_collection = nil
           end
 
           def changed?
@@ -114,7 +118,7 @@ module LucidData
           end
 
           def documents
-            documents_as_sids.map { |node_sid| LucidData::Node::Base.document_from_sid(node_sid) }
+            documents_as_sids.map { |node_sid| Isomorfeus.instance_from_sid(node_sid) }
           end
           alias edges documents
           alias nodes documents
@@ -207,7 +211,7 @@ module LucidData
             result = raw_collection.delete_at(idx)
             return nil if result.nil?
             @_changed_collection = raw_collection
-            LucidData::Node.instance_from_sid(result)
+            Isomorfeus.instance_from_sid(result)
           end
 
           def delete_if(&block)
@@ -255,7 +259,7 @@ module LucidData
             raw_collection = _get_collection
             result = raw_collection.pop(n)
             @_changed_collection = raw_collection
-            LucidData::Node.instance_from_sid(result)
+            Isomorfeus.instance_from_sid(result)
           end
 
           def push(*documents)
@@ -305,7 +309,7 @@ module LucidData
             raw_collection = _get_collection
             result = raw_collection.shift(n)
             @_changed_collection = raw_collection
-            LucidData::Node.instance_from_sid(result)
+            Isomorfeus.instance_from_sid(result)
           end
 
           def shuffle!(*args)
@@ -359,12 +363,19 @@ module LucidData
           alias prepend unshift
         else # RUBY_ENGINE
           unless base == LucidData::Collection::Base
-            Isomorfeus.add_valid_data_collection_class(base)
+            Isomorfeus.add_valid_data_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
           end
 
-          def initialize(key:, revision: nil, documents: nil, elements: nil, edges: nil)
+          base.instance_exec do
+            def load(key:, pub_sub_client: nil, current_user: nil)
+              documents = instance_exec(key: key, &@_load_block)
+              self.new(key: key, documents: documents)
+            end
+          end
+
+          def initialize(key:, revision: nil, documents: nil, edges: nil, nodes: nil)
             @key = key.to_s
             @_revision = revision
             @_changed = false
@@ -372,12 +383,12 @@ module LucidData
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @doc_con = self.class.document_conditions
             @_validate_documents = @doc_con ? true : false
-            documents = documents || elements ||edges
+            documents = documents || edges || nodes
             documents = [] unless documents
             if @_validate_documents
               documents.each { |e| _validate_document(e) }
             end
-            @_raw_collection = _collection_to_sids(documents)
+            @_raw_collection = documents
           end
 
           def changed?
@@ -389,33 +400,33 @@ module LucidData
           end
 
           def documents
-            @_raw_collection.map do |sid|
-              LucidData::Node.instance_from_sid(sid)
-            end
+            @_raw_collection
           end
+          alias edges documents
+          alias nodes documents
 
           def documents_as_sids
-            @_raw_collection
+            @_raw_collection.map(&:to_sid)
           end
 
           def each(&block)
-            documents.each(&block)
+            @_raw_collection.each(&block)
           end
 
           def method_missing(method_name, *args, &block)
-            if method_name.start_with?('find_document_by_') || method_name.start_with?('find_edge_by_') || method_name.start_with?('find_node_by_')
-              attribute = method_name[13..-1] # remove 'find_node_by_'
+            method_name_s = method_name.to_s
+            if method_name_s.start_with?('find_document_by_') || method_name_s.start_with?('find_edge_by_') || method_name_s.start_with?('find_node_by_')
+              attribute = method_name_s[13..-1] # remove 'find_node_by_'
               value = args[0]
               attribute_hash = { attribute => value }
               attribute_hash.merge!(args[1]) if args[1]
               find_node(attribute_hash)
             else
-              documents.send(method_name, *args, &block)
+              @_raw_collection.send(method_name, *args, &block)
             end
           end
 
           def <<(document)
-            document, sid = _document_sid_from_arg(document)
             _validate_document(document) if @_validate_documents
             @_changed = true
             @_raw_collection << sid
@@ -423,39 +434,39 @@ module LucidData
           end
 
           def []=(idx, document)
-            document.respond_to?(:to_sid) ? document.to_sid : document
             _validate_document(document) if @_validate_documents
             @_changed = true
             @_raw_collection[idx] = document
           end
 
           def clear
+            @_changed = true
             @_raw_collection = []
             self
           end
 
           def collect!(&block)
             @_changed = true
-            result = documents.collect!(&block)
-            @_raw_collection = _collection_to_sids(result)
+            @_raw_collection.collect!(&block)
             self
           end
 
           def compact!
-            result = @_raw_collection.compact!
+            @_raw_collection.compact!
             return nil if result.nil?
             @_changed = true
             self
           end
 
           def concat(*docs)
-            sids = docs.map do |doc|
-              document, sid = _document_sid_from_arg(doc)
-              _validate_document(document)
-              sid
+            if @_validate_documents
+              docs = docs.map do |document|
+                _validate_document(document)
+                document
+              end
             end
             @_changed = true
-            @_raw_collection.concat(*sids)
+            @_raw_collection.concat(*docs)
             self
           end
 
@@ -473,41 +484,38 @@ module LucidData
           end
 
           def delete_if(&block)
-            documents.delete_if(&block)
-            @_raw_collection = _collection_to_sids(result)
+            @_raw_collection.delete_if(&block)
             @_changed = true
             self
           end
 
           def filter!(&block)
-            result = documents.filter!(&block)
+            result = @_raw_collection.filter!(&block)
             return nil if result.nil?
-            @_raw_collection = _collection_to_sids(result)
             @_changed = true
             self
           end
 
-          def insert(*args)
-            sids = docs.map do |doc|
-              document, sid = _document_sid_from_arg(doc)
-              _validate_document(document)
-              sid
+          def insert(idx, *docs)
+            if @_validate_documents
+              docs = docs.map do |document|
+                _validate_document(document)
+                document
+              end
             end
-            @_raw_collection.insert(*sids)
+            @_raw_collection.insert(idx, *docs)
             @_changed = true
             self
           end
 
           def keep_if(&block)
-            result = documents.keep_if(&block)
-            @_raw_collection = _collection_to_sids(result)
+            @_raw_collection.keep_if(&block)
             @_changed = true
             self
           end
 
           def map!(&block)
-            result = documents.map!(&block)
-            @_raw_collection = _collection_to_sids(result)
+            @_raw_collection.map!(&block)
             @_changed = true
             self
           end
@@ -515,31 +523,25 @@ module LucidData
           def pop(n = nil)
             result = @_raw_collection.pop(n)
             @_changed = true
-            if n > 0
-              result.map do |sid|
-                LucidData::Node.instance_from_sid(sid)
-              end
-            else
-              LucidData::Node.instance_from_sid(result)
-            end
+            result
           end
 
-          def push(*documents)
-            sids = docs.map do |doc|
-              document, sid = _document_sid_from_arg(doc)
-              _validate_document(document)
-              sid
+          def push(*docs)
+            if @_validate_documents
+              docs = docs.map do |document|
+                _validate_document(document)
+                document
+              end
             end
-            @_raw_collection.push(*sids)
+            @_raw_collection.push(*docs)
             @_changed = true
             self
           end
           alias append push
 
           def reject!(&block)
-            result = documents.reject!(&block)
+            result = @_raw_collection.reject!(&block)
             return nil if result.nil?
-            @_raw_collection = _collection_to_sids(result)
             @_changed = true
             self
           end
@@ -557,9 +559,8 @@ module LucidData
           end
 
           def select!(&block)
-            result = documents.select!(&block)
+            result = @_raw_collection.select!(&block)
             return nil if result.nil?
-            @_raw_collection = _collection_to_sids(result)
             @_changed = true
             self
           end
@@ -567,7 +568,7 @@ module LucidData
           def shift(n = nil)
             result = @_raw_collection.shift(n)
             @_changed = true
-            LucidData::Node.instance_from_sid(result)
+            result
           end
 
           def shuffle!(*args)
@@ -579,38 +580,35 @@ module LucidData
           def slice!(*args)
             result = @_raw_collection.slice!(*args)
             @_changed = true
-            # TODO
             result
           end
 
           def sort!(&block)
-            docs = documents.sort!(&block)
-            @_raw_collection = _collection_to_sids(docs)
+            @_raw_collection.sort!(&block)
             @_changed = true
             self
           end
 
           def sort_by!(&block)
-            docs = documents.sort_by!(&block)
-            @_raw_collection = _collection_to_sids(docs)
+            @_raw_collection.sort_by!(&block)
             @_changed = true
             self
           end
 
           def uniq!(&block)
-            docs = documents.uniq!(&block)
-            @_raw_collection = _collection_to_sids(docs)
+            @_raw_collection.uniq!(&block)
             @_changed = true
             self
           end
 
-          def unshift(*args)
-            sids = docs.map do |doc|
-              document, sid = _document_sid_from_arg(doc)
-              _validate_document(document)
-              sid
+          def unshift(*docs)
+            if @_validate_documents
+              docs = docs.map do |document|
+                _validate_document(document)
+                document
+              end
             end
-            @_raw_collection.unshift(*sids)
+            @_raw_collection.unshift(*docs)
             @_changed = true
             self
           end

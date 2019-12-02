@@ -1,214 +1,42 @@
 module Isomorfeus
   # available settings
   class << self
-    def cached_composable_graph_classes
-      @cached_composable_graph_classes ||= {}
+    def instance_from_sid(sid)
+      data_class = cached_data_class(sid[0])
+      data_class.new(key: sid[1])
     end
 
-    def cached_composable_graph_class(class_name)
-      return "::#{class_name}".constantize if Isomorfeus.development?
-      return cached_composable_graph_classes[class_name] if cached_composable_graph_classes.key?(class_name)
-      cached_composable_graph_classes[class_name] = "::#{class_name}".constantize
-    end
-
-    def cached_generic_collection_classes
-      @cached_generic_collection_classes ||= {}
-    end
-
-    def cached_generic_collection_class(class_name)
-      return "::#{class_name}".constantize if Isomorfeus.development?
-      return cached_generic_collection_classes[class_name] if cached_generic_collection_classes.key?(class_name)
-      cached_generic_collection_classes[class_name] = "::#{class_name}".constantize
-    end
-
-    def cached_generic_edge_classes
-      @cached_generic_edge_classes ||= {}
-    end
-
-    def cached_generic_edge_class(class_name)
-      return "::#{class_name}".constantize if Isomorfeus.development?
-      return cached_generic_edge_classes[class_name] if cached_generic_edge_classes.key?(class_name)
-      cached_generic_edge_classes[class_name] = "::#{class_name}".constantize
-    end
-
-    def cached_generic_node_classes
-      @cached_generic_node_classes ||= {}
-    end
-
-    def cached_generic_node_class(class_name)
-      return "::#{class_name}".constantize if Isomorfeus.development?
-      return cached_generic_node_classes[class_name] if cached_generic_node_classes.key?(class_name)
-      cached_generic_node_classes[class_name] = "::#{class_name}".constantize
-    end
-
-    if RUBY_ENGINE != 'opal'
-      # array
-      def valid_array_class_names
-        @valid_array_class_names ||= Set.new
+    if RUBY_ENGINE == 'opal'
+      def cached_data_classes
+        @cached_data_classes ||= `{}`
       end
 
-      def valid_array_class_name?(class_name)
-        valid_array_class_names.include?(class_name)
+      def cached_data_class(class_name)
+        return "::#{class_name}".constantize if Isomorfeus.development?
+        return cached_data_classes.JS[class_name] if cached_data_classes.JS[class_name]
+        cached_data_classes.JS[class_name] = "::#{class_name}".constantize
+      end
+    else
+      def cached_data_classes
+        @cached_data_classes ||= {}
       end
 
-      def add_valid_array_class(klass)
-        valid_array_class_names << data_class_name(klass)
+      def cached_data_class(class_name)
+        return "::#{class_name}".constantize if Isomorfeus.development?
+        return cached_data_classes[class_name] if cached_data_classes.key?(class_name)
+        cached_data_classes[class_name] = "::#{class_name}".constantize
       end
 
-      # composable graph
-      def valid_composable_graph_class_names
-        @valid_composable_graph_class_names ||= Set.new
+      def valid_data_classes
+        @valid_data_classes ||= {}
       end
 
-      def valid_composable_graph_class_name?(class_name)
-        valid_composable_graph_class_names.include?(class_name)
+      def valid_data_class_name?(class_name)
+        valid_data_classes.key?(class_name)
       end
 
-      def add_valid_composable_graph_class(klass)
-        valid_composable_graph_class_names << data_class_name(klass)
-      end
-
-      # document
-      def valid_document_class_names
-        @valid_document_class_names ||= Set.new
-      end
-
-      def valid_document_class_name?(class_name)
-        valid_document_class_names.include?(class_name)
-      end
-
-      def add_valid_document_class(klass)
-        valid_document_class_names << data_class_name(klass)
-      end
-
-      # document collection
-      def valid_document_collection_class_names
-        @valid_document_collection_class_names ||= Set.new
-      end
-
-      def valid_document_collection_class_name?(class_name)
-        valid_document_collection_class_names.include?(class_name)
-      end
-
-      def add_valid_document_collection_class(klass)
-        valid_document_collection_class_names << data_class_name(klass)
-      end
-
-      # edge
-      def valid_edge_class_names
-        @valid_edge_class_names ||= Set.new
-      end
-
-      def valid_edge_class_name?(class_name)
-        valid_edge_class_names.include?(class_name)
-      end
-
-      def add_valid_edge_class(klass)
-        valid_edge_class_names << data_class_name(klass)
-      end
-
-      # edge collection
-      def valid_edge_collection_class_names
-        @valid_edge_collection_class_names ||= Set.new
-      end
-
-      def valid_edge_collection_class_name?(class_name)
-        valid_edge_collection_class_names.include?(class_name)
-      end
-
-      def add_valid_edge_collection_class(klass)
-        valid_edge_collection_class_names << data_class_name(klass)
-      end
-
-      # generic collection
-      def valid_generic_collection_class_names
-        @valid_generic_collection_class_names ||= Set.new
-      end
-
-      def valid_generic_collection_class_name?(class_name)
-        valid_generic_collection_class_names.include?(class_name)
-      end
-
-      def add_valid_generic_collection_class(klass)
-        valid_generic_collection_class_names << data_class_name(klass)
-      end
-
-      # generic document
-      def valid_generic_document_class_names
-        @valid_generic_document_class_names ||= Set.new
-      end
-
-      def valid_generic_document_class_name?(class_name)
-        valid_generic_document_class_names.include?(class_name)
-      end
-
-      def add_valid_generic_document_class(klass)
-        valid_generic_document_class_names << data_class_name(klass)
-      end
-
-      # generic edge
-      def valid_generic_edge_class_names
-        @valid_generic_edge_class_names ||= Set.new
-      end
-
-      def valid_generic_edge_class_name?(class_name)
-        valid_generic_edge_class_names.include?(class_name)
-      end
-
-      def add_valid_generic_edge_class(klass)
-        valid_generic_edge_class_names << data_class_name(klass)
-      end
-
-      # graph
-      def valid_graph_class_names
-        @valid_graph_class_names ||= Set.new
-      end
-
-      def valid_graph_class_name?(class_name)
-        valid_graph_class_names.include?(class_name)
-      end
-
-      def add_valid_graph_class(klass)
-        valid_graph_class_names << data_class_name(klass)
-      end
-
-      # hash
-      def valid_hash_class_names
-        @valid_hash_class_names ||= Set.new
-      end
-
-      def valid_hash_class_name?(class_name)
-        valid_hash_class_names.include?(class_name)
-      end
-
-      def add_valid_hash_class(klass)
-        valid_hash_class_names << data_class_name(klass)
-      end
-
-      # remote object
-      def valid_remote_object_class_names
-        @valid_remote_object_class_names ||= Set.new
-      end
-
-      def valid_remote_object_class_name?(class_name)
-        valid_remote_object_class_names.include?(class_name)
-      end
-
-      def add_valid_remote_object_class(klass)
-        valid_remote_object_class_names << data_class_name(klass)
-      end
-
-      # storable object
-      def valid_storable_object_class_names
-        @valid_storable_object_class_names ||= Set.new
-      end
-
-      def valid_storable_object_class_name?(class_name)
-        valid_storable_object_class_names.include?(class_name)
-      end
-
-      def add_valid_storable_object_class(klass)
-        valid_storable_object_class_names << data_class_name(klass)
+      def add_valid_data_class(klass)
+        valid_data_classes[raw_class_name(klass)] = true
       end
 
       def connect_to_arango
@@ -273,14 +101,6 @@ module Isomorfeus
       attr_accessor :arango_production
       attr_accessor :arango_development
       attr_accessor :arango_test
-
-      private
-
-      def data_class_name(klass)
-        class_name = klass.name
-        class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        class_name
-      end
     end
   end
 end

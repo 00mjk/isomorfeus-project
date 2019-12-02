@@ -10,10 +10,6 @@ module LucidHash
       attr_accessor :default_proc
 
       base.instance_exec do
-        def _handler_type
-          'hash'
-        end
-
         def attribute_conditions
           @attribute_conditions ||= {}
         end
@@ -224,7 +220,7 @@ module LucidHash
         end
       else # RUBY_ENGINE
         unless base == LucidHash::Base
-          Isomorfeus.add_valid_hash_class(base)
+          Isomorfeus.add_valid_data_class(base)
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: Anonymous.new
         end

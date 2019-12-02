@@ -11,21 +11,6 @@ module LucidData
         base.include(LucidData::Graph::Finders)
 
         base.instance_exec do
-          def _handler_type
-            'graph'
-          end
-
-          def nodes(node_class = nil, &block)
-            @node_class = node_class
-            @edge_block = block
-          end
-          alias documents nodes
-
-          def edges(edge_class, &block)
-            @edge_class = edge_class
-            @edge_block = block
-          end
-
           def attribute_conditions
             @attribute_conditions ||= {}
           end
@@ -38,15 +23,19 @@ module LucidData
         end
 
         def _validate_attribute(attr_name, attr_val)
+          raise "No such attribute declared: '#{attr_name}'!" unless self.class.attribute_conditions.key?(attr_name)
           Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
         end
 
         def to_transport
-          { @class_name => { @key => { edge_collection: edge_collection.to_transport, node_collection: node_collection.to_transport }}}
+          { @class_name => { @key => { attributes: _get_attributes, edge_collection: edge_collection.to_sid, node_collection: node_collection.to_sid }}}
         end
 
         def included_items_to_transport
-          edge_collection.included_items_to_transport + node_collection.included_items_to_transport
+          hash = edge_collection.to_transport
+          hash.merge!(node_collection.to_transport)
+          hash.merge!(edge_collection.included_items_to_transport)
+          hash.merge!(node_collection.included_items_to_transport)
         end
 
         if RUBY_ENGINE == 'opal'
@@ -65,26 +54,43 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, node_collection: nil, edge_collection: nil, attributes: nil)
+          def initialize(key:, revision: nil, document_collection: nil, node_collection: nil, edge_collection: nil, attributes: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key, :attributes]
             @_edge_collection_path = [:data_state, @class_name, @key, :edge_collection]
             @_node_collection_path = [:data_state, @class_name, @key, :node_collection]
-            edge_collection = edge_collection.to_sid if edge_collection.respond_to?(:to_sid)
-            node_collection = node_collection.to_sid if node_collection.respond_to?(:to_sid)
-            @_edge_collection_sid = edge_collection ? edge_collection : Redux.fetch_by_path(*@_edge_collection_path)
-            @_node_collection_sid = node_collection ? node_collection : Redux.fetch_by_path(*@_node_collection_path)
-            @_revision_store_path = [:data_state, :revision, @class_name, @key]
+            @_revision_store_path = [:data_state, @class_name, @key, :revision]
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
-            attributes = {} unless attributes
-            attributes.each { |a,v| _validate_attribute(a, v) }
-            raw_attributes = Redux.fetch_by_path(*@_store_path)
-            if `raw_attributes === null`
-              @_changed_attributes = !attributes ? {} : attributes
-            elsif raw_attributes && !attributes.nil? && Hash.new(raw_attributes) != attributes
-              @_changed_attributes = attributes
+            loaded = loaded?
+            if attributes
+              attributes.each { |a,v| _validate_attribute(a, v) }
+              if loaded
+                raw_attributes = Redux.fetch_by_path(*@_store_path)
+                if `raw_attributes === null`
+                  @_changed_attributes = !attributes ? {} : attributes
+                elsif raw_attributes && !attributes.nil? && Hash.new(raw_attributes) != attributes
+                  @_changed_attributes = attributes
+                end
+              else
+                @_changed_attributes = attributes
+              end
+            else
+              @_changed_attributes = {}
+            end
+            edge_collection = edge_collection.to_sid if edge_collection.respond_to?(:to_sid)
+            if loaded && edge_collection
+              @_edge_collection_sid = edge_collection ? edge_collection : Redux.fetch_by_path(*@_edge_collection_path)
+            else
+              @_edge_collection_sid = edge_collection
+            end
+            node_collection = document_collection || node_collection
+            node_collection = node_collection.to_sid if node_collection.respond_to?(:to_sid)
+            if loaded && node_collection
+              @_node_collection_sid = node_collection ? node_collection : Redux.fetch_by_path(*@_node_collection_path)
+            else
+              @_node_collection_sid = node_collection
             end
           end
 
@@ -101,6 +107,12 @@ module LucidData
             hash = Hash.new(raw_attributes)
             hash.merge!(@_changed_attributes) if @_changed_attributes
             hash
+          end
+
+          def _load_from_store!
+            @_changed_attributes = {}
+            @_edge_collection_sid = nil
+            @_node_collection_sid = nil
           end
 
           def changed?
@@ -121,28 +133,58 @@ module LucidData
           end
 
           def node_collection
-            Isomorfeus.instance_from_sid(@_node_collection_sid)
+            sid = node_collection_sid
+            return Isomorfeus.instance_from_sid(sid) if sid
+            []
           end
+          alias document_collection node_collection
+          alias nodes node_collection
+          alias documents node_collection
 
-          def nodes
-            nodes_collection.map
+          def node_collection_sid
+            @_node_collection_sid ||= Redux.fetch_by_path(*@_node_collection_path)
           end
+          alias document_collection_sid node_collection_sid
 
           def edge_collection
-            Isomorfeus.instance_from_sid(@_edge_collection_sid)
+            sid = edge_collection_sid
+            return Isomorfeus.instance_from_sid(sid) if sid
+            []
           end
+          alias edges edge_collection
 
-          def edges
-            edge_collection.map
+          def edge_collection_sid
+            @_edge_collection_sid ||= Redux.fetch_by_path(*@_edge_collection_path)
           end
         else # RUBY_ENGINE
           unless base == LucidData::Graph::Base
-            Isomorfeus.add_valid_data_collection_class(base)
+            Isomorfeus.add_valid_data_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
           end
 
           base.instance_exec do
+            def load(key:, pub_sub_client: nil, current_user: nil)
+              data = instance_exec(key: key, &@_load_block)
+              revision = nil
+              revision = data.delete(:_revision) if data.key?(:_revision)
+              revision = data.delete(:revision) if !revision && data.key?(:revision)
+              node_collection = data.delete(:node_collection)
+              unless node_collection.respond_to?(:to_sid)
+                # no loaded yet, sid expected, load
+                node_collection_class = Isomorfeus.cached_data_class(node_collection[0])
+                node_collection = node_collection_class.load(key: node_collection[1])
+              end
+              edge_collection = data.delete(:edge_collection)
+              unless edge_collection.respond_to?(:to_sid)
+                # no loaded yet, sid expected, load
+                edge_collection_class = Isomorfeus.cached_data_class(edge_collection[0])
+                edge_collection = edge_collection_class.load(key: edge_collection[1])
+              end
+              attributes = data.delete(:attributes)
+              self.new(key: key, revision: revision, edge_collection: edge_collection, node_collection: node_collection, attributes: attributes)
+            end
+
             def attribute(name, options = {})
               attribute_conditions[name] = options
 
@@ -158,18 +200,28 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, node_collection: nil, edge_collection: nil)
+          def initialize(key:, revision: nil, document_collection: nil, node_collection: nil, edge_collection: nil, attributes: nil)
             @key = key.to_s
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_edge_collection = edge_collection
-            @_node_collection = node_collection
+            @_node_collection = document_collection || node_collection
+            @_validate_attributes = self.class.attribute_conditions.any?
+            attributes = {} unless attributes
+            if @_validate_attributes
+              attributes.each { |a,v| _validate_attribute(a, v) }
+            end
+            @_raw_attributes = attributes
+          end
+
+          def _get_attributes
+            @_raw_attributes
           end
 
           def changed?
-            edge_collection.changed? || nodes_collection.changed? || @_changed_attributes.any?
+            edge_collection.changed? || node_collection.changed? || @_changed
           end
 
           def revision
@@ -189,18 +241,14 @@ module LucidData
           def node_collection
             @_node_collection
           end
-
-          def nodes
-            node_collection.map
-          end
+          alias document_collection node_collection
+          alias nodes node_collection
+          alias documents node_collection
 
           def edge_collection
             @_edge_collection
           end
-
-          def edges
-            edge_collection.map
-          end
+          alias edges edge_collection
         end  # RUBY_ENGINE
       end
     end

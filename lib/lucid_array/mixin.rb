@@ -7,10 +7,6 @@ module LucidArray
       base.include(Isomorfeus::Data::GenericInstanceApi)
 
       base.instance_exec do
-        def _handler_type
-          'array'
-        end
-
         def elements(validate_hash = {})
           @element_conditions = validate_hash
         end
@@ -295,7 +291,7 @@ module LucidArray
         alias prepend unshift
       else # RUBY_ENGINE
         unless base == LucidArray::Base
-          Isomorfeus.add_valid_array_class(base)
+          Isomorfeus.add_valid_data_class(base)
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: Anonymous.new
         end

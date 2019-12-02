@@ -48,7 +48,7 @@ RSpec.describe 'Combined LucidGraph' do
   context 'on server' do
     it 'can load a combined graph' do
       result = on_server do
-        graph = CombinedGraph.load
+        graph = CombinedGraph.load(key: 1)
         n_nodes = graph.nodes.size
         n_edges = graph.edges.size
         [n_nodes, n_edges]
@@ -58,7 +58,7 @@ RSpec.describe 'Combined LucidGraph' do
 
     it 'can access the included simple array' do
       result = on_server do
-        graph = CombinedGraph.load
+        graph = CombinedGraph.load(key: 1)
         graph.simple_array.items
       end
       expect(result).to eq([1,2,3])
@@ -66,7 +66,7 @@ RSpec.describe 'Combined LucidGraph' do
 
     it 'can access the included simple collection' do
       result = on_server do
-        graph = CombinedGraph.load
+        graph = CombinedGraph.load(key: 1)
         graph.simple_collection.nodes.map(&:id)
       end
       expect(result).to eq(["1","2"])
@@ -74,7 +74,7 @@ RSpec.describe 'Combined LucidGraph' do
 
     it 'can access the included simple graph' do
       result = on_server do
-        graph = CombinedGraph.load
+        graph = CombinedGraph.load(key: 1)
         nodes = graph.simple_graph.nodes.map(&:id)
         edges = graph.simple_graph.edges.map(&:id)
         [nodes, edges]
@@ -84,7 +84,7 @@ RSpec.describe 'Combined LucidGraph' do
 
     it 'can access the included simple hash' do
       result = on_server do
-        graph = CombinedGraph.load
+        graph = CombinedGraph.load(key: 1)
         graph.simple_hash.to_h
       end
       expect(result).to eq({"simple_key"=>"simple_value"})
@@ -92,7 +92,7 @@ RSpec.describe 'Combined LucidGraph' do
 
     it 'can access the included node' do
       result = on_server do
-        graph = CombinedGraph.load
+        graph = CombinedGraph.load(key: 1)
         graph.simple_node.simple_attribute
       end
       expect(result).to eq('yeah, a test')
@@ -100,7 +100,7 @@ RSpec.describe 'Combined LucidGraph' do
 
     it 'can convert the graph to transport' do
       result = on_server do
-        graph = CombinedGraph.load
+        graph = CombinedGraph.load(key: 1)
         graph.to_transport
       end
       expect(result).to eq(CG_TRANSPORT)
@@ -108,7 +108,7 @@ RSpec.describe 'Combined LucidGraph' do
 
     it 'can convert the graphs included items to transport' do
       result = on_server do
-        graph = CombinedGraph.load
+        graph = CombinedGraph.load(key: 1)
         graph.included_items_to_transport
       end
       expect(result).to eq(CG_ITEMS)
@@ -117,7 +117,7 @@ RSpec.describe 'Combined LucidGraph' do
     context 'multi combined graph' do
       it 'can load a multi combined graph on the server' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           n_nodes = graph.nodes.size
           n_edges = graph.edges.size
           [n_nodes, n_edges]
@@ -127,7 +127,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the included simple array' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.simple_array.items
         end
         expect(result).to eq([1,2,3])
@@ -135,7 +135,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the included simple collection' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.simple_collection.nodes.map(&:id)
         end
         expect(result).to eq(["1","2"])
@@ -143,7 +143,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the included simple graph' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           nodes = graph.simple_graph.nodes.map(&:id)
           edges = graph.simple_graph.edges.map(&:id)
           [nodes, edges]
@@ -153,7 +153,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the included simple hash' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.simple_hash.to_h
         end
         expect(result).to eq({"simple_key"=>"simple_value"})
@@ -161,7 +161,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the included node' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.simple_node.simple_attribute
         end
         expect(result).to eq('yeah, yeah, yeah, a test' )
@@ -169,7 +169,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the combined graph included simple array' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.combined_graph.simple_array.items
         end
         expect(result).to eq([1,2,3])
@@ -177,7 +177,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the combined graph included simple collection' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.combined_graph.simple_collection.nodes.map(&:id)
         end
         expect(result).to eq(["1","2"])
@@ -185,7 +185,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the combined graph included simple graph' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           nodes = graph.combined_graph.simple_graph.nodes.map(&:id)
           edges = graph.combined_graph.simple_graph.edges.map(&:id)
           [nodes, edges]
@@ -195,7 +195,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the combined graph included simple hash' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.combined_graph.simple_hash.to_h
         end
         expect(result).to eq({"simple_key"=>"simple_value"})
@@ -203,7 +203,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can access the included node' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.combined_graph.simple_node.simple_attribute
         end
         expect(result).to eq('yeah, a test')
@@ -211,7 +211,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can convert the graph to transport' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.to_transport
         end
         expect(result).to eq(MCG_TRANSPORT)
@@ -219,7 +219,7 @@ RSpec.describe 'Combined LucidGraph' do
 
       it 'can convert the graphs included items to transport' do
         result = on_server do
-          graph = MultiCombinedGraph.load
+          graph = MultiCombinedGraph.load(key: 1)
           graph.included_items_to_transport
         end
         expect(result).to eq(MCG_ITEMS)

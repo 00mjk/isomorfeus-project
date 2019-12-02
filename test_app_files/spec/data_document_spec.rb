@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidData::Node' do
+RSpec.describe 'LucidData::Document' do
   context 'on the server' do
     it 'can instantiate a document by inheritance' do
       result = on_server do
-        class TestDocumentBase < LucidData::Node::Base
+        class TestDocumentBase < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentBase.new(key: 1, attributes: { test_attribute: 'test_value' })
@@ -16,7 +16,7 @@ RSpec.describe 'LucidData::Node' do
     it 'can instantiate a document by mixin' do
       result = on_server do
         class TestDocumentMixin
-          include LucidData::Node::Mixin
+          include LucidData::Document::Mixin
           attribute :test_attribute
         end
         document = TestDocumentMixin.new(key: 2, attributes: { test_attribute: 'test_value' })
@@ -27,7 +27,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'verifies attribute class' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         document = TestDocumentMixinC.new(key: 3, attributes: { test_attribute: 'test_value' })
@@ -35,7 +35,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to eq('String')
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -46,7 +46,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -61,7 +61,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'verifies if attribute is_a' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, is_a: Enumerable
         end
         document = TestDocumentMixinC.new(key: 6, attributes: { test_attribute: ['test_value'] })
@@ -69,7 +69,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to eq('Array')
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -80,7 +80,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -95,7 +95,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'reports a change' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentMixinC.new(key: 9, attributes: { test_attribute: 10 })
@@ -103,7 +103,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to be(false)
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentMixinC.new(key: 10, attributes: { test_attribute: 10 })
@@ -115,7 +115,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'converts to sid' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentMixinC.new(key: 11)
@@ -126,21 +126,21 @@ RSpec.describe 'LucidData::Node' do
 
     it 'can validate a attribute' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         TestDocumentMixinC.valid_attribute?(:test_attribute, 10)
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         TestDocumentMixinC.valid_attribute?(:test, '10')
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         TestDocumentMixinC.valid_attribute?(:test_attribute, '10')
@@ -150,24 +150,24 @@ RSpec.describe 'LucidData::Node' do
 
     it 'converts to transport' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentMixinC.new(key: 12, attributes: { test_attribute: 'test'})
         document.to_transport
       end
-      expect(result).to eq("TestDocumentMixinC"=>{"12"=>{"_revision"=>nil, "test_attribute" => "test"}})
+      expect(result).to eq("TestDocumentMixinC"=>{"12"=>{"test_attribute" => "test"}})
     end
 
     it 'keeps server_only attribute on server' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, server_only: true
         end
         document = TestDocumentMixinC.new(key: 13, attributes: { test_attribute: 'test' })
         document.to_transport
       end
-      expect(result).to eq("TestDocumentMixinC"=>{"13"=>{"_revision"=>nil}})
+      expect(result).to eq("TestDocumentMixinC"=>{"13"=>{}})
     end
   end
 
@@ -178,7 +178,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'can instantiate a document by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidData::Node::Base
+        class TestDocumentBase < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentBase.new(key: 14, attributes: { test_attribute: 'test_value' })
@@ -190,7 +190,7 @@ RSpec.describe 'LucidData::Node' do
     it 'can instantiate a document by mixin' do
       result = @doc.evaluate_ruby do
         class TestDocumentMixin
-          include LucidData::Node::Mixin
+          include LucidData::Document::Mixin
           attribute :test_attribute
         end
         document = TestDocumentMixin.new(key: 15, attributes: { test_attribute: 'test_value' })
@@ -201,7 +201,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'verifies attribute class' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         document = TestDocumentMixinC.new(key: 16, attributes: { test_attribute: 'test_value' })
@@ -209,7 +209,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -220,7 +220,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         begin
@@ -235,7 +235,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'verifies if attribute is_a' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, is_a: Enumerable
         end
         document = TestDocumentMixinC.new(key: 19, attributes: { test_attribute: ['test_value'] })
@@ -243,7 +243,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to eq('Array')
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -254,7 +254,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, is_a: Enumerable
         end
         begin
@@ -269,7 +269,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'reports a change' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentMixinC.new(key: 23, attributes: { test_attribute: 10 })
@@ -277,7 +277,7 @@ RSpec.describe 'LucidData::Node' do
       end
       expect(result).to be(true)
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentMixinC.new(key: 23, attributes: { test_attribute: 10 })
@@ -289,7 +289,7 @@ RSpec.describe 'LucidData::Node' do
 
     it 'converts to sid' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentMixinC.new(key: 24)
@@ -300,21 +300,21 @@ RSpec.describe 'LucidData::Node' do
 
     it 'can validate a attribute' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         TestDocumentMixinC.valid_attribute?(:test_attribute, 10)
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         TestDocumentMixinC.valid_attribute?(:test, '10')
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute, class: String
         end
         TestDocumentMixinC.valid_attribute?(:test_attribute, '10')
@@ -324,13 +324,13 @@ RSpec.describe 'LucidData::Node' do
 
     it 'converts to transport' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Node::Base
+        class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute
         end
         document = TestDocumentMixinC.new(key: 28, attributes: { test_attribute: 'test' })
         document.to_transport.to_n
       end
-      expect(result).to eq("TestDocumentMixinC" => {"28"=>{"_revision"=>nil, "test_attribute" => "test"}})
+      expect(result).to eq("TestDocumentMixinC" => {"28"=>{"test_attribute" => "test"}})
     end
   end
 end

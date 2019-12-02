@@ -2,23 +2,23 @@ module Isomorfeus
   module Data
     module GenericClassApi
       if RUBY_ENGINE == 'opal'
-        def create(key, *things)
-          instance = new(key, *things)
+        def create(key:, **things)
+          instance = new(key: key, **things)
           instance.promise_save
           instance
         end
 
-        def promise_create(key, *things)
-          new(key, *things).promise_save
+        def promise_create(key:, **things)
+          new(key: key, **things).promise_save
         end
 
-        def destroy(key)
-          promise_destroy(key)
+        def destroy(key:)
+          promise_destroy(key: key)
           true
         end
 
-        def promise_destroy(key)
-          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::GenericHandler', _handler_type, self.name, 'destroy', key).then do |agent|
+        def promise_destroy(key:)
+          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :destroy, key: key).then do |agent|
             if agent.processed
               agent.result
             else
@@ -33,15 +33,15 @@ module Isomorfeus
           end
         end
 
-        def load(key)
-          instance = self.new(key)
-          self.promise_load(key, instance) unless instance.loaded?
+        def load(key:)
+          instance = self.new(key: key)
+          self.promise_load(key: key, instance: instance) unless instance.loaded?
           instance
         end
 
-        def promise_load(key, instance = nil)
-          instance = self.new(key) unless instance
-          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::GenericHandler', _handler_type, self.name, 'load', key).then do |agent|
+        def promise_load(key:, instance: nil)
+          instance = self.new(key: key) unless instance
+          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key).then do |agent|
             if agent.processed
               agent.result
             else
@@ -50,6 +50,7 @@ module Isomorfeus
                 `console.error(#{agent.response[:error].to_n})`
                 raise agent.response[:error]
               end
+              instance._load_from_store!
               Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
               agent.result = instance
             end
@@ -60,7 +61,7 @@ module Isomorfeus
           validate_props(props)
           props_json = props.to_json
           instance = self.new(key) unless instance
-          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::GenericHandler', _handler_type, self.name, 'query', props_json).then do |agent|
+          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, 'query', props_json).then do |agent|
             if agent.processed
               agent.result
             else
@@ -87,22 +88,22 @@ module Isomorfeus
         def on_query(_); end
         def on_save(_); end
       else
-        def promise_create(key, *things)
-          instance = self.create(key, *things)
+        def promise_create(key:, **things)
+          instance = self.create(key: key, **things)
           result_promise = Promise.new
           result_promise.resolve(instance)
           result_promise
         end
 
-        def promise_destroy(key)
-          self.destroy(key)
+        def promise_destroy(key:)
+          self.destroy(key: key)
           result_promise = Promise.new
           result_promise.resolve(true)
           result_promise
         end
 
-        def promise_load(key, _)
-          instance = self.load(key)
+        def promise_load(key:)
+          instance = self.load(key: key)
           result_promise = Promise.new
           result_promise.resolve(instance)
           result_promise
@@ -116,10 +117,6 @@ module Isomorfeus
         end
 
         # execute
-        def execute_create(&block)
-          @_create_block = block
-        end
-
         def execute_destroy(&block)
           @_destroy_block = block
         end
@@ -137,10 +134,6 @@ module Isomorfeus
         end
 
         # callbacks
-        def on_create(&block)
-          @_on_create_block = block
-        end
-
         def on_destroy(&block)
           @_on_destroy_block = block
         end

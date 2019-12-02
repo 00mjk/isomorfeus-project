@@ -9,12 +9,6 @@ module LucidComposableGraph
       base.include(Isomorfeus::Data::GenericInstanceApi)
       base.include(LucidComposableGraph::Finders)
 
-      base.instance_exec do
-        def _handler_type
-          'graph'
-        end
-      end
-
       def to_transport(inline: false)
         items_hash = {}
         own_edge_sids = own_edges_as_sids
@@ -184,7 +178,7 @@ module LucidComposableGraph
         end
 
         def edges
-          edges_as_sids.map { |edge_sid| LucidData::Edge::Base.edge_from_sid(edge_sid) }
+          edges_as_sids.map { |edge_sid| Isomorfeus.instance_from_sid(edge_sid) }
         end
 
         def edges_as_sids
@@ -201,14 +195,14 @@ module LucidComposableGraph
 
         def find_edge_by_id(edge_id)
           edges_as_sids.each do |edge_sid|
-            return  LucidData::Node::Base.edge_from_sid(edge_sid) if edge_sid[1] == edge_id
+            return Isomorfeus.instance_from_sid(edge_sid) if edge_sid[1] == edge_id
           end
           nil
         end
 
         def find_node_by_id(node_id)
           nodes_as_sids.each do |node_sid|
-            return  LucidData::Node::Base.node_from_sid(node_sid) if node_sid[1] == node_id
+            return Isomorfeus.instance_from_sid(node_sid) if node_sid[1] == node_id
           end
           nil
         end
@@ -218,13 +212,13 @@ module LucidComposableGraph
           path = @store_path + [:included_nodes]
           self.class.included_nodes.each_key do |name|
             node_sid = Redux.fetch_by_path(*(path + [name]))
-            incl_nodes[name] = LucidData::Node::Base.node_from_sid(node_sid) if node_sid
+            incl_nodes[name] = Isomorfeus.instance_from_sid(node_sid) if node_sid
           end
           incl_nodes
         end
 
         def nodes
-          nodes_as_sids.map { |node_sid| LucidData::Node::Base.node_from_sid(node_sid) }
+          nodes_as_sids.map { |node_sid| Isomorfeus.instance_from_sid(node_sid) }
         end
 
         def nodes_as_sids
@@ -291,7 +285,7 @@ module LucidComposableGraph
             define_method(name) do
               path = @store_path + [:included_nodes, name]
               node_sid = Redux.fetch_by_path(*path)
-              node_sid ? self.class.included_nodes[name][:class].node_from_sid(node_sid) : nil
+              node_sid ? Isomorfeus.instance_from_sid(node_sid) : nil
             end
           end
 
@@ -328,7 +322,7 @@ module LucidComposableGraph
         end
       else # RUBY_ENGINE
         unless base == LucidComposableGraph::Base
-          Isomorfeus.add_valid_composable_graph_class(base)
+          Isomorfeus.add_valid_data_class(base)
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: Anonymous.new
         end

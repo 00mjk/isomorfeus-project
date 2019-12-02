@@ -32,14 +32,14 @@ RSpec.describe 'LucidGraph' do
 
     it 'the simple graph is a valid graph class' do
       result = on_server do
-        Isomorfeus.valid_graph_class_name?('SimpleGraph')
+        Isomorfeus.valid_data_class_name?('SimpleGraph')
       end
       expect(result).to be true
     end
 
     it 'can load a simple graph on the server' do
       result = on_server do
-        graph = SimpleGraph.load
+        graph = SimpleGraph.load(key: 1)
         n_nodes = graph.nodes.size
         n_edges = graph.edges.size
         [n_nodes, n_edges]
@@ -49,7 +49,7 @@ RSpec.describe 'LucidGraph' do
 
     it 'can converts a simple graph on the server to transport' do
       result = on_server do
-        graph = SimpleGraph.load
+        graph = SimpleGraph.load(key: 2)
         graph.to_transport
       end
       expect(result).to eq("generic_graphs"=>{"SimpleGraph"=>{"{}"=>{"generic_edges"=>[["SimpleEdge", "1"]],
@@ -58,7 +58,7 @@ RSpec.describe 'LucidGraph' do
 
     it 'can converts a simple graphs included items on the server to transport' do
       result = on_server do
-        graph = SimpleGraph.load
+        graph = SimpleGraph.load(key: 3)
         graph.included_items_to_transport
       end
       expect(result).to eq("generic_edges" => { "SimpleEdge"=>{"1"=>{"attributes"=>{"simple_attribute"=>"simple"},

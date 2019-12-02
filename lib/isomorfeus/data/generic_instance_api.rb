@@ -14,6 +14,10 @@ module Isomorfeus
       end
 
       if RUBY_ENGINE == 'opal'
+        def loaded?
+          Redux.fetch_by_path(*@_store_path) ? true : false
+        end
+
         def destroy
           promise_destroy
           nil
@@ -39,7 +43,7 @@ module Isomorfeus
         alias create save
 
         def promise_save
-          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::GenericHandler', _handler_type, self.name, 'save', to_transport).then do |agent|
+          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, 'save', to_transport).then do |agent|
             if agent.processed
               agent.result
             else
@@ -55,7 +59,9 @@ module Isomorfeus
         end
         alias promise_create promise_save
       else # RUBY_ENGINE
-
+        def loaded?
+          true
+        end
       end # RUBY_ENGINE
     end
   end

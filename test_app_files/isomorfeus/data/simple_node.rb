@@ -1,7 +1,7 @@
-class SimpleNode < LucidData::Node::Base
+class SimpleNode < LucidData::Document::Base
   attribute :one
 
-  execute_load do |key|
+  execute_load do |key:|
     { one: key }
   end
 

@@ -4,7 +4,7 @@ module LucidArango
       def self.included(base)
         if RUBY_ENGINE != 'opal'
           unless base == LucidArango::Graph::Base
-            Isomorfeus.add_valid_graph_class(base)
+            Isomorfeus.add_valid_data_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
           end
