@@ -12,6 +12,11 @@ module Isomorfeus
         Isomorfeus::Installer::NewProject.execute(yarn_and_bundle: options[:yarn_and_bundle])
       end
 
+      desc "console", "Open console for current project."
+      def console
+        Isomorfeus::Console.new.run
+      end
+
       desc "test_app", "Create a test_app for internal framework tests."
       option :module, required: true, type: :string, aliases: '-m', desc: "Isomorfeus module name for which to generate the test app, eg: 'i18n'. (required)"
       option :source_dir, required: false, type: :string, aliases: '-s', desc: "Recursively copy files from source dir into app. (optional)"
