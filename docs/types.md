@@ -9,9 +9,9 @@ LucidArango::DocumentCollection # -> Arango::DocumentCollection
 LucidArango::EdgeCollection # -> Arango::EdgeCollection
 LucidArango::Graph # -> Arango::Graph
 
-LucidGeneric::Document # -> any db (would be like  ActiveRecord or Node)
-LucidGeneric::Edge # -> any db
-LucidGeneric::Collection # -> any db
+LucidData::Document # -> any db (would be like  ActiveRecord or Node)
+LucidData::Edge # -> any db
+LucidData::Collection # -> any db
 # to build graphs from that use LucidComposableGraph
 ```
 
