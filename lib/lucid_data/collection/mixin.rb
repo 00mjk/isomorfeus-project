@@ -72,17 +72,18 @@ module LucidData
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, documents: nil, elements: nil, edges: nil, nodes: nil)
+          def initialize(key:, revision: nil, documents: nil, edges: nil, nodes: nil, graph: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @_graph = graph
             @_store_path = [:data_state, @class_name, @key]
             @_changed_collection = nil
             @_revision_store_path = [:data_state, :revision, @class_name, @key]
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
             @doc_con = self.class.document_conditions
             @_validate_documents = @el_con ? true : false
-            documents = documents || elements || edges || nodes
+            documents = documents || edges || nodes
             loaded = loaded?
             if documents && loaded
               if @_validate_documents
@@ -118,7 +119,7 @@ module LucidData
           end
 
           def documents
-            documents_as_sids.map { |node_sid| Isomorfeus.instance_from_sid(node_sid) }
+            _get_collection.map { |node_sid| Isomorfeus.instance_from_sid(node_sid) }
           end
           alias edges documents
           alias nodes documents
@@ -128,7 +129,7 @@ module LucidData
           end
 
           def each(&block)
-            _get_collection.each(&block)
+            documents.each(&block)
           end
 
           def method_missing(method_name, *args, &block)
@@ -368,6 +369,8 @@ module LucidData
             base.prop :current_user, default: Anonymous.new
           end
 
+          base.attr_accessor :graph
+
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
               documents = instance_exec(key: key, &@_load_block)
@@ -375,12 +378,13 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, documents: nil, edges: nil, nodes: nil)
+          def initialize(key:, revision: nil, documents: nil, edges: nil, nodes: nil, graph: nil)
             @key = key.to_s
-            @_revision = revision
-            @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @graph = graph
+            @_revision = revision
+            @_changed = false
             @doc_con = self.class.document_conditions
             @_validate_documents = @doc_con ? true : false
             documents = documents || edges || nodes
@@ -429,7 +433,7 @@ module LucidData
           def <<(document)
             _validate_document(document) if @_validate_documents
             @_changed = true
-            @_raw_collection << sid
+            @_raw_collection << document
             document
           end
 

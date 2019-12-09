@@ -20,6 +20,14 @@ module LucidData
           rescue
             false
           end
+
+          def edge_collections
+            @edge_collections ||= {}
+          end
+
+          def node_collections
+            @node_collections ||= {}
+          end
         end
 
         def _validate_attribute(attr_name, attr_val)
@@ -52,9 +60,51 @@ module LucidData
                 @_changed_attributes[name] = val
               end
             end
+
+            def nodes(access_name, collection_class = nil)
+              node_collections[access_name] = collection_class
+
+              define_method(access_name) do
+
+              end
+
+              define_method("#{access_name}=") do |collection|
+
+              end
+
+              if collection_class
+                singular_access_name = access_name.to_s.singularize
+                define_singleton_method("valid_#{singular_access_name}?") do |node|
+                  collection_class.valid_node?(node)
+                end
+              end
+            end
+            alias documents nodes
+            alias vertices nodes
+            alias vertexes nodes
+
+            def edges(access_name, collection_class = nil)
+              edge_collections[access_name] = collection_class
+
+              define_method(access_name) do
+
+              end
+
+              define_method("#{access_name}=") do |collection|
+
+              end
+
+              if collection_class
+                singular_access_name = access_name.to_s.singularize
+                define_singleton_method("valid_#{singular_access_name}?") do |edge|
+                  collection_class.valid_edge?(edge)
+                end
+              end
+            end
+            alias links edges
           end
 
-          def initialize(key:, revision: nil, document_collection: nil, node_collection: nil, edge_collection: nil, attributes: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, nodes: nil, documents: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -79,6 +129,7 @@ module LucidData
             else
               @_changed_attributes = {}
             end
+            nodes = nodes || documents
             edge_collection = edge_collection.to_sid if edge_collection.respond_to?(:to_sid)
             if loaded && edge_collection
               @_edge_collection_sid = edge_collection ? edge_collection : Redux.fetch_by_path(*@_edge_collection_path)
@@ -169,20 +220,20 @@ module LucidData
               revision = nil
               revision = data.delete(:_revision) if data.key?(:_revision)
               revision = data.delete(:revision) if !revision && data.key?(:revision)
-              node_collection = data.delete(:node_collection)
+              node_collections = data.delete(:nodes)
               unless node_collection.respond_to?(:to_sid)
                 # no loaded yet, sid expected, load
                 node_collection_class = Isomorfeus.cached_data_class(node_collection[0])
                 node_collection = node_collection_class.load(key: node_collection[1])
               end
-              edge_collection = data.delete(:edge_collection)
+              edge_collections = data.delete(:edges)
               unless edge_collection.respond_to?(:to_sid)
                 # no loaded yet, sid expected, load
                 edge_collection_class = Isomorfeus.cached_data_class(edge_collection[0])
                 edge_collection = edge_collection_class.load(key: edge_collection[1])
               end
               attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, edge_collection: edge_collection, node_collection: node_collection, attributes: attributes)
+              self.new(key: key, revision: revision, edges: edge_collection, nodes: node_collection, attributes: attributes)
             end
 
             def attribute(name, options = {})
@@ -198,22 +249,109 @@ module LucidData
                 @_raw_attributes[name] = val
               end
             end
+
+
+            def nodes(access_name, collection_class = nil)
+              node_collections[access_name] = collection_class
+
+              define_method(access_name) do
+                @_node_collections[access_name]
+              end
+
+              define_method("#{access_name}=") do |collection|
+                @_changed_true
+                @_node_collections[access_name] = collection
+                @_node_collections[access_name].graph = self
+                @_node_collections[access_name]
+              end
+
+              if collection_class
+                singular_access_name = access_name.to_s.singularize
+                define_singleton_method("valid_#{singular_access_name}?") do |node|
+                  collection_class.valid_node?(node)
+                end
+              end
+            end
+            alias documents nodes
+            alias vertices nodes
+            alias vertexes nodes
+
+            def edges(access_name, collection_class = nil)
+              edge_collections[access_name] = collection_class
+
+              define_method(access_name) do
+                @_edge_collections[access_name]
+              end
+
+              define_method("#{access_name}=") do |collection|
+                @_changed = true
+                @_edge_collections[access_name] = collection
+                @_edge_collections[access_name].graph = self
+                @_edge_collections[access_name]
+              end
+
+              if collection_class
+                singular_access_name = access_name.to_s.singularize
+                define_singleton_method("valid_#{singular_access_name}?") do |edge|
+                  collection_class.valid_edge?(edge)
+                end
+              end
+            end
+            alias links edges
           end
 
-          def initialize(key:, revision: nil, document_collection: nil, node_collection: nil, edge_collection: nil, attributes: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, nodes: nil)
             @key = key.to_s
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_edge_collection = edge_collection
-            @_node_collection = document_collection || node_collection
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
               attributes.each { |a,v| _validate_attribute(a, v) }
             end
             @_raw_attributes = attributes
+            @_node_collections = {}
+            self.class.node_collections.each_key do |access_name|
+              if nodes.key?(access_name)
+                @_node_collections[access_name] = nodes[access_name]
+                @_node_collections[access_name].graph = self
+              end
+            end
+            @_edge_collections = {}
+            self.class.edge_collections.each_key do |access_name|
+              if edges.key?(access_name)
+                @_edge_collections[access_name] = edges[access_name]
+                @_edge_collections[access_name].graph = self
+              end
+            end
+            @_matrix = nil
+          end
+
+          def _build_matrix
+            @_matrix = {}
+            edge_collections.each do |collection|
+              collection.each do |edge|
+                sid = edge.from.to_sid
+                node_matrix = _get_node_matrix(sid)
+                node_matrix.push([edge.to.class.name.underscore, edge.to, edge.class.name.underscore, edge])
+                sid = edge.to.to_sid
+                node_matrix = _get_node_matrix(sid)
+                node_matrix.push([edge.from.class.name.underscore, edge.from, edge.class.name.underscore, edge])
+              end
+            end
+          end
+
+          def _get_matrix
+            _build_matrix unless @_matrix
+            @_matrix
+          end
+
+          def _get_node_matrix(sid)
+            matrix = _get_matrix
+            matrix[sid] = [] unless matrix.key?(sid)
+            matrix[sid]
           end
 
           def _get_attributes
@@ -238,17 +376,13 @@ module LucidData
             @_raw_attributes[name] = val
           end
 
-          def node_collection
-            @_node_collection
+          def nodes
+            @_node_collections
           end
-          alias document_collection node_collection
-          alias nodes node_collection
-          alias documents node_collection
 
-          def edge_collection
-            @_edge_collection
+          def edges
+            @_edge_collections
           end
-          alias edges edge_collection
         end  # RUBY_ENGINE
       end
     end

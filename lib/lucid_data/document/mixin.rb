@@ -39,10 +39,11 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil)
+          def initialize(key:, revision: nil, attributes: nil, graph: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @_graph = graph
             @_store_path = [:data_state, @class_name, @key]
             @_revision_store_path = [:data_state, :revision, @class_name, @key]
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
@@ -117,6 +118,8 @@ module LucidData
             base.prop :current_user, default: Anonymous.new
           end
 
+          base.attr_accessor :collection
+
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, &@_load_block)
@@ -143,12 +146,13 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil)
+          def initialize(key:, revision: nil, attributes: nil, collection: collection)
             @key = key.to_s
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @collection = collection
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
@@ -177,6 +181,32 @@ module LucidData
             _validate_attribute(name, val)
             @_changed = true
             @_raw_attributes[name] = val
+          end
+
+          def method_missing(method_name, *args, &block)
+            if collection&.graph
+              node_matrix = collection.graph._get_node_matrix([@class_name, @key])
+              singular_name = method_name.singularize
+              plural_name = method_name.pluralize
+              if method_name == plural_name
+                # return all nodes that match
+                nodes = []
+                node_matrix.each do |node_edge|
+                  if node_edge[0] == singular_name
+                    # node match
+                    nodes < node_edge[1]
+                  end
+                end
+              elsif method_name == singular_name
+                # return one node
+                node_matrix.each do |node_edge|
+                  if node_edge[0] == singular_name
+                    # node match
+                    return node_edge[1]
+                  end
+                end
+              end
+            end
           end
 
           def to_transport

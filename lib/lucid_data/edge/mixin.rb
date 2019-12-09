@@ -39,10 +39,11 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, from: nil, to: nil, attributes: nil)
+          def initialize(key:, revision: nil, from: nil, to: nil, attributes: nil, graph: graph)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @_graph = graph
             @_store_path = [:data_state, @class_name, @key, :attributes]
             @_from_path = [:data_state, @class_name, @key, :from]
             @_to_path = [:data_state, @class_name, @key, :to]
@@ -200,12 +201,13 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, from:, to:, attributes: nil)
+          def initialize(key:, revision: nil, from:, to:, attributes: nil, graph: nil)
             @key = key.to_s
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @_graph = graph
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
