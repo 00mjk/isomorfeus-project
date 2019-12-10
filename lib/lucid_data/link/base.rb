@@ -1,7 +1,7 @@
 module LucidData
-  module Document
+  module Link
     class Base
-      include LucidData::Node::Mixin
+      include LucidData::Edge::Mixin
 
       if RUBY_ENGINE != 'opal'
         def self.inherited(base)

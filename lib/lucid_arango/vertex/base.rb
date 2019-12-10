@@ -1,7 +1,7 @@
-module LucidData
-  module Document
+module LucidArango
+  module Vertex
     class Base
-      include LucidData::Node::Mixin
+      include LucidArango::Node::Mixin
 
       if RUBY_ENGINE != 'opal'
         def self.inherited(base)

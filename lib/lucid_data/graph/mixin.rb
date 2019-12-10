@@ -1,8 +1,6 @@
 module LucidData
   module Graph
     module Mixin
-      # TODO nodes -> documents
-      # TODO inline store path
       def self.included(base)
         base.include(Enumerable)
         base.extend(LucidPropDeclaration::Mixin)
@@ -224,13 +222,13 @@ module LucidData
               unless node_collection.respond_to?(:to_sid)
                 # no loaded yet, sid expected, load
                 node_collection_class = Isomorfeus.cached_data_class(node_collection[0])
-                node_collection = node_collection_class.load(key: node_collection[1])
+                node_collection = node_collection_class.load(key: node_collections[1])
               end
               edge_collections = data.delete(:edges)
               unless edge_collection.respond_to?(:to_sid)
                 # no loaded yet, sid expected, load
                 edge_collection_class = Isomorfeus.cached_data_class(edge_collection[0])
-                edge_collection = edge_collection_class.load(key: edge_collection[1])
+                edge_collection = edge_collection_class.load(key: edge_collections[1])
               end
               attributes = data.delete(:attributes)
               self.new(key: key, revision: revision, edges: edge_collection, nodes: node_collection, attributes: attributes)
@@ -330,6 +328,7 @@ module LucidData
           end
 
           def _build_matrix
+            # not a incidence matrix, but somewhat going in that direction
             @_matrix = {}
             edge_collections.each do |collection|
               collection.each do |edge|

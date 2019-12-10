@@ -1,5 +1,5 @@
 module LucidData
-  module Document
+  module Vertex
     module Mixin
       def self.included(base)
         base.include(LucidData::Node::Mixin)

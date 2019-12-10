@@ -1,5 +1,5 @@
 module LucidData
-  module Document
+  module Vertex
     class Base
       include LucidData::Node::Mixin
 

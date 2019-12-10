@@ -1,8 +1,8 @@
 module LucidData
-  module Document
+  module Link
     module Mixin
       def self.included(base)
-        base.include(LucidData::Node::Mixin)
+        base.include(LucidData::Edge::Mixin)
       end
     end
   end

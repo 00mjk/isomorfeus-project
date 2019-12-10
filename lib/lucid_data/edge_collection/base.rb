@@ -1,7 +1,7 @@
 module LucidData
-  module Document
+  module EdgeCollection
     class Base
-      include LucidData::Node::Mixin
+      include LucidData::EdgeCollection::Mixin
 
       if RUBY_ENGINE != 'opal'
         def self.inherited(base)

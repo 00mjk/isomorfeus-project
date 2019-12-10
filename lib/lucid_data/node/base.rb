@@ -1,5 +1,5 @@
 module LucidData
-  module Document
+  module Node
     class Base
       include LucidData::Node::Mixin
 
