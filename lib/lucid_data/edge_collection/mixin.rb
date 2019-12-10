@@ -15,7 +15,7 @@ module LucidData
           alias links edges
 
           def edge_conditions
-            @dedge_conditions
+            @edge_conditions
           end
 
           def valid_edge?(edge)
