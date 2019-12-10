@@ -27,12 +27,12 @@ module LucidData
           alias valid_link? valid_edge?
         end
 
-        def _validate_edge(doc)
-          Isomorfeus::Data::ElementValidator.new(@class_name, doc, @doc_con).validate!
+        def _validate_edge(edge)
+          Isomorfeus::Data::ElementValidator.new(@class_name, edge, @edge_con).validate!
         end
 
-        def _validate_edges(docs)
-          docs.each { |doc| Isomorfeus::Data::ElementValidator.new(@class_name, doc, @doc_con).validate! }
+        def _validate_edges(many_edges)
+          many_edges.each { |edge| Isomorfeus::Data::ElementValidator.new(@class_name, edge, @edge_con).validate! }
         end
 
         def _collection_to_sids(collection)
@@ -179,8 +179,8 @@ module LucidData
           end
 
           def concat(*args)
-            sids = args.map do |doc|
-              edge, sid = _edge_sid_from_arg(doc)
+            sids = args.map do |edge|
+              edge, sid = _edge_sid_from_arg(edge)
               _validate_edge(edge)
               sid
             end
@@ -222,9 +222,9 @@ module LucidData
             self
           end
 
-          def insert(index, *docs)
-            sids = docs.map do |doc|
-              edge, sid = _edge_sid_from_arg(doc)
+          def insert(index, *many_edges)
+            sids = many_edges.map do |edge|
+              edge, sid = _edge_sid_from_arg(edge)
               _validate_edge(edge)
               sid
             end
@@ -256,8 +256,8 @@ module LucidData
           end
 
           def push(*edges)
-            sids = docs.map do |doc|
-              edge, sid = _edge_sid_from_arg(doc)
+            sids = many_edges.map do |edge|
+              edge, sid = _edge_sid_from_arg(edge)
               _validate_edge(edge)
               sid
             end
@@ -342,9 +342,9 @@ module LucidData
             self
           end
 
-          def unshift(*docs)
-            sids = docs.map do |doc|
-              edge, sid = _edge_sid_from_arg(doc)
+          def unshift(*many_edges)
+            sids = many_edges.map do |edge|
+              edge, sid = _edge_sid_from_arg(edge)
               _validate_edge(edge)
               sid
             end
@@ -375,6 +375,7 @@ module LucidData
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @graph = graph
+            @_node_to_edge_cache = {}
             @_revision = revision
             @_changed = false
             @edge_con = self.class.edge_conditions
@@ -384,11 +385,17 @@ module LucidData
             if @_validate_edges
               edges.each { |e| _validate_edge(e) }
             end
+            edges.each { |e| e.collection = self }
             @_raw_collection = edges
           end
 
           def changed?
             @_changed
+          end
+
+          def changed!
+            @graph.changed! if @graph
+            @_changed = true
           end
 
           def revision
@@ -402,6 +409,31 @@ module LucidData
 
           def edges_as_sids
             @_raw_collection.map(&:to_sid)
+          end
+
+          def edges_for_node(node)
+            node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+            return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
+            node_edges = edges.select do |edge|
+              if edge.from.to_sid == node_sid || edge.to.to_sid == node_sid
+                true
+              else
+                false
+              end
+            end
+            @_node_to_edge_cache[node_sid] = node_edges
+          end
+          alias edges_for_vertex edges_for_node
+          alias edges_for_document edges_for_node
+
+          def update_node_to_edge_cache(edge, old_node, new_node)
+            old_node_sid = old_node.to_sid
+            new_node_sid = new_node.to_sid
+            edge_sid = edge.to_sid
+            if @_node_to_edge_cache.key?(old_node_sid)
+              @_node_to_edge_cache[old_node_sid].delete_if { |node_edge| node_edge.to_sid == edge_sid }
+            end
+            @_node_to_edge_cache[new_node_sid].push(edge) if @_node_to_edge_cache.key?(new_node_sid)
           end
 
           def each(&block)
@@ -423,25 +455,25 @@ module LucidData
 
           def <<(edge)
             _validate_edge(edge) if @_validate_edges
-            @_changed = true
+            changed!
             @_raw_collection << edge
             edge
           end
 
           def []=(idx, edge)
             _validate_edge(edge) if @_validate_edges
-            @_changed = true
+            changed!
             @_raw_collection[idx] = edge
           end
 
           def clear
-            @_changed = true
+            changed!
             @_raw_collection = []
             self
           end
 
           def collect!(&block)
-            @_changed = true
+            changed!
             @_raw_collection.collect!(&block)
             self
           end
@@ -449,87 +481,87 @@ module LucidData
           def compact!
             @_raw_collection.compact!
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
-          def concat(*docs)
+          def concat(*many_edges)
             if @_validate_edges
-              docs = docs.map do |edge|
+              many_edges = many_edges.map do |edge|
                 _validate_edge(edge)
                 edge
               end
             end
-            @_changed = true
-            @_raw_collection.concat(*docs)
+            changed!
+            @_raw_collection.concat(*many_edges)
             self
           end
 
           def delete(edge, &block)
             result = @_raw_collection.delete(edge, &block)
-            @_changed = true
+            changed!
             result
           end
 
           def delete_at(idx)
             result = @_raw_collection.delete_at(idx)
             return nil if result.nil?
-            @_changed = true
+            changed!
             result
           end
 
           def delete_if(&block)
             @_raw_collection.delete_if(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def filter!(&block)
             result = @_raw_collection.filter!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
-          def insert(idx, *docs)
+          def insert(idx, *many_edges)
             if @_validate_edges
-              docs = docs.map do |edge|
+              many_edges = many_edges.map do |edge|
                 _validate_edge(edge)
                 edge
               end
             end
-            @_raw_collection.insert(idx, *docs)
-            @_changed = true
+            @_raw_collection.insert(idx, *many_edges)
+            changed!
             self
           end
 
           def keep_if(&block)
             @_raw_collection.keep_if(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def map!(&block)
             @_raw_collection.map!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def pop(n = nil)
             result = @_raw_collection.pop(n)
-            @_changed = true
+            changed!
             result
           end
 
-          def push(*docs)
+          def push(*many_edges)
             if @_validate_edges
-              docs = docs.map do |edge|
+              many_edges = many_edges.map do |edge|
                 _validate_edge(edge)
                 edge
               end
             end
-            @_raw_collection.push(*docs)
-            @_changed = true
+            @_raw_collection.push(*many_edges)
+            changed!
             self
           end
           alias append push
@@ -537,74 +569,74 @@ module LucidData
           def reject!(&block)
             result = @_raw_collection.reject!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def reverse!
             @_raw_collection.reverse!
-            @_changed = true
+            changed!
             self
           end
 
           def rotate!(count = 1)
             @_raw_collection.rotate!(count)
-            @_changed = true
+            changed!
             self
           end
 
           def select!(&block)
             result = @_raw_collection.select!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def shift(n = nil)
             result = @_raw_collection.shift(n)
-            @_changed = true
+            changed!
             result
           end
 
           def shuffle!(*args)
             @_raw_collection.shuffle!(*args)
-            @_changed = true
+            changed!
             self
           end
 
           def slice!(*args)
             result = @_raw_collection.slice!(*args)
-            @_changed = true
+            changed!
             result
           end
 
           def sort!(&block)
             @_raw_collection.sort!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def sort_by!(&block)
             @_raw_collection.sort_by!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def uniq!(&block)
             @_raw_collection.uniq!(&block)
-            @_changed = true
+            changed!
             self
           end
 
-          def unshift(*docs)
+          def unshift(*many_edges)
             if @_validate_edges
-              docs = docs.map do |edge|
+              many_edges = many_edges.map do |edge|
                 _validate_edge(edge)
                 edge
               end
             end
-            @_raw_collection.unshift(*docs)
-            @_changed = true
+            @_raw_collection.unshift(*many_edges)
+            changed!
             self
           end
           alias prepend unshift

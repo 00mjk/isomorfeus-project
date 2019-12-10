@@ -39,11 +39,11 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, from: nil, to: nil, attributes: nil, graph: graph)
+          def initialize(key:, revision: nil, from: nil, to: nil, attributes: nil, collection: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_graph = graph
+            @_collection = collection
             @_store_path = [:data_state, @class_name, @key, :attributes]
             @_from_path = [:data_state, @class_name, @key, :from]
             @_to_path = [:data_state, @class_name, @key, :to]
@@ -195,19 +195,19 @@ module LucidData
 
               define_method("#{name}=") do |val|
                 _validate_attribute(name, val)
-                @_changed = true
+                changed!
                 @_raw_attributes[name] = val
               end
             end
           end
 
-          def initialize(key:, revision: nil, from:, to:, attributes: nil, graph: nil)
+          def initialize(key:, revision: nil, from:, to:, attributes: nil, collection: nil)
             @key = key.to_s
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_graph = graph
+            @_collection = collection
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
@@ -215,17 +215,26 @@ module LucidData
             end
             @_raw_attributes = attributes
             @_changed_from = nil
-            @_changes_to = nil
-            from = from.to_sid if from.respond_to?(:to_sid)
-            to = to.to_sid if to.respond_to?(:to_sid)
+            @_changed_to = nil
             @_raw_from = from
             @_raw_to = to
-            @_from_instance = nil
-            @_to_instance = nil
           end
 
           def changed?
             @_changed
+          end
+
+          def changed!
+            @_collection.changed! if @_collection
+            @_changed = true
+          end
+
+          def collection
+            @_collection
+          end
+
+          def graph
+            @_collection&.graph
           end
 
           def revision
@@ -242,40 +251,39 @@ module LucidData
 
           def []=(name, val)
             _validate_attribute(name, val)
-            @_changed = true
+            changed!
             @_raw_attributes[name] = val
           end
 
           def from
-            return @_from_instance if @_from_instance
-            sid = @_changed_from ? @_changed_from : @_raw_from
-            @_from_instance = Isomorfeus.instance_from_sid(sid)
+            @_changed_from ? @_changed_from : @_raw_from
           end
 
-          def from=(document)
-            if document.respond_to?(:to_sid)
-              @_changed_from = document.to_sid
-              @_from_instance = document
-            else
-              @_changed_from = document
-              @_from_instance = Isomorfeus.instance_from_sid(document)
-            end
+          def from=(node)
+            raise "A invalid 'to' was given" unless node
+            old_from = from
+            @_changed_from = node
+            @_collection.update_node_to_edge_cache(self, old_from, @_changed_from) if @_collection
+            @_changed_from
           end
 
           def to
-            return @_to_instance if @_to_instance
-            sid = @_changed_to ? @_changed_to : @_raw_to
-            @_to_instance = Isomorfeus.instance_from_sid(sid)
+            @_changed_to ? @_changed_to : @_raw_to
           end
 
-          def to=(document)
-            if document.respond_to?(:to_sid)
-              @_changed_to = document.to_sid
-              @_to_instance = document
-            else
-              @_changed_to = document
-              @_to_instance = Isomorfeus.instance_from_sid(document)
-            end
+          def to=(node)
+            raise "A invalid 'to' was given" unless node
+            old_to = to
+            @_changed_to = node
+            @_collection.update_node_to_edge_cache(self, old_to, @_changed_to) if @_collection
+            @_changed_to
+          end
+
+          def other(node)
+            other_from = from
+            other_to = to
+            return other_to if other_from == node
+            other_from if other_to == node
           end
 
           def to_transport

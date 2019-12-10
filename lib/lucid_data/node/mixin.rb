@@ -140,19 +140,19 @@ module LucidData
 
               define_method("#{name}=") do |val|
                 _validate_attribute(name, val)
-                @_changed = true
+                changed!
                 @_raw_attributes[name] = val
               end
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil, collection: collection)
+          def initialize(key:, revision: nil, attributes: nil, collection: nil)
             @key = key.to_s
             @_revision = revision
             @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @collection = collection
+            @_collection = collection
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
@@ -163,6 +163,19 @@ module LucidData
 
           def changed?
             @_changed
+          end
+
+          def changed!
+            @_collection.changed! if @_collection
+            @_changed = true
+          end
+
+          def collection
+            @_collection
+          end
+
+          def graph
+            @_collection&.graph
           end
 
           def revision
@@ -179,31 +192,45 @@ module LucidData
 
           def []=(name, val)
             _validate_attribute(name, val)
-            @_changed = true
+            changed!
             @_raw_attributes[name] = val
+          end
+
+          def edges
+            graph&.edges_for_node(self)
           end
 
           def method_missing(method_name, *args, &block)
             if collection&.graph
-              node_matrix = collection.graph._get_node_matrix([@class_name, @key])
               singular_name = method_name.singularize
               plural_name = method_name.pluralize
+              node_edges = edges
               if method_name == plural_name
-                # return all nodes that match
+                # return all nodes
                 nodes = []
-                node_matrix.each do |node_edge|
-                  if node_edge[0] == singular_name
-                    # node match
-                    nodes < node_edge[1]
-                  end
+                sid = to_sid
+                node_edges.each do |edge|
+                  from_sid = edge.from.to_sid
+                  to_sid = edge.to.to_sid
+                  node = if from_sid[0] == singular_name
+                           edge.from if to_sid == sid
+                         elsif to_sid[0] == singular_name
+                           edge.to if from_sid == sid
+                         end
+                  nodes < node if node
                 end
               elsif method_name == singular_name
                 # return one node
-                node_matrix.each do |node_edge|
-                  if node_edge[0] == singular_name
-                    # node match
-                    return node_edge[1]
-                  end
+                sid = to_sid
+                node_edges.each do |edge|
+                  from_sid = edge.from.to_sid
+                  to_sid = edge.to.to_sid
+                  node = if from_sid[0] == singular_name
+                           edge.from if to_sid == sid
+                         elsif to_sid[0] == singular_name
+                           edge.to if from_sid == sid
+                         end
+                  return node if node
                 end
               end
             end

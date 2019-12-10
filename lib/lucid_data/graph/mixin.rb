@@ -311,46 +311,29 @@ module LucidData
             end
             @_raw_attributes = attributes
             @_node_collections = {}
-            self.class.node_collections.each_key do |access_name|
-              if nodes.key?(access_name)
-                @_node_collections[access_name] = nodes[access_name]
-                @_node_collections[access_name].graph = self
+            if nodes.class == Hash
+              self.class.node_collections.each_key do |access_name|
+                if nodes.key?(access_name)
+                  @_node_collections[access_name] = nodes[access_name]
+                  @_node_collections[access_name].graph = self
+                end
               end
+            else
+              @_node_collections[:nodes] = nodes
+              @_node_collections[:nodes].graph = self
             end
             @_edge_collections = {}
-            self.class.edge_collections.each_key do |access_name|
-              if edges.key?(access_name)
-                @_edge_collections[access_name] = edges[access_name]
-                @_edge_collections[access_name].graph = self
+            if edges.class == Hash
+              self.class.edge_collections.each_key do |access_name|
+                if edges.key?(access_name)
+                  @_edge_collections[access_name] = edges[access_name]
+                  @_edge_collections[access_name].graph = self
+                end
               end
+            else
+              @_edge_collections[:edges] = edges
+              @_edge_collections[:edges].graph = self
             end
-            @_matrix = nil
-          end
-
-          def _build_matrix
-            # not a incidence matrix, but somewhat going in that direction
-            @_matrix = {}
-            edge_collections.each do |collection|
-              collection.each do |edge|
-                sid = edge.from.to_sid
-                node_matrix = _get_node_matrix(sid)
-                node_matrix.push([edge.to.class.name.underscore, edge.to, edge.class.name.underscore, edge])
-                sid = edge.to.to_sid
-                node_matrix = _get_node_matrix(sid)
-                node_matrix.push([edge.from.class.name.underscore, edge.from, edge.class.name.underscore, edge])
-              end
-            end
-          end
-
-          def _get_matrix
-            _build_matrix unless @_matrix
-            @_matrix
-          end
-
-          def _get_node_matrix(sid)
-            matrix = _get_matrix
-            matrix[sid] = [] unless matrix.key?(sid)
-            matrix[sid]
           end
 
           def _get_attributes
@@ -358,7 +341,11 @@ module LucidData
           end
 
           def changed?
-            edge_collection.changed? || node_collection.changed? || @_changed
+            @_changed
+          end
+
+          def changed!
+            @_changed = true
           end
 
           def revision
@@ -375,12 +362,44 @@ module LucidData
             @_raw_attributes[name] = val
           end
 
+          def edges_for_node(node)
+            node_edges = []
+            @edge_collections.each do |collection|
+              node_edges.push(collection.edges_for_node(node))
+            end
+            node_edges
+          end
+
+          def linked_nodes_for_node(node)
+            node_edges = edges_for_node(node)
+            nodes = []
+            node_sid = node.to_sid
+            node_edges.each do |edge|
+              from_sid = edge.from.to_sid
+              to_sid = edge.to.to_sid
+              if to_sid == node_sid
+                nodes << edge.from
+              elsif from_sid == node_sid
+                nodes << edge.to
+              end
+            end
+            nodes
+          end
+
           def nodes
-            @_node_collections
+            all_nodes = []
+            @_node_collections.each_value do |collection|
+              all_nodes.push(*collection.nodes)
+            end
+            all_nodes
           end
 
           def edges
-            @_edge_collections
+            all_edges = []
+            @_edge_collections.each_value do |collection|
+              all_edges.push(*collection.edges)
+            end
+            all_edges
           end
         end  # RUBY_ENGINE
       end
