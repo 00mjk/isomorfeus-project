@@ -1,4 +1,4 @@
-class CombinedGraph < LucidComposableGraph::Base
+class CombinedGraph < LucidData::ComposableGraph::Base
   # load_query do
   #   node1 = SimpleNode.new(id: 3, simple_attribute: 'simple')
   #   node2 = SimpleNode.new(id: 4, simple_attribute: 'simple')
