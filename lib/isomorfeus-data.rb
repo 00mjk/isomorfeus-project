@@ -59,7 +59,6 @@ else
   require 'lucid_data/object/base'
   require 'lucid_data/remote_object/mixin'
   require 'lucid_data/remote_object/base'
-  require 'lucid_data/composable_graph/finders'
   require 'lucid_data/composable_graph/mixin'
   require 'lucid_data/composable_graph/base'
 
