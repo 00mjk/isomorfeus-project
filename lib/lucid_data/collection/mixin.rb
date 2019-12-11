@@ -412,8 +412,8 @@ module LucidData
           def nodes
             @_raw_collection
           end
-          alias vertices documents
-          alias vertexes documents
+          alias vertices nodes
+          alias vertexes nodes
           alias documents nodes
 
           def nodes_as_sids

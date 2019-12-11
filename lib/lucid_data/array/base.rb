@@ -1,7 +1,7 @@
 module LucidData
   module Array
     class Base
-      include LucidArray::Mixin
+      include LucidData::Array::Mixin
 
       if RUBY_ENGINE != 'opal'
         def self.inherited(base)

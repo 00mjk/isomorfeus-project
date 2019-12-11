@@ -220,7 +220,7 @@ module LucidData
             self
           end
         else # RUBY_ENGINE
-          unless base == LucidHash::Base
+          unless base == LucidData::Hash::Base
             Isomorfeus.add_valid_data_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new

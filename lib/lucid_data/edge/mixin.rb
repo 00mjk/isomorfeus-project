@@ -164,7 +164,7 @@ module LucidData
             { @class_name => { @key => hash }}
           end
         else # RUBY_ENGINE
-          unless base == LucidData::Edge::Base
+          unless base == LucidData::Edge::Base || base == LucidData::Link::Base
             Isomorfeus.add_valid_data_class(base)
             base.prop :pub_sub_client, default: nil
             base.prop :current_user, default: Anonymous.new
