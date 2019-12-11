@@ -45,7 +45,7 @@ module Isomorfeus
           end
 
           Dir.chdir('..')
-          puts 'Installation finished, make your dreams come true :)'
+          puts 'Project setup finished, make your dreams come true :)'
         rescue Exception => e
           puts e.backtrace.join("\n")
           puts "Installation failed: #{e.message}"
