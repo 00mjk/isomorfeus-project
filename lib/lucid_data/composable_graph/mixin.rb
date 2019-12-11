@@ -1,4 +1,4 @@
-module LucidComposableGraph
+module LucidData::ComposableGraph
   module Mixin
     # TODO nodes -> documents
     # TODO include -> compose dsl
@@ -7,7 +7,7 @@ module LucidComposableGraph
       base.extend(LucidPropDeclaration::Mixin)
       base.extend(Isomorfeus::Data::GenericClassApi)
       base.include(Isomorfeus::Data::GenericInstanceApi)
-      base.include(LucidComposableGraph::Finders)
+      base.include(LucidData::ComposableGraph::Finders)
 
       def to_transport(inline: false)
         items_hash = {}
@@ -271,7 +271,7 @@ module LucidComposableGraph
             included_graphs[name] = if graph_class
                                       { class: graph_class }
                                     else
-                                      new_class = Class.new(LucidComposableGraph::Base)
+                                      new_class = Class.new(LucidData::ComposableGraph::Base)
                                       new_class.instance_exec(&block)
                                       { anonymous: true, class: new_class }
                                     end
@@ -321,7 +321,7 @@ module LucidComposableGraph
 
         end
       else # RUBY_ENGINE
-        unless base == LucidComposableGraph::Base
+        unless base == LucidData::ComposableGraph::Base
           Isomorfeus.add_valid_data_class(base)
           base.prop :pub_sub_client, default: nil
           base.prop :current_user, default: Anonymous.new

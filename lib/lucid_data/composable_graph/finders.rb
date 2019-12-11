@@ -1,4 +1,4 @@
-module LucidComposableGraph
+module LucidData::ComposableGraph
   module Finders
     def find_edge(attribute_hash = nil, &block)
       if block_given?

@@ -1,6 +1,6 @@
-module LucidComposableGraph
+module LucidData::ComposableGraph
   class Base
-    include LucidComposableGraph::Mixin
+    include LucidData::ComposableGraph::Mixin
 
     if RUBY_ENGINE != 'opal'
       def self.inherited(base)
