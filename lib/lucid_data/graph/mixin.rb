@@ -33,6 +33,7 @@ module LucidData
           Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
         end
 
+        # TODO
         def to_transport
           { @class_name => { @key => { attributes: _get_attributes, edge_collection: edge_collection.to_sid, node_collection: node_collection.to_sid }}}
         end
@@ -102,13 +103,13 @@ module LucidData
             alias links edges
           end
 
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, nodes: nil, documents: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_edge_collection_path = [:data_state, @class_name, @key, :edge_collection]
-            @_node_collection_path = [:data_state, @class_name, @key, :node_collection]
+            @_edge_collections_path = [:data_state, @class_name, @key, :edges]
+            @_node_collections_path = [:data_state, @class_name, @key, :nodes]
             @_revision_store_path = [:data_state, @class_name, @key, :revision]
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
             loaded = loaded?
@@ -127,7 +128,12 @@ module LucidData
             else
               @_changed_attributes = {}
             end
-            nodes = nodes || documents
+            # nodes
+            nodes = nodes || documents || vertices || vertexes
+
+            # edges
+            edges = edges || links
+
             edge_collection = edge_collection.to_sid if edge_collection.respond_to?(:to_sid)
             if loaded && edge_collection
               @_edge_collection_sid = edge_collection ? edge_collection : Redux.fetch_by_path(*@_edge_collection_path)
@@ -205,7 +211,9 @@ module LucidData
           def edge_collection_sid
             @_edge_collection_sid ||= Redux.fetch_by_path(*@_edge_collection_path)
           end
-        else # RUBY_ENGINE
+        end # RUBY_ENGINE
+        # else # RUBY_ENGINE
+        if RUBY_ENGINE != 'opal'
           unless base == LucidData::Graph::Base
             Isomorfeus.add_valid_data_class(base)
             base.prop :pub_sub_client, default: nil
@@ -239,7 +247,6 @@ module LucidData
                 @_raw_attributes[name] = val
               end
             end
-
 
             def nodes(access_name, collection_class = nil)
               node_collections[access_name] = collection_class
@@ -290,7 +297,7 @@ module LucidData
             alias links edges
           end
 
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, nodes: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil)
             @key = key.to_s
             @_revision = revision
             @_changed = false
@@ -302,7 +309,10 @@ module LucidData
               attributes.each { |a,v| _validate_attribute(a, v) }
             end
             @_raw_attributes = attributes
+
+            # nodes
             @_node_collections = {}
+            nodes = nodes || documents || vertices || vertexes
             if nodes.class == Hash
               self.class.node_collections.each_key do |access_name|
                 if nodes.key?(access_name)
@@ -314,7 +324,10 @@ module LucidData
               @_node_collections[:nodes] = nodes
               @_node_collections[:nodes].graph = self
             end
+
+            # edges
             @_edge_collections = {}
+            edges = edges || links
             if edges.class == Hash
               self.class.edge_collections.each_key do |access_name|
                 if edges.key?(access_name)
@@ -411,6 +424,8 @@ module LucidData
             end
             node
           end
+          alias document_from_sid node_from_sid
+          alias vertex_from_sid node_from_sid
 
           def nodes
             all_nodes = []
@@ -419,6 +434,9 @@ module LucidData
             end
             all_nodes
           end
+          alias documents nodes
+          alias vertices nodes
+          alias vertexes nodes
 
           def edges
             all_edges = []
@@ -427,14 +445,18 @@ module LucidData
             end
             all_edges
           end
+          alias links edges
 
           def edge_collections
             @_edge_collections
           end
+          alias link_collections edge_collections
 
           def node_collections
             @_node_collections
           end
+          alias document_collections node_collections
+          alias vertex_collections node_collections
         end  # RUBY_ENGINE
       end
     end
