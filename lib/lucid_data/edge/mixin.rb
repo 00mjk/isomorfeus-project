@@ -216,7 +216,9 @@ module LucidData
             @_raw_attributes = attributes
             @_changed_from = nil
             @_changed_to = nil
+            from = from.to_sid if from.respond_to?(:to_sid)
             @_raw_from = from
+            to = to.to_sid if to.respond_to?(:to_sid)
             @_raw_to = to
           end
 
@@ -231,6 +233,10 @@ module LucidData
 
           def collection
             @_collection
+          end
+
+          def collection=(c)
+            @_collection = c
           end
 
           def graph
@@ -256,27 +262,41 @@ module LucidData
           end
 
           def from
-            @_changed_from ? @_changed_from : @_raw_from
+            sid = @_changed_from ? @_changed_from : @_raw_from
+            graph&.node_from_sid(sid)
           end
 
           def from=(node)
             raise "A invalid 'to' was given" unless node
             old_from = from
-            @_changed_from = node
-            @_collection.update_node_to_edge_cache(self, old_from, @_changed_from) if @_collection
-            @_changed_from
+            if node.respond_to?(:to_sid)
+              node_sid = node.to_sid
+            else
+              node_sid = node
+              node = graph.node_from_sid(node_sid)
+            end
+            @_changed_from = node_sid
+            @_collection.update_node_to_edge_cache(self, old_from, node) if @_collection
+            node
           end
 
           def to
-            @_changed_to ? @_changed_to : @_raw_to
+            sid = @_changed_to ? @_changed_to : @_raw_to
+            graph&.node_from_sid(sid)
           end
 
           def to=(node)
             raise "A invalid 'to' was given" unless node
             old_to = to
-            @_changed_to = node
-            @_collection.update_node_to_edge_cache(self, old_to, @_changed_to) if @_collection
-            @_changed_to
+            if node.respond_to?(:to_sid)
+              node_sid = node.to_sid
+            else
+              node_sid = node
+              node = graph.node_from_sid(node_sid)
+            end
+            @_changed_to = node_sid
+            @_collection.update_node_to_edge_cache(self, old_to, node) if @_collection
+            node
           end
 
           def other(node)

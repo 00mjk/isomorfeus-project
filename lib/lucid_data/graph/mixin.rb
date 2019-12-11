@@ -215,23 +215,15 @@ module LucidData
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, &@_load_block)
+
+              STDERR.puts "data: #{data}"
               revision = nil
               revision = data.delete(:_revision) if data.key?(:_revision)
               revision = data.delete(:revision) if !revision && data.key?(:revision)
-              node_collections = data.delete(:nodes)
-              unless node_collection.respond_to?(:to_sid)
-                # no loaded yet, sid expected, load
-                node_collection_class = Isomorfeus.cached_data_class(node_collection[0])
-                node_collection = node_collection_class.load(key: node_collections[1])
-              end
-              edge_collections = data.delete(:edges)
-              unless edge_collection.respond_to?(:to_sid)
-                # no loaded yet, sid expected, load
-                edge_collection_class = Isomorfeus.cached_data_class(edge_collection[0])
-                edge_collection = edge_collection_class.load(key: edge_collections[1])
-              end
+              nodes = data.delete(:nodes)
+              edges = data.delete(:edges)
               attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, edges: edge_collection, nodes: node_collection, attributes: attributes)
+              self.new(key: key, revision: revision, edges: edges, nodes: nodes, attributes: attributes)
             end
 
             def attribute(name, options = {})
@@ -364,7 +356,7 @@ module LucidData
 
           def edges_for_node(node)
             node_edges = []
-            @edge_collections.each do |collection|
+            @_edge_collections.each_value do |collection|
               node_edges.push(collection.edges_for_node(node))
             end
             node_edges
@@ -384,6 +376,15 @@ module LucidData
               end
             end
             nodes
+          end
+
+          def node_from_sid(sid)
+            node = nil
+            @_node_collections.each_value do |collection|
+              node = collection.node_from_sid(sid)
+              break if node
+            end
+            node
           end
 
           def nodes

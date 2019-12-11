@@ -118,8 +118,6 @@ module LucidData
             base.prop :current_user, default: Anonymous.new
           end
 
-          base.attr_accessor :collection
-
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, &@_load_block)
@@ -174,6 +172,10 @@ module LucidData
             @_collection
           end
 
+          def collection=(c)
+            @_collection = c
+          end
+
           def graph
             @_collection&.graph
           end
@@ -200,10 +202,15 @@ module LucidData
             graph&.edges_for_node(self)
           end
 
+          def linked_nodes
+            graph&.linked_nodes_for_node(self)
+          end
+
           def method_missing(method_name, *args, &block)
             if collection&.graph
-              singular_name = method_name.singularize
-              plural_name = method_name.pluralize
+              method_name_s = method_name.to_s
+              singular_name = method_name_s.singularize
+              plural_name = method_name_s.pluralize
               node_edges = edges
               if method_name == plural_name
                 # return all nodes
@@ -212,9 +219,9 @@ module LucidData
                 node_edges.each do |edge|
                   from_sid = edge.from.to_sid
                   to_sid = edge.to.to_sid
-                  node = if from_sid[0] == singular_name
+                  node = if from_sid[0].underscore == singular_name
                            edge.from if to_sid == sid
-                         elsif to_sid[0] == singular_name
+                         elsif to_sid[0].underscore == singular_name
                            edge.to if from_sid == sid
                          end
                   nodes < node if node
@@ -225,9 +232,9 @@ module LucidData
                 node_edges.each do |edge|
                   from_sid = edge.from.to_sid
                   to_sid = edge.to.to_sid
-                  node = if from_sid[0] == singular_name
+                  node = if from_sid[0].underscore == singular_name
                            edge.from if to_sid == sid
-                         elsif to_sid[0] == singular_name
+                         elsif to_sid[0].underscore == singular_name
                            edge.to if from_sid == sid
                          end
                   return node if node

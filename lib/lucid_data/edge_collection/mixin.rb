@@ -414,7 +414,7 @@ module LucidData
           def edges_for_node(node)
             node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
             return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
-            node_edges = edges.select do |edge|
+            node_edges = select do |edge|
               if edge.from.to_sid == node_sid || edge.to.to_sid == node_sid
                 true
               else
