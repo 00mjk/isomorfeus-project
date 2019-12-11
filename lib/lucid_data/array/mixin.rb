@@ -26,7 +26,7 @@ module LucidData
         end
 
         def _validate_element(el)
-          Isomorfeus::Data::ElementValidator.new(@class_name, el, @el_con).validate!
+          Isomorfeus::Data::ElementValidator.new(@class_name, el, @_el_con).validate!
         end
 
         if RUBY_ENGINE == 'opal'
@@ -38,8 +38,8 @@ module LucidData
             @_changed_array = nil
             @_revision_store_path = [:data_state, :revision, @class_name, @key]
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
-            @el_con = self.class.element_conditions
-            @_validate_elements = @el_con ? true : false
+            @_el_con = self.class.element_conditions
+            @_validate_elements = @_el_con ? true : false
             elements = [] unless elements
             if @_validate_elements
               elements.each { |e| _validate_element(e) }
@@ -303,8 +303,8 @@ module LucidData
             @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @el_con = self.class.element_conditions
-            @_validate_elements = @el_con ? true : false
+            @_el_con = self.class.element_conditions
+            @_validate_elements = @_el_con ? true : false
             elements = [] unless elements
             if @_validate_elements
               elements.each { |e| _validate_element(e) }

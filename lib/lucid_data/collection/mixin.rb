@@ -34,11 +34,11 @@ module LucidData
         end
 
         def _validate_node(node)
-          Isomorfeus::Data::ElementValidator.new(@class_name, node, @node_con).validate!
+          Isomorfeus::Data::ElementValidator.new(@class_name, node, @_node_con).validate!
         end
 
         def _validate_nodes(many_nodes)
-          many_nodes.each { |node| Isomorfeus::Data::ElementValidator.new(@class_name, node, @node_con).validate! }
+          many_nodes.each { |node| Isomorfeus::Data::ElementValidator.new(@class_name, node, @_node_con).validate! }
         end
 
         def _collection_to_sids(collection)
@@ -80,8 +80,8 @@ module LucidData
             @_changed_collection = nil
             @_revision_store_path = [:data_state, :revision, @class_name, @key]
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
-            @node_con = self.class.node_conditions
-            @_validate_nodes = @node_con ? true : false
+            @_node_con = self.class.node_conditions
+            @_validate_nodes = @_node_con ? true : false
             nodes = documents || nodes || vertices || vertexes
             loaded = loaded?
             if nodes && loaded
@@ -382,11 +382,11 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @graph = graph
+            @_graph = graph
             @_revision = revision
             @_changed = false
-            @node_con = self.class.node_conditions
-            @_validate_nodes = @node_con ? true : false
+            @_node_con = self.class.node_conditions
+            @_validate_nodes = @_node_con ? true : false
             nodes = documents || nodes || vertices || vertexes
             nodes = [] unless nodes
             if @_validate_nodes
@@ -394,6 +394,7 @@ module LucidData
             end
             nodes.each { |n| n.collection = self }
             @_raw_collection = nodes
+            @_sid_to_node_cache = {}
           end
 
           def changed?
@@ -401,7 +402,7 @@ module LucidData
           end
 
           def changed!
-            @graph.changed! if @graph
+            @_graph.changed! if @_graph
             @_changed = true
           end
 
@@ -420,18 +421,26 @@ module LucidData
             @_raw_collection.map(&:to_sid)
           end
 
+          def node_from_sid(sid)
+            return @_sid_to_node_cache[sid] if @_sid_to_node_cache.key?(sid)
+            node = nil
+            idx = @_raw_collection.find_index { |node| node.to_sid == sid }
+            node = @_raw_collection[idx] if idx
+            @_sid_to_node_cache[sid] = node
+          end
+
           def each(&block)
             @_raw_collection.each(&block)
           end
 
           def method_missing(method_name, *args, &block)
             method_name_s = method_name.to_s
-            if method_name_s.start_with?('find_document_by_') || method_name_s.start_with?('find_node_by_')
-              attribute = method_name_s[13..-1] # remove 'find_node_by_'
+            if method_name_s.start_with?('find_by_')
+              attribute = method_name_s[8..-1] # remove 'find_by_'
               value = args[0]
               attribute_hash = { attribute => value }
               attribute_hash.merge!(args[1]) if args[1]
-              find_node(attribute_hash)
+              find(attribute_hash)
             else
               @_raw_collection.send(method_name, *args, &block)
             end

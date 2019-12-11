@@ -216,10 +216,18 @@ module LucidData
             @_raw_attributes = attributes
             @_changed_from = nil
             @_changed_to = nil
-            from = from.to_sid if from.respond_to?(:to_sid)
-            @_raw_from = from
-            to = to.to_sid if to.respond_to?(:to_sid)
-            @_raw_to = to
+            @_raw_from = if from.respond_to?(:to_sid)
+                           from.to_sid
+                         else
+                           from[1] = from[1].to_s
+                           from
+                         end
+            @_raw_to = if to.respond_to?(:to_sid)
+                         to.to_sid
+                       else
+                         to[1] = to[1].to_s
+                         to
+                       end
           end
 
           def changed?
@@ -266,13 +274,18 @@ module LucidData
             graph&.node_from_sid(sid)
           end
 
+          def from_as_sid
+            @_changed_from ? @_changed_from : @_raw_from
+          end
+
           def from=(node)
-            raise "A invalid 'to' was given" unless node
+            raise "A invalid 'from' was given" unless node
             old_from = from
             if node.respond_to?(:to_sid)
               node_sid = node.to_sid
             else
               node_sid = node
+              node_sid[1] = node_sid[1].to_s
               node = graph.node_from_sid(node_sid)
             end
             @_changed_from = node_sid
@@ -285,6 +298,10 @@ module LucidData
             graph&.node_from_sid(sid)
           end
 
+          def to_as_sid
+            @_changed_to ? @_changed_to : @_raw_to
+          end
+
           def to=(node)
             raise "A invalid 'to' was given" unless node
             old_to = to
@@ -292,6 +309,7 @@ module LucidData
               node_sid = node.to_sid
             else
               node_sid = node
+              node_sid[1] = node_sid[1].to_s
               node = graph.node_from_sid(node_sid)
             end
             @_changed_to = node_sid

@@ -1,7 +1,7 @@
 module LucidData
   module Collection
     module Finders
-      def find_node(attribute_hash = nil, &block)
+      def find(attribute_hash = nil, &block)
         if block_given?
           nodes.each do |node|
             return node if block.call(node)
@@ -27,7 +27,7 @@ module LucidData
         nil
       end
 
-      def find_nodes(attribute_hash = nil, &block)
+      def find_all(attribute_hash = nil, &block)
         found_nodes = Set.new
         if block_given?
           nodes.each do |node|
@@ -54,9 +54,17 @@ module LucidData
         found_nodes
       end
 
-      def find_node_by_id(node_id)
-        nodes_as_sids.each do |node_sid|
-          return Isomorfeus.instance_from_sid(node_sid) if node_sid[1] == node_id
+      def find_by_key(node_key)
+        nodes.each do |node|
+          return node if node.key == node_key
+        end
+        nil
+      end
+
+      def find_by_sid(node)
+        node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+        nodes.each do |node|
+          return node if node.to_sid == node_sid
         end
         nil
       end

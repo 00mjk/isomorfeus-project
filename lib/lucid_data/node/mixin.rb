@@ -207,35 +207,37 @@ module LucidData
           end
 
           def method_missing(method_name, *args, &block)
-            if collection&.graph
+            if graph
               method_name_s = method_name.to_s
               singular_name = method_name_s.singularize
               plural_name = method_name_s.pluralize
               node_edges = edges
-              if method_name == plural_name
+              if method_name_s == plural_name
+                STDERR.puts "plural"
                 # return all nodes
                 nodes = []
                 sid = to_sid
                 node_edges.each do |edge|
-                  from_sid = edge.from.to_sid
-                  to_sid = edge.to.to_sid
-                  node = if from_sid[0].underscore == singular_name
-                           edge.from if to_sid == sid
-                         elsif to_sid[0].underscore == singular_name
-                           edge.to if from_sid == sid
+                  from_sid = edge.from_as_sid
+                  to_sid = edge.to_as_sid
+                  node = if from_sid[0].underscore == singular_name && to_sid == sid
+                           edge.from
+                         elsif to_sid[0].underscore == singular_name && from_sid == sid
+                           edge.to
                          end
-                  nodes < node if node
+                  nodes << node if node
                 end
-              elsif method_name == singular_name
+                return nodes
+              elsif method_name_s == singular_name
                 # return one node
                 sid = to_sid
                 node_edges.each do |edge|
-                  from_sid = edge.from.to_sid
-                  to_sid = edge.to.to_sid
-                  node = if from_sid[0].underscore == singular_name
-                           edge.from if to_sid == sid
-                         elsif to_sid[0].underscore == singular_name
-                           edge.to if from_sid == sid
+                  from_sid = edge.from_as_sid
+                  to_sid = edge.to_as_sid
+                  node = if from_sid[0].underscore == singular_name && to_sid == sid
+                           edge.from
+                         elsif to_sid[0].underscore == singular_name && from_sid == sid
+                           edge.to
                          end
                   return node if node
                 end

@@ -28,11 +28,11 @@ module LucidData
         end
 
         def _validate_edge(edge)
-          Isomorfeus::Data::ElementValidator.new(@class_name, edge, @edge_con).validate!
+          Isomorfeus::Data::ElementValidator.new(@class_name, edge, @_edge_con).validate!
         end
 
         def _validate_edges(many_edges)
-          many_edges.each { |edge| Isomorfeus::Data::ElementValidator.new(@class_name, edge, @edge_con).validate! }
+          many_edges.each { |edge| Isomorfeus::Data::ElementValidator.new(@class_name, edge, @_edge_con).validate! }
         end
 
         def _collection_to_sids(collection)
@@ -74,8 +74,8 @@ module LucidData
             @_changed_collection = nil
             @_revision_store_path = [:data_state, :revision, @class_name, @key]
             @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
-            @edge_con = self.class.edge_conditions
-            @_validate_edges = @edge_con ? true : false
+            @_edge_con = self.class.edge_conditions
+            @_validate_edges = @_edge_con ? true : false
             edges = edges || links
             loaded = loaded?
             if edges && loaded
@@ -361,8 +361,6 @@ module LucidData
             base.prop :current_user, default: Anonymous.new
           end
 
-          base.attr_accessor :graph
-
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
               edges = instance_exec(key: key, &@_load_block)
@@ -374,12 +372,12 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @graph = graph
+            @_graph = graph
             @_node_to_edge_cache = {}
             @_revision = revision
             @_changed = false
-            @edge_con = self.class.edge_conditions
-            @_validate_edges = @edge_con ? true : false
+            @_edge_con = self.class.edge_conditions
+            @_validate_edges = @_edge_con ? true : false
             edges = edges || links
             edges = [] unless edges
             if @_validate_edges
@@ -389,12 +387,20 @@ module LucidData
             @_raw_collection = edges
           end
 
+          def graph
+            @_graph
+          end
+
+          def graph=(g)
+            @_graph = g
+          end
+
           def changed?
             @_changed
           end
 
           def changed!
-            @graph.changed! if @graph
+            @_graph.changed! if @_graph
             @_changed = true
           end
 
@@ -415,11 +421,7 @@ module LucidData
             node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
             return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
             node_edges = select do |edge|
-              if edge.from.to_sid == node_sid || edge.to.to_sid == node_sid
-                true
-              else
-                false
-              end
+              (edge.from_as_sid == node_sid || edge.to_as_sid == node_sid) ? true : false
             end
             @_node_to_edge_cache[node_sid] = node_edges
           end
@@ -442,12 +444,12 @@ module LucidData
 
           def method_missing(method_name, *args, &block)
             method_name_s = method_name.to_s
-            if method_name_s.start_with?('find_edge_by_') || method_name_s.start_with?('find_link_by_')
-              attribute = method_name_s[13..-1] # remove 'find_edge_by_'
+            if method_name_s.start_with?('find_by_')
+              attribute = method_name_s[8..-1] # remove 'find_by_'
               value = args[0]
               attribute_hash = { attribute => value }
               attribute_hash.merge!(args[1]) if args[1]
-              find_edge(attribute_hash)
+              find(attribute_hash)
             else
               @_raw_collection.send(method_name, *args, &block)
             end

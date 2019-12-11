@@ -354,10 +354,35 @@ module LucidData
             @_raw_attributes[name] = val
           end
 
+          def method_missing(method_name, *args, &block)
+            method_name_s = method_name.to_s
+            if method_name_s.start_with?('find_edge_by_') || method_name_s.start_with?('find_link_by_')
+              attribute = method_name_s[13..-1] # remove 'find_by_'
+              value = args[0]
+              attribute_hash = { attribute => value }
+              attribute_hash.merge!(args[1]) if args[1]
+              find_edge(attribute_hash)
+            elsif method_name_s.start_with?('find_node_by_') || method_name_s.start_with?('find_document_by_') || method_name_s.start_with?('find_vertex_by_')
+              attribute = if method_name_s.start_with?('find_node_by_')
+                            method_name_s[13..-1]
+                          elsif method_name_s.start_with?('find_document_by_')
+                            method_name_s[17..-1]
+                          elsif method_name_s.start_with?('find_vertex_by_')
+                            method_name_s[15..-1]
+                          end
+              value = args[0]
+              attribute_hash = { attribute => value }
+              attribute_hash.merge!(args[1]) if args[1]
+              find_node(attribute_hash)
+            else
+              @_raw_collection.send(method_name, *args, &block)
+            end
+          end
+
           def edges_for_node(node)
             node_edges = []
             @_edge_collections.each_value do |collection|
-              node_edges.push(collection.edges_for_node(node))
+              node_edges.push(*collection.edges_for_node(node))
             end
             node_edges
           end
@@ -401,6 +426,14 @@ module LucidData
               all_edges.push(*collection.edges)
             end
             all_edges
+          end
+
+          def edge_collections
+            @_edge_collections
+          end
+
+          def node_collections
+            @_node_collections
           end
         end  # RUBY_ENGINE
       end
