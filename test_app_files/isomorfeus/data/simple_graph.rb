@@ -1,9 +1,11 @@
 class SimpleGraph < LucidData::Graph::Base
   execute_load do |key:|
+    if RUBY_ENGINE != 'opal'
     { key: key,
-      edge_collection: ['SimpleEdgeCollection', 1],
-      node_collection: ['SimpleNodeCollection', 1],
+      edges: SimpleEdgeCollection.load(key: 1),
+      nodes: SimpleNodeCollection.load(key: 1),
       attributes: { one: key }}
+    end
   end
 
   on_load do
