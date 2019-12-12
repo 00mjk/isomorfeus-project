@@ -432,8 +432,13 @@ module LucidData
 
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
-              edges = instance_exec(key: key, &@_load_block)
-              self.new(key: key, edges: edges)
+              data = instance_exec(key: key, &@_load_block)
+              revision = nil
+              revision = data.delete(:_revision) if data.key?(:_revision)
+              revision = data.delete(:revision) if !revision && data.key?(:revision)
+              attributes = data.delete(:attributes)
+              edges = data.delete(:nodes)
+              self.new(key: key, revision: revision, attributes: attributes, edges: edges)
             end
           end
 
