@@ -83,6 +83,7 @@ module LucidData
                        end
                 return node if node
               end
+              nil
             end
           else
             super(method_name, *args, &block)
