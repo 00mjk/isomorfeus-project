@@ -59,7 +59,7 @@ module LucidData
         end
 
         def to_transport
-          { @class_name => { @key => nodes_as_sids }}
+          { @class_name => { @key => { nodes: nodes_as_sids }}}
         end
 
         def included_items_to_transport
@@ -76,10 +76,11 @@ module LucidData
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_graph = graph
-            @_store_path = [:data_state, @class_name, @key]
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_nodes_path = [:data_state, @class_name, @key, :nodes]
+            @_revision_path = [:data_state, @class_name, @key, :revision]
+            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_path)
             @_changed_collection = nil
-            @_revision_store_path = [:data_state, :revision, @class_name, @key]
-            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
             @_node_con = self.class.node_conditions
             @_validate_nodes = @_node_con ? true : false
             nodes = documents || nodes || vertices || vertexes
@@ -89,7 +90,7 @@ module LucidData
                 nodes.each { |e| _validate_node(e) }
               end
               raw_nodes = _collection_to_sids(nodes)
-              raw_collection = Redux.fetch_by_path(*@_store_path)
+              raw_collection = Redux.fetch_by_path(*@_nodes_path)
               if raw_collection != raw_nodes
                 @_changed_collection = raw_nodes
               end
@@ -100,7 +101,7 @@ module LucidData
 
           def _get_collection
             return @_changed_collection if @_changed_collection
-            collection = Redux.fetch_by_path(*@_store_path)
+            collection = Redux.fetch_by_path(*@_nodes_path)
             return collection if collection
             []
           end

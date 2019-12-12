@@ -70,10 +70,11 @@ module LucidData
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_graph = graph
-            @_store_path = [:data_state, @class_name, @key]
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_edges_path = [:data_state, @class_name, @key, :edges]
+            @_revision_path = [:data_state, @class_name, @key, :revision]
+            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_path)
             @_changed_collection = nil
-            @_revision_store_path = [:data_state, :revision, @class_name, @key]
-            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
             @_edge_con = self.class.edge_conditions
             @_validate_edges = @_edge_con ? true : false
             edges = edges || links
@@ -83,7 +84,7 @@ module LucidData
                 edges.each { |e| _validate_edges(e) }
               end
               raw_edges = _collection_to_sids(edges)
-              raw_collection = Redux.fetch_by_path(*@_store_path)
+              raw_collection = Redux.fetch_by_path(*@_edges_path)
               if raw_collection != raw_edges
                 @_changed_collection = raw_edges
               end
@@ -94,7 +95,7 @@ module LucidData
 
           def _get_collection
             return @_changed_collection if @_changed_collection
-            collection = Redux.fetch_by_path(*@_store_path)
+            collection = Redux.fetch_by_path(*@_edges_path)
             return collection if collection
             []
           end
