@@ -25,19 +25,37 @@ module LucidData
           end
         end
 
+        def composition
+          @_composition
+        end
+
+        def composition=(c)
+          @_composition = c
+        end
+
+        def changed!
+          @_composition.changed! if @_composition
+          @_changed = true
+        end
+
+        def revision
+          @_revision
+        end
+
         def _validate_element(el)
           Isomorfeus::Data::ElementValidator.new(@class_name, el, @_el_con).validate!
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, elements: nil)
+          def initialize(key:, revision: nil, elements: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key]
             @_changed_array = nil
-            @_revision_store_path = [:data_state, :revision, @class_name, @key]
-            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
+            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
+            @_composition = composition
+            @_changed = false
             @_el_con = self.class.element_conditions
             @_validate_elements = @_el_con ? true : false
             elements = [] unless elements
@@ -58,11 +76,7 @@ module LucidData
           end
 
           def changed?
-            !!@_changed_array
-          end
-
-          def revision
-            @_revision
+            @_changed || !!@_changed_array
           end
 
           def each(&block)
@@ -84,6 +98,7 @@ module LucidData
             raw_array = _get_array
             result = raw_array << element
             @_changed_array = raw_array
+            changed!
             result
           end
 
@@ -96,11 +111,13 @@ module LucidData
             raw_array = _get_array
             raw_array[idx] = element
             @_changed_array = raw_array
+            changed!
             element
           end
 
           def clear
             @_changed_array = []
+            changed!
             self
           end
 
@@ -108,6 +125,7 @@ module LucidData
             raw_array = _get_array
             raw_array.collect!(&block)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -116,6 +134,7 @@ module LucidData
             result = raw_array.compact!
             return nil if result.nil?
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -123,6 +142,7 @@ module LucidData
             raw_array = _get_array
             raw_array.concat(*args)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -131,6 +151,7 @@ module LucidData
             result = raw_array.delete(element, &block)
             return nil if result.nil?
             @_changed_array = raw_array
+            changed!
             result
           end
 
@@ -139,6 +160,7 @@ module LucidData
             result = raw_array.delete_at(idx)
             return nil if result.nil?
             @_changed_array = raw_array
+            changed!
             result
           end
 
@@ -146,6 +168,7 @@ module LucidData
             raw_array = _get_array
             raw_array.delete_if(&block)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -153,6 +176,7 @@ module LucidData
             raw_array = _get_array
             raw_array.fill(*args, &block)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -161,6 +185,7 @@ module LucidData
             result = raw_array.filter!(&block)
             return nil if result.nil?
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -169,6 +194,7 @@ module LucidData
             result = raw_array.flatten!(level)
             return nil if result.nil?
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -176,6 +202,7 @@ module LucidData
             raw_array = _get_array
             raw_array.insert(*args)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -183,6 +210,7 @@ module LucidData
             raw_array = _get_array
             raw_array.keep_if(&block)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -190,6 +218,7 @@ module LucidData
             raw_array = _get_array
             raw_array.map!(&block)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -197,6 +226,7 @@ module LucidData
             raw_array = _get_array
             result = raw_array.pop(n)
             @_changed_array = raw_array
+            changed!
             result
           end
 
@@ -207,6 +237,7 @@ module LucidData
             raw_array = _get_array
             raw_array.push(*elements)
             @_changed_array = raw_array
+            changed!
             self
           end
           alias append push
@@ -216,6 +247,7 @@ module LucidData
             result = raw_array.reject!(&block)
             return nil if result.nil?
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -223,6 +255,7 @@ module LucidData
             raw_array = _get_array
             raw_array.reverse!
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -230,6 +263,7 @@ module LucidData
             raw_array = _get_array
             raw_array.rotate!(count)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -238,6 +272,7 @@ module LucidData
             result = raw_array.select!(&block)
             return nil if result.nil?
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -245,6 +280,7 @@ module LucidData
             raw_array = _get_array
             result = raw_array.shift(n)
             @_changed_array = raw_array
+            changed!
             result
           end
 
@@ -252,6 +288,7 @@ module LucidData
             raw_array = _get_array
             raw_array.shuffle!(*args)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -259,6 +296,7 @@ module LucidData
             raw_array = _get_array
             result = raw_array.slice!(*args)
             @_changed_array = raw_array
+            changed!
             result
           end
 
@@ -266,6 +304,7 @@ module LucidData
             raw_array = _get_array
             raw_array.sort!(&block)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -273,6 +312,7 @@ module LucidData
             raw_array = _get_array
             raw_array.sort_by!(&block)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -280,6 +320,7 @@ module LucidData
             raw_array = _get_array
             raw_array.uniq!(&block)
             @_changed_array = raw_array
+            changed!
             self
           end
 
@@ -287,6 +328,7 @@ module LucidData
             raw_array = _get_array
             raw_array.unshift(*args)
             @_changed_array = raw_array
+            changed!
             self
           end
           alias prepend unshift
@@ -297,12 +339,13 @@ module LucidData
             base.prop :current_user, default: Anonymous.new
           end
 
-          def initialize(key:, revision: nil, elements: nil)
+          def initialize(key:, revision: nil, elements: nil, composition: nil)
             @key = key.to_s
-            @_revision = revision
-            @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @_revision = revision
+            @_changed = false
+            @_composition = composition
             @_el_con = self.class.element_conditions
             @_validate_elements = @_el_con ? true : false
             elements = [] unless elements
@@ -314,10 +357,6 @@ module LucidData
 
           def changed?
             @_changed
-          end
-
-          def revision
-            @_revision
           end
 
           def each(&block)
@@ -335,13 +374,13 @@ module LucidData
 
           def <<(element)
             _validate_element(element) if @_validate_elements
-            @_changed = true
+            changed!
             @_raw_array << element
           end
 
           def []=(idx, element)
             _validate_element(element) if @_validate_elements
-            @_changed = true
+            changed!
             @_raw_array[idx] = element
           end
 
@@ -351,7 +390,7 @@ module LucidData
           end
 
           def collect!(&block)
-            @_changed = true
+            changed!
             @_raw_array.collect!(&block)
             self
           end
@@ -359,76 +398,76 @@ module LucidData
           def compact!
             result = @_raw_array.compact!
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def concat(*args)
-            @_changed = true
+            changed!
             @_raw_array.concat(*args)
             self
           end
 
           def delete(element, &block)
             result = @_raw_array.delete(element, &block)
-            @_changed = true
+            changed!
             result
           end
 
           def delete_at(idx)
             result = @_raw_array.delete_at(idx)
             return nil if result.nil?
-            @_changed = true
+            changed!
             result
           end
 
           def delete_if(&block)
             @_raw_array.delete_if(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def fill(*args, &block)
             @_raw_array.fill(*args, &block)
-            @_changed = true
+            changed!
             self
           end
 
           def filter!(&block)
             result = @_raw_array.filter!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def flatten!(level = nil)
             result = @_raw_array.flatten!(level)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def insert(*args)
             @_raw_array.insert(*args)
-            @_changed = true
+            changed!
             self
           end
 
           def keep_if(&block)
             @_raw_array.keep_if(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def map!(&block)
             @_raw_array.map!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def pop(n = nil)
             result = @_raw_array.pop(n)
-            @_changed = true
+            changed!
             result
           end
 
@@ -437,7 +476,7 @@ module LucidData
               elements.each { |element| _validate_element(element) }
             end
             @_raw_array.push(*elements)
-            @_changed = true
+            changed!
             self
           end
           alias append push
@@ -445,68 +484,68 @@ module LucidData
           def reject!(&block)
             result = @_raw_array.reject!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def reverse!
             @_raw_array.reverse!
-            @_changed = true
+            changed!
             self
           end
 
           def rotate!(count = 1)
             @_raw_array.rotate!(count)
-            @_changed = true
+            changed!
             self
           end
 
           def select!(&block)
             result = @_raw_array.select!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def shift(n = nil)
             result = @_raw_array.shift(n)
-            @_changed = true
+            changed!
             result
           end
 
           def shuffle!(*args)
             @_raw_array.shuffle!(*args)
-            @_changed = true
+            changed!
             self
           end
 
           def slice!(*argsk)
             result = @_raw_array.slice!(*args)
-            @_changed = true
+            changed!
             result
           end
 
           def sort!(&block)
             @_raw_array.sort!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def sort_by!(&block)
             @_raw_array.sort_by!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def uniq!(&block)
             @_raw_array.uniq!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def unshift(*args)
             @_raw_array.unshift(*args)
-            @_changed = true
+            changed!
             self
           end
           alias prepend unshift

@@ -28,7 +28,7 @@ module LucidData
       end
 
       def find_all(attribute_hash = nil, &block)
-        found_nodes = Set.new
+        found_nodes = []
         if block_given?
           nodes.each do |node|
             found_nodes << node if block.call(node)
@@ -61,12 +61,22 @@ module LucidData
         nil
       end
 
-      def find_by_sid(node)
-        node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
-        nodes.each do |node|
-          return node if node.to_sid == node_sid
+      if RUBY_ENGINE == 'opal'
+        def find_by_sid(node)
+          node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+          nodes_as_sids.each do |sid|
+            return Isomorfeus.instance_from_sid(node_sid) if sid == node_sid
+          end
+          nil
         end
-        nil
+      else
+        def find_by_sid(node)
+          node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+          nodes.each do |node|
+            return node if node.to_sid == node_sid
+          end
+          nil
+        end
       end
     end
   end

@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidHash' do
+RSpec.describe 'LucidData::Hash' do
   context 'on the server' do
     it 'can instantiate a hash by inheritance' do
       result = on_server do
-        class TestHashBase < LucidHash::Base
+        class TestHashBase < LucidData::Hash::Base
         end
         hash = TestHashBase.new(key: 1, attributes: { test: 1, experiment: 2 })
         hash.count
@@ -15,7 +15,7 @@ RSpec.describe 'LucidHash' do
     it 'can instantiate a hash by mixin' do
       result = on_server do
         class TestHashMixin
-          include LucidHash::Mixin
+          include LucidData::Hash::Mixin
         end
         hash = TestHashMixin.new(key: 2, attributes: { test: 1, experiment: 2, probe: 3 })
         hash.count
@@ -25,7 +25,7 @@ RSpec.describe 'LucidHash' do
 
     it 'verifies attribute :test, class' do
       result = on_server do
-        class TestHashC < LucidHash::Base
+        class TestHashC < LucidData::Hash::Base
           attribute :test, class: String
         end
         hash = TestHashC.new(key: 3, attributes: { test: 'a_string' })
@@ -33,7 +33,7 @@ RSpec.describe 'LucidHash' do
       end
       expect(result).to eq('String')
       result = on_server do
-        class TestHashC < LucidHash::Base
+        class TestHashC < LucidData::Hash::Base
           attribute :test, class: String
         end
         begin
@@ -44,7 +44,7 @@ RSpec.describe 'LucidHash' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestHashC < LucidHash::Base
+        class TestHashC < LucidData::Hash::Base
           attribute :test, class: String
         end
         begin
@@ -59,7 +59,7 @@ RSpec.describe 'LucidHash' do
 
     it 'verifies if attribute :test, is_a' do
       result = on_server do
-        class TestHashD < LucidHash::Base
+        class TestHashD < LucidData::Hash::Base
           attribute :test, is_a: String
         end
         hash = TestHashD.new(key: 5, attributes: { test: 'a_string' })
@@ -67,7 +67,7 @@ RSpec.describe 'LucidHash' do
       end
       expect(result).to eq('String')
       result = on_server do
-        class TestHashD < LucidHash::Base
+        class TestHashD < LucidData::Hash::Base
           attribute :test, is_a: String
         end
         begin
@@ -78,7 +78,7 @@ RSpec.describe 'LucidHash' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestHashD < LucidHash::Base
+        class TestHashD < LucidData::Hash::Base
           attribute :test, is_a: String
         end
         begin
@@ -93,14 +93,14 @@ RSpec.describe 'LucidHash' do
 
     it 'reports a change' do
       result = on_server do
-        class TestHashE < LucidHash::Base
+        class TestHashE < LucidData::Hash::Base
         end
         hash = TestHashE.new(key: 8)
         hash.changed?
       end
       expect(result).to be(false)
       result = on_server do
-        class TestHashE < LucidHash::Base
+        class TestHashE < LucidData::Hash::Base
         end
         hash = TestHashE.new(key: 9)
         hash[:test] = 20
@@ -111,7 +111,7 @@ RSpec.describe 'LucidHash' do
 
     it 'converts to cid' do
       result = on_server do
-        class TestHashE < LucidHash::Base
+        class TestHashE < LucidData::Hash::Base
         end
         hash = TestHashE.new(key: 10)
         hash.to_sid
@@ -121,14 +121,14 @@ RSpec.describe 'LucidHash' do
 
     it 'can validate a attribute :test,' do
       result = on_server do
-        class TestHashF < LucidHash::Base
+        class TestHashF < LucidData::Hash::Base
           attribute :test, class: String
         end
         TestHashF.valid_attribute?(:test, 10)
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestHashF < LucidHash::Base
+        class TestHashF < LucidData::Hash::Base
           attribute :test, class: String
         end
         TestHashF.valid_attribute?(:test, '10')
@@ -138,7 +138,7 @@ RSpec.describe 'LucidHash' do
 
     it 'converts to transport' do
       result = on_server do
-        class TestHashG < LucidHash::Base
+        class TestHashG < LucidData::Hash::Base
         end
         hash = TestHashG.new(key: 13, attributes: { test: 1, experiment: 2, probe: 3 })
         JSON.dump(hash.to_transport)
@@ -154,7 +154,7 @@ RSpec.describe 'LucidHash' do
 
     it 'can instantiate a hash by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestHashBase < LucidHash::Base
+        class TestHashBase < LucidData::Hash::Base
         end
         hash = TestHashBase.new(key: 1, attributes: { test: 1, experiment: 2 })
         hash.count
@@ -165,7 +165,7 @@ RSpec.describe 'LucidHash' do
     it 'can instantiate a hash by mixin' do
       result = @doc.evaluate_ruby do
         class TestHashMixin
-          include LucidHash::Mixin
+          include LucidData::Hash::Mixin
         end
         hash = TestHashMixin.new(key: 2, attributes: { test: 1, experiment: 2, probe: 3 })
         hash.count
@@ -175,7 +175,7 @@ RSpec.describe 'LucidHash' do
 
     it 'verifies attribute :test, class' do
       result = @doc.evaluate_ruby do
-        class TestHashC < LucidHash::Base
+        class TestHashC < LucidData::Hash::Base
           attribute :test, class: String
         end
         hash = TestHashC.new(key: 3, attributes: { test: 'a_string' })
@@ -183,7 +183,7 @@ RSpec.describe 'LucidHash' do
       end
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
-        class TestHashC < LucidHash::Base
+        class TestHashC < LucidData::Hash::Base
           attribute :test, class: String
         end
         begin
@@ -194,7 +194,7 @@ RSpec.describe 'LucidHash' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestHashC < LucidHash::Base
+        class TestHashC < LucidData::Hash::Base
           attribute :test, class: String
         end
         begin
@@ -209,7 +209,7 @@ RSpec.describe 'LucidHash' do
 
     it 'verifies if attribute :test, is_a' do
       result = @doc.evaluate_ruby do
-        class TestHashD < LucidHash::Base
+        class TestHashD < LucidData::Hash::Base
           attribute :test, is_a: String
         end
         hash = TestHashD.new(key: 5, attributes: { test: 'a_string' })
@@ -217,7 +217,7 @@ RSpec.describe 'LucidHash' do
       end
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
-        class TestHashD < LucidHash::Base
+        class TestHashD < LucidData::Hash::Base
           attribute :test, is_a: String
         end
         begin
@@ -228,7 +228,7 @@ RSpec.describe 'LucidHash' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestHashD < LucidHash::Base
+        class TestHashD < LucidData::Hash::Base
           attribute :test, is_a: String
         end
         begin
@@ -243,14 +243,14 @@ RSpec.describe 'LucidHash' do
 
     it 'reports a change' do
       result = @doc.evaluate_ruby do
-        class TestHashE < LucidHash::Base
+        class TestHashE < LucidData::Hash::Base
         end
         hash = TestHashE.new(key: 8)
         hash.changed?
       end
       expect(result).to be(false)
       result = @doc.evaluate_ruby do
-        class TestHashE < LucidHash::Base
+        class TestHashE < LucidData::Hash::Base
         end
         hash = TestHashE.new(key: 9)
         hash[:test] = 20
@@ -261,7 +261,7 @@ RSpec.describe 'LucidHash' do
 
     it 'converts to cid' do
       result = @doc.evaluate_ruby do
-        class TestHashE < LucidHash::Base
+        class TestHashE < LucidData::Hash::Base
         end
         hash = TestHashE.new(key: 10)
         hash.to_sid
@@ -271,14 +271,14 @@ RSpec.describe 'LucidHash' do
 
     it 'can validate a attribute :test,' do
       result = @doc.evaluate_ruby do
-        class TestHashF < LucidHash::Base
+        class TestHashF < LucidData::Hash::Base
           attribute :test, class: String
         end
         TestHashF.valid_attribute?(:test, 10)
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestHashF < LucidHash::Base
+        class TestHashF < LucidData::Hash::Base
           attribute :test, class: String
         end
         TestHashF.valid_attribute?(:test, '10')
@@ -288,7 +288,7 @@ RSpec.describe 'LucidHash' do
 
     it 'converts to transport' do
       result = @doc.evaluate_ruby do
-        class TestHashG < LucidHash::Base
+        class TestHashG < LucidData::Hash::Base
         end
         hash = TestHashG.new(key: 13, attributes: { test: 1, experiment: 2, probe: 3 })
         JSON.dump(hash.to_transport)

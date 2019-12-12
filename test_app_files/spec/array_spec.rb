@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidArray' do
+RSpec.describe 'LucidData::Array' do
   context 'on the server' do
     it 'can instantiate a array by inheritance' do
       result = on_server do
-        class TestArrayBase < LucidArray::Base
+        class TestArrayBase < LucidData::Array::Base
         end
         array = TestArrayBase.new(key: 1, elements: [1, 2])
         array.count
@@ -15,7 +15,7 @@ RSpec.describe 'LucidArray' do
     it 'can instantiate a array by mixin' do
       result = on_server do
         class TestArrayMixin
-          include LucidArray::Mixin
+          include LucidData::Array::Mixin
         end
         array = TestArrayMixin.new(key: 2, elements: [1, 2, 3])
         array.count
@@ -25,7 +25,7 @@ RSpec.describe 'LucidArray' do
 
     it 'verifies element class' do
       result = on_server do
-        class TestArrayC < LucidArray::Base
+        class TestArrayC < LucidData::Array::Base
           elements class: String
         end
         array = TestArrayC.new(key: 3, elements: ['test'])
@@ -33,7 +33,7 @@ RSpec.describe 'LucidArray' do
       end
       expect(result).to eq('String')
       result = on_server do
-        class TestArrayC < LucidArray::Base
+        class TestArrayC < LucidData::Array::Base
           elements class: String
         end
         begin
@@ -44,7 +44,7 @@ RSpec.describe 'LucidArray' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestArrayC < LucidArray::Base
+        class TestArrayC < LucidData::Array::Base
           elements class: String
         end
         begin
@@ -59,7 +59,7 @@ RSpec.describe 'LucidArray' do
 
     it 'verifies if element is_a' do
       result = on_server do
-        class TestArrayD < LucidArray::Base
+        class TestArrayD < LucidData::Array::Base
           element is_a: String
         end
         array = TestArrayD.new(key: 5, elements: ['test'])
@@ -67,7 +67,7 @@ RSpec.describe 'LucidArray' do
       end
       expect(result).to eq('String')
       result = on_server do
-        class TestArrayD < LucidArray::Base
+        class TestArrayD < LucidData::Array::Base
           element is_a: String
         end
         begin
@@ -78,7 +78,7 @@ RSpec.describe 'LucidArray' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestArrayD < LucidArray::Base
+        class TestArrayD < LucidData::Array::Base
           element is_a: String
         end
         begin
@@ -93,14 +93,14 @@ RSpec.describe 'LucidArray' do
 
     it 'reports a change' do
       result = on_server do
-        class TestArrayE < LucidArray::Base
+        class TestArrayE < LucidData::Array::Base
         end
         array = TestArrayE.new(key: 8)
         array.changed?
       end
       expect(result).to be(false)
       result = on_server do
-        class TestArrayE < LucidArray::Base
+        class TestArrayE < LucidData::Array::Base
         end
         array = TestArrayE.new(key: 9)
         array[0] = 20
@@ -111,7 +111,7 @@ RSpec.describe 'LucidArray' do
 
     it 'converts to cid' do
       result = on_server do
-        class TestArrayE < LucidArray::Base
+        class TestArrayE < LucidData::Array::Base
         end
         array = TestArrayE.new(key: 10)
         array.to_sid
@@ -121,14 +121,14 @@ RSpec.describe 'LucidArray' do
 
     it 'can validate a element' do
       result = on_server do
-        class TestArrayF < LucidArray::Base
+        class TestArrayF < LucidData::Array::Base
           element class: String
         end
         TestArrayF.valid_element?(10)
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestArrayF < LucidArray::Base
+        class TestArrayF < LucidData::Array::Base
           element class: String
         end
         TestArrayF.valid_element?('10')
@@ -138,7 +138,7 @@ RSpec.describe 'LucidArray' do
 
     it 'converts to transport' do
       result = on_server do
-        class TestArrayG < LucidArray::Base
+        class TestArrayG < LucidData::Array::Base
         end
         array = TestArrayG.new(key: 13, elements: [1, 2, 3])
         array.to_transport
@@ -154,7 +154,7 @@ RSpec.describe 'LucidArray' do
 
     it 'can instantiate a array by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestArrayBase < LucidArray::Base
+        class TestArrayBase < LucidData::Array::Base
         end
         array = TestArrayBase.new(key: 1, elements: [1, 2])
         array.count
@@ -165,7 +165,7 @@ RSpec.describe 'LucidArray' do
     it 'can instantiate a array by mixin' do
       result = @doc.evaluate_ruby do
         class TestArrayMixin
-          include LucidArray::Mixin
+          include LucidData::Array::Mixin
         end
         array = TestArrayMixin.new(key: 2, elements: [1, 2, 3])
         array.count
@@ -175,7 +175,7 @@ RSpec.describe 'LucidArray' do
 
     it 'verifies element class' do
       result = @doc.evaluate_ruby do
-        class TestArrayC < LucidArray::Base
+        class TestArrayC < LucidData::Array::Base
           elements class: String
         end
         array = TestArrayC.new(key: 3, elements: ['test'])
@@ -183,7 +183,7 @@ RSpec.describe 'LucidArray' do
       end
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
-        class TestArrayC < LucidArray::Base
+        class TestArrayC < LucidData::Array::Base
           elements class: String
         end
         begin
@@ -194,7 +194,7 @@ RSpec.describe 'LucidArray' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestArrayC < LucidArray::Base
+        class TestArrayC < LucidData::Array::Base
           elements class: String
         end
         begin
@@ -209,7 +209,7 @@ RSpec.describe 'LucidArray' do
 
     it 'verifies if element is_a' do
       result = @doc.evaluate_ruby do
-        class TestArrayD < LucidArray::Base
+        class TestArrayD < LucidData::Array::Base
           element is_a: String
         end
         array = TestArrayD.new(key: 5, elements: ['test'])
@@ -217,7 +217,7 @@ RSpec.describe 'LucidArray' do
       end
       expect(result).to eq('String')
       result = @doc.evaluate_ruby do
-        class TestArrayD < LucidArray::Base
+        class TestArrayD < LucidData::Array::Base
           element is_a: String
         end
         begin
@@ -228,7 +228,7 @@ RSpec.describe 'LucidArray' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestArrayD < LucidArray::Base
+        class TestArrayD < LucidData::Array::Base
           element is_a: String
         end
         begin
@@ -243,14 +243,14 @@ RSpec.describe 'LucidArray' do
 
     it 'reports a change' do
       result = @doc.evaluate_ruby do
-        class TestArrayE < LucidArray::Base
+        class TestArrayE < LucidData::Array::Base
         end
         array = TestArrayE.new(key: 8)
         array.changed?
       end
       expect(result).to be(true)
       result = @doc.evaluate_ruby do
-        class TestArrayE < LucidArray::Base
+        class TestArrayE < LucidData::Array::Base
         end
         array = TestArrayE.new(key: 9)
         array[0] = 20
@@ -261,7 +261,7 @@ RSpec.describe 'LucidArray' do
 
     it 'converts to cid' do
       result = @doc.evaluate_ruby do
-        class TestArrayE < LucidArray::Base
+        class TestArrayE < LucidData::Array::Base
         end
         array = TestArrayE.new(key: 10)
         array.to_sid
@@ -271,14 +271,14 @@ RSpec.describe 'LucidArray' do
 
     it 'can validate a element' do
       result = @doc.evaluate_ruby do
-        class TestArrayF < LucidArray::Base
+        class TestArrayF < LucidData::Array::Base
           element class: String
         end
         TestArrayF.valid_element?(10)
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestArrayF < LucidArray::Base
+        class TestArrayF < LucidData::Array::Base
           element class: String
         end
         TestArrayF.valid_element?('10')
@@ -288,7 +288,7 @@ RSpec.describe 'LucidArray' do
 
     it 'converts to transport' do
       result = @doc.evaluate_ruby do
-        class TestArrayG < LucidArray::Base
+        class TestArrayG < LucidData::Array::Base
         end
         array = TestArrayG.new(key: 13, elements: [1, 2, 3])
         JSON.dump(array.to_transport)

@@ -1,6 +1,7 @@
 require 'isomorfeus-transport'
 require 'isomorfeus/data/config'
 require 'isomorfeus/data/props'
+require 'isomorfeus/data/attribute_support'
 require 'isomorfeus/data/generic_class_api'
 require 'isomorfeus/data/generic_instance_api'
 require 'isomorfeus/data/element_validator'
@@ -59,8 +60,8 @@ else
   require 'lucid_data/object/base'
   require 'lucid_data/remote_object/mixin'
   require 'lucid_data/remote_object/base'
-  require 'lucid_data/composable_graph/mixin'
-  require 'lucid_data/composable_graph/base'
+  require 'lucid_data/composition/mixin'
+  require 'lucid_data/composition/base'
 
   require 'isomorfeus/data/handler/generic'
   require 'isomorfeus/data/handler/object_call'

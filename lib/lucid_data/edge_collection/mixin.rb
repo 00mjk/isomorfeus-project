@@ -4,6 +4,7 @@ module LucidData
       def self.included(base)
         base.include(Enumerable)
         base.extend(LucidPropDeclaration::Mixin)
+        base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
         base.include(LucidData::EdgeCollection::Finders)
@@ -52,33 +53,84 @@ module LucidData
           [edge, sid]
         end
 
+        def graph
+          @_graph
+        end
+
+        def graph=(g)
+          @_graph = g
+        end
+
+        def composition
+          @_composition
+        end
+
+        def composition=(c)
+          @_composition = c
+        end
+
+        def changed?
+          @_changed
+        end
+
+        def changed!
+          @_graph.changed! if @_graph
+          @_composition.changed! if @_composition
+          @_changed = true
+        end
+
+        def revision
+          @_revision
+        end
+
         def to_transport
-          { @class_name => { @key => edges_as_sids }}
+          hash = { attributes: _get_attributes, edges: edges_as_sids }
+          rev = revision
+          hash.merge!(_revision: rev) if rev
+          { @class_name => { @key => hash }}
         end
 
         def included_items_to_transport
           edges_hash = {}
           edges.each do |edge|
-            edges_hash.deep_merge!(edge.to_transport)
+            edges_hash.merge!(edge.to_transport)
           end
           edges_hash
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, edges: nil, links: nil, graph: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_graph = graph
             @_store_path = [:data_state, @class_name, @key, :attributes]
             @_edges_path = [:data_state, @class_name, @key, :edges]
-            @_revision_path = [:data_state, @class_name, @key, :revision]
-            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_path)
+            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
+            @_graph = graph
+            @_composition = composition
             @_changed_collection = nil
             @_edge_con = self.class.edge_conditions
             @_validate_edges = @_edge_con ? true : false
-            edges = edges || links
+
             loaded = loaded?
+
+            if attributes
+              attributes.each { |a,v| _validate_attribute(a, v) }
+              if loaded
+                raw_attributes = Redux.fetch_by_path(*@_store_path)
+                if `raw_attributes === null`
+                  @_changed_attributes = !attributes ? {} : attributes
+                elsif raw_attributes && !attributes.nil? && Hash.new(raw_attributes) != attributes
+                  @_changed_attributes = attributes
+                end
+              else
+                @_changed_attributes = attributes
+              end
+            else
+              @_changed_attributes = {}
+            end
+
+            edges = edges || links
             if edges && loaded
               if @_validate_edges
                 edges.each { |e| _validate_edges(e) }
@@ -93,32 +145,22 @@ module LucidData
             end
           end
 
-          def _get_collection
-            return @_changed_collection if @_changed_collection
-            collection = Redux.fetch_by_path(*@_edges_path)
-            return collection if collection
-            []
-          end
-
           def _load_from_store!
+            @_changed = false
+            @_changed_attributes = {}
             @_changed_collection = nil
           end
 
-          def changed?
-            !!@_changed_collection
-          end
-
-          def revision
-            @_revision
-          end
-
           def edges
-            _get_collection.map { |edge_sid| Isomorfeus.instance_from_sid(edge_sid) }
+            edges_as_sids.map { |edge_sid| Isomorfeus.instance_from_sid(edge_sid) }
           end
           alias links edges
 
           def edges_as_sids
-            _get_collection
+            return @_changed_collection if @_changed_collection
+            collection = Redux.fetch_by_path(*@_edges_path)
+            return collection if collection
+            []
           end
 
           def each(&block)
@@ -133,7 +175,7 @@ module LucidData
               attribute_hash.merge!(args[1]) if args[1]
               find_edge(attribute_hash)
             else
-              collection = _get_collection
+              collection = edges
               collection.send(method_name, *args, &block)
             end
           end
@@ -141,26 +183,30 @@ module LucidData
           def <<(edge)
             edge, sid = _edge_sid_from_arg(edge)
             _validate_edge(edge) if @_validate_edges
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             @_changed_collection = raw_collection << sid
+            changed!
             self
           end
 
           def [](idx)
-            _get_collection[idx]
+            sid = edges_as_sids[idx]
+            Isomorfeus.instance_from_sid(sid)
           end
 
           def []=(idx, edge)
             edge, sid = _edge_sid_from_arg(edge)
             _validate_edge(edge) if @_validate_edges
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             raw_collection[idx] = sid
             @_changed_collection = raw_collection
+            changed!
             edge
           end
 
           def clear
             @_changed_collection = []
+            changed!
             self
           end
 
@@ -168,14 +214,16 @@ module LucidData
             collection = edges
             collection.collect!(&block)
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
           def compact!
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             result = raw_collection.compact!
             return nil if result.nil?
             @_changed_collection = raw_collection
+            changed!
             self
           end
 
@@ -185,26 +233,29 @@ module LucidData
               _validate_edge(edge)
               sid
             end
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             raw_collection.concat(*sids)
             @_changed_collection = raw_collection
+            changed!
             self
           end
 
           def delete(edge, &block)
             edge, sid = _edge_sid_from_arg(edge)
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             result = raw_collection.delete(sid, &block)
             return nil unless result
             @_changed_collection = raw_collection
+            changed!
             edge
           end
 
           def delete_at(idx)
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             result = raw_collection.delete_at(idx)
             return nil if result.nil?
             @_changed_collection = raw_collection
+            changed!
             Isomorfeus.instance_from_sid(result)
           end
 
@@ -212,6 +263,7 @@ module LucidData
             collection = edges
             collection.delete_if(&block)
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
@@ -220,6 +272,7 @@ module LucidData
             result = collection.filter!(&block)
             return nil if result.nil?
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
@@ -229,9 +282,10 @@ module LucidData
               _validate_edge(edge)
               sid
             end
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             raw_collection.insert(index, sids)
             @_changed_collection = raw_collection
+            changed!
             self
           end
 
@@ -239,6 +293,7 @@ module LucidData
             collection = edges
             collection.keep_if(&block)
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
@@ -246,13 +301,15 @@ module LucidData
             collection = edges
             collection.map!(&block)
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
           def pop(n = nil)
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             result = raw_collection.pop(n)
             @_changed_collection = raw_collection
+            changed!
             Isomorfeus.instance_from_sid(result)
           end
 
@@ -262,9 +319,10 @@ module LucidData
               _validate_edge(edge)
               sid
             end
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             raw_collection.push(*sids)
             @_changed_collection = raw_collection
+            changed!
             self
           end
           alias append push
@@ -274,20 +332,23 @@ module LucidData
             result = collection.reject!(&block)
             return nil if result.nil?
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
           def reverse!
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             raw_collection.reverse!
             @_changed_collection = raw_collection
+            changed!
             self
           end
 
           def rotate!(count = 1)
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             raw_collection.rotate!(count)
             @_changed_collection = raw_collection
+            changed!
             self
           end
 
@@ -296,27 +357,31 @@ module LucidData
             result = collection.select!(&block)
             return nil if result.nil?
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
           def shift(n = nil)
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             result = raw_collection.shift(n)
             @_changed_collection = raw_collection
+            changed!
             Isomorfeus.instance_from_sid(result)
           end
 
           def shuffle!(*args)
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             raw_collection.shuffle!(*args)
             @_changed_collection = raw_collection
+            changed!
             self
           end
 
           def slice!(*args)
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             result = raw_collection.slice!(*args)
             @_changed_collection = raw_collection
+            changed!
             return nil if result.nil?
             # TODO
             result
@@ -333,6 +398,7 @@ module LucidData
             collection = edges
             collection.sort_by!(&block)
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
@@ -340,6 +406,7 @@ module LucidData
             collection = edges
             collection.uniq!(&block)
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
@@ -349,9 +416,10 @@ module LucidData
               _validate_edge(edge)
               sid
             end
-            raw_collection = _get_collection
+            raw_collection = edges_as_sids
             raw_collection.unshift(*sids)
             @_changed_collection = raw_collection
+            changed!
             self
           end
           alias prepend unshift
@@ -369,16 +437,25 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, edges: nil, links: nil, graph: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_graph = graph
-            @_node_to_edge_cache = {}
             @_revision = revision
+            @_graph = graph
+            @_composition = composition
+            @_node_to_edge_cache = {}
             @_changed = false
+            @_validate_attributes = self.class.attribute_conditions.any?
             @_edge_con = self.class.edge_conditions
             @_validate_edges = @_edge_con ? true : false
+
+            attributes = {} unless attributes
+            if @_validate_attributes
+              attributes.each { |a,v| _validate_attribute(a, v) }
+            end
+            @_raw_attributes = attributes
+
             edges = edges || links
             edges = [] unless edges
             if @_validate_edges
@@ -386,27 +463,6 @@ module LucidData
             end
             edges.each { |e| e.collection = self }
             @_raw_collection = edges
-          end
-
-          def graph
-            @_graph
-          end
-
-          def graph=(g)
-            @_graph = g
-          end
-
-          def changed?
-            @_changed
-          end
-
-          def changed!
-            @_graph.changed! if @_graph
-            @_changed = true
-          end
-
-          def revision
-            @_revision
           end
 
           def edges

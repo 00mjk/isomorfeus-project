@@ -61,12 +61,22 @@ module LucidData
         nil
       end
 
-      def find_by_sid(edge)
-        edge_sid = edge.respond_to?(:to_sid) ? edge.to_sid : edge
-        edges.each do |edge|
-          return edge if edge.to_sid == edge_sid
+      if RUBY_ENGINE == 'opal'
+        def find_by_sid(edge)
+          edge_sid = edge.respond_to?(:to_sid) ? edge.to_sid : edge
+          edges_as_sids.each do |sid|
+            return Isomorfeus.instance_from_sid(edge_sid) if sid == edge_sid
+          end
+          nil
         end
-        nil
+      else
+        def find_by_sid(edge)
+          edge_sid = edge.respond_to?(:to_sid) ? edge.to_sid : edge
+          edges.each do |edge|
+            return edge if edge.to_sid == edge_sid
+          end
+          nil
+        end
       end
 
       def find_by_from(node)

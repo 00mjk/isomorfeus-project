@@ -3,50 +3,102 @@ module LucidData
     module Mixin
       def self.included(base)
         base.extend(LucidPropDeclaration::Mixin)
+        base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
 
-        base.instance_exec do
-          def attribute_conditions
-            @attribute_conditions ||= {}
-          end
-
-          def valid_attribute?(attr_name, attr_value)
-            Isomorfeus::Props::Validator.new(self.name, attr_name, attr_value, attribute_conditions[attr_name]).validate!
-          rescue
-            false
-          end
+        def changed?
+          @_changed
         end
 
-        def _validate_attribute(attr_name, attr_val)
-          raise "No such attribute declared: '#{attr_name}'!" unless self.class.attribute_conditions.key?(attr_name)
-          Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
+        def changed!
+          @_collection.changed! if @_collection
+          @_composition.changed! if @_composition
+          @_changed = true
+        end
+
+        def collection
+          @_collection
+        end
+
+        def collection=(c)
+          @_collection = c
+        end
+
+        def graph
+          @_collection&.graph
+        end
+
+        def composition
+          @_composition
+        end
+
+        def composition=(c)
+          @_composition = c
+        end
+
+        def revision
+          @_revision
+        end
+
+        def edges
+          graph&.edges_for_node(self)
+        end
+
+        def linked_nodes
+          graph&.linked_nodes_for_node(self)
+        end
+
+        def method_missing(method_name, *args, &block)
+          if graph
+            method_name_s = method_name.to_s
+            singular_name = method_name_s.singularize
+            plural_name = method_name_s.pluralize
+            node_edges = edges
+            if method_name_s == plural_name
+              # return all nodes
+              nodes = []
+              sid = to_sid
+              node_edges.each do |edge|
+                from_sid = edge.from_as_sid
+                to_sid = edge.to_as_sid
+                node = if from_sid[0].underscore == singular_name && to_sid == sid
+                         edge.from
+                       elsif to_sid[0].underscore == singular_name && from_sid == sid
+                         edge.to
+                       end
+                nodes << node if node
+              end
+              return nodes
+            elsif method_name_s == singular_name
+              # return one node
+              sid = to_sid
+              node_edges.each do |edge|
+                from_sid = edge.from_as_sid
+                to_sid = edge.to_as_sid
+                node = if from_sid[0].underscore == singular_name && to_sid == sid
+                         edge.from
+                       elsif to_sid[0].underscore == singular_name && from_sid == sid
+                         edge.to
+                       end
+                return node if node
+              end
+            end
+          else
+            super(method_name, *args, &block)
+          end
         end
 
         if RUBY_ENGINE == 'opal'
-          base.instance_exec do
-            def attribute(name, options = {})
-              attribute_conditions[name] = options
-
-              define_method(name) do
-                _get_attribute(name)
-              end
-
-              define_method("#{name}=") do |val|
-                _validate_attribute(name, val)
-                @_changed_attributes[name] = val
-              end
-            end
-          end
-
-          def initialize(key:, revision: nil, attributes: nil, graph: nil)
+          def initialize(key:, revision: nil, attributes: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_graph = graph
             @_store_path = [:data_state, @class_name, @key]
-            @_revision_store_path = [:data_state, :revision, @class_name, @key]
-            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
+            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
+            @_graph = graph
+            @_composition = composition
+            @_changed = false
             loaded = loaded?
             if attributes
               attributes.each { |a,v| _validate_attribute(a, v) }
@@ -65,31 +117,9 @@ module LucidData
             end
           end
 
-          def _get_attribute(name)
-            return @_changed_attributes[name] if @_changed_attributes.key?(name)
-            path = @_store_path + [name]
-            result = Redux.fetch_by_path(*path)
-            return nil if `result === null`
-            result
-          end
-
-          def _get_attributes
-            raw_attributes = Redux.fetch_by_path(*@_store_path)
-            hash = Hash.new(raw_attributes)
-            hash.merge!(@_changed_attributes) if @_changed_attributes
-            hash
-          end
-
           def _load_from_store!
             @_changed_attributes = {}
-          end
-
-          def changed?
-            @_changed_attributes.any?
-          end
-
-          def revision
-            @_revision
+            @_changed = false
           end
 
           def each(&block)
@@ -102,6 +132,7 @@ module LucidData
 
           def []=(name, val)
             _validate_attribute(name, val)
+            changed!
             @_changed_attributes[name] = val
           end
 
@@ -128,60 +159,22 @@ module LucidData
               attributes = data.key?(:attributes) ? data.delete(:attributes) : data
               self.new(key: key, revision: revision, attributes: attributes)
             end
-
-            def attribute(name, options = {})
-              attribute_conditions[name] = options
-
-              define_method(name) do
-                @_raw_attributes[name]
-              end
-
-              define_method("#{name}=") do |val|
-                _validate_attribute(name, val)
-                changed!
-                @_raw_attributes[name] = val
-              end
-            end
           end
 
-          def initialize(key:, revision: nil, attributes: nil, collection: nil)
+          def initialize(key:, revision: nil, attributes: nil, collection: nil, composition: nil)
             @key = key.to_s
-            @_revision = revision
-            @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @_revision = revision
+            @_composition = composition
             @_collection = collection
+            @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
               attributes.each { |a,v| _validate_attribute(a, v) }
             end
             @_raw_attributes = attributes
-          end
-
-          def changed?
-            @_changed
-          end
-
-          def changed!
-            @_collection.changed! if @_collection
-            @_changed = true
-          end
-
-          def collection
-            @_collection
-          end
-
-          def collection=(c)
-            @_collection = c
-          end
-
-          def graph
-            @_collection&.graph
-          end
-
-          def revision
-            @_revision
           end
 
           def each(&block)
@@ -196,53 +189,6 @@ module LucidData
             _validate_attribute(name, val)
             changed!
             @_raw_attributes[name] = val
-          end
-
-          def edges
-            graph&.edges_for_node(self)
-          end
-
-          def linked_nodes
-            graph&.linked_nodes_for_node(self)
-          end
-
-          def method_missing(method_name, *args, &block)
-            if graph
-              method_name_s = method_name.to_s
-              singular_name = method_name_s.singularize
-              plural_name = method_name_s.pluralize
-              node_edges = edges
-              if method_name_s == plural_name
-                STDERR.puts "plural"
-                # return all nodes
-                nodes = []
-                sid = to_sid
-                node_edges.each do |edge|
-                  from_sid = edge.from_as_sid
-                  to_sid = edge.to_as_sid
-                  node = if from_sid[0].underscore == singular_name && to_sid == sid
-                           edge.from
-                         elsif to_sid[0].underscore == singular_name && from_sid == sid
-                           edge.to
-                         end
-                  nodes << node if node
-                end
-                return nodes
-              elsif method_name_s == singular_name
-                # return one node
-                sid = to_sid
-                node_edges.each do |edge|
-                  from_sid = edge.from_as_sid
-                  to_sid = edge.to_as_sid
-                  node = if from_sid[0].underscore == singular_name && to_sid == sid
-                           edge.from
-                         elsif to_sid[0].underscore == singular_name && from_sid == sid
-                           edge.to
-                         end
-                  return node if node
-                end
-              end
-            end
           end
 
           def to_transport

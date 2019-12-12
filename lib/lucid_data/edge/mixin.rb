@@ -3,52 +3,63 @@ module LucidData
     module Mixin
       def self.included(base)
         base.extend(LucidPropDeclaration::Mixin)
+        base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
 
-        base.instance_exec do
-          def attribute_conditions
-            @attribute_conditions ||= {}
-          end
-
-          def valid_attribute?(attr_name, attr_value)
-            Isomorfeus::Props::Validator.new(self.name, attr_name, attr_value, attribute_conditions[attr_name]).validate!
-          rescue
-            false
-          end
+        def changed?
+          @_changed
         end
 
-        def _validate_attribute(attr_name, attr_val)
-          raise "No such attribute declared: '#{attr_name}'!" unless self.class.attribute_conditions.key?(attr_name)
-          Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
+        def changed!
+          @_collection.changed! if @_collection
+          @_composition.changed! if @_composition
+          @_changed = true
+        end
+
+        def collection
+          @_collection
+        end
+
+        def collection=(c)
+          @_collection = c
+        end
+
+        def graph
+          @_collection&.graph
+        end
+
+        def composition
+          @_composition
+        end
+
+        def composition=(c)
+          @_composition = c
+        end
+
+        def revision
+          @_revision
+        end
+
+        def other(node)
+          other_from = from
+          other_to = to
+          return other_to if other_from == node
+          other_from if other_to == node
         end
 
         if RUBY_ENGINE == 'opal'
-          base.instance_exec do
-            def attribute(name, options = {})
-              attribute_conditions[name] = options
-
-              define_method(name) do
-                _get_attribute(name)
-              end
-
-              define_method("#{name}=") do |val|
-                _validate_attribute(name, val)
-                @_changed_attributes[name] = val
-              end
-            end
-          end
-
-          def initialize(key:, revision: nil, from: nil, to: nil, attributes: nil, collection: nil)
+          def initialize(key:, revision: nil, from: nil, to: nil, attributes: nil, collection: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_collection = collection
             @_store_path = [:data_state, @class_name, @key, :attributes]
             @_from_path = [:data_state, @class_name, @key, :from]
             @_to_path = [:data_state, @class_name, @key, :to]
-            @_revision_store_path = [:data_state, :revision, @class_name, @key]
-            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
+            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
+            @_collection = collection
+            @_composition = composition
+            @_changed = false
             loaded = loaded?
             if attributes
               attributes.each { |a,v| _validate_attribute(a, v) }
@@ -83,33 +94,11 @@ module LucidData
             end
           end
 
-          def _get_attribute(name)
-            return @_changed_attributes[name] if @_changed_attributes.key?(name)
-            path = @_store_path + [name]
-            result = Redux.fetch_by_path(*path)
-            return nil if `result === null`
-            result
-          end
-
-          def _get_attributes
-            raw_attributes = Redux.fetch_by_path(*@_store_path)
-            hash = Hash.new(raw_attributes)
-            hash.merge!(@_changed_attributes) if @_changed_attributes
-            hash
-          end
-
           def _load_from_store!
             @_changed_attributes = {}
             @_changed_from = nil
             @_changed_to = nil
-          end
-
-          def changed?
-            @_changed_attributes.any?
-          end
-
-          def revision
-            @_revision
+            @_changed = false
           end
 
           def each(&block)
@@ -122,6 +111,7 @@ module LucidData
 
           def []=(name, val)
             _validate_attribute(name, val)
+            changed!
             @_changed_attributes[name] = val
           end
 
@@ -131,6 +121,7 @@ module LucidData
           end
 
           def from=(document)
+            changed!
             if document.respond_to?(:to_sid)
               @_changed_from = document.to_sid
               document
@@ -146,6 +137,7 @@ module LucidData
           end
 
           def to=(document)
+            changed!
             if document.respond_to?(:to_sid)
               @_changed_to = document.to_sid
               document
@@ -185,28 +177,15 @@ module LucidData
               attributes = data.delete(:attributes)
               self.new(key: key, revision: revision, from: from, to: to, attributes: attributes)
             end
-
-            def attribute(name, options = {})
-              attribute_conditions[name] = options
-
-              define_method(name) do
-                @_raw_attributes[name]
-              end
-
-              define_method("#{name}=") do |val|
-                _validate_attribute(name, val)
-                changed!
-                @_raw_attributes[name] = val
-              end
-            end
           end
 
-          def initialize(key:, revision: nil, from:, to:, attributes: nil, collection: nil)
+          def initialize(key:, revision: nil, from:, to:, attributes: nil, collection: nil, composition: nil)
             @key = key.to_s
-            @_revision = revision
-            @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @_revision = revision
+            @_composition = composition
+            @_changed = false
             @_collection = collection
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
@@ -228,31 +207,6 @@ module LucidData
                          to[1] = to[1].to_s
                          to
                        end
-          end
-
-          def changed?
-            @_changed
-          end
-
-          def changed!
-            @_collection.changed! if @_collection
-            @_changed = true
-          end
-
-          def collection
-            @_collection
-          end
-
-          def collection=(c)
-            @_collection = c
-          end
-
-          def graph
-            @_collection&.graph
-          end
-
-          def revision
-            @_revision
           end
 
           def each(&block)
@@ -280,6 +234,7 @@ module LucidData
 
           def from=(node)
             raise "A invalid 'from' was given" unless node
+            changed!
             old_from = from
             if node.respond_to?(:to_sid)
               node_sid = node.to_sid
@@ -305,6 +260,7 @@ module LucidData
           def to=(node)
             raise "A invalid 'to' was given" unless node
             old_to = to
+            changed!
             if node.respond_to?(:to_sid)
               node_sid = node.to_sid
             else
@@ -315,13 +271,6 @@ module LucidData
             @_changed_to = node_sid
             @_collection.update_node_to_edge_cache(self, old_to, node) if @_collection
             node
-          end
-
-          def other(node)
-            other_from = from
-            other_to = to
-            return other_to if other_from == node
-            other_from if other_to == node
           end
 
           def to_transport

@@ -23,6 +23,23 @@ module LucidData
           end
         end
 
+        def composition
+          @_composition
+        end
+
+        def composition=(c)
+          @_composition = c
+        end
+
+        def changed!
+          @_composition.changed! if @_composition
+          @_changed = true
+        end
+
+        def revision
+          @_revision
+        end
+
         def to_transport
           { @class_name => { @key => to_h }}
         end
@@ -54,16 +71,17 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil,  attributes: nil, default: nil, &block)
+          def initialize(key:, revision: nil, attributes: nil, default: nil, composition: nil, &block)
             @_default = default
             @_default_proc = block
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key]
+            @_changed = false
             @_changed_attributes = {}
-            @_revision_store_path = [:data_state, :revision, @class_name, @key]
-            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
+            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
+            @_composition = composition
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
@@ -93,11 +111,7 @@ module LucidData
           end
 
           def changed?
-            @_changed_attributes.any?
-          end
-
-          def revision
-            @_revision
+            @_changed || @_changed_attributes.any?
           end
 
           def each(&block)
@@ -113,6 +127,7 @@ module LucidData
 
           def []=(name, val)
             _validate_attribute(name, val) if @_validate_attributes
+            changed!
             @_changed_attributes[name] = val
           end
 
@@ -120,6 +135,7 @@ module LucidData
             result = _get_attributes.compact!
             return nil if result.nil?
             @_changed_attributes = result
+            changed!
             self
           end
 
@@ -127,6 +143,7 @@ module LucidData
             hash = _get_attributes
             result = hash.delete(name)
             @_changed_attributes = hash
+            changed!
             result
           end
 
@@ -134,6 +151,7 @@ module LucidData
             hash = _get_attributes
             result = hash.delete_if(&block)
             @_changed_attributes = hash
+            changed!
             result
           end
 
@@ -141,6 +159,7 @@ module LucidData
             if method_name.end_with?('=')
               val = args[0]
               _validate_attribute(method_name, val) if @_validate_attributes
+              changed!
               @_changed_attributes[method_name] = val
             elsif args.size == 0 && hash.key?(method_name)
               result = _get_attribute(method_name)
@@ -161,12 +180,14 @@ module LucidData
           def keep_if(&block)
             raw_hash = _get_attributes
             raw_hash.keep_if(&block)
-            _update_array(raw_hash)
+            @_changed_attributes = raw_hash
+            changed!
             self
           end
 
           def merge!(*args)
             @_changed_attributes = _get_attributes.merge!(*args)
+            changed!
             self
           end
 
@@ -175,6 +196,7 @@ module LucidData
             result = hash.reject!(&block)
             return nil if result.nil?
             @_changed_attributes = hash
+            changed!
             self
           end
 
@@ -183,6 +205,7 @@ module LucidData
             result = hash.select!(&block)
             return nil if result.nil?
             @_changed_attributes = hash
+            changed!
             self
           end
           alias filter! select!
@@ -191,12 +214,14 @@ module LucidData
             hash = _get_attributes
             result = hash.shift
             @_changed_attributes = hash
+            changed!
             result
           end
 
           def store(name, val)
             _validate_attribute(name, val) if @_validate_attributes
             @_changed_attributes[name] = val
+            changed!
             val
           end
 
@@ -207,16 +232,19 @@ module LucidData
 
           def transform_keys!(&block)
             @_changed_attributes = _get_attributes.transform_keys!(&block)
+            changed!
             self
           end
 
           def transform_values!(&block)
             @_changed_attributes = _get_attributes.transform_values!(&block)
+            changed!
             self
           end
 
           def update(*args)
             @_changed_attributes = _get_attributes.update(*args)
+            changed!
             self
           end
         else # RUBY_ENGINE
@@ -236,18 +264,19 @@ module LucidData
 
               define_method("#{name}=") do |val|
                 _validate_attribute(name, val) if @_validate_attributes
-                @_changed = true
+                changed!
                 @_raw_attributes[name] = val
               end
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil)
+          def initialize(key:, revision: nil, attributes: nil, composition: nil)
             @key = key.to_s
-            @_revision = revision
-            @_changed = false
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+            @_revision = revision
+            @_composition = composition
+            @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             if @_validate_attributes
@@ -260,10 +289,6 @@ module LucidData
             @_changed
           end
 
-          def revision
-            @_revision
-          end
-
           def each(&block)
             @_raw_attributes.each(&block)
           end
@@ -274,32 +299,32 @@ module LucidData
 
           def []=(name, val)
             _validate_attribute(name, val) if @_validate_attributes
-            @_changed = true
+            changed!
             @_raw_attributes[name] = val
           end
 
           def compact!(&block)
             result = @_raw_attributes.compact!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def delete(element, &block)
             result = @_raw_attributes.delete(element, &block)
-            @_changed = true
+            changed!
             result
           end
 
           def delete_if(&block)
             @_raw_attributes.delete_if(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def keep_if(&block)
             @_raw_attributes.keep_if(&block)
-            @_changed = true
+            changed!
             self
           end
 
@@ -307,7 +332,7 @@ module LucidData
             if method_name.end_with?('=')
               val = args[0]
               _validate_attribute(name, val) if @_validate_attributes
-              @_changed = true
+              changed!
               @_raw_attributes[name] = val
             elsif args.size == 0 && @_raw_attributes.key?(method_name)
               @_raw_attributes[method_name]
@@ -318,34 +343,34 @@ module LucidData
 
           def merge!(*args)
             @_raw_attributes.merge!(*args)
-            @_changed = true
+            changed!
             self
           end
 
           def reject!(&block)
             result = @_raw_attributes.reject!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
 
           def select!(&block)
             result = @_raw_attributes.select!(&block)
             return nil if result.nil?
-            @_changed = true
+            changed!
             self
           end
           alias filter! select!
 
           def shift
             result = @_raw_attributes.shift
-            @_changed = true
+            changed!
             result
           end
 
           def store(name, val)
             _validate_attribute(name, val) if @_validate_attributes
-            @_changed = true
+            changed!
             @_raw_attributes[name] = val
           end
 
@@ -355,19 +380,19 @@ module LucidData
 
           def transform_keys!(&block)
             @_raw_attributes.transform_keys!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def transform_values!(&block)
             @_raw_attributes.transform_values!(&block)
-            @_changed = true
+            changed!
             self
           end
 
           def update(*args)
             @_raw_attributes.update(*args)
-            @_changed = true
+            changed!
             self
           end
         end  # RUBY_ENGINE
