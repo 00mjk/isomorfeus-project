@@ -26,23 +26,184 @@ module LucidData
           def node_collections
             @node_collections ||= {}
           end
+
+          def nodes(access_name, collection_class = nil)
+            node_collections[access_name] = collection_class
+
+            define_method(access_name) do
+              @_node_collections[access_name]
+            end
+
+            define_method("#{access_name}=") do |collection|
+              @_changed = true
+              @_node_collections[access_name] = collection
+              @_node_collections[access_name].graph = self
+              @_node_collections[access_name]
+            end
+
+            if collection_class
+              singular_access_name = access_name.to_s.singularize
+              define_singleton_method("valid_#{singular_access_name}?") do |node|
+                collection_class.valid_node?(node)
+              end
+            end
+          end
+          alias documents nodes
+          alias vertices nodes
+          alias vertexes nodes
+
+          def edges(access_name, collection_class = nil)
+            edge_collections[access_name] = collection_class
+
+            define_method(access_name) do
+              @_edge_collections[access_name]
+            end
+
+            define_method("#{access_name}=") do |collection|
+              @_changed = true
+              @_edge_collections[access_name] = collection
+              @_edge_collections[access_name].graph = self
+              @_edge_collections[access_name]
+            end
+
+            if collection_class
+              singular_access_name = access_name.to_s.singularize
+              define_singleton_method("valid_#{singular_access_name}?") do |edge|
+                collection_class.valid_edge?(edge)
+              end
+            end
+          end
+          alias links edges
         end
+
+        def method_missing(method_name, *args, &block)
+          method_name_s = method_name.to_s
+          if method_name_s.start_with?('find_edge_by_') || method_name_s.start_with?('find_link_by_')
+            attribute = method_name_s[13..-1] # remove 'find_by_'
+            value = args[0]
+            attribute_hash = { attribute => value }
+            attribute_hash.merge!(args[1]) if args[1]
+            find_edge(attribute_hash)
+          elsif method_name_s.start_with?('find_node_by_') || method_name_s.start_with?('find_document_by_') || method_name_s.start_with?('find_vertex_by_')
+            attribute = if method_name_s.start_with?('find_node_by_')
+                          method_name_s[13..-1]
+                        elsif method_name_s.start_with?('find_document_by_')
+                          method_name_s[17..-1]
+                        elsif method_name_s.start_with?('find_vertex_by_')
+                          method_name_s[15..-1]
+                        end
+            value = args[0]
+            attribute_hash = { attribute => value }
+            attribute_hash.merge!(args[1]) if args[1]
+            find_node(attribute_hash)
+          else
+            super(method_name, *args, &block)
+          end
+        end
+
+        def edges_for_node(node)
+          node_edges = []
+          @_edge_collections.each_value do |collection|
+            node_edges.push(*collection.edges_for_node(node))
+          end
+          node_edges
+        end
+
+        def linked_nodes_for_node(node)
+          node_edges = edges_for_node(node)
+          nodes = []
+          node_sid = node.to_sid
+          node_edges.each do |edge|
+            from_sid = edge.from.to_sid
+            to_sid = edge.to.to_sid
+            if to_sid == node_sid
+              nodes << edge.from
+            elsif from_sid == node_sid
+              nodes << edge.to
+            end
+          end
+          nodes
+        end
+
+        def node_from_sid(sid)
+          node = nil
+          @_node_collections.each_value do |collection|
+            node = collection.node_from_sid(sid)
+            break if node
+          end
+          node
+        end
+        alias document_from_sid node_from_sid
+        alias vertex_from_sid node_from_sid
+
+        def nodes
+          all_nodes = []
+          @_node_collections.each_value do |collection|
+            all_nodes.push(*collection.nodes)
+          end
+          all_nodes
+        end
+        alias documents nodes
+        alias vertices nodes
+        alias vertexes nodes
+
+        def edges
+          all_edges = []
+          @_edge_collections.each_value do |collection|
+            all_edges.push(*collection.edges)
+          end
+          all_edges
+        end
+        alias links edges
+
+        def edge_collections
+          @_edge_collections
+        end
+        alias link_collections edge_collections
+
+        def node_collections
+          @_node_collections
+        end
+        alias document_collections node_collections
+        alias vertex_collections node_collections
 
         def _validate_attribute(attr_name, attr_val)
           raise "No such attribute declared: '#{attr_name}'!" unless self.class.attribute_conditions.key?(attr_name)
           Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
         end
 
-        # TODO
+        def changed?
+          @_changed
+        end
+
+        def changed!
+          @_changed = true
+        end
+
+        def revision
+          @_revision
+        end
+
         def to_transport
-          { @class_name => { @key => { attributes: _get_attributes, edge_collection: edge_collection.to_sid, node_collection: node_collection.to_sid }}}
+          hash = { attributes: _get_attributes, nodes: {}, edges: {} }
+          @_node_collections.each { |name, collection| hash[:nodes][name] = collection.to_sid }
+          @_edge_collections.each { |name, collection| hash[:edges][name] = collection.to_sid }
+          rev = revision
+          hash.merge!(_revision: rev) if rev
+          { @class_name => { @key => hash }}
         end
 
         def included_items_to_transport
-          hash = edge_collection.to_transport
-          hash.merge!(node_collection.to_transport)
-          hash.merge!(edge_collection.included_items_to_transport)
-          hash.merge!(node_collection.included_items_to_transport)
+          hash = {}
+          @_node_collections.each_value do |collection|
+            hash.merge!(collection.to_transport)
+            hash.merge!(collection.included_items_to_transport)
+          end
+          @_edge_collections.each_value do |collection|
+            hash.merge!(collection.to_transport)
+            hash.merge!(collection.included_items_to_transport)
+          end
+          hash
         end
 
         if RUBY_ENGINE == 'opal'
@@ -56,51 +217,10 @@ module LucidData
 
               define_method("#{name}=") do |val|
                 _validate_attribute(name, val)
+                @_changed = true
                 @_changed_attributes[name] = val
               end
             end
-
-            def nodes(access_name, collection_class = nil)
-              node_collections[access_name] = collection_class
-
-              define_method(access_name) do
-
-              end
-
-              define_method("#{access_name}=") do |collection|
-
-              end
-
-              if collection_class
-                singular_access_name = access_name.to_s.singularize
-                define_singleton_method("valid_#{singular_access_name}?") do |node|
-                  collection_class.valid_node?(node)
-                end
-              end
-            end
-            alias documents nodes
-            alias vertices nodes
-            alias vertexes nodes
-
-            def edges(access_name, collection_class = nil)
-              edge_collections[access_name] = collection_class
-
-              define_method(access_name) do
-
-              end
-
-              define_method("#{access_name}=") do |collection|
-
-              end
-
-              if collection_class
-                singular_access_name = access_name.to_s.singularize
-                define_singleton_method("valid_#{singular_access_name}?") do |edge|
-                  collection_class.valid_edge?(edge)
-                end
-              end
-            end
-            alias links edges
           end
 
           def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil)
@@ -108,10 +228,12 @@ module LucidData
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_edge_collections_path = [:data_state, @class_name, @key, :edges]
-            @_node_collections_path = [:data_state, @class_name, @key, :nodes]
-            @_revision_store_path = [:data_state, @class_name, @key, :revision]
-            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_store_path)
+            @_edges_path = [:data_state, @class_name, @key, :edges]
+            @_nodes_path = [:data_state, @class_name, @key, :nodes]
+            @_revision_path = [:data_state, @class_name, @key, :revision]
+            @_revision = revision ? revision : Redux.fetch_by_path(*@_revision_path)
+            @_changed = false
+
             loaded = loaded?
             if attributes
               attributes.each { |a,v| _validate_attribute(a, v) }
@@ -128,25 +250,65 @@ module LucidData
             else
               @_changed_attributes = {}
             end
+
             # nodes
+            @_node_collections = {}
             nodes = nodes || documents || vertices || vertexes
+            if nodes && loaded
+              if nodes.class == Hash
+                self.class.node_collections.each_key do |access_name|
+                  if nodes.key?(access_name)
+                    collection = nodes[access_name]
+                    @_node_collections[access_name] = if collection.respond_to?(:to_sid)
+                                                        collection
+                                                      else
+                                                        Isomorfeus.instance_from_sid(collection)
+                                                      end
+                  end
+                end
+              else
+                @_node_collections[:nodes] = if nodes.respond_to?(:to_sid)
+                                               nodes
+                                             else
+                                               Isomorfeus.instance_from_sid(nodes)
+                                             end
+              end
+            elsif loaded
+              self.class.node_collections.each_key do |access_name|
+                sid = Redux.fetch_by_path(*@_nodes_path.push(access_name))
+                @_node_collections[access_name] = Isomorfeus.instance_from_sid(sid)
+              end
+            end
+            @_node_collections.each_value { |collection| collection.graph = self }
 
             # edges
             edges = edges || links
-
-            edge_collection = edge_collection.to_sid if edge_collection.respond_to?(:to_sid)
-            if loaded && edge_collection
-              @_edge_collection_sid = edge_collection ? edge_collection : Redux.fetch_by_path(*@_edge_collection_path)
-            else
-              @_edge_collection_sid = edge_collection
+            if edges && loaded
+              if edges.class == Hash
+                self.class.edge_collections.each_key do |access_name|
+                  if edges.key?(access_name)
+                    collection = edges[access_name]
+                    @_edge_collections[access_name] = if collection.respond_to?(:to_sid)
+                                                        collection
+                                                      else
+                                                        Isomorfeus.instance_from_sid(collection)
+                                                      end
+                  end
+                end
+              else
+                @_edge_collections[:edges] = if edges.respond_to?(:to_sid)
+                                               edges
+                                             else
+                                               Isomorfeus.instance_from_sid(edges)
+                                             end
+              end
+            elsif loaded
+              self.class.edge_collections.each_key do |access_name|
+                sid = Redux.fetch_by_path(*@_edges_path.push(access_name))
+                @_edge_collections[access_name] = Isomorfeus.instance_from_sid(sid)
+              end
             end
-            node_collection = document_collection || node_collection
-            node_collection = node_collection.to_sid if node_collection.respond_to?(:to_sid)
-            if loaded && node_collection
-              @_node_collection_sid = node_collection ? node_collection : Redux.fetch_by_path(*@_node_collection_path)
-            else
-              @_node_collection_sid = node_collection
-            end
+            @_edge_collections.each_value { |collection| collection.graph = self }
           end
 
           def _get_attribute(name)
@@ -165,17 +327,19 @@ module LucidData
           end
 
           def _load_from_store!
+            @_changed = false
             @_changed_attributes = {}
-            @_edge_collection_sid = nil
-            @_node_collection_sid = nil
-          end
-
-          def changed?
-            edge_collection.changed? || node_collection.changed? || @_changed_attributes.any?
-          end
-
-          def revision
-            @_revision
+            self.class.node_collections.each_key do |access_name|
+              sid = Redux.fetch_by_path(*@_nodes_path.push(access_name))
+              @_node_collections[access_name] = Isomorfeus.instance_from_sid(sid)
+              @_node_collections[access_name].graph = self
+            end
+            self.class.edge_collections.each_key do |access_name|
+              sid = Redux.fetch_by_path(*@_edges_path.push(access_name))
+              @_edge_collections[access_name] = Isomorfeus.instance_from_sid(sid)
+              @_edge_collections[access_name].graph = self
+            end
+            nil
           end
 
           def [](name)
@@ -184,32 +348,8 @@ module LucidData
 
           def []=(name, val)
             _validate_attribute(name, val)
+            @_changed = true
             @_changed_attributes[name] = val
-          end
-
-          def node_collection
-            sid = node_collection_sid
-            return Isomorfeus.instance_from_sid(sid) if sid
-            []
-          end
-          alias document_collection node_collection
-          alias nodes node_collection
-          alias documents node_collection
-
-          def node_collection_sid
-            @_node_collection_sid ||= Redux.fetch_by_path(*@_node_collection_path)
-          end
-          alias document_collection_sid node_collection_sid
-
-          def edge_collection
-            sid = edge_collection_sid
-            return Isomorfeus.instance_from_sid(sid) if sid
-            []
-          end
-          alias edges edge_collection
-
-          def edge_collection_sid
-            @_edge_collection_sid ||= Redux.fetch_by_path(*@_edge_collection_path)
           end
         end # RUBY_ENGINE
         # else # RUBY_ENGINE
@@ -223,8 +363,6 @@ module LucidData
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, &@_load_block)
-
-              STDERR.puts "data: #{data}"
               revision = nil
               revision = data.delete(:_revision) if data.key?(:_revision)
               revision = data.delete(:revision) if !revision && data.key?(:revision)
@@ -247,54 +385,6 @@ module LucidData
                 @_raw_attributes[name] = val
               end
             end
-
-            def nodes(access_name, collection_class = nil)
-              node_collections[access_name] = collection_class
-
-              define_method(access_name) do
-                @_node_collections[access_name]
-              end
-
-              define_method("#{access_name}=") do |collection|
-                @_changed_true
-                @_node_collections[access_name] = collection
-                @_node_collections[access_name].graph = self
-                @_node_collections[access_name]
-              end
-
-              if collection_class
-                singular_access_name = access_name.to_s.singularize
-                define_singleton_method("valid_#{singular_access_name}?") do |node|
-                  collection_class.valid_node?(node)
-                end
-              end
-            end
-            alias documents nodes
-            alias vertices nodes
-            alias vertexes nodes
-
-            def edges(access_name, collection_class = nil)
-              edge_collections[access_name] = collection_class
-
-              define_method(access_name) do
-                @_edge_collections[access_name]
-              end
-
-              define_method("#{access_name}=") do |collection|
-                @_changed = true
-                @_edge_collections[access_name] = collection
-                @_edge_collections[access_name].graph = self
-                @_edge_collections[access_name]
-              end
-
-              if collection_class
-                singular_access_name = access_name.to_s.singularize
-                define_singleton_method("valid_#{singular_access_name}?") do |edge|
-                  collection_class.valid_edge?(edge)
-                end
-              end
-            end
-            alias links edges
           end
 
           def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil)
@@ -345,18 +435,6 @@ module LucidData
             @_raw_attributes
           end
 
-          def changed?
-            @_changed
-          end
-
-          def changed!
-            @_changed = true
-          end
-
-          def revision
-            @_revision
-          end
-
           def [](name)
             @_raw_attributes[name]
           end
@@ -366,97 +444,6 @@ module LucidData
             @_changed = true
             @_raw_attributes[name] = val
           end
-
-          def method_missing(method_name, *args, &block)
-            method_name_s = method_name.to_s
-            if method_name_s.start_with?('find_edge_by_') || method_name_s.start_with?('find_link_by_')
-              attribute = method_name_s[13..-1] # remove 'find_by_'
-              value = args[0]
-              attribute_hash = { attribute => value }
-              attribute_hash.merge!(args[1]) if args[1]
-              find_edge(attribute_hash)
-            elsif method_name_s.start_with?('find_node_by_') || method_name_s.start_with?('find_document_by_') || method_name_s.start_with?('find_vertex_by_')
-              attribute = if method_name_s.start_with?('find_node_by_')
-                            method_name_s[13..-1]
-                          elsif method_name_s.start_with?('find_document_by_')
-                            method_name_s[17..-1]
-                          elsif method_name_s.start_with?('find_vertex_by_')
-                            method_name_s[15..-1]
-                          end
-              value = args[0]
-              attribute_hash = { attribute => value }
-              attribute_hash.merge!(args[1]) if args[1]
-              find_node(attribute_hash)
-            else
-              @_raw_collection.send(method_name, *args, &block)
-            end
-          end
-
-          def edges_for_node(node)
-            node_edges = []
-            @_edge_collections.each_value do |collection|
-              node_edges.push(*collection.edges_for_node(node))
-            end
-            node_edges
-          end
-
-          def linked_nodes_for_node(node)
-            node_edges = edges_for_node(node)
-            nodes = []
-            node_sid = node.to_sid
-            node_edges.each do |edge|
-              from_sid = edge.from.to_sid
-              to_sid = edge.to.to_sid
-              if to_sid == node_sid
-                nodes << edge.from
-              elsif from_sid == node_sid
-                nodes << edge.to
-              end
-            end
-            nodes
-          end
-
-          def node_from_sid(sid)
-            node = nil
-            @_node_collections.each_value do |collection|
-              node = collection.node_from_sid(sid)
-              break if node
-            end
-            node
-          end
-          alias document_from_sid node_from_sid
-          alias vertex_from_sid node_from_sid
-
-          def nodes
-            all_nodes = []
-            @_node_collections.each_value do |collection|
-              all_nodes.push(*collection.nodes)
-            end
-            all_nodes
-          end
-          alias documents nodes
-          alias vertices nodes
-          alias vertexes nodes
-
-          def edges
-            all_edges = []
-            @_edge_collections.each_value do |collection|
-              all_edges.push(*collection.edges)
-            end
-            all_edges
-          end
-          alias links edges
-
-          def edge_collections
-            @_edge_collections
-          end
-          alias link_collections edge_collections
-
-          def node_collections
-            @_node_collections
-          end
-          alias document_collections node_collections
-          alias vertex_collections node_collections
         end  # RUBY_ENGINE
       end
     end
