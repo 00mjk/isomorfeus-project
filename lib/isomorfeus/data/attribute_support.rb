@@ -15,7 +15,7 @@ module Isomorfeus
         end
 
         def _validate_attribute(attr_name, attr_val)
-          raise "No such attribute declared: '#{attr_name}'!" unless self.class.attribute_conditions.key?(attr_name)
+          raise "#{@class_name} No such attribute declared: '#{attr_name}'!" unless self.class.attribute_conditions.key?(attr_name)
           Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
         end
 
