@@ -19,6 +19,14 @@ module Isomorfeus
           Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
         end
 
+        def exclude_attributes(*attrs)
+          @_excluded_attributes = attrs
+        end
+
+        def select_attributes(*attrs)
+          @_selected_attributes = attrs
+        end
+
         if RUBY_ENGINE == 'opal'
           base.instance_exec do
             def attribute(name, options = {})
@@ -50,6 +58,21 @@ module Isomorfeus
             hash.merge!(@_changed_attributes) if @_changed_attributes
             hash
           end
+
+          def _get_selected_attributes
+            attributes = _get_attributes.dup
+            if @_selected_attributes && !@_selected_attributes.empty?
+              attributes.each_key do |attr|
+                unless @_selected_attributes.include?(attr) || @_selected_attributes.include?(attr)
+                  attributes.delete(attr)
+                end
+              end
+            end
+            if @_excluded_attributes && !@_excluded_attributes.empty?
+              @_excluded_attributes.each { |attr| attributes.delete(attr) }
+            end
+            attributes
+          end
         else
           base.instance_exec do
             def attribute(name, options = {})
@@ -69,6 +92,24 @@ module Isomorfeus
 
           def _get_attributes
             @_raw_attributes
+          end
+
+          def _get_selected_attributes
+            attributes = _get_attributes.transform_keys(&:to_s)
+            self.class.attribute_conditions.each do |attr, options|
+              attributes.delete(attr.to_s) if options[:server_only]
+            end
+            if @_selected_attributes && !@_selected_attributes.empty?
+              attributes.each_key do |attr|
+                unless @_selected_attributes.include?(attr.to_sym) || @_selected_attributes.include?(attr)
+                  attributes.delete(attr)
+                end
+              end
+            end
+            if @_excluded_attributes && !@_excluded_attributes.empty?
+              @_excluded_attributes.each { |attr| attributes.delete(attr.to_s) }
+            end
+            attributes
           end
         end
       end

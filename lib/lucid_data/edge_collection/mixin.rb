@@ -84,9 +84,9 @@ module LucidData
         end
 
         def to_transport
-          hash = { attributes: _get_attributes, edges: edges_as_sids }
+          hash = { 'attributes' => _get_selected_attributes, 'edges' => edges_as_sids }
           rev = revision
-          hash.merge!(_revision: rev) if rev
+          hash.merge!('_revision' => rev) if rev
           { @class_name => { @key => hash }}
         end
 

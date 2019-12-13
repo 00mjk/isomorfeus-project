@@ -48,6 +48,15 @@ module LucidData
           other_from if other_to == node
         end
 
+        def to_transport
+          hash = { "attributes" => _get_selected_attributes,
+                   "from" => @_changed_from ? @_changed_from : @_raw_from,
+                   "to" => @_changed_to ? @_changed_to : @_raw_to }
+          rev = revision
+          hash.merge!("_revision" => rev) if rev
+          { @class_name => { @key => hash }}
+        end
+
         if RUBY_ENGINE == 'opal'
           def initialize(key:, revision: nil, from: nil, to: nil, attributes: nil, collection: nil, composition: nil)
             @key = key.to_s
@@ -145,15 +154,6 @@ module LucidData
               @_changed_to = document
               Isomorfeus.instance_from_sid(document)
             end
-          end
-
-          def to_transport
-            hash = { attributes: _get_attributes,
-                     from: @_changed_from ? @_changed_from : Redux.fetch_by_path(@_from_path),
-                     to: @_changed_to ? @_changed_to : Redux.fetch_by_path(@_to_path) }
-            rev = revision
-            hash.merge!(_revision: rev) if rev
-            { @class_name => { @key => hash }}
           end
         else # RUBY_ENGINE
           unless base == LucidData::Edge::Base || base == LucidData::Link::Base
@@ -271,20 +271,6 @@ module LucidData
             @_changed_to = node_sid
             @_collection.update_node_to_edge_cache(self, old_to, node) if @_collection
             node
-          end
-
-          def to_transport
-            attributes = {}
-            self.class.attribute_conditions.each do |attr, options|
-              if !options[:server_only] && @_raw_attributes.key?(attr)
-                attributes[attr.to_s] = @_raw_attributes[attr]
-              end
-            end
-            hash = { "attributes" => attributes,
-                     "from" => @_changed_from ? @_changed_from : @_raw_from,
-                     "to" => @_changed_to ? @_changed_to : @_raw_to }
-            hash.merge!("_revision" => revision ) if revision
-            { @class_name => { @key => hash }}
           end
         end # RUBY_ENGINE
       end

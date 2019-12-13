@@ -180,11 +180,11 @@ module LucidData
         end
 
         def to_transport
-          hash = { attributes: _get_attributes, nodes: {}, edges: {} }
-          @_node_collections.each { |name, collection| hash[:nodes][name] = collection.to_sid }
-          @_edge_collections.each { |name, collection| hash[:edges][name] = collection.to_sid }
+          hash = { 'attributes' => _get_selected_attributes, 'nodes' => {}, 'edges' => {} }
+          @_node_collections.each { |name, collection| hash['nodes'][name.to_s] = collection.to_sid }
+          @_edge_collections.each { |name, collection| hash['edges'][name.to_s] = collection.to_sid }
           rev = revision
-          hash.merge!(_revision: rev) if rev
+          hash.merge!('_revision' => rev) if rev
           { @class_name => { @key => hash }}
         end
 

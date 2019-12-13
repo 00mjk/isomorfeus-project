@@ -44,11 +44,11 @@ module LucidData
         end
 
         def to_transport
-          hash = { attributes: _get_attributes, parts: {} }
+          hash = { 'attributes' => _get_selected_attributes, 'parts' => {} }
           rev = revision
-          hash.merge!(_revision: rev) if rev
+          hash.merge!('_revision' => rev) if rev
           parts.each do |name, instance|
-            hash[:parts][name] = instance.to_sid
+            hash['parts'][name.to_s] = instance.to_sid
           end
           { @class_name => { @key => hash }}
         end

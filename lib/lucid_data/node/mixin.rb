@@ -90,6 +90,13 @@ module LucidData
           end
         end
 
+        def to_transport
+          hash = _get_selected_attributes
+          rev = revision
+          hash.merge!("_revision" => rev) if rev
+          { @class_name => { @key => hash }}
+        end
+
         if RUBY_ENGINE == 'opal'
           def initialize(key:, revision: nil, attributes: nil, graph: nil, composition: nil)
             @key = key.to_s
@@ -135,13 +142,6 @@ module LucidData
             _validate_attribute(name, val)
             changed!
             @_changed_attributes[name] = val
-          end
-
-          def to_transport
-            hash = _get_attributes
-            rev = revision
-            hash.merge!(_revision: rev) if rev
-            { @class_name => { @key => hash }}
           end
         else # RUBY_ENGINE
           unless base == LucidData::Node::Base || base == LucidData::Document::Base || base == LucidData::Vertex::Base
@@ -190,17 +190,6 @@ module LucidData
             _validate_attribute(name, val)
             changed!
             @_raw_attributes[name] = val
-          end
-
-          def to_transport
-            hash = {}
-            self.class.attribute_conditions.each do |attr, options|
-              if !options[:server_only] && @_raw_attributes.key?(attr)
-                hash[attr.to_s] = @_raw_attributes[attr]
-              end
-            end
-            hash.merge!("_revision" => revision) if revision
-            { @class_name => { @key => hash }}
           end
         end # RUBY_ENGINE
       end
