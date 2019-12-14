@@ -1,6 +1,6 @@
 # isomorfeus-transport
 
-Transport and PubSub for isomorfeus.
+Transport and PubSub for Isomorfeus.
 
 ### Community and Support
 At the [Isomorfeus Framework Project](http://isomorfeus.com) 
