@@ -54,6 +54,8 @@ else
   require 'isomorfeus_data/lucid_data/edge_collection/finders'
   require 'isomorfeus_data/lucid_data/edge_collection/mixin'
   require 'isomorfeus_data/lucid_data/edge_collection/base'
+  require 'isomorfeus_data/lucid_data/link_collection/mixin'
+  require 'isomorfeus_data/lucid_data/link_collection/base'
   require 'isomorfeus_data/lucid_data/graph/finders'
   require 'isomorfeus_data/lucid_data/graph/mixin'
   require 'isomorfeus_data/lucid_data/graph/base'

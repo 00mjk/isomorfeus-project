@@ -62,11 +62,11 @@ RSpec.describe 'LucidData::EdgeCollection' do
         collection = SimpleEdgeCollection.load(key: 3)
         collection.included_items_to_transport
       end
-      expect(result).to eq({"SimpleEdge"=>{"1"=>{"one"=>1},
-                                           "2"=>{"one"=>2},
-                                           "3"=>{"one"=>3},
-                                           "4"=>{"one"=>4},
-                                           "5"=>{"one"=>5}}})
+      expect(result).to eq({"SimpleEdge" => {"1"=>{"attributes"=>{"one"=>1}, "from"=>["SimpleNode", "1"], "to"=>["SimpleNode", "2"]},
+                                             "2"=>{"attributes"=>{"one"=>2}, "from"=>["SimpleNode", "2"], "to"=>["SimpleNode", "3"]},
+                                             "3"=>{"attributes"=>{"one"=>3}, "from"=>["SimpleNode", "3"], "to"=>["SimpleNode", "4"]},
+                                             "4"=>{"attributes"=>{"one"=>4}, "from"=>["SimpleNode", "4"], "to"=>["SimpleNode", "5"]},
+                                             "5"=>{"attributes"=>{"one"=>5}, "from"=>["SimpleNode", "5"], "to"=>["SimpleNode", "5"]}}})
     end
   end
 
