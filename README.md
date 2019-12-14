@@ -1,9 +1,15 @@
 # isomorfeus-policy
+
 Policy for Isomorfeus
+
+
+### Community and Support
+At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+
+## Usage
 
 Policy is enforced on the server, however, the same policy rules are also available on the client to allow for making consistent decisions everywhere.
 
-## Usage
 Everything that is not explicitly allowed somewhere is denied.
 
 Place the policy file in your projects `isomorfeus/policies`.
