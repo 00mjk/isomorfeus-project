@@ -6,44 +6,22 @@ props are used for load requests
 prop :a_prop
 ```
 
-
-
-### loading a graph
-```ruby
-MyGraph.get(key) #<- for arango based graph
-MyGraph.get_by #???
-MyGraph.load(props)
-MyGraph.fetch()
+### attributes
+Its a challenge to keep data safe in a isomorphic framework. To ensure safety of data several requirements must be followed in `isomorfeus-data`.
+Ill explain the comiing days ...
+First: The central element, the smalles entity of `isomorfeus-data` is a Node (In AR terms comparable to a Record), LucidNode.
+The data for a Node must be explicitly made available.
+Example:
 ```
-
-### modifying a graph
-that means modifying the included elements directly. See modifying collections, nodes.
-
-### querying  graph
-a query is delegated to each included items.
-```ruby
-my_graph.query(query)
-my_graph.find(Class, id)
-my_graph.find_by(hash)
-```
-
-### saving changes -> OK
-```
-my_graph.save
-```
-will walk the graph, asking each loaded element for changes and call save on the element if it changed.
-
-
-## LucidGraph
-### querying
-```ruby
-class MyGraph < LucidArango::Graph::Base
-  predefine_query :name do
-  
-  end
+class MyNode < LucidNode
+  attribute :name # attributes MUST be declared, only if declared it becomes accessable
+  attribute :name, server_only: true # attribute value is not transported to the client
+  # also validations work, similar to props for components
+  attribute :name, class: String
+  attribute :name, is_a: String
+  # and in addition a block may be given
+  attribute name, validate: proc { |value| value.is_a?(String) }
+  # default value:
+  attribute :name, default: 'no_name'
 end
-```
-
-```ruby
-my_graph.execute_query :name, props
 ```
