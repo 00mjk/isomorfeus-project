@@ -304,7 +304,7 @@ RSpec.describe 'LucidData::Edge' do
         document = TestEdgeMixinC.new(key: 23, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2), attributes: { test_attribute: 10 })
         document.changed?
       end
-      expect(result).to be(true)
+      expect(result).to be(false)
       result = @doc.evaluate_ruby do
         class TestDocumentBase < LucidData::Document::Base; end
         class TestEdgeMixinC < LucidData::Edge::Base

@@ -36,12 +36,10 @@ module LucidData
           @_changed = true
         end
 
-        def revision
-          @_revision
-        end
-
         def to_transport
-          { @class_name => { @key => to_h }}
+          hash = { 'attributes' => to_h }
+          hash['revision'] = revision if revision
+          { @class_name => { @key => hash }}
         end
 
         def _validate_attribute(attr_name, attr_val)
@@ -77,10 +75,10 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key]
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_changed = false
             @_changed_attributes = {}
-            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
             @_composition = composition
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
@@ -90,7 +88,7 @@ module LucidData
             raw_attributes = Redux.fetch_by_path(*@_store_path)
             if `raw_attributes === null`
               @_changed_attributes = !attributes ? {} : attributes
-            elsif raw_attributes && !attributes.nil? && Hash.new(raw_attributes) != attributes
+            elsif raw_attributes && !attributes.nil? && ::Hash.new(raw_attributes) != attributes
               @_changed_attributes = attributes
             end
           end
@@ -105,9 +103,14 @@ module LucidData
 
           def _get_attributes
             raw_attributes = Redux.fetch_by_path(*@_store_path)
-            hash = Hash.new(raw_attributes)
+            hash = ::Hash.new(raw_attributes)
             hash.merge!(@_changed_attributes) if @_changed_attributes
             hash
+          end
+
+          def _load_from_store!
+            @_changed = false
+            @_changed_attributes = {}
           end
 
           def changed?
@@ -226,8 +229,7 @@ module LucidData
           end
 
           def to_h
-            hash = _get_attributes
-            hash.merge(_revision: revision)
+            _get_attributes.dup
           end
 
           def transform_keys!(&block)
@@ -267,6 +269,14 @@ module LucidData
                 changed!
                 @_raw_attributes[name] = val
               end
+            end
+
+            def load(key:, pub_sub_client: nil, current_user: nil)
+              data = instance_exec(key: key, &@_load_block)
+              revision = nil
+              revision = data.delete(:revision) if data.key?(:revision)
+              attributes = data.delete(:attributes)
+              self.new(key: key, revision: revision, attributes: attributes)
             end
           end
 
@@ -374,8 +384,9 @@ module LucidData
             @_raw_attributes[name] = val
           end
 
-          def to_h
-            @_raw_attributes.to_h.merge(_revision: @_revision).transform_keys { |k| k.to_s }
+          # If using def the method to_h gets not overwritten.
+          base.define_method :to_h do
+            @_raw_attributes.dup.transform_keys!(&:to_s)
           end
 
           def transform_keys!(&block)

@@ -37,10 +37,6 @@ module LucidData
           @_composition = c
         end
 
-        def revision
-          @_revision
-        end
-
         def edges
           graph&.edges_for_node(self)
         end
@@ -92,8 +88,7 @@ module LucidData
 
         def to_transport
           hash = _get_selected_attributes
-          rev = revision
-          hash.merge!("_revision" => rev) if rev
+          hash.merge!("revision" => revision) if revision
           { @class_name => { @key => hash }}
         end
 
@@ -154,8 +149,7 @@ module LucidData
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, &@_load_block)
               revision = nil
-              revision = data.delete(:_revision) if data.key?(:_revision)
-              revision = data.delete(:revision) if !revision && data.key?(:revision)
+              revision = data.delete(:revision) if data.key?(:revision)
               data.delete(:_key)
               attributes = data.key?(:attributes) ? data.delete(:attributes) : data
               self.new(key: key, revision: revision, attributes: attributes)

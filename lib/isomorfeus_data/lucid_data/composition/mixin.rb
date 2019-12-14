@@ -19,20 +19,16 @@ module LucidData
             parts[access_name] = part_class
 
             define_method(access_name) do
-              @_parts[access_name]
+              parts[access_name]
             end
 
             define_method("#{access_name}=") do |part|
               @_changed = true
-              @_parts[access_name] = part
-              @_parts[access_name].composition = self
-              @_parts[access_name]
+              parts[access_name] = part
+              parts[access_name].composition = self
+              parts[access_name]
             end
           end
-        end
-
-        def parts
-          @_parts
         end
 
         def changed?
@@ -45,8 +41,7 @@ module LucidData
 
         def to_transport
           hash = { 'attributes' => _get_selected_attributes, 'parts' => {} }
-          rev = revision
-          hash.merge!('_revision' => rev) if rev
+          hash.merge!('revision' => revision) if revision
           parts.each do |name, instance|
             hash['parts'][name.to_s] = instance.to_sid
           end
@@ -56,8 +51,8 @@ module LucidData
         def included_items_to_transport
           hash = {}
           parts.each_value do |instance|
-            hash.merge!(instance.to_transport)
-            hash.merge!(instance.included_items_to_transport) if instance.respond_to?(:included_items_to_transport)
+            hash.deep_merge!(instance.to_transport)
+            hash.deep_merge!(instance.included_items_to_transport) if instance.respond_to?(:included_items_to_transport)
           end
           hash
         end
@@ -92,8 +87,8 @@ module LucidData
 
             @_parts = {}
             if parts && loaded
-              self.class.composition.each_key do |access_name|
-                if composition.key?(access_name)
+              self.class.parts.each_key do |access_name|
+                if parts.key?(access_name)
                   part = parts[access_name]
                   @_parts[access_name] = if part.respond_to?(:to_sid)
                                            part
@@ -103,12 +98,34 @@ module LucidData
                 end
               end
             elsif loaded
-              self.class.composition.each_key do |access_name|
-                sid = Redux.fetch_by_path(*@_parts_path.push(access_name))
-                @_parts[access_name] = Isomorfeus.instance_from_sid(sid)
+              self.class.parts.each_key do |access_name|
+                sid = Redux.fetch_by_path(*(@_parts_path + [access_name]))
+                @_parts[access_name] = Isomorfeus.instance_from_sid(sid) if sid
               end
             end
             @_parts.each_value { |part| part.composition = self }
+          end
+
+          def _load_from_store!
+            @_changed = false
+            @_changed_attributes = {}
+            @_parts = {}
+            nil
+          end
+
+          def _init_parts
+            self.class.parts.each_key do |access_name|
+              sid = Redux.fetch_by_path(*(@_parts_path + [access_name]))
+              if sid
+                @_parts[access_name] = Isomorfeus.instance_from_sid(sid)
+                @_parts[access_name].composition = self
+              end
+            end
+          end
+
+          def parts
+            _init_parts if @_parts.empty?
+            @_parts
           end
 
           def parts_as_sids
@@ -125,8 +142,7 @@ module LucidData
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, &@_load_block)
               revision = nil
-              revision = data.delete(:_revision) if data.key?(:_revision)
-              revision = data.delete(:revision) if !revision && data.key?(:revision)
+              revision = data.delete(:revision) if data.key?(:revision)
               attributes = data.delete(:attributes)
               parts = data.delete(:parts)
               self.new(key: key, revision: revision, parts: parts, attributes: attributes)
@@ -134,7 +150,7 @@ module LucidData
           end
 
           def initialize(key:, revision: nil, attributes: nil, parts: nil)
-            @key = key
+            @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_revision = revision
@@ -153,6 +169,10 @@ module LucidData
                 @_parts[access_name].composition = self
               end
             end
+          end
+
+          def parts
+            @_parts
           end
 
           def parts_as_sids

@@ -275,7 +275,7 @@ RSpec.describe 'LucidData::Document' do
         document = TestDocumentMixinC.new(key: 23, attributes: { test_attribute: 10 })
         document.changed?
       end
-      expect(result).to be(true)
+      expect(result).to be(false)
       result = @doc.evaluate_ruby do
         class TestDocumentMixinC < LucidData::Document::Base
           attribute :test_attribute

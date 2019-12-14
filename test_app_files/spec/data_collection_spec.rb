@@ -50,11 +50,11 @@ RSpec.describe 'LucidData::Collection' do
         collection = SimpleCollection.load(key: 2)
         collection.to_transport
       end
-      expect(result).to eq({"SimpleCollection"=>{"2"=>[["SimpleNode", "1"],
-                                                       ["SimpleNode", "2"],
-                                                       ["SimpleNode", "3"],
-                                                       ["SimpleNode", "4"],
-                                                       ["SimpleNode", "5"]]}})
+      expect(result).to eq({"SimpleCollection"=>{"2"=>{"attributes"=>{}, "nodes"=>[["SimpleNode", "1"],
+                                                                                   ["SimpleNode", "2"],
+                                                                                   ["SimpleNode", "3"],
+                                                                                   ["SimpleNode", "4"], 
+                                                                                   ["SimpleNode", "5"]]}}})
     end
 
     it 'can convert the simple collection included items on the server to transport' do

@@ -37,10 +37,6 @@ module LucidData
           @_composition = c
         end
 
-        def revision
-          @_revision
-        end
-
         def other(node)
           other_from = from
           other_to = to
@@ -50,10 +46,9 @@ module LucidData
 
         def to_transport
           hash = { "attributes" => _get_selected_attributes,
-                   "from" => @_changed_from ? @_changed_from : @_raw_from,
-                   "to" => @_changed_to ? @_changed_to : @_raw_to }
-          rev = revision
-          hash.merge!("_revision" => rev) if rev
+                   "from" => from_as_sid,
+                   "to" => to_as_sid }
+          hash.merge!("revision" => revision) if revision
           { @class_name => { @key => hash }}
         end
 
@@ -125,8 +120,12 @@ module LucidData
           end
 
           def from
-            sid = @_changed_from ? @_changed_from : Redux.fetch_by_path(@_from_path)
-            Isomorfeus.instance_from_sid(sid)
+            sid = from_as_sid
+            Isomorfeus.instance_from_sid(sid) if sid
+          end
+
+          def from_as_sid
+            @_changed_from ? @_changed_from : Redux.fetch_by_path(*@_from_path)
           end
 
           def from=(document)
@@ -141,8 +140,12 @@ module LucidData
           end
 
           def to
-            sid = @_changed_to ? @_changed_to : Redux.fetch_by_path(@_to_path)
-            Isomorfeus.instance_from_sid(sid)
+            sid = to_as_sid
+            Isomorfeus.instance_from_sid(sid) if sid
+          end
+
+          def to_as_sid
+            @_changed_to ? @_changed_to : Redux.fetch_by_path(*@_to_path)
           end
 
           def to=(document)
@@ -166,8 +169,7 @@ module LucidData
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, &@_load_block)
               revision = nil
-              revision = data.delete(:_revision) if data.key?(:_revision)
-              revision = data.delete(:revision) if !revision && data.key?(:revision)
+              revision = data.delete(:revision) if data.key?(:revision)
               from = nil
               from = data.delete(:_from) if data.key?(:_from)
               from = data.delete(:from) if !from && data.key?(:from)

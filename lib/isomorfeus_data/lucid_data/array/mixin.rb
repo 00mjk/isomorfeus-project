@@ -38,10 +38,6 @@ module LucidData
           @_changed = true
         end
 
-        def revision
-          @_revision
-        end
-
         def _validate_element(el)
           Isomorfeus::Data::ElementValidator.new(@class_name, el, @_el_con).validate!
         end
@@ -51,23 +47,27 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key]
+            @_store_path = [:data_state, @class_name, @key, :elements]
+            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_changed_array = nil
-            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
             @_composition = composition
             @_changed = false
             @_el_con = self.class.element_conditions
             @_validate_elements = @_el_con ? true : false
-            elements = [] unless elements
-            if @_validate_elements
+            if @_validate_elements && elements
               elements.each { |e| _validate_element(e) }
             end
             raw_array = Redux.fetch_by_path(*@_store_path)
             if `raw_array === null`
-              @_changed_array = !elements ? [] : elements
-            elsif raw_array && !elements.nil? && raw_array != elements
+              @_changed_array = elements ? elements : []
+            elsif raw_array && !elements.nil?
               @_changed_array = elements
             end
+          end
+
+          def _load_from_store!
+            @_changed = false
+            @_changed_array = nil
           end
 
           def _get_array
@@ -84,7 +84,9 @@ module LucidData
           end
 
           def to_transport
-            { @class_name => { @key => _get_array }}
+            hash = { 'elements' => _get_array }
+            hash.merge!('revision' => revision) if revision
+            { @class_name => { @key =>  hash }}
           end
 
           # Array methods
@@ -339,6 +341,16 @@ module LucidData
             base.prop :current_user, default: Anonymous.new
           end
 
+          base.instance_exec do
+            def load(key:, pub_sub_client: nil, current_user: nil)
+              data = instance_exec(key: key, &@_load_block)
+              revision = nil
+              revision = data.delete(:revision) if data.key?(:revision)
+              elements = data.delete(:elements)
+              self.new(key: key, revision: revision, elements: elements)
+            end
+          end
+
           def initialize(key:, revision: nil, elements: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
@@ -364,7 +376,9 @@ module LucidData
           end
 
           def to_transport
-            { @class_name => { @key => @_raw_array }}
+            hash = { 'elements' => @_raw_array }
+            hash.merge!('revision' => revision) if revision
+            { @class_name => { @key => hash }}
           end
 
           # Array methods

@@ -1,5 +1,5 @@
 module LucidData
-  module EdgeCollection
+  module Collection
     module Mixin
       def self.included(base)
         base.include(Enumerable)
@@ -7,50 +7,56 @@ module LucidData
         base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
-        base.include(LucidData::EdgeCollection::Finders)
+        base.include(LucidData::Collection::Finders)
 
         base.instance_exec do
-          def edges(validate_hash = {})
-            @edge_conditions = validate_hash
+          def nodes(validate_hash = {})
+            @node_conditions = validate_hash
           end
-          alias links edges
+          alias document nodes
+          alias vertices nodes
+          alias vertexes nodes
+          alias vertex nodes
+          alias documents nodes
+          alias node nodes
 
-          def edge_conditions
-            @edge_conditions
+          def node_conditions
+            @node_conditions
           end
 
-          def valid_edge?(edge)
-            return true unless @edge_conditions
-            Isomorfeus::Data::ElementValidator.new(self.name, edge, @edge_conditions).validate!
+          def valid_node?(node)
+            return true unless @node_conditions
+            Isomorfeus::Data::ElementValidator.new(self.name, node, @node_conditions).validate!
           rescue
             false
           end
-          alias valid_link? valid_edge?
+          alias valid_vertex? valid_node?
+          alias valid_document? valid_node?
         end
 
-        def _validate_edge(edge)
-          Isomorfeus::Data::ElementValidator.new(@class_name, edge, @_edge_con).validate!
+        def _validate_node(node)
+          Isomorfeus::Data::ElementValidator.new(@class_name, node, @_node_con).validate!
         end
 
-        def _validate_edges(many_edges)
-          many_edges.each { |edge| Isomorfeus::Data::ElementValidator.new(@class_name, edge, @_edge_con).validate! }
+        def _validate_nodes(many_nodes)
+          many_nodes.each { |node| Isomorfeus::Data::ElementValidator.new(@class_name, node, @_node_con).validate! }
         end
 
         def _collection_to_sids(collection)
-          collection.map do |edge|
-            edge.respond_to?(:to_sid) ? edge.to_sid : edge
+          collection.map do |node|
+            node.respond_to?(:to_sid) ? node.to_sid : node
           end
         end
 
-        def _edge_sid_from_arg(arg)
+        def _node_sid_from_arg(arg)
           if arg.respond_to?(:to_sid)
             sid = arg.to_sid
-            edge = arg
+            node = arg
           else
             sid = arg
-            edge = Isomorfeus.instance_from_sid(sid)
+            node = Isomorfeus.instance_from_sid(sid)
           end
-          [edge, sid]
+          [node, sid]
         end
 
         def graph
@@ -79,38 +85,34 @@ module LucidData
           @_changed = true
         end
 
-        def revision
-          @_revision
-        end
-
         def to_transport
-          hash = { 'attributes' => _get_selected_attributes, 'edges' => edges_as_sids }
-          rev = revision
-          hash.merge!('_revision' => rev) if rev
+          hash = { 'attributes' => _get_selected_attributes, 'nodes' => nodes_as_sids }
+          hash.merge!('revision' => revision) if revision
           { @class_name => { @key => hash }}
         end
 
         def included_items_to_transport
-          edges_hash = {}
-          edges.each do |edge|
-            edges_hash.merge!(edge.to_transport)
+          hash = {}
+          nodes.each do |node|
+            hash.deep_merge!(node.to_transport)
           end
-          edges_hash
+          hash
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, graph: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, documents: nil, vertices: nil, vertexes: nil, nodes: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_edges_path = [:data_state, @class_name, @key, :edges]
-            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_graph = graph
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_nodes_path = [:data_state, @class_name, @key, :nodes]
+            @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_composition = composition
+            @_changed = false
             @_changed_collection = nil
-            @_edge_con = self.class.edge_conditions
-            @_validate_edges = @_edge_con ? true : false
+            @_node_con = self.class.node_conditions
+            @_validate_nodes = @_node_con ? true : false
 
             loaded = loaded?
 
@@ -130,15 +132,15 @@ module LucidData
               @_changed_attributes = {}
             end
 
-            edges = edges || links
-            if edges && loaded
-              if @_validate_edges
-                edges.each { |e| _validate_edges(e) }
+            nodes = documents || nodes || vertices || vertexes
+            if nodes && loaded
+              if @_validate_nodes
+                nodes.each { |e| _validate_node(e) }
               end
-              raw_edges = _collection_to_sids(edges)
-              raw_collection = Redux.fetch_by_path(*@_edges_path)
-              if raw_collection != raw_edges
-                @_changed_collection = raw_edges
+              raw_nodes = _collection_to_sids(nodes)
+              raw_collection = Redux.fetch_by_path(*@_nodes_path)
+              if raw_collection != raw_nodes
+                @_changed_collection = raw_nodes
               end
             elsif !loaded
               @_changed_collection = []
@@ -151,57 +153,65 @@ module LucidData
             @_changed_collection = nil
           end
 
-          def edges
-            edges_as_sids.map { |edge_sid| Isomorfeus.instance_from_sid(edge_sid) }
+          def nodes
+            nodes_as_sids.map { |node_sid| Isomorfeus.instance_from_sid(node_sid) }
           end
-          alias links edges
+          alias vertices nodes
+          alias vertexes nodes
+          alias documents nodes
 
-          def edges_as_sids
+          def nodes_as_sids
             return @_changed_collection if @_changed_collection
-            collection = Redux.fetch_by_path(*@_edges_path)
+            collection = Redux.fetch_by_path(*@_nodes_path)
             return collection if collection
             []
           end
 
+          def node_from_sid(sid)
+            node_sids = nodes_as_sids
+            return Isomorfeus.instance_from_sid(sid) if node_sids.include?(sid)
+            nil
+          end
+
           def each(&block)
-            edges.each(&block)
+            nodes.each(&block)
           end
 
           def method_missing(method_name, *args, &block)
-            if method_name.JS.startsWith('find_edge_by_') || method_name.JS.startsWith('find_link_by_')
-              attribute = method_name[13..-1] # remove 'find_edge_by_'
+            if method_name.JS.startsWith('find_by_')
+              attribute = method_name[8..-1] # remove 'find_by_'
               value = args[0]
               attribute_hash = { attribute => value }
               attribute_hash.merge!(args[1]) if args[1]
-              find_edge(attribute_hash)
+              find(attribute_hash)
             else
-              collection = edges
+              collection = nodes
               collection.send(method_name, *args, &block)
             end
           end
 
-          def <<(edge)
-            edge, sid = _edge_sid_from_arg(edge)
-            _validate_edge(edge) if @_validate_edges
-            raw_collection = edges_as_sids
+          def <<(node)
+            node, sid = _node_sid_from_arg(node)
+            _validate_node(node) if @_validate_nodes
+            raw_collection = nodes_as_sids
             @_changed_collection = raw_collection << sid
             changed!
             self
           end
 
           def [](idx)
-            sid = edges_as_sids[idx]
+            sid = nodes_as_sids[idx]
             Isomorfeus.instance_from_sid(sid)
           end
 
-          def []=(idx, edge)
-            edge, sid = _edge_sid_from_arg(edge)
-            _validate_edge(edge) if @_validate_edges
-            raw_collection = edges_as_sids
+          def []=(idx, node)
+            node, sid = _node_sid_from_arg(node)
+            _validate_node(node) if @_validate_nodes
+            raw_collection = nodes_as_sids
             raw_collection[idx] = sid
             @_changed_collection = raw_collection
             changed!
-            edge
+            node
           end
 
           def clear
@@ -211,7 +221,7 @@ module LucidData
           end
 
           def collect!(&block)
-            collection = edges
+            collection = nodes
             collection.collect!(&block)
             @_changed_collection = _collection_to_sids(collection)
             changed!
@@ -219,7 +229,7 @@ module LucidData
           end
 
           def compact!
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             result = raw_collection.compact!
             return nil if result.nil?
             @_changed_collection = raw_collection
@@ -228,30 +238,30 @@ module LucidData
           end
 
           def concat(*args)
-            sids = args.map do |edge|
-              edge, sid = _edge_sid_from_arg(edge)
-              _validate_edge(edge)
+            sids = args.map do |node|
+              node, sid = _node_sid_from_arg(node)
+              _validate_node(node)
               sid
             end
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             raw_collection.concat(*sids)
             @_changed_collection = raw_collection
             changed!
             self
           end
 
-          def delete(edge, &block)
-            edge, sid = _edge_sid_from_arg(edge)
-            raw_collection = edges_as_sids
+          def delete(node, &block)
+            node, sid = _node_sid_from_arg(node)
+            raw_collection = nodes_as_sids
             result = raw_collection.delete(sid, &block)
             return nil unless result
             @_changed_collection = raw_collection
             changed!
-            edge
+            node
           end
 
           def delete_at(idx)
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             result = raw_collection.delete_at(idx)
             return nil if result.nil?
             @_changed_collection = raw_collection
@@ -260,7 +270,7 @@ module LucidData
           end
 
           def delete_if(&block)
-            collection = edges
+            collection = nodes
             collection.delete_if(&block)
             @_changed_collection = _collection_to_sids(collection)
             changed!
@@ -268,7 +278,7 @@ module LucidData
           end
 
           def filter!(&block)
-            collection = edges
+            collection = nodes
             result = collection.filter!(&block)
             return nil if result.nil?
             @_changed_collection = _collection_to_sids(collection)
@@ -276,13 +286,13 @@ module LucidData
             self
           end
 
-          def insert(index, *many_edges)
-            sids = many_edges.map do |edge|
-              edge, sid = _edge_sid_from_arg(edge)
-              _validate_edge(edge)
+          def insert(index, *many_nodes)
+            sids = many_nodes.map do |node|
+              node, sid = _node_sid_from_arg(node)
+              _validate_node(node)
               sid
             end
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             raw_collection.insert(index, sids)
             @_changed_collection = raw_collection
             changed!
@@ -290,7 +300,7 @@ module LucidData
           end
 
           def keep_if(&block)
-            collection = edges
+            collection = nodes
             collection.keep_if(&block)
             @_changed_collection = _collection_to_sids(collection)
             changed!
@@ -298,7 +308,7 @@ module LucidData
           end
 
           def map!(&block)
-            collection = edges
+            collection = nodes
             collection.map!(&block)
             @_changed_collection = _collection_to_sids(collection)
             changed!
@@ -306,20 +316,20 @@ module LucidData
           end
 
           def pop(n = nil)
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             result = raw_collection.pop(n)
             @_changed_collection = raw_collection
             changed!
             Isomorfeus.instance_from_sid(result)
           end
 
-          def push(*edges)
-            sids = many_edges.map do |edge|
-              edge, sid = _edge_sid_from_arg(edge)
-              _validate_edge(edge)
+          def push(*many_nodes)
+            sids = many_nodes.map do |node|
+              node, sid = _node_sid_from_arg(node)
+              _validate_node(node)
               sid
             end
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             raw_collection.push(*sids)
             @_changed_collection = raw_collection
             changed!
@@ -328,7 +338,7 @@ module LucidData
           alias append push
 
           def reject!(&block)
-            collection = edges
+            collection = nodes
             result = collection.reject!(&block)
             return nil if result.nil?
             @_changed_collection = _collection_to_sids(collection)
@@ -337,7 +347,7 @@ module LucidData
           end
 
           def reverse!
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             raw_collection.reverse!
             @_changed_collection = raw_collection
             changed!
@@ -345,7 +355,7 @@ module LucidData
           end
 
           def rotate!(count = 1)
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             raw_collection.rotate!(count)
             @_changed_collection = raw_collection
             changed!
@@ -353,7 +363,7 @@ module LucidData
           end
 
           def select!(&block)
-            collection = edges
+            collection = nodes
             result = collection.select!(&block)
             return nil if result.nil?
             @_changed_collection = _collection_to_sids(collection)
@@ -362,7 +372,7 @@ module LucidData
           end
 
           def shift(n = nil)
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             result = raw_collection.shift(n)
             @_changed_collection = raw_collection
             changed!
@@ -370,7 +380,7 @@ module LucidData
           end
 
           def shuffle!(*args)
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             raw_collection.shuffle!(*args)
             @_changed_collection = raw_collection
             changed!
@@ -378,7 +388,7 @@ module LucidData
           end
 
           def slice!(*args)
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             result = raw_collection.slice!(*args)
             @_changed_collection = raw_collection
             changed!
@@ -388,14 +398,15 @@ module LucidData
           end
 
           def sort!(&block)
-            collection = edges
+            collection = nodes
             collection.sort!(&block)
             @_changed_collection = _collection_to_sids(collection)
+            changed!
             self
           end
 
           def sort_by!(&block)
-            collection = edges
+            collection = nodes
             collection.sort_by!(&block)
             @_changed_collection = _collection_to_sids(collection)
             changed!
@@ -403,20 +414,20 @@ module LucidData
           end
 
           def uniq!(&block)
-            collection = edges
+            collection = nodes
             collection.uniq!(&block)
             @_changed_collection = _collection_to_sids(collection)
             changed!
             self
           end
 
-          def unshift(*many_edges)
-            sids = many_edges.map do |edge|
-              edge, sid = _edge_sid_from_arg(edge)
-              _validate_edge(edge)
+          def unshift(*many_nodes)
+            sids = many_nodes.map do |node|
+              node, sid = _node_sid_from_arg(node)
+              _validate_node(node)
               sid
             end
-            raw_collection = edges_as_sids
+            raw_collection = nodes_as_sids
             raw_collection.unshift(*sids)
             @_changed_collection = raw_collection
             changed!
@@ -434,26 +445,24 @@ module LucidData
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, &@_load_block)
               revision = nil
-              revision = data.delete(:_revision) if data.key?(:_revision)
-              revision = data.delete(:revision) if !revision && data.key?(:revision)
+              revision = data.delete(:revision) if data.key?(:revision)
               attributes = data.delete(:attributes)
-              edges = data.delete(:nodes)
-              self.new(key: key, revision: revision, attributes: attributes, edges: edges)
+              nodes = data.delete(:nodes)
+              self.new(key: key, revision: revision, attributes: attributes, nodes: nodes)
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, graph: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_revision = revision
             @_graph = graph
             @_composition = composition
-            @_node_to_edge_cache = {}
             @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
-            @_edge_con = self.class.edge_conditions
-            @_validate_edges = @_edge_con ? true : false
+            @_node_con = self.class.node_conditions
+            @_validate_nodes = @_node_con ? true : false
 
             attributes = {} unless attributes
             if @_validate_attributes
@@ -461,43 +470,33 @@ module LucidData
             end
             @_raw_attributes = attributes
 
-            edges = edges || links
-            edges = [] unless edges
-            if @_validate_edges
-              edges.each { |e| _validate_edge(e) }
+            nodes = documents || nodes || vertices || vertexes
+            nodes = [] unless nodes
+            if @_validate_nodes
+              nodes.each { |n| _validate_node(n) }
             end
-            edges.each { |e| e.collection = self }
-            @_raw_collection = edges
+            nodes.each { |n| n.collection = self }
+            @_raw_collection = nodes
+            @_sid_to_node_cache = {}
           end
 
-          def edges
+          def nodes
             @_raw_collection
           end
-          alias links edges
+          alias vertices nodes
+          alias vertexes nodes
+          alias documents nodes
 
-          def edges_as_sids
+          def nodes_as_sids
             @_raw_collection.map(&:to_sid)
           end
 
-          def edges_for_node(node)
-            node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
-            return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
-            node_edges = select do |edge|
-              (edge.from_as_sid == node_sid || edge.to_as_sid == node_sid) ? true : false
-            end
-            @_node_to_edge_cache[node_sid] = node_edges
-          end
-          alias edges_for_vertex edges_for_node
-          alias edges_for_document edges_for_node
-
-          def update_node_to_edge_cache(edge, old_node, new_node)
-            old_node_sid = old_node.to_sid
-            new_node_sid = new_node.to_sid
-            edge_sid = edge.to_sid
-            if @_node_to_edge_cache.key?(old_node_sid)
-              @_node_to_edge_cache[old_node_sid].delete_if { |node_edge| node_edge.to_sid == edge_sid }
-            end
-            @_node_to_edge_cache[new_node_sid].push(edge) if @_node_to_edge_cache.key?(new_node_sid)
+          def node_from_sid(sid)
+            return @_sid_to_node_cache[sid] if @_sid_to_node_cache.key?(sid)
+            node = nil
+            idx = @_raw_collection.find_index { |node| node.to_sid == sid }
+            node = @_raw_collection[idx] if idx
+            @_sid_to_node_cache[sid] = node
           end
 
           def each(&block)
@@ -517,17 +516,17 @@ module LucidData
             end
           end
 
-          def <<(edge)
-            _validate_edge(edge) if @_validate_edges
+          def <<(node)
+            _validate_node(node) if @_validate_nodes
             changed!
-            @_raw_collection << edge
-            edge
+            @_raw_collection << node
+            node
           end
 
-          def []=(idx, edge)
-            _validate_edge(edge) if @_validate_edges
+          def []=(idx, node)
+            _validate_node(node) if @_validate_nodes
             changed!
-            @_raw_collection[idx] = edge
+            @_raw_collection[idx] = node
           end
 
           def clear
@@ -549,20 +548,20 @@ module LucidData
             self
           end
 
-          def concat(*many_edges)
-            if @_validate_edges
-              many_edges = many_edges.map do |edge|
-                _validate_edge(edge)
-                edge
+          def concat(*many_nodes)
+            if @_validate_nodes
+              many_nodes = many_nodes.map do |node|
+                _validate_node(node)
+                node
               end
             end
             changed!
-            @_raw_collection.concat(*many_edges)
+            @_raw_collection.concat(*many_nodes)
             self
           end
 
-          def delete(edge, &block)
-            result = @_raw_collection.delete(edge, &block)
+          def delete(node, &block)
+            result = @_raw_collection.delete(node, &block)
             changed!
             result
           end
@@ -587,14 +586,14 @@ module LucidData
             self
           end
 
-          def insert(idx, *many_edges)
-            if @_validate_edges
-              many_edges = many_edges.map do |edge|
-                _validate_edge(edge)
-                edge
+          def insert(idx, *many_nodes)
+            if @_validate_nodes
+              many_nodes = many_nodes.map do |node|
+                _validate_node(node)
+                node
               end
             end
-            @_raw_collection.insert(idx, *many_edges)
+            @_raw_collection.insert(idx, *many_nodes)
             changed!
             self
           end
@@ -617,14 +616,14 @@ module LucidData
             result
           end
 
-          def push(*many_edges)
-            if @_validate_edges
-              many_edges = many_edges.map do |edge|
-                _validate_edge(edge)
-                edge
+          def push(*many_nodes)
+            if @_validate_nodes
+              many_nodes = many_nodes.map do |node|
+                _validate_node(node)
+                node
               end
             end
-            @_raw_collection.push(*many_edges)
+            @_raw_collection.push(*many_nodes)
             changed!
             self
           end
@@ -692,14 +691,14 @@ module LucidData
             self
           end
 
-          def unshift(*many_edges)
-            if @_validate_edges
-              many_edges = many_edges.map do |edge|
-                _validate_edge(edge)
-                edge
+          def unshift(*many_nodes)
+            if @_validate_nodes
+              many_nodes = many_nodes.map do |node|
+                _validate_node(node)
+                node
               end
             end
-            @_raw_collection.unshift(*many_edges)
+            @_raw_collection.unshift(*many_nodes)
             changed!
             self
           end

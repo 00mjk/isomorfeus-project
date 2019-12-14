@@ -9,6 +9,10 @@ module Isomorfeus
         @key = k.to_s
       end
 
+      def revision
+        @_revision
+      end
+
       def to_sid
         [@class_name, @key]
       end

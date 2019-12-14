@@ -143,7 +143,7 @@ RSpec.describe 'LucidData::Hash' do
         hash = TestHashG.new(key: 13, attributes: { test: 1, experiment: 2, probe: 3 })
         JSON.dump(hash.to_transport)
       end
-      expect(JSON.load(result)).to eq("TestHashG"=>{"13"=>{"test"=>1,"experiment"=>2,"probe"=>3}})
+      expect(JSON.load(result)).to eq("TestHashG" => {"13"=>{"attributes"=>{"experiment"=>2, "probe"=>3, "test"=>1}}})
     end
   end
 
@@ -293,7 +293,7 @@ RSpec.describe 'LucidData::Hash' do
         hash = TestHashG.new(key: 13, attributes: { test: 1, experiment: 2, probe: 3 })
         JSON.dump(hash.to_transport)
       end
-      expect(JSON.parse(result)).to eq("TestHashG"=>{"13"=>{"test"=>1,"experiment"=>2,"probe"=>3}})
+      expect(JSON.parse(result)).to eq("TestHashG" => {"13"=>{"attributes"=>{"experiment"=>2, "probe"=>3, "test"=>1}}})
     end
   end
 end
