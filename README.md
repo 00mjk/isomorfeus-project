@@ -1,5 +1,11 @@
 # isomorfeus-operation
 
+Operations for Isomorfeus.
+
+### Community and Support
+At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+
+### Usage
 there are 3 kinds of Operations:
 - LucidQuickOp
 - LucidOperation
