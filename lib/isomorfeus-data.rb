@@ -24,8 +24,8 @@ require 'isomorfeus/data/element_validator'
 if RUBY_ENGINE == 'opal'
   require 'isomorfeus/data/reducer'
   Isomorfeus::Data::Reducer.add_reducer_to_store
-  require_tree 'isomorfeus_data', :autoload
   Isomorfeus.zeitwerk.push_dir('isomorfeus_data')
+  require_tree 'isomorfeus_data', :autoload
   Isomorfeus.zeitwerk.push_dir('data')
 else
   require 'oj'
