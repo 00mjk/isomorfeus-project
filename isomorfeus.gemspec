@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'bundler'
   s.add_dependency 'oj', '>= 3.10.0'
   s.add_dependency 'pry', '~> 0.12.2'
-  s.add_dependency 'opal-webpack-loader', '>= 0.9.6'
+  s.add_dependency 'opal-webpack-loader', '>= 0.9.9'
   s.add_dependency 'thor', '>= 0.19.4'
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'rake'
