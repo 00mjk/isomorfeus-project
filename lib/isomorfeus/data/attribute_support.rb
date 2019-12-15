@@ -12,6 +12,10 @@ module Isomorfeus
           rescue
             false
           end
+
+          def validate
+            Isomorfeus::Props::ValidateHashProxy.new
+          end
         end
 
         def _validate_attribute(attr_name, attr_val)
