@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-react', '>= 16.12.1'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.16'
   s.add_development_dependency 'isomorfeus', Isomorfeus::Policy::VERSION
-  s.add_development_dependency 'opal-webpack-loader', '>= 0.9.6'
+  s.add_development_dependency 'opal-webpack-loader', '>= 0.9.9'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.8.0'
 end
