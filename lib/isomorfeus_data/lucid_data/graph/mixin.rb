@@ -205,7 +205,7 @@ module LucidData
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
                   @_changed_attributes = !attributes ? {} : attributes
-                elsif raw_attributes && !attributes.nil? && Hash.new(raw_attributes) != attributes
+                elsif raw_attributes && !attributes.nil? && ::Hash.new(raw_attributes) != attributes
                   @_changed_attributes = attributes
                 end
               else
@@ -219,7 +219,7 @@ module LucidData
             @_node_collections = {}
             nodes = nodes || documents || vertices || vertexes
             if nodes && loaded
-              if nodes.class.to_s == 'Hash'
+              if nodes.class == ::Hash
                 self.class.node_collections.each_key do |access_name|
                   if nodes.key?(access_name)
                     collection = nodes[access_name]
@@ -249,7 +249,7 @@ module LucidData
             @_edge_collections = {}
             edges = edges || links
             if edges && loaded
-              if edges.class.to_s == 'Hash'
+              if edges.class == ::Hash
                 self.class.edge_collections.each_key do |access_name|
                   if edges.key?(access_name)
                     collection = edges[access_name]
@@ -356,7 +356,7 @@ module LucidData
             # nodes
             @_node_collections = {}
             nodes = nodes || documents || vertices || vertexes
-            if nodes.class.to_s == 'Hash'
+            if nodes.class == ::Hash
               self.class.node_collections.each_key do |access_name|
                 if nodes.key?(access_name)
                   @_node_collections[access_name] = nodes[access_name]
@@ -371,7 +371,7 @@ module LucidData
             # edges
             @_edge_collections = {}
             edges = edges || links
-            if edges.class.to_s == 'Hash'
+            if edges.class == ::Hash
               self.class.edge_collections.each_key do |access_name|
                 if edges.key?(access_name)
                   @_edge_collections[access_name] = edges[access_name]

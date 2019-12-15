@@ -75,7 +75,7 @@ module LucidData
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
                   @_changed_attributes = !attributes ? {} : attributes
-                elsif raw_attributes && !attributes.nil? && Hash.new(raw_attributes) != attributes
+                elsif raw_attributes && !attributes.nil? && ::Hash.new(raw_attributes) != attributes
                   @_changed_attributes = attributes
                 end
               else
