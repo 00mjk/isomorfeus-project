@@ -1,5 +1,5 @@
 module Isomorfeus
   module Transport
-    VERSION = '1.0.0.zeta5'
+    VERSION = '1.0.0.zeta6'
   end
 end
