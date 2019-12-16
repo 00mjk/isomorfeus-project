@@ -61,10 +61,24 @@ end
 task default: %w[ruby_specs]
 
 task :push_ruby_packages do
+  Rake::Task['push_ruby_packages_to_rubygems'].invoke
+  Rake::Task['push_ruby_packages_to_github'].invoke
+end
+
+task :push_ruby_packages_to_rubygems do
   %w[data i18n operation policy transport].each do |mod|
+    puts "Publishing to rubygems"
     system("gem push ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
   end
   system("gem push ruby/isomorfeus/isomorfeus-#{VERSION}.gem")
+end
+
+task :push_ruby_packages_to_github do
+  puts "Publishing to github"
+  %w[data i18n operation policy transport].each do |mod|
+    system("gem push --key github --host https://rubygems.pkg.github.com/isomorfeus ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
+  end
+  system("gem push --key github --host https://rubygems.pkg.github.com/isomorfeus ruby/isomorfeus/isomorfeus-#{VERSION}.gem")
 end
 
 task :build_ruby_packages do
