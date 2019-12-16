@@ -9,12 +9,13 @@ Gem::Specification.new do |s|
   s.homepage     = 'http://isomorfeus.com'
   s.summary      = 'Create new isomorfeus-framework applications with ease.'
   s.description  = 'Create new isomorfeus-framework applications with ease.'
-  s.bindir         = 'bin'
-  s.executables    << 'isomorfeus'
-  s.executables    << 'yandle'
-  s.files          = `git ls-files -- {lib,LICENSE,readme.md}`.split("\n")
+  s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
+  s.bindir       = 'bin'
+  s.executables  << 'isomorfeus'
+  s.executables  << 'yandle'
+  s.files        = `git ls-files -- {lib,LICENSE,readme.md}`.split("\n")
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.require_paths  = ['lib']
+  s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.0'
   s.add_dependency 'bundler'

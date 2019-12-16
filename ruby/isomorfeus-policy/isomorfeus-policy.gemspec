@@ -9,10 +9,10 @@ Gem::Specification.new do |s|
   s.homepage     = 'http://isomorfeus.com'
   s.summary      = 'Policies for Isomorfeus.'
   s.description  = 'Policies for Isomorfeus.'
-
-  s.files          = `git ls-files -- {lib,LICENSE,README.md}`.split("\n")
+  s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
+  s.files        = `git ls-files -- {lib,LICENSE,README.md}`.split("\n")
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.require_paths  = ['lib']
+  s.require_paths = ['lib']
 
   s.add_dependency 'opal', '>= 1.0.0'
   s.add_dependency 'isomorfeus-react', '>= 16.12.1'
