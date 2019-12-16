@@ -1,0 +1,57 @@
+require_relative 'app_loader'
+require_relative 'owl_init'
+# require_relative 'arango_config'
+<%= rack_server_init %>
+
+class <%= app_class %> < Roda
+  extend Isomorfeus::Transport::Middlewares
+  include OpalWebpackLoader::ViewHelper
+  include Isomorfeus::ReactViewHelper
+
+  use_isomorfeus_middlewares
+  plugin :public, root: 'public'
+
+  def page_content(env, location)
+    locale = env.http_accept_language.preferred_language_from(Isomorfeus.available_locales)
+    locale = env.http_accept_language.compatible_language_from(Isomorfeus.available_locales) unless locale
+    locale = Isomorfeus.locale unless locale
+    rendered_tree = mount_component('<%= app_class %>', location_host: env['HTTP_HOST'], location: location, locale: locale)
+    <<~HTML
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Welcome to <%= app_class %></title>
+          <meta charset="utf-8"/>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style id="jss-server-side" type="text/css">#{ssr_styles}</style>
+          #{owl_script_tag 'application.js'}
+        </head>
+        <body>
+          #{rendered_tree}
+        </body>
+      </html>
+    HTML
+  end
+
+  route do |r|
+    r.root do
+      page_content(env, '/')
+    end
+
+    r.public
+
+    r.get 'favicon.ico' do
+      r.public
+    end
+
+    r.get 'robots.txt' do
+      r.public
+    end
+
+    r.get do
+      content = page_content(env, env['PATH_INFO'])
+      response.status = ssr_response_status
+      content
+    end
+  end
+end
