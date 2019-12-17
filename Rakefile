@@ -83,7 +83,7 @@ task :push_ruby_packages_to_github do
 end
 
 task :push_ruby_packages_to_isomorfeus do
-  puts "Publishing to github"
+  puts "Publishing to isomorfeus"
   %w[data i18n operation policy transport].each do |mod|
     system("gem inabox ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem --host http://localhost:5555/")
   end
