@@ -6,7 +6,11 @@ if RUBY_ENGINE == 'opal'
   Isomorfeus::I18n::Reducer.add_reducer_to_store
   require 'lucid_translation/mixin'
   require 'isomorfeus/i18n/init'
-  Isomorfeus::I18n::Init.init
+  if Isomorfeus.on_browser?
+    Isomorfeus::I18n::Init.init
+  else
+    Isomorfeus.add_transport_init_class_name('Isomorfeus::I18n::Init')
+  end
 else
   require 'active_support'
   require 'oj'
