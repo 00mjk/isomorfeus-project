@@ -1,3 +1,3 @@
 module Isomorfeus
-  VERSION = '1.0.0.zeta8'
+  VERSION = '1.0.0.zeta9'
 end
