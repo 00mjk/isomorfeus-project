@@ -12,11 +12,14 @@ gem 'opal-webpack-loader', '>= 0.9.9'
 
 gem 'isomorfeus-redux', '~> 4.0.16'
 gem 'isomorfeus-react', '>= 16.12.1'
-gem 'isomorfeus-policy', <%= isomorfeus_policy %>
-gem 'isomorfeus-transport', <%= isomorfeus_transport %>
-gem 'isomorfeus-i18n', <%= isomorfeus_i18n %>
-gem 'isomorfeus-data', <%= isomorfeus_data %>
-gem 'isomorfeus-operation', <%= isomorfeus_operation %>
+
+source "http://gems.isomorfeus.com" do
+  gem 'isomorfeus-policy', <%= isomorfeus_policy %>
+  gem 'isomorfeus-transport', <%= isomorfeus_transport %>
+  gem 'isomorfeus-i18n', <%= isomorfeus_i18n %>
+  gem 'isomorfeus-data', <%= isomorfeus_data %>
+  gem 'isomorfeus-operation', <%= isomorfeus_operation %>
+end
 
 group :development do
   gem 'pry', '~> 0.12.2'
