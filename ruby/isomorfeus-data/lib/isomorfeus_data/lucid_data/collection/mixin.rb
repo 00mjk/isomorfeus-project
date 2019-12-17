@@ -154,7 +154,11 @@ module LucidData
           end
 
           def nodes
-            nodes_as_sids.map { |node_sid| Isomorfeus.instance_from_sid(node_sid) }
+            nodes_as_sids.map do |node_sid|
+              node = Isomorfeus.instance_from_sid(node_sid)
+              node.collection = self
+              node
+            end
           end
           alias vertices nodes
           alias vertexes nodes
@@ -169,7 +173,11 @@ module LucidData
 
           def node_from_sid(sid)
             node_sids = nodes_as_sids
-            return Isomorfeus.instance_from_sid(sid) if node_sids.include?(sid)
+            if node_sids.include?(sid)
+              node = Isomorfeus.instance_from_sid(sid)
+              node.collection = self
+              return node
+            end
             nil
           end
 

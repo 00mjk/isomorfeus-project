@@ -93,13 +93,13 @@ module LucidData
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, attributes: nil, graph: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, collection: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_store_path = [:data_state, @class_name, @key]
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
-            @_graph = graph
+            @_collection = collection
             @_composition = composition
             @_changed = false
             loaded = loaded?
@@ -161,8 +161,8 @@ module LucidData
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_revision = revision
-            @_composition = composition
             @_collection = collection
+            @_composition = composition
             @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes

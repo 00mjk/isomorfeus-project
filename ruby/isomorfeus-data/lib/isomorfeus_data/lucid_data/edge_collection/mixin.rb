@@ -147,7 +147,11 @@ module LucidData
           end
 
           def edges
-            edges_as_sids.map { |edge_sid| Isomorfeus.instance_from_sid(edge_sid) }
+            edges_as_sids.map do |edge_sid|
+              edge = Isomorfeus.instance_from_sid(edge_sid)
+              edge.collection = self
+              edge
+            end
           end
           alias links edges
 
