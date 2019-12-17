@@ -6,7 +6,7 @@ if RUBY_ENGINE == 'opal'
   Isomorfeus::I18n::Reducer.add_reducer_to_store
   require 'lucid_translation/mixin'
   require 'isomorfeus/i18n/init'
-  Isomorfeus.add_transport_init_class_name('Isomorfeus::I18n::Init')
+  Isomorfeus::I18n::Init.init
 else
   require 'active_support'
   require 'oj'

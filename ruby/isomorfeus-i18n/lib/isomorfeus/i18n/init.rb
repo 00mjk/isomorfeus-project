@@ -6,9 +6,17 @@ module Isomorfeus
           return if @initializing || initialized?
           @initializing = true
           if Isomorfeus.on_browser?
-            root_element = `document.querySelector('div[data-iso-root]')`
-            Isomorfeus.negotiated_locale = root_element.JS.getAttribute('data-iso-nloc')
+            Isomorfeus::TopLevel.on_ready do
+              root_element = `document.querySelector('div[data-iso-root]')`
+              Isomorfeus.negotiated_locale = root_element.JS.getAttribute('data-iso-nloc') if root_element
+              init_from_server
+            end
+          else
+            init_from_server
           end
+        end
+
+        def self.init_from_server
           Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', :init, Isomorfeus.negotiated_locale).then do |agent|
             if agent.processed
               agent.result
