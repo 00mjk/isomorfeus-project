@@ -37,7 +37,12 @@ module Isomorfeus
               attribute_conditions[name] = options
 
               define_method(name) do
-                _get_attribute(name)
+                v = _get_attribute(name)
+                %x{
+                  if (v instanceof Object && !(v instanceof Array)) {
+                    return Opal.Hash.$new(v);
+                  } else { return v; }
+                }
               end
 
               define_method("#{name}=") do |val|
