@@ -209,7 +209,9 @@ module LucidData
 
           def [](idx)
             sid = nodes_as_sids[idx]
-            Isomorfeus.instance_from_sid(sid)
+            node = Isomorfeus.instance_from_sid(sid)
+            node.collection = self
+            node
           end
 
           def []=(idx, node)
