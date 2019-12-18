@@ -44,6 +44,14 @@ module LucidData
           other_from if other_to == node
         end
 
+        def from
+          graph&.node_from_sid(from_as_sid)
+        end
+
+        def to
+          graph&.node_from_sid(to_as_sid)
+        end
+
         def to_transport
           hash = { "attributes" => _get_selected_attributes,
                    "from" => from_as_sid,
@@ -119,44 +127,39 @@ module LucidData
             @_changed_attributes[name] = val
           end
 
-          def from
-            sid = from_as_sid
-            Isomorfeus.instance_from_sid(sid) if sid
-          end
-
           def from_as_sid
             @_changed_from ? @_changed_from : Redux.fetch_by_path(*@_from_path)
           end
 
-          def from=(document)
+          def from=(node)
             changed!
-            if document.respond_to?(:to_sid)
-              @_changed_from = document.to_sid
-              document
+            old_from = from
+            if node.respond_to?(:to_sid)
+              @_changed_from = node.to_sid
             else
-              @_changed_from = document
-              Isomorfeus.instance_from_sid(document)
+              @_changed_from = node
+              node = Isomorfeus.instance_from_sid(node)
             end
-          end
-
-          def to
-            sid = to_as_sid
-            Isomorfeus.instance_from_sid(sid) if sid
+            @_collection.update_node_to_edge_cache(self, old_from, node) if @_collection
+            node
           end
 
           def to_as_sid
             @_changed_to ? @_changed_to : Redux.fetch_by_path(*@_to_path)
           end
 
-          def to=(document)
+          def to=(node)
             changed!
-            if document.respond_to?(:to_sid)
-              @_changed_to = document.to_sid
-              document
+            old_to = to
+            if node.respond_to?(:to_sid)
+              @_changed_to = node.to_sid
+              node
             else
-              @_changed_to = document
-              Isomorfeus.instance_from_sid(document)
+              @_changed_to = node
+              node = Isomorfeus.instance_from_sid(node)
             end
+            @_collection.update_node_to_edge_cache(self, old_to, node) if @_collection
+            node
           end
         else # RUBY_ENGINE
           unless base == LucidData::Edge::Base || base == LucidData::Link::Base
@@ -225,11 +228,6 @@ module LucidData
             @_raw_attributes[name] = val
           end
 
-          def from
-            sid = @_changed_from ? @_changed_from : @_raw_from
-            graph&.node_from_sid(sid)
-          end
-
           def from_as_sid
             @_changed_from ? @_changed_from : @_raw_from
           end
@@ -248,11 +246,6 @@ module LucidData
             @_changed_from = node_sid
             @_collection.update_node_to_edge_cache(self, old_from, node) if @_collection
             node
-          end
-
-          def to
-            sid = @_changed_to ? @_changed_to : @_raw_to
-            graph&.node_from_sid(sid)
           end
 
           def to_as_sid
