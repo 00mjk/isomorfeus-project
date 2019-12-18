@@ -289,7 +289,7 @@ module LucidData
           end
 
           def _init_edge_collections
-            keys = self.class.node_collections.keys
+            keys = self.class.edge_collections.keys
             keys << :edges if keys.empty?
             keys.each do |access_name|
               sid = Redux.fetch_by_path(*(@_edges_path + [access_name]))
