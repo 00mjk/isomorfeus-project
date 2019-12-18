@@ -49,6 +49,7 @@ module LucidData
           else
             sid = arg
             edge = Isomorfeus.instance_from_sid(sid)
+            edge.collection = self
           end
           [edge, sid]
         end
@@ -79,6 +80,27 @@ module LucidData
           @_changed = true
         end
 
+        def edges_for_node(node)
+          node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+          return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
+          node_edges = select do |edge|
+            (edge.from_as_sid == node_sid || edge.to_as_sid == node_sid) ? true : false
+          end
+          @_node_to_edge_cache[node_sid] = node_edges
+        end
+        alias edges_for_vertex edges_for_node
+        alias edges_for_document edges_for_node
+
+        def update_node_to_edge_cache(edge, old_node, new_node)
+          old_node_sid = old_node.to_sid
+          new_node_sid = new_node.to_sid
+          edge_sid = edge.to_sid
+          if @_node_to_edge_cache.key?(old_node_sid)
+            @_node_to_edge_cache[old_node_sid].delete_if { |node_edge| node_edge.to_sid == edge_sid }
+          end
+          @_node_to_edge_cache[new_node_sid].push(edge) if @_node_to_edge_cache.key?(new_node_sid)
+        end
+
         def to_transport
           hash = { 'attributes' => _get_selected_attributes, 'edges' => edges_as_sids }
           hash.merge!('revision' => revision) if revision
@@ -103,6 +125,7 @@ module LucidData
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_graph = graph
             @_composition = composition
+            @_node_to_edge_cache = {}
             @_changed_collection = nil
             @_edge_con = self.class.edge_conditions
             @_validate_edges = @_edge_con ? true : false
@@ -190,7 +213,9 @@ module LucidData
 
           def [](idx)
             sid = edges_as_sids[idx]
-            Isomorfeus.instance_from_sid(sid)
+            edge = Isomorfeus.instance_from_sid(sid)
+            edge.collection = self
+            edge
           end
 
           def []=(idx, edge)
@@ -475,27 +500,6 @@ module LucidData
 
           def edges_as_sids
             @_raw_collection.map(&:to_sid)
-          end
-
-          def edges_for_node(node)
-            node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
-            return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
-            node_edges = select do |edge|
-              (edge.from_as_sid == node_sid || edge.to_as_sid == node_sid) ? true : false
-            end
-            @_node_to_edge_cache[node_sid] = node_edges
-          end
-          alias edges_for_vertex edges_for_node
-          alias edges_for_document edges_for_node
-
-          def update_node_to_edge_cache(edge, old_node, new_node)
-            old_node_sid = old_node.to_sid
-            new_node_sid = new_node.to_sid
-            edge_sid = edge.to_sid
-            if @_node_to_edge_cache.key?(old_node_sid)
-              @_node_to_edge_cache[old_node_sid].delete_if { |node_edge| node_edge.to_sid == edge_sid }
-            end
-            @_node_to_edge_cache[new_node_sid].push(edge) if @_node_to_edge_cache.key?(new_node_sid)
           end
 
           def each(&block)
