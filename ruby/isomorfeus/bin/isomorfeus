@@ -1,23 +1,22 @@
 #!/usr/bin/env ruby
-require 'thor'
-require_relative '../lib/isomorfeus/installer'
-require_relative '../lib/isomorfeus/installer/rack_servers'
-
 if %w[c con console].include?(ARGV[0])
   require 'pry'
   require_relative '../lib/isomorfeus/console'
-  require_relative '../lib/isomorfeus/cli'
 
-  Isomorfeus::Installer::CLI.start(ARGV)
+  Isomorfeus::Console.new.run
 else
+  require 'thor'
   require 'bundler'
   require 'fileutils'
   require 'erb'
   require 'active_support/core_ext/string'
   require 'opal-webpack-loader/installer_cli'
+  require_relative '../lib/isomorfeus/installer'
+  require_relative '../lib/isomorfeus/installer/rack_servers'
   require_relative '../lib/isomorfeus/version'
   require_relative '../lib/isomorfeus/installer/options_mangler'
   require_relative '../lib/isomorfeus/installer/new_project'
+  require_relative '../lib/isomorfeus/cli'
 
   Isomorfeus::Installer.module_directories.each do |mod_dir|
     mod_path = File.realpath(File.join(Isomorfeus::Installer.base_path, mod_dir))
@@ -29,5 +28,5 @@ else
 
   require_relative '../lib/isomorfeus/cli'
 
-  Isomorfeus::Installer::CLI.start(ARGV)
+  Isomorfeus::CLI.start(ARGV)
 end
