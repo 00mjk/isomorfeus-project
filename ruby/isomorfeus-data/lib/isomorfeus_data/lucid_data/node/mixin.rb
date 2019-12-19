@@ -45,47 +45,6 @@ module LucidData
           graph&.linked_nodes_for_node(self)
         end
 
-        def method_missing(method_name, *args, &block)
-          if graph
-            method_name_s = method_name.to_s
-            singular_name = method_name_s.singularize
-            plural_name = method_name_s.pluralize
-            node_edges = edges
-            if method_name_s == plural_name
-              # return all nodes
-              nodes = []
-              sid = to_sid
-              node_edges.each do |edge|
-                from_sid = edge.from_as_sid
-                to_sid = edge.to_as_sid
-                node = if from_sid[0].underscore == singular_name && to_sid == sid
-                         edge.from
-                       elsif to_sid[0].underscore == singular_name && from_sid == sid
-                         edge.to
-                       end
-                nodes << node if node
-              end
-              return nodes
-            elsif method_name_s == singular_name
-              # return one node
-              sid = to_sid
-              node_edges.each do |edge|
-                from_sid = edge.from_as_sid
-                to_sid = edge.to_as_sid
-                node = if from_sid[0].underscore == singular_name && to_sid == sid
-                         edge.from
-                       elsif to_sid[0].underscore == singular_name && from_sid == sid
-                         edge.to
-                       end
-                return node if node
-              end
-              nil
-            end
-          else
-            super(method_name, *args, &block)
-          end
-        end
-
         def to_transport
           hash = _get_selected_attributes
           hash.merge!("revision" => revision) if revision
@@ -138,6 +97,46 @@ module LucidData
             changed!
             @_changed_attributes[name] = val
           end
+
+          def method_missing(method_name, *args, &block)
+            if graph
+              singular_name = `method_name.endsWith('s')` ? method_name.singularize : method_name
+              node_edges = edges
+              sid = to_sid
+              camelized_singular = singular_name.camelize
+
+              if method_name == singular_name
+                # return one node
+                node_edges.each do |edge|
+                  from_sid = edge.from_as_sid
+                  to_sid = edge.to_as_sid
+                  node = if from_sid[0] == camelized_singular && to_sid == sid
+                           edge.from
+                         elsif to_sid[0] == camelized_singular && from_sid == sid
+                           edge.to
+                         end
+                  return node if node
+                end
+                nil
+              elsif method_name == method_name.pluralize
+                # return all nodes
+                nodes = []
+                node_edges.each do |edge|
+                  from_sid = edge.from_as_sid
+                  to_sid = edge.to_as_sid
+                  node = if from_sid[0] == camelized_singular && to_sid == sid
+                           edge.from
+                         elsif to_sid[0] == camelized_singular && from_sid == sid
+                           edge.to
+                         end
+                  nodes << node if node
+                end
+                return nodes
+              end
+            else
+              super(method_name, *args, &block)
+            end
+          end
         else # RUBY_ENGINE
           unless base == LucidData::Node::Base || base == LucidData::Document::Base || base == LucidData::Vertex::Base
             Isomorfeus.add_valid_data_class(base)
@@ -184,6 +183,47 @@ module LucidData
             _validate_attribute(name, val)
             changed!
             @_raw_attributes[name] = val
+          end
+
+          def method_missing(method_name, *args, &block)
+            if graph
+              method_name_s = method_name.to_s
+              singular_name = method_name_s.singularize
+              node_edges = edges
+              sid = to_sid
+              camelized_singular = singular_name.camelize
+
+              if method_name_s == singular_name
+                # return one node
+                node_edges.each do |edge|
+                  from_sid = edge.from_as_sid
+                  to_sid = edge.to_as_sid
+                  node = if from_sid[0] == camelized_singular && to_sid == sid
+                           edge.from
+                         elsif to_sid[0] == camelized_singular && from_sid == sid
+                           edge.to
+                         end
+                  return node if node
+                end
+                nil
+              elsif method_name_s == method_name_s.pluralize
+                # return all nodes
+                nodes = []
+                node_edges.each do |edge|
+                  from_sid = edge.from_as_sid
+                  to_sid = edge.to_as_sid
+                  node = if from_sid[0] == camelized_singular && to_sid == sid
+                           edge.from
+                         elsif to_sid[0] == camelized_singular && from_sid == sid
+                           edge.to
+                         end
+                  nodes << node if node
+                end
+                return nodes
+              end
+            else
+              super(method_name, *args, &block)
+            end
           end
         end # RUBY_ENGINE
       end
