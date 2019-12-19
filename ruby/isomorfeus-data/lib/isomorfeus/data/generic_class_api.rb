@@ -35,7 +35,7 @@ module Isomorfeus
 
         def load(key:)
           instance = self.new(key: key)
-          self.promise_load(key: key, instance: instance) unless instance.loaded?
+          promise_load(key: key, instance: instance) unless instance.loaded?
           instance
         end
 
@@ -54,6 +54,15 @@ module Isomorfeus
               Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
               agent.result = instance
             end
+          end
+        end
+
+        def promise_load_once(key:, instance: nil)
+          instance = self.new(key: key) unless instance
+          if instance.loaded?
+            Promise.new.resolve(instance)
+          else
+            promise_load(key: key, instance: instance)
           end
         end
 

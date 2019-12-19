@@ -36,6 +36,10 @@ module Isomorfeus
           self
         end
 
+        def promise_load_once
+          self.class.promise_load_once(key: key, instance: self)
+        end
+        
         def promise_reload
           self.class.promise_load(@key, self)
         end
