@@ -53,7 +53,7 @@ RSpec.describe 'LucidData::Collection' do
       expect(result).to eq({"SimpleCollection"=>{"2"=>{"attributes"=>{}, "nodes"=>[["SimpleNode", "1"],
                                                                                    ["SimpleNode", "2"],
                                                                                    ["SimpleNode", "3"],
-                                                                                   ["SimpleNode", "4"], 
+                                                                                   ["SimpleNode", "4"],
                                                                                    ["SimpleNode", "5"]]}}})
     end
 
@@ -116,9 +116,7 @@ RSpec.describe 'LucidData::Collection' do
     end
 
     it 'save the data state for the client' do
-      node = @doc.find('[data-iso-state]')
-      expect(node).to be_truthy
-      state_json = node.get_attribute('data-iso-state')
+      state_json = @doc.evaluate_script('JSON.stringify(ServerSideRenderingStateJSON)')
       state = Oj.load(state_json, mode: :strict)
       expect(state).to have_key('data_state')
       expect(state['data_state']).to have_key('SimpleCollection')
@@ -126,9 +124,7 @@ RSpec.describe 'LucidData::Collection' do
 
     it 'save the data state for the client, also on subsequent renders' do
       # the same as above, a second time, just to see if the store is initialized correctly
-      node = @doc.find('[data-iso-state]')
-      expect(node).to be_truthy
-      state_json = node.get_attribute('data-iso-state')
+      state_json = @doc.evaluate_script('JSON.stringify(ServerSideRenderingStateJSON)')
       state = Oj.load(state_json, mode: :strict)
       expect(state).to have_key('data_state')
       expect(state['data_state']).to have_key('SimpleCollection')

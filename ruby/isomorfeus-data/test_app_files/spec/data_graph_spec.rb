@@ -133,9 +133,7 @@ RSpec.describe 'LucidGraph' do
     end
 
     it 'save the application state for the client' do
-      node = @doc.find('[data-iso-state]')
-      expect(node).to be_truthy
-      state_json = node.get_attribute('data-iso-state')
+      state_json = @doc.evaluate_script('JSON.stringify(ServerSideRenderingStateJSON)')
       state = Oj.load(state_json, mode: :strict)
       expect(state).to have_key('data_state')
       expect(state['data_state']).to have_key('SimpleGraph')
@@ -143,9 +141,7 @@ RSpec.describe 'LucidGraph' do
 
     it 'save the application state for the client, also on subsequent renders' do
       # the same as above, a second time, just to see if the store is initialized correctly
-      node = @doc.find('[data-iso-state]')
-      expect(node).to be_truthy
-      state_json = node.get_attribute('data-iso-state')
+      state_json = @doc.evaluate_script('JSON.stringify(ServerSideRenderingStateJSON)')
       state = Oj.load(state_json, mode: :strict)
       expect(state).to have_key('data_state')
       expect(state['data_state']).to have_key('SimpleGraph')
