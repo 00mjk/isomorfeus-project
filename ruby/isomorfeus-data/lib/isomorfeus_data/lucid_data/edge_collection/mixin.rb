@@ -80,17 +80,6 @@ module LucidData
           @_changed = true
         end
 
-        def edges_for_node(node)
-          node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
-          return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
-          node_edges = select do |edge|
-            (edge.from_as_sid == node_sid || edge.to_as_sid == node_sid) ? true : false
-          end
-          @_node_to_edge_cache[node_sid] = node_edges
-        end
-        alias edges_for_vertex edges_for_node
-        alias edges_for_document edges_for_node
-
         def update_node_to_edge_cache(edge, old_node, new_node)
           old_node_sid = old_node.to_sid
           new_node_sid = new_node.to_sid
@@ -184,6 +173,23 @@ module LucidData
             return collection if collection
             []
           end
+
+          def edges_for_node(node)
+            node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+            return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
+            node_edge_sids = edges_as_sids.select do |edge_sid|
+              edge_data = Redux.fetch_by_path(:data_state, edge_sid[0], edge_sid[1])
+              (edge_data.JS[:from] == node_sid || edge_data.JS[:to] == node_sid) ? true : false
+            end
+            node_edges = node_edge_sids.map do |edge_sid|
+              edge = Isomorfeus.instance_from_sid(edge_sid)
+              edge.collection = self
+              edge
+            end
+            @_node_to_edge_cache[node_sid] = node_edges
+          end
+          alias edges_for_vertex edges_for_node
+          alias edges_for_document edges_for_node
 
           def each(&block)
             edges.each(&block)
@@ -501,6 +507,17 @@ module LucidData
           def edges_as_sids
             @_raw_collection.map(&:to_sid)
           end
+
+          def edges_for_node(node)
+            node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+            return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
+            node_edges = select do |edge|
+              (edge.from_as_sid == node_sid || edge.to_as_sid == node_sid) ? true : false
+            end
+            @_node_to_edge_cache[node_sid] = node_edges
+          end
+          alias edges_for_vertex edges_for_node
+          alias edges_for_document edges_for_node
 
           def each(&block)
             @_raw_collection.each(&block)
