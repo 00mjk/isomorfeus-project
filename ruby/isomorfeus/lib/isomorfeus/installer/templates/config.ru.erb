@@ -4,7 +4,7 @@ if !Isomorfeus.development?
   Isomorfeus.zeitwerk.setup
   Isomorfeus.zeitwerk.eager_load
 
-  run <%= app_class %>.app
+  run <%= app_class %>.freeze.app
 else
   Isomorfeus.zeitwerk.enable_reloading
   Isomorfeus.zeitwerk.setup
