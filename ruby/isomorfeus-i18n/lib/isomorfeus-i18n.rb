@@ -7,7 +7,7 @@ if RUBY_ENGINE == 'opal'
   require 'lucid_translation/mixin'
   require 'isomorfeus/i18n/init'
   if Isomorfeus.on_browser?
-    Isomorfeus::I18n::Init.init
+    Isomorfeus.add_client_init_after_store_class_name('Isomorfeus::I18n::Init')
   else
     Isomorfeus.add_transport_init_class_name('Isomorfeus::I18n::Init')
   end
