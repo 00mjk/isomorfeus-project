@@ -17,7 +17,7 @@ RSpec.describe 'isomorfeus installer' do
     end
 
     it 'it can' do
-      Isomorfeus::Installer::CLI.start(%w[new morphing --no-yarn-and-bundle])
+      Isomorfeus::CLI.start(%w[new morphing --no-yarn-and-bundle])
       Dir.chdir('morphing')
       expect(Dir.exist?(File.join('isomorfeus', 'imports')))
       expect(Dir.exist?(File.join('isomorfeus', 'channels')))
@@ -99,7 +99,7 @@ RSpec.describe 'isomorfeus installer' do
       Dir.mkdir('test_apps') unless Dir.exist?('test_apps')
       Dir.chdir('test_apps')
       FileUtils.rm_rf('morphing') if Dir.exist?('morphing')
-      Isomorfeus::Installer::CLI.start(%w[new morphing --no-yarn-and-bundle])
+      Isomorfeus::CLI.start(%w[new morphing --no-yarn-and-bundle])
       Dir.chdir('morphing')
       gemfile = File.read('Gemfile')
       new_gemfile_lines = []
@@ -160,7 +160,7 @@ RSpec.describe 'isomorfeus installer' do
     end
 
     # it 'agoo' do
-    #   Isomorfeus::Installer::CLI.start(%w[new morphing -r agoo --no-yarn-and-bundle])
+    #   Isomorfeus::CLI.start(%w[new morphing -r agoo --no-yarn-and-bundle])
     #   Dir.chdir('morphing')
     #   system('env -i PATH=$PATH yarn install')
     #   system('env -i PATH=$PATH bundle install')
@@ -169,7 +169,7 @@ RSpec.describe 'isomorfeus installer' do
     # end
 
     it 'iodine' do
-      Isomorfeus::Installer::CLI.start(%w[new morphing -r iodine --no-yarn-and-bundle])
+      Isomorfeus::CLI.start(%w[new morphing -r iodine --no-yarn-and-bundle])
       Dir.chdir('morphing')
       expect(File.exist?('iodine_config.rb')).to be true
       gemfile = File.read('Gemfile')
