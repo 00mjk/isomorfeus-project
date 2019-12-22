@@ -3,7 +3,7 @@ module LucidPolicy
     def self.included(base)
       base.instance_exec do
         def policy_for(a_class)
-          raise LucidPolicy::Exception, "policy_for #{a_class} can only be used once within #{self}!" if @the_class
+          raise LucidPolicy::Exception, "#{self}: policy_for #{a_class} can only be used once within #{self}!" if @the_class
           @the_class = a_class
           unless a_class.methods.include?(:authorization_rules)
             a_class.define_singleton_method(:authorization_rules) do
@@ -13,7 +13,7 @@ module LucidPolicy
           unless a_class.method_defined?(:authorized?)
             a_class.define_method(:authorized?) do |*class_method_props|
               target_class = class_method_props[0]
-              raise "At least the class must be given!" unless target_class
+              raise LucidPolicy::Exception, "#{self}: At least the class must be given!" unless target_class
               target_method = class_method_props[1]
               props = class_method_props[2..-1]
 
@@ -51,7 +51,7 @@ module LucidPolicy
           unless a_class.method_defined?(:authorized!)
             a_class.define_method(:authorized!) do |*class_method_props|
               return true if authorized?(*class_method_props)
-              raise LucidPolicy::Exception, "#{self} not authorized to call #{class_method_props}"
+              raise LucidPolicy::Exception, "#{self}: not authorized to call #{class_method_props}"
             end
           end
           @the_class.authorization_rules[self.to_s] = { classes: {}, conditions: [], others: :deny }
@@ -88,11 +88,11 @@ module LucidPolicy
         private
 
         def _raise_policy_first
-          raise LucidPolicy::Exception, "'allow' or 'deny' must appear before 'refine'"
+          raise LucidPolicy::Exception, "#{self}: 'allow' or 'deny' must appear before 'refine'"
         end
 
         def _raise_policy_first
-          raise LucidPolicy::Exception, "policy_for Class must be specified first"
+          raise LucidPolicy::Exception, "#{self}: policy_for Class must be specified first"
         end
 
         def _allow_or_deny(allow_or_deny, *classes_and_methods, &block)
