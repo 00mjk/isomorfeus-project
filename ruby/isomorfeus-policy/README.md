@@ -31,7 +31,7 @@ Example Policy:
     # deny all
 
     with_condition do |user_or_role_instance, target_class, target_method, *props|
-       role.class == AdminRole
+       user_or_role_instance.class == AdminRole
     end
 
     refine BlaGraph, :load, :count do |user_or_role_instance, target_class, target_method, *props|
