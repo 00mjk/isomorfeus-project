@@ -4,6 +4,7 @@ module LucidData
       def self.included(base)
         base.include(Enumerable)
         base.extend(LucidPropDeclaration::Mixin)
+        base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
 
@@ -11,15 +12,24 @@ module LucidData
         attr_accessor :default_proc
 
         base.instance_exec do
-          def attribute_conditions
-            @attribute_conditions ||= {}
-          end
-
           def valid_attribute?(attr_name, attr_value)
-            return true unless @attribute_conditions
+            return true unless attribute_conditions.any?
             Isomorfeus::Props::Validator.new(self.name, attr_name, attr_value, attribute_conditions[attr_name]).validate!
           rescue
             false
+          end
+
+          def _relaxed_validate_attribute(attr_name, attr_val)
+            Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, attribute_conditions[attr_name]).validate!
+          end
+
+          def _relaxed_validate_attributes(attrs)
+            attribute_conditions.each_key do |attr|
+              if attribute_conditions[attr].key?(:required) && attribute_conditions[attr][:required] && !attrs.key?(attr)
+                raise "Required attribute #{attr} not given!"
+              end
+            end
+            attrs.each { |attr, val| _relaxed_validate_attribute(attr, val) } if attribute_conditions.any?
           end
         end
 
@@ -42,8 +52,12 @@ module LucidData
           { @class_name => { @key => hash }}
         end
 
-        def _validate_attribute(attr_name, attr_val)
-          Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
+        def _relaxed_validate_attribute(attr_name, attr_val)
+          self.class._relaxed_validate_attribute(attr_name, attr_val)
+        end
+
+        def _relaxed_validate_attributes(attrs)
+          self.class._relaxed_validate_attributes(attrs)
         end
 
         if RUBY_ENGINE == 'opal'
@@ -63,7 +77,7 @@ module LucidData
               end
 
               define_method("#{name}=") do |val|
-                _validate_attribute(name, val) if @_validate_attributes
+                _relaxed_validate_attribute(name, val) if @_validate_attributes
                 @_changed_attributes[name] = val
               end
             end
@@ -82,9 +96,7 @@ module LucidData
             @_composition = composition
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
-            if @_validate_attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
-            end
+            _relaxed_validate_attribute(attributes) if @_validate_attributes
             raw_attributes = Redux.fetch_by_path(*@_store_path)
             if `raw_attributes === null`
               @_changed_attributes = !attributes ? {} : attributes
@@ -129,7 +141,7 @@ module LucidData
           end
 
           def []=(name, val)
-            _validate_attribute(name, val) if @_validate_attributes
+            _relaxed_validate_attribute(name, val) if @_validate_attributes
             changed!
             @_changed_attributes[name] = val
           end
@@ -161,7 +173,7 @@ module LucidData
           def method_missing(method_name, *args, &block)
             if method_name.end_with?('=')
               val = args[0]
-              _validate_attribute(method_name, val) if @_validate_attributes
+              _relaxed_validate_attribute(method_name, val) if @_validate_attributes
               changed!
               @_changed_attributes[method_name] = val
             elsif args.size == 0 && hash.key?(method_name)
@@ -222,7 +234,7 @@ module LucidData
           end
 
           def store(name, val)
-            _validate_attribute(name, val) if @_validate_attributes
+            _relaxed_validate_attribute(name, val) if @_validate_attributes
             @_changed_attributes[name] = val
             changed!
             val
@@ -265,16 +277,25 @@ module LucidData
               end
 
               define_method("#{name}=") do |val|
-                _validate_attribute(name, val) if @_validate_attributes
+                _relaxed_validate_attribute(name, val) if @_validate_attributes
                 changed!
                 @_raw_attributes[name] = val
               end
             end
 
             def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, &@_load_block)
-              revision = nil
-              revision = data.delete(:revision) if data.key?(:revision)
+              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              revision = data.delete(:revision)
+              attributes = data.delete(:attributes)
+              self.new(key: key, revision: revision, attributes: attributes)
+            end
+
+            def save(key:, revision: nil, attributes: nil, pub_sub_client: nil, current_user: nil)
+              attributes = {} unless attributes
+              _relaxed_validate_attributes(attributes)
+              data = instance_exec(key: key, revision: revision, attributes: attributes,
+                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              revision = data.delete(:revision)
               attributes = data.delete(:attributes)
               self.new(key: key, revision: revision, attributes: attributes)
             end
@@ -289,9 +310,7 @@ module LucidData
             @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
-            if @_validate_attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
-            end
+            _relaxed_validate_attribute(attributes) if @_validate_attributes
             @_raw_attributes = attributes
           end
 
@@ -308,7 +327,7 @@ module LucidData
           end
 
           def []=(name, val)
-            _validate_attribute(name, val) if @_validate_attributes
+            _relaxed_validate_attribute(name, val) if @_validate_attributes
             changed!
             @_raw_attributes[name] = val
           end
@@ -341,7 +360,7 @@ module LucidData
           def method_missing(method_name, *args, &block)
             if method_name.end_with?('=')
               val = args[0]
-              _validate_attribute(name, val) if @_validate_attributes
+              _relaxed_validate_attribute(name, val) if @_validate_attributes
               changed!
               @_raw_attributes[name] = val
             elsif args.size == 0 && @_raw_attributes.key?(method_name)
@@ -379,7 +398,7 @@ module LucidData
           end
 
           def store(name, val)
-            _validate_attribute(name, val) if @_validate_attributes
+            _relaxed_validate_attribute(name, val) if @_validate_attributes
             changed!
             @_raw_attributes[name] = val
           end

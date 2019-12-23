@@ -14,14 +14,22 @@ module LucidData
           alias element elements
 
           def element_conditions
-            @element_conditions
+            @element_conditions ||= {}
           end
 
           def valid_element?(element)
-            return true unless @element_conditions
-            Isomorfeus::Data::ElementValidator.new(self.name, element, @element_conditions).validate!
+            return true unless element_conditions.any?
+            _validate_element(element)
           rescue
             false
+          end
+
+          def _validate_element(element)
+            Isomorfeus::Data::ElementValidator.new(self.to_s, element, element_conditions).validate!
+          end
+
+          def _validate_elements(many_els)
+            many_els.each { |e| _validate_element(e) } if element_conditions.any?
           end
         end
 
@@ -38,8 +46,12 @@ module LucidData
           @_changed = true
         end
 
-        def _validate_element(el)
-          Isomorfeus::Data::ElementValidator.new(@class_name, el, @_el_con).validate!
+        def _validate_element(element)
+          self.class._validate_element(element)
+        end
+
+        def _validate_elements(many_elements)
+          self.class._validate_elements(many_elements)
         end
 
         if RUBY_ENGINE == 'opal'
@@ -52,11 +64,8 @@ module LucidData
             @_changed_array = nil
             @_composition = composition
             @_changed = false
-            @_el_con = self.class.element_conditions
-            @_validate_elements = @_el_con ? true : false
-            if @_validate_elements && elements
-              elements.each { |e| _validate_element(e) }
-            end
+            @_validate_elements = self.class.element_conditions.any?
+            _validate_elements(elements)
             raw_array = Redux.fetch_by_path(*@_store_path)
             if `raw_array === null`
               @_changed_array = elements ? elements : []
@@ -343,9 +352,17 @@ module LucidData
 
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, &@_load_block)
-              revision = nil
-              revision = data.delete(:revision) if data.key?(:revision)
+              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              revision = data.delete(:revision)
+              elements = data.delete(:elements)
+              self.new(key: key, revision: revision, elements: elements)
+            end
+
+            def save(key: key, revision: nil, elements: nil, pub_sub_client: nil, current_user: nil)
+              _validate_elements(elements)
+              data = instance_exec(key: key, revision: revision, elements: elements,
+                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              revision = data.delete(:revision)
               elements = data.delete(:elements)
               self.new(key: key, revision: revision, elements: elements)
             end
@@ -358,12 +375,9 @@ module LucidData
             @_revision = revision
             @_changed = false
             @_composition = composition
-            @_el_con = self.class.element_conditions
-            @_validate_elements = @_el_con ? true : false
             elements = [] unless elements
-            if @_validate_elements
-              elements.each { |e| _validate_element(e) }
-            end
+            @_validate_elements = self.class.element_conditions.any?
+            _validate_elements(elements)
             @_raw_array = elements
           end
 

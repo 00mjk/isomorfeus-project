@@ -10,7 +10,7 @@ module LucidData
         base.include(LucidData::Collection::Finders)
 
         base.instance_exec do
-          def nodes(validate_hash = {})
+          def nodes(validate_hash)
             @node_conditions = validate_hash
           end
           alias document nodes
@@ -21,25 +21,33 @@ module LucidData
           alias node nodes
 
           def node_conditions
-            @node_conditions
+            @node_conditions ||= {}
           end
 
           def valid_node?(node)
-            return true unless @node_conditions
-            Isomorfeus::Data::ElementValidator.new(self.name, node, @node_conditions).validate!
+            return true unless node_conditions.any?
+            _validate_node(node)
           rescue
             false
           end
           alias valid_vertex? valid_node?
           alias valid_document? valid_node?
+
+          def _validate_node(node)
+            Isomorfeus::Data::ElementValidator.new(self.to_s, node, node_conditions).validate!
+          end
+
+          def _validate_nodes(many_nodes)
+            many_nodes.each { |node| _validate_node(node) } if node_conditions.any?
+          end
         end
 
         def _validate_node(node)
-          Isomorfeus::Data::ElementValidator.new(@class_name, node, @_node_con).validate!
+          self.class._validate_node(node)
         end
 
         def _validate_nodes(many_nodes)
-          many_nodes.each { |node| Isomorfeus::Data::ElementValidator.new(@class_name, node, @_node_con).validate! }
+          self.class._validate_nodes(many_nodes)
         end
 
         def _collection_to_sids(collection)
@@ -111,13 +119,12 @@ module LucidData
             @_composition = composition
             @_changed = false
             @_changed_collection = nil
-            @_node_con = self.class.node_conditions
-            @_validate_nodes = @_node_con ? true : false
+            @_validate_nodes = self.class.node_conditions.any?
 
             loaded = loaded?
 
             if attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
+              _validate_attributes(attributes)
               if loaded
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
@@ -134,9 +141,7 @@ module LucidData
 
             nodes = documents || nodes || vertices || vertexes
             if nodes && loaded
-              if @_validate_nodes
-                nodes.each { |e| _validate_node(e) }
-              end
+              _validate_nodes(nodes)
               raw_nodes = _collection_to_sids(nodes)
               raw_collection = Redux.fetch_by_path(*@_nodes_path)
               if raw_collection != raw_nodes
@@ -453,12 +458,32 @@ module LucidData
 
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, &@_load_block)
-              revision = nil
-              revision = data.delete(:revision) if data.key?(:revision)
+              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              revision = data.delete(:revision)
               attributes = data.delete(:attributes)
+              documents = data.delete(:documents)
+              vertexes = data.delete(:vertexes)
+              vertices = data.delete(:vertices)
               nodes = data.delete(:nodes)
-              self.new(key: key, revision: revision, attributes: attributes, nodes: nodes)
+              self.new(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
+                       nodes: nodes)
+            end
+
+            def save(key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil,
+                     pub_sub_client: nil, current_user: nil)
+              val_nodes = documents || nodes || vertexes || vertices
+              _validate_attributes(attributes)
+              _validate_nodes(val_nodes)
+              data = instance_exec(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
+                                   nodes: nodes, pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              revision = data.delete(:revision)
+              attributes = data.delete(:attributes)
+              documents = data.delete(:documents)
+              vertexes = data.delete(:vertexes)
+              vertices = data.delete(:vertices)
+              nodes = data.delete(:nodes)
+              self.new(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
+                       nodes: nodes)
             end
           end
 
@@ -471,20 +496,15 @@ module LucidData
             @_composition = composition
             @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
-            @_node_con = self.class.node_conditions
-            @_validate_nodes = @_node_con ? true : false
+            @_validate_nodes = self.class.node_conditions.any?
 
             attributes = {} unless attributes
-            if @_validate_attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
-            end
+            _validate_attributes(attributes) if attributes
             @_raw_attributes = attributes
 
             nodes = documents || nodes || vertices || vertexes
             nodes = [] unless nodes
-            if @_validate_nodes
-              nodes.each { |n| _validate_node(n) }
-            end
+            _validate_nodes(nodes) if @_validate_nodes
             nodes.each { |n| n.collection = self }
             @_raw_collection = nodes
             @_sid_to_node_cache = {}

@@ -18,50 +18,56 @@ module LucidData
             @node_collections ||= {}
           end
 
-          def nodes(access_name, collection_class = nil)
-            node_collections[access_name] = collection_class
+          def nodes(access_name, validate_hash = {})
+            node_collections[access_name] = validate_hash
 
             define_method(access_name) do
               node_collections[access_name]
             end
 
             define_method("#{access_name}=") do |collection|
+              node_collection_conditions = self.class.node_collections[access_name]
+              Isomorfeus::Data::ElementValidator.new(self.name, part, node_collection_conditions).validate!
               @_changed = true
               node_collections[access_name] = collection
               node_collections[access_name].graph = self
               node_collections[access_name]
             end
 
-            if collection_class
-              singular_access_name = access_name.to_s.singularize
-              define_singleton_method("valid_#{singular_access_name}?") do |node|
-                collection_class.valid_node?(node)
-              end
+            define_singleton_method("valid_#{access_name}?") do |part|
+              raise "#{@class_name} No such node collection declared: '#{access_name}'!" unless self.class.node_collections.key?(access_name)
+              node_collection_conditions = self.class.node_collections[access_name]
+              Isomorfeus::Data::ElementValidator.new(self.name, part, node_collection_conditions).validate!
+            rescue
+              false
             end
           end
           alias documents nodes
           alias vertices nodes
           alias vertexes nodes
 
-          def edges(access_name, collection_class = nil)
-            edge_collections[access_name] = collection_class
+          def edges(access_name, validate_hash = {})
+            edge_collections[access_name] = validate_hash
 
             define_method(access_name) do
               edge_collections[access_name]
             end
 
             define_method("#{access_name}=") do |collection|
+              edge_collection_conditions = self.class.edge_collections[access_name]
+              Isomorfeus::Data::ElementValidator.new(self.name, part, edge_collection_conditions).validate!
               @_changed = true
               edge_collections[access_name] = collection
               edge_collections[access_name].graph = self
               edge_collections[access_name]
             end
 
-            if collection_class
-              singular_access_name = access_name.to_s.singularize
-              define_singleton_method("valid_#{singular_access_name}?") do |edge|
-                collection_class.valid_edge?(edge)
-              end
+            define_singleton_method("valid_#{access_name}?") do |part|
+              raise "#{@class_name} No such edge collection declared: '#{access_name}'!" unless self.class.edge_collections.key?(access_name)
+              edge_collection_conditions = self.class.edge_collections[access_name]
+              Isomorfeus::Data::ElementValidator.new(self.name, part, edge_collection_conditions).validate!
+            rescue
+              false
             end
           end
           alias links edges
@@ -200,7 +206,7 @@ module LucidData
             loaded = loaded?
 
             if attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
+              _validate_attribute(attributes)
               if loaded
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
@@ -329,9 +335,8 @@ module LucidData
 
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, &@_load_block)
-              revision = nil
-              revision = data.delete(:revision) if data.key?(:revision)
+              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              revision = data.delete(:revision)
               nodes = data.delete(:nodes)
               edges = data.delete(:edges)
               attributes = data.delete(:attributes)
@@ -339,7 +344,8 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil,
+                         composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -348,9 +354,7 @@ module LucidData
             @_composition = composition
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
-            if @_validate_attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
-            end
+            _validate_attributes(attributes) if attributes.any?
             @_raw_attributes = attributes
 
             # nodes

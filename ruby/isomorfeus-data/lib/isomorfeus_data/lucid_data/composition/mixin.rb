@@ -15,20 +15,50 @@ module LucidData
             @parts ||= {}
           end
 
-          def compose_with(access_name, part_class = nil)
-            parts[access_name] = part_class
+          def compose_with(access_name, validate_hash = {})
+            parts[access_name] = validate_hash
 
             define_method(access_name) do
               parts[access_name]
             end
 
             define_method("#{access_name}=") do |part|
+              part_conditions = self.class.parts[access_name]
+              Isomorfeus::Data::ElementValidator.new(self.name, part, part_conditions).validate!
               @_changed = true
               parts[access_name] = part
               parts[access_name].composition = self
               parts[access_name]
             end
+
+            define_singleton_method("valid_#{access_name}?") do |part|
+              _validate(access_name, part)
+            rescue
+              false
+            end
           end
+
+          def _validate_part(access_name, part)
+            raise "#{@class_name} No such part declared: '#{access_name}'!" unless self.class.parts.key?(access_name)
+            Isomorfeus::Data::ElementValidator.new(self.name, part, parts[access_name]).validate!
+          end
+
+          def _validate_parts(many_parts)
+            parts.each_key do |access_name|
+              if parts[access_name].key?(:required) && parts[access_name][:required] && !many_parts.key?(attr)
+                raise "Required part #{access_name} not given!"
+              end
+            end
+            many_parts.each { |access_name, part| _validate_part(access_name, part) } if parts.any?
+          end
+        end
+
+        def _validate_part(access_name, part)
+          self.class._validate_part(access_name, part)
+        end
+
+        def _validate_parts(many_parts)
+          self.class._validate_parts(many_parts)
         end
 
         def changed?
@@ -70,7 +100,7 @@ module LucidData
             loaded = loaded?
 
             if attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
+              _validate_attributes(attributes)
               if loaded
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
@@ -87,6 +117,7 @@ module LucidData
 
             @_parts = {}
             if parts && loaded
+              _validate_parts(parts)
               self.class.parts.each_key do |access_name|
                 if parts.key?(access_name)
                   part = parts[access_name]
@@ -140,9 +171,20 @@ module LucidData
 
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, &@_load_block)
-              revision = nil
-              revision = data.delete(:revision) if data.key?(:revision)
+              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              revision = data.delete(:revision)
+              attributes = data.delete(:attributes)
+              parts = data.delete(:parts)
+              self.new(key: key, revision: revision, parts: parts, attributes: attributes)
+            end
+
+            def save(key:, revision: nil, parts: nil, attributes: nil, pub_sub_client: nil, current_user: nil)
+              attributes = {} unless attributes
+              _validate_attributes(attributes)
+              _validate_parts(parts)
+              data = instance_exec(key: key, revision: revision, parts: parts, attributes: attributes,
+                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              revision = data.delete(:revision)
               attributes = data.delete(:attributes)
               parts = data.delete(:parts)
               self.new(key: key, revision: revision, parts: parts, attributes: attributes)
@@ -157,12 +199,11 @@ module LucidData
             @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
-            if @_validate_attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
-            end
+            _validate_attributes(attributes) if attributes.any?
             @_raw_attributes = attributes
 
             @_parts = {}
+            _validate_parts(parts)
             self.class.parts.each_key do |access_name|
               if parts.key?(access_name)
                 @_parts[access_name] = parts[access_name]

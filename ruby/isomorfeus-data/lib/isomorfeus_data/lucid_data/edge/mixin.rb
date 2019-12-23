@@ -74,7 +74,7 @@ module LucidData
             @_changed = false
             loaded = loaded?
             if attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
+              _validate_attributes(attributes)
               if loaded
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
@@ -170,15 +170,22 @@ module LucidData
 
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, &@_load_block)
-              revision = nil
-              revision = data.delete(:revision) if data.key?(:revision)
-              from = nil
-              from = data.delete(:_from) if data.key?(:_from)
-              from = data.delete(:from) if !from && data.key?(:from)
-              to = nil
-              to = data.delete(:_to) if data.key?(:_to)
-              to = data.delete(:to) if !to&& data.key?(:to)
+              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              revision = data.delete(:revision)
+              from = data.delete(:from)
+              to = data.delete(:to)
+              attributes = data.delete(:attributes)
+              self.new(key: key, revision: revision, from: from, to: to, attributes: attributes)
+            end
+
+            def save(key:, revision: nil, from:, to:, attributes: nil, pub_sub_client: nil, current_user: nil)
+              attributes = {} unless attributes
+              _validate_attributes(attributes)
+              data = instance_exec(key: key, revision: revision, from: from, to: to, attributes: attributes,
+                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              revision = data.delete(:revision)
+              from = data.delete(:from)
+              to = data.delete(:to)
               attributes = data.delete(:attributes)
               self.new(key: key, revision: revision, from: from, to: to, attributes: attributes)
             end
@@ -192,11 +199,8 @@ module LucidData
             @_composition = composition
             @_changed = false
             @_collection = collection
-            @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
-            if @_validate_attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
-            end
+            _validate_attributes if attributes
             @_raw_attributes = attributes
             @_changed_from = nil
             @_changed_to = nil

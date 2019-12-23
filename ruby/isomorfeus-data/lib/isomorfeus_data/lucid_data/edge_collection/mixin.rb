@@ -10,30 +10,38 @@ module LucidData
         base.include(LucidData::EdgeCollection::Finders)
 
         base.instance_exec do
-          def edges(validate_hash = {})
+          def edges(validate_hash)
             @edge_conditions = validate_hash
           end
           alias links edges
 
           def edge_conditions
-            @edge_conditions
+            @edge_conditions ||= {}
           end
 
           def valid_edge?(edge)
-            return true unless @edge_conditions
-            Isomorfeus::Data::ElementValidator.new(self.name, edge, @edge_conditions).validate!
+            return true unless edge_conditions.any?
+            _validate_edge(edge)
           rescue
             false
           end
           alias valid_link? valid_edge?
+
+          def _validate_edge(edge)
+            Isomorfeus::Data::ElementValidator.new(self.to_s, edge, edge_conditions).validate!
+          end
+
+          def _validate_edges(many_edges)
+            many_edges.each { |edge| _validate_edge(edge) } if edge_conditions.any?
+          end
         end
 
         def _validate_edge(edge)
-          Isomorfeus::Data::ElementValidator.new(@class_name, edge, @_edge_con).validate!
+          self.class._validate_edge(edge)
         end
 
         def _validate_edges(many_edges)
-          many_edges.each { |edge| Isomorfeus::Data::ElementValidator.new(@class_name, edge, @_edge_con).validate! }
+          self.class._validate_edges(many_edges)
         end
 
         def _collection_to_sids(collection)
@@ -116,13 +124,12 @@ module LucidData
             @_composition = composition
             @_node_to_edge_cache = {}
             @_changed_collection = nil
-            @_edge_con = self.class.edge_conditions
-            @_validate_edges = @_edge_con ? true : false
+            @_validate_edges = self.class.edge_conditions.any?
 
             loaded = loaded?
 
             if attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
+              _validate_attributes(attributes)
               if loaded
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
@@ -139,9 +146,7 @@ module LucidData
 
             edges = edges || links
             if edges && loaded
-              if @_validate_edges
-                edges.each { |e| _validate_edges(e) }
-              end
+              _validate_edges(edges)
               raw_edges = _collection_to_sids(edges)
               raw_collection = Redux.fetch_by_path(*@_edges_path)
               if raw_collection != raw_edges
@@ -462,12 +467,25 @@ module LucidData
 
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, &@_load_block)
-              revision = nil
-              revision = data.delete(:revision) if data.key?(:revision)
+              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              revision = data.delete(:revision)
               attributes = data.delete(:attributes)
               edges = data.delete(:edges)
-              self.new(key: key, revision: revision, attributes: attributes, edges: edges)
+              links = data.delete(:links)
+              self.new(key: key, revision: revision, attributes: attributes, edges: edges, links: links)
+            end
+
+            def load(key:, revision: nil, attributes: nil, edges: nil, links: nil, pub_sub_client: nil, current_user: nil)
+              val_edges = edges || links
+              _validate_attributes(attributes)
+              _validate_edges(val_edges)
+              data = instance_exec(key: key, revision: revision, attributes: attributes, edges: edges, links: links,
+                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              revision = data.delete(:revision)
+              attributes = data.delete(:attributes)
+              edges = data.delete(:edges)
+              links = data.delete(:links)
+              self.new(key: key, revision: revision, attributes: attributes, edges: edges, links: links)
             end
           end
 
@@ -481,20 +499,15 @@ module LucidData
             @_node_to_edge_cache = {}
             @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
-            @_edge_con = self.class.edge_conditions
-            @_validate_edges = @_edge_con ? true : false
+            @_validate_edges = self.class.edge_conditions.any?
 
             attributes = {} unless attributes
-            if @_validate_attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
-            end
+            _validate_attributes(attributes) if attributes
             @_raw_attributes = attributes
 
             edges = edges || links
             edges = [] unless edges
-            if @_validate_edges
-              edges.each { |e| _validate_edge(e) }
-            end
+            _validate_edges(edges) if @_validate_edges
             edges.each { |e| e.collection = self }
             @_raw_collection = edges
           end

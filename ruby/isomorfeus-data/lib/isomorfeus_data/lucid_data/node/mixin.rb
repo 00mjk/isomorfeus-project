@@ -63,7 +63,7 @@ module LucidData
             @_changed = false
             loaded = loaded?
             if attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
+              _validate_attributes(attributes)
               if loaded
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
@@ -146,11 +146,19 @@ module LucidData
 
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, &@_load_block)
-              revision = nil
-              revision = data.delete(:revision) if data.key?(:revision)
-              data.delete(:_key)
-              attributes = data.key?(:attributes) ? data.delete(:attributes) : data
+              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              revision = data.delete(:revision)
+              attributes = data.delete(:attributes)
+              self.new(key: key, revision: revision, attributes: attributes)
+            end
+
+            def save(key:, revision: nil, attributes: nil, pub_sub_client: nil, current_user: nil)
+              attributes = {} unless attributes
+              _validate_attributes(attributes)
+              data = instance_exec(key: key, revision: revision, attributes: attributes,
+                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              revision = data.delete(:revision)
+              attributes = data.delete(:attributes)
               self.new(key: key, revision: revision, attributes: attributes)
             end
           end
@@ -163,11 +171,8 @@ module LucidData
             @_collection = collection
             @_composition = composition
             @_changed = false
-            @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
-            if @_validate_attributes
-              attributes.each { |a,v| _validate_attribute(a, v) }
-            end
+            _validate_attributes if attributes
             @_raw_attributes = attributes
           end
 
