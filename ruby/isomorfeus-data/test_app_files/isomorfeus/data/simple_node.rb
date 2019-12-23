@@ -1,7 +1,7 @@
 class SimpleNode < LucidData::Document::Base
   attribute :one
 
-  execute_load do |key:|
+  execute_load do |key:, current_user:, pub_sub_client:|
     { key: key, attributes: { one: key }}
   end
 
