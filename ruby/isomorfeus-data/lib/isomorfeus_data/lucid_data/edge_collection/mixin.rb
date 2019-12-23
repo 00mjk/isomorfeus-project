@@ -475,9 +475,9 @@ module LucidData
               self.new(key: key, revision: revision, attributes: attributes, edges: edges, links: links)
             end
 
-            def load(key:, revision: nil, attributes: nil, edges: nil, links: nil, pub_sub_client: nil, current_user: nil)
+            def save(key:, revision: nil, attributes: nil, edges: nil, links: nil, pub_sub_client: nil, current_user: nil)
               val_edges = edges || links
-              _validate_attributes(attributes)
+              _validate_attributes(attributes) if attributes
               _validate_edges(val_edges)
               data = instance_exec(key: key, revision: revision, attributes: attributes, edges: edges, links: links,
                                    pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)

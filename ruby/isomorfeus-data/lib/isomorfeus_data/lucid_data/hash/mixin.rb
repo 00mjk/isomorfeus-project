@@ -96,7 +96,7 @@ module LucidData
             @_composition = composition
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
-            _relaxed_validate_attribute(attributes) if @_validate_attributes
+            _relaxed_validate_attributes(attributes) if @_validate_attributes
             raw_attributes = Redux.fetch_by_path(*@_store_path)
             if `raw_attributes === null`
               @_changed_attributes = !attributes ? {} : attributes
@@ -310,7 +310,7 @@ module LucidData
             @_changed = false
             @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
-            _relaxed_validate_attribute(attributes) if @_validate_attributes
+            _relaxed_validate_attributes(attributes) if @_validate_attributes
             @_raw_attributes = attributes
           end
 

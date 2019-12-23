@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 CG_NODES_EDGES = [5,10,1]
-CG_TRANSPORT = { " SimpleComposition" => {"6"=>{"attributes"=>{},
+CG_TRANSPORT = { "SimpleComposition" => {"6"=>{"attributes"=>{},
                                              "parts"=>{"a_array"=>["SimpleArray", "6"],
                                                        "a_collection"=>["SimpleCollection", "6"],
                                                        "a_graph"=>["SimpleGraph", "6"],

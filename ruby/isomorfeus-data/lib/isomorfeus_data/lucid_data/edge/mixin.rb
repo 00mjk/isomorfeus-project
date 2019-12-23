@@ -200,7 +200,7 @@ module LucidData
             @_changed = false
             @_collection = collection
             attributes = {} unless attributes
-            _validate_attributes if attributes
+            _validate_attributes(attributes) if attributes
             @_raw_attributes = attributes
             @_changed_from = nil
             @_changed_to = nil

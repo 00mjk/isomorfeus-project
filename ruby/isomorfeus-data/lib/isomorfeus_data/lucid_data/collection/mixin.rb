@@ -472,8 +472,8 @@ module LucidData
             def save(key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil,
                      pub_sub_client: nil, current_user: nil)
               val_nodes = documents || nodes || vertexes || vertices
-              _validate_attributes(attributes)
-              _validate_nodes(val_nodes)
+              _validate_attributes(attributes) if self.class.attribute_conditions.any?
+              _validate_nodes(val_nodes) if self.class.node_conditions.any?
               data = instance_exec(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
                                    nodes: nodes, pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
               revision = data.delete(:revision)

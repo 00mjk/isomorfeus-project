@@ -39,7 +39,7 @@ module LucidData
           end
 
           def _validate_part(access_name, part)
-            raise "#{@class_name} No such part declared: '#{access_name}'!" unless self.class.parts.key?(access_name)
+            raise "#{self.name}: No such part declared: '#{access_name}'!" unless parts.key?(access_name)
             Isomorfeus::Data::ElementValidator.new(self.name, part, parts[access_name]).validate!
           end
 

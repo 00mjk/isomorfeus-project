@@ -1,4 +1,6 @@
 class SimpleGraph < LucidData::Graph::Base
+  attribute :one
+
   execute_load do |key:, current_user:, pub_sub_client:|
     if RUBY_ENGINE != 'opal'
     { key: key,

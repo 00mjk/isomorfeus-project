@@ -358,7 +358,7 @@ module LucidData
               self.new(key: key, revision: revision, elements: elements)
             end
 
-            def save(key: key, revision: nil, elements: nil, pub_sub_client: nil, current_user: nil)
+            def save(key:, revision: nil, elements: nil, pub_sub_client: nil, current_user: nil)
               _validate_elements(elements)
               data = instance_exec(key: key, revision: revision, elements: elements,
                                    pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)

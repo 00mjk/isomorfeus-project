@@ -172,7 +172,7 @@ module LucidData
             @_composition = composition
             @_changed = false
             attributes = {} unless attributes
-            _validate_attributes if attributes
+            _validate_attributes(attributes) if attributes
             @_raw_attributes = attributes
           end
 

@@ -26,18 +26,15 @@ module LucidData
             end
 
             define_method("#{access_name}=") do |collection|
-              node_collection_conditions = self.class.node_collections[access_name]
-              Isomorfeus::Data::ElementValidator.new(self.name, part, node_collection_conditions).validate!
+              _validate_node_collection(access_name, collection)
               @_changed = true
               node_collections[access_name] = collection
               node_collections[access_name].graph = self
               node_collections[access_name]
             end
 
-            define_singleton_method("valid_#{access_name}?") do |part|
-              raise "#{@class_name} No such node collection declared: '#{access_name}'!" unless self.class.node_collections.key?(access_name)
-              node_collection_conditions = self.class.node_collections[access_name]
-              Isomorfeus::Data::ElementValidator.new(self.name, part, node_collection_conditions).validate!
+            define_singleton_method("valid_#{access_name}?") do |collection|
+              _validate_node_collection(access_name, collection)
             rescue
               false
             end
@@ -45,6 +42,23 @@ module LucidData
           alias documents nodes
           alias vertices nodes
           alias vertexes nodes
+
+          def _validate_nodes(nodes_hash_or_array)
+            if nodes_hash_or_array.class == Hash
+              nodes_hash_or_array.each do |access_name, collection|
+                _validate_node_collection(access_name, collection)
+              end
+            else
+              _validate_node_collection(:nodes, nodes_hash_or_array)
+            end
+          end
+
+          def _validate_node_collection(access_name, collection)
+            unless node_collections.key?(access_name) || access_name == :nodes
+              raise "#{self.name}: No such node collection declared: '#{access_name}'!"
+            end
+            Isomorfeus::Data::ElementValidator.new(self.name, collection, node_collections[access_name]).validate! if node_collections[access_name]
+          end
 
           def edges(access_name, validate_hash = {})
             edge_collections[access_name] = validate_hash
@@ -54,23 +68,53 @@ module LucidData
             end
 
             define_method("#{access_name}=") do |collection|
-              edge_collection_conditions = self.class.edge_collections[access_name]
-              Isomorfeus::Data::ElementValidator.new(self.name, part, edge_collection_conditions).validate!
+              _validate_edge_collection(access_name, collection)
               @_changed = true
               edge_collections[access_name] = collection
               edge_collections[access_name].graph = self
               edge_collections[access_name]
             end
 
-            define_singleton_method("valid_#{access_name}?") do |part|
-              raise "#{@class_name} No such edge collection declared: '#{access_name}'!" unless self.class.edge_collections.key?(access_name)
-              edge_collection_conditions = self.class.edge_collections[access_name]
-              Isomorfeus::Data::ElementValidator.new(self.name, part, edge_collection_conditions).validate!
+            define_singleton_method("valid_#{access_name}?") do |collection|
+              _validate_edge_collection(access_name, collection)
             rescue
               false
             end
           end
           alias links edges
+
+          def _validate_edges(edges_hash_or_array)
+            if edges_hash_or_array.class == Hash
+              edges_hash_or_array.each do |access_name, collection|
+                _validate_edge_collection(access_name, collection)
+              end
+            else
+              _validate_edge_collection(:edges, edges_hash_or_array)
+            end
+          end
+
+          def _validate_edge_collection(access_name, collection)
+            unless edge_collections.key?(access_name) || access_name == :edges
+              raise "#{self.name}: No such edge collection declared: '#{access_name}'!"
+            end
+            Isomorfeus::Data::ElementValidator.new(self.name, collection, edge_collections[access_name]).validate! if edge_collections[access_name]
+          end
+        end
+
+        def _validate_edges(edges_hash_or_array)
+          self.class._validate_edges(edges_hash_or_array)
+        end
+
+        def _validate_edge_collection(access_name, collection)
+          self.class._validate_edge_collection(access_name, collection)
+        end
+
+        def _validate_nodes(nodes_hash_or_array)
+          self.class._validate_nodes(nodes_hash_or_array)
+        end
+
+        def _validate_node_collection(access_name, collection)
+          self.class._validate_node_collection(access_name, collection)
         end
 
         def method_missing(method_name, *args, &block)
@@ -206,7 +250,7 @@ module LucidData
             loaded = loaded?
 
             if attributes
-              _validate_attribute(attributes)
+              _validate_attributes(attributes)
               if loaded
                 raw_attributes = Redux.fetch_by_path(*@_store_path)
                 if `raw_attributes === null`
@@ -225,6 +269,7 @@ module LucidData
             @_node_collections = {}
             nodes = nodes || documents || vertices || vertexes
             if nodes && loaded
+              _validate_nodes(nodes)
               if nodes.class == ::Hash
                 self.class.node_collections.each_key do |access_name|
                   if nodes.key?(access_name)
@@ -255,6 +300,7 @@ module LucidData
             @_edge_collections = {}
             edges = edges || links
             if edges && loaded
+              _validate_edges(edges)
               if edges.class == ::Hash
                 self.class.edge_collections.each_key do |access_name|
                   if edges.key?(access_name)
@@ -342,6 +388,28 @@ module LucidData
               attributes = data.delete(:attributes)
               self.new(key: key, revision: revision, edges: edges, nodes: nodes, attributes: attributes)
             end
+
+            def save(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil,
+                     pub_sub_client: nil, current_user: nil)
+              attributes = {} unless attributes
+              val_edges = edges || links
+              val_nodes = documents || nodes || vertexes || vertices
+              _validate_attributes(attributes) if attributes.any?
+              _validate_edges(val_edges)
+              _validate_nodes(val_nodes)
+              data = instance_exec(key: key, revision: revision, parts: parts, attributes: attributes,
+                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              revision = data.delete(:revision)
+              attributes = data.delete(:attributes)
+              documents = data.delete(:documents)
+              vertexes = data.delete(:vertexes)
+              vertices = data.delete(:vertices)
+              nodes = data.delete(:nodes)
+              edges = data.delete(:edges)
+              links = data.delete(:links)
+              self.new(key: key, revision: revision, attributes: attributes, edges: edges, links: links, nodes: nodes, documents: documents,
+                       vertices: vertices, vertexes: vertexes, pub_sub_client: nil, current_user: nil)
+            end
           end
 
           def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil,
@@ -352,7 +420,6 @@ module LucidData
             @_revision = revision
             @_changed = false
             @_composition = composition
-            @_validate_attributes = self.class.attribute_conditions.any?
             attributes = {} unless attributes
             _validate_attributes(attributes) if attributes.any?
             @_raw_attributes = attributes
@@ -361,6 +428,7 @@ module LucidData
             @_node_collections = {}
             nodes = nodes || documents || vertices || vertexes
             if nodes.class == ::Hash
+              _validate_nodes(nodes)
               self.class.node_collections.each_key do |access_name|
                 if nodes.key?(access_name)
                   @_node_collections[access_name] = nodes[access_name]
@@ -368,6 +436,7 @@ module LucidData
                 end
               end
             else
+              _validate_nodes(nodes) if nodes
               @_node_collections[:nodes] = nodes ? nodes : []
               @_node_collections[:nodes].graph = self if @_node_collections[:nodes].respond_to?(:graph=)
             end
@@ -376,6 +445,7 @@ module LucidData
             @_edge_collections = {}
             edges = edges || links
             if edges.class == ::Hash
+              _validate_edges(edges)
               self.class.edge_collections.each_key do |access_name|
                 if edges.key?(access_name)
                   @_edge_collections[access_name] = edges[access_name]
@@ -383,6 +453,7 @@ module LucidData
                 end
               end
             else
+              _validate_edges(edges) if edges
               @_edge_collections[:edges] = edges ? edges : []
               @_edge_collections[:edges].graph = self if @_edge_collections[:edges].respond_to?(:graph=)
             end
