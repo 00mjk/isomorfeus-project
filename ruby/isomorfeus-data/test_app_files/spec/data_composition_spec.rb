@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 CG_NODES_EDGES = [5,10,1]
-CG_TRANSPORT = { "DataComposition" => {"6"=>{"attributes"=>{}, 
+CG_TRANSPORT = { " SimpleComposition" => {"6"=>{"attributes"=>{},
                                              "parts"=>{"a_array"=>["SimpleArray", "6"],
                                                        "a_collection"=>["SimpleCollection", "6"],
                                                        "a_graph"=>["SimpleGraph", "6"],
@@ -43,7 +43,7 @@ RSpec.describe 'LucidData::Composition' do
   context 'on server' do
     it 'can load a combined graph' do
       result = on_server do
-        graph = DataComposition.load(key: 1)
+        graph =  SimpleComposition.load(key: 1)
         n_nodes = graph.a_collection.nodes.size
         n_edges = graph.a_graph.nodes.size + graph.a_graph.edges.size
         n_node = graph.a_node ? 1 : 0
@@ -54,7 +54,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included simple array' do
       result = on_server do
-        graph = DataComposition.load(key: 2)
+        graph =  SimpleComposition.load(key: 2)
         graph.a_array.to_a
       end
       expect(result).to eq([1,2,3])
@@ -62,7 +62,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included simple collection' do
       result = on_server do
-        graph = DataComposition.load(key: 1)
+        graph =  SimpleComposition.load(key: 1)
         graph.a_collection.nodes.map(&:key)
       end
       expect(result).to eq(["1", "2", "3", "4", "5"])
@@ -70,7 +70,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included simple graph' do
       result = on_server do
-        graph = DataComposition.load(key: 3)
+        graph =  SimpleComposition.load(key: 3)
         nodes = graph.a_graph.nodes.map(&:key)
         edges = graph.a_graph.edges.map(&:key)
         [nodes, edges]
@@ -80,7 +80,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included simple hash' do
       result = on_server do
-        graph = DataComposition.load(key: 4)
+        graph =  SimpleComposition.load(key: 4)
         graph.a_hash.to_h
       end
       expect(result).to eq({"one"=>1, "three"=>3, "two"=>2})
@@ -88,7 +88,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included node' do
       result = on_server do
-        graph = DataComposition.load(key: 5)
+        graph =  SimpleComposition.load(key: 5)
         graph.a_node.one
       end
       expect(result).to eq(5)
@@ -96,7 +96,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can convert the graph to transport' do
       result = on_server do
-        graph = DataComposition.load(key: 6)
+        graph =  SimpleComposition.load(key: 6)
         graph.to_transport
       end
       expect(result).to eq(CG_TRANSPORT)
@@ -104,7 +104,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can convert the graphs included items to transport' do
       result = on_server do
-        graph = DataComposition.load(key: 7)
+        graph =  SimpleComposition.load(key: 7)
         graph.included_items_to_transport
       end
       expect(result).to eq(CG_ITEMS)
@@ -118,7 +118,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can load a combined graph' do
       result = @doc.await_ruby do
-        DataComposition.promise_load(key: 1).then do |graph|
+         SimpleComposition.promise_load(key: 1).then do |graph|
           n_nodes = graph.a_collection.nodes.size
           n_edges = graph.a_graph.nodes.size + graph.a_graph.edges.size
           n_node = graph.a_node ? 1 : 0
@@ -130,7 +130,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included simple array' do
       result = @doc.await_ruby do
-        DataComposition.promise_load(key: 2).then do |graph|
+         SimpleComposition.promise_load(key: 2).then do |graph|
           graph.a_array.to_a
         end
       end
@@ -139,7 +139,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included simple collection' do
       result = @doc.await_ruby do
-        DataComposition.promise_load(key: 3).then do |graph|
+         SimpleComposition.promise_load(key: 3).then do |graph|
           graph.a_collection.nodes.map(&:key)
         end
       end
@@ -148,7 +148,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included simple graph' do
       result = @doc.await_ruby do
-        DataComposition.promise_load(key: 4).then do |graph|
+         SimpleComposition.promise_load(key: 4).then do |graph|
           nodes = graph.a_graph.nodes.map(&:key)
           edges = graph.a_graph.edges.map(&:key)
           [nodes, edges]
@@ -159,7 +159,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included simple hash' do
       result = @doc.await_ruby do
-        DataComposition.promise_load(key: 5).then do |graph|
+         SimpleComposition.promise_load(key: 5).then do |graph|
           graph.a_hash.to_h
         end
       end
@@ -168,7 +168,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can access the included node' do
       result = @doc.await_ruby do
-        DataComposition.promise_load(key: 8).then do |graph|
+         SimpleComposition.promise_load(key: 8).then do |graph|
           graph.a_node.one
         end
       end
@@ -177,7 +177,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can convert the graph to transport' do
       result = @doc.await_ruby do
-        DataComposition.promise_load(key: 6).then do |graph|
+         SimpleComposition.promise_load(key: 6).then do |graph|
           graph.to_transport
         end
       end
@@ -186,7 +186,7 @@ RSpec.describe 'LucidData::Composition' do
 
     it 'can convert the graphs included items to transport' do
       result = @doc.await_ruby do
-        DataComposition.promise_load(key: 7).then do |graph|
+         SimpleComposition.promise_load(key: 7).then do |graph|
           graph.included_items_to_transport
         end
       end

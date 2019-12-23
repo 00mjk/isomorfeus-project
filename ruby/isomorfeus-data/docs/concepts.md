@@ -78,12 +78,6 @@ To detect parallel data changes and to be able to handle them, the LucidData cla
 
  (more to come on this topic later)
 
-### Attributes
-
-All LucidData classes except LucidData::Array support attributes, some require them to be useful. See the Common API doc and class specific docs.
-Attributes can be declared and validated just like props and the same options as for props apply to attributes. Just instead of `prop` use `attribute`.
-See [the isomorfeus-react props documentation](https://github.com/isomorfeus/isomorfeus-react/blob/master/ruby/docs/props.md#prop-declaration).
-
 ### Classes and Mixins
 
 To inherit from a LucidData class use the Base class, example:
