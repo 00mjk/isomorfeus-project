@@ -66,11 +66,21 @@ module Isomorfeus
           end
         end
 
-        def promise_query(props = {})
+        def query(props: {})
+          query_result_instance = LucidData::QueryResult.new
+          promise_query(props: props, query_result_instance: query_result_instance) unless query_result_instance.loaded?
+          query_result_instance
+        end
+
+        def promise_query(props: {}, query_result_instance:)
+          query_result_instance = LucidData::QueryResult.new unless query_result_instance
+          props.each_key do |prop_name|
+            raise "#{self.to_s} No such query prop declared: '#{prop_name}'!" unless declared_props.key?(prop_name)
+          end
           validate_props(props)
-          props_json = props.to_json
-          instance = self.new(key) unless instance
-          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, 'query', props_json).then do |agent|
+          data_props = { props: props, query_result_instance_key: query_result_instance.key }
+          props_json = data_props.to_json
+          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :query, props_json).then do |agent|
             if agent.processed
               agent.result
             else
@@ -79,8 +89,9 @@ module Isomorfeus
                 `console.error(#{agent.response[:error].to_n})`
                 raise agent.response[:error]
               end
+              query_result_instance._load_from_store!
               Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
-              agent.result = instance
+              agent.result = query_result_instance
             end
           end
         end
@@ -90,12 +101,6 @@ module Isomorfeus
         def execute_load(_); end
         def execute_query(_); end
         def execute_save(_); end
-
-        # callbacks
-        def on_destroy(_); end
-        def on_load(_); end
-        def on_query(_); end
-        def on_save(_); end
       else
         def promise_create(key:, **things)
           instance = self.create(key: key, **things)
@@ -105,10 +110,14 @@ module Isomorfeus
         end
 
         def promise_destroy(key:)
-          self.destroy(key: key)
+          sid = self.destroy(key: key)
           result_promise = Promise.new
-          result_promise.resolve(true)
+          result_promise.resolve(sid)
           result_promise
+        end
+
+        def destroy(key:, pub_sub_client: nil, current_user: nil)
+          instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_destroy_block)
         end
 
         def promise_load(key:)
@@ -118,11 +127,21 @@ module Isomorfeus
           result_promise
         end
 
-        def promise_query(props)
-          instance = self.query(props)
+        def promise_query(props:)
+          instance = self.query(props: props)
           result_promise = Promise.new
           result_promise.resolve(instance)
           result_promise
+        end
+
+        def query(props:, query_result_instance_key:, pub_sub_client: nil, current_user: nil)
+          props.each_key do |prop_name|
+            raise "#{self.to_s} No such query prop declared: '#{prop_name}'!" unless declared_props.key?(prop_name)
+          end
+          validate_props(props)
+          query_result = LucidData::QueryResult.new(key: query_result_instance_key)
+          query_result.result_set = instance_exec(props: props, pub_sub_client: pub_sub_client, current_user: current_user, &@_query_block)
+          query_result
         end
 
         # execute
@@ -140,23 +159,6 @@ module Isomorfeus
 
         def execute_save(&block)
           @_save_block = block
-        end
-
-        # callbacks
-        def on_destroy(&block)
-          @_on_destroy_block = block
-        end
-
-        def on_load(&block)
-          @_on_load_block = block
-        end
-
-        def on_query(&block)
-          @_on_query_block = block
-        end
-
-        def on_save(&block)
-          @_on_save_block = block
         end
       end
     end

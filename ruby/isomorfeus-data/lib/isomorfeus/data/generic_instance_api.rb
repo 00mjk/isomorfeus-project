@@ -39,7 +39,7 @@ module Isomorfeus
         def promise_load_once
           self.class.promise_load_once(key: key, instance: self)
         end
-        
+
         def promise_reload
           self.class.promise_load(@key, self)
         end
@@ -51,7 +51,11 @@ module Isomorfeus
         alias create save
 
         def promise_save
-          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, 'save', to_transport).then do |agent|
+          data_hash = to_transport
+          if self.respond_to?(:included_changed_items)
+            data_hash.deep_merge!(self.included_changed_items)
+          end
+          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, 'save', data_hash).then do |agent|
             if agent.processed
               agent.result
             else
