@@ -57,7 +57,7 @@ module LucidStorableObject
         base.instance_exec do
           def load(props_hash = {})
             validate_props(props_hash)
-            instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
+            # instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
             self.promise_load(props_hash, instance) unless instance.loaded?
             instance
           end
@@ -68,7 +68,7 @@ module LucidStorableObject
           def promise_load(props_hash = {}, instance = nil)
             unless instance
               validate_props(props_hash)
-              instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
+              # instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
             end
 
             props_json = instance.instance_variable_get(:@props_json)
@@ -132,7 +132,7 @@ module LucidStorableObject
         base.instance_exec do
           def load(props_hash = {})
             validate_props(props_hash)
-            instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
+            # instance = self.new(validated_props: Isomorfeus::Data::Props.new(props_hash))
             instance.instance_exec do
               @data_array = self.class.load_query_block.call(props_hash)
               @loaded = true
