@@ -13,9 +13,6 @@ All LucidData *classes* support the following methods for loading data based on 
   delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
-  
-- `promise_load_once(key:)` -> promise with instance when resolved
-  This method returns a promise. This method triggers a load only once for the given key.
 
 ### Querying Data
 

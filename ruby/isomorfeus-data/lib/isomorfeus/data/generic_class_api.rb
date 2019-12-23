@@ -57,15 +57,6 @@ module Isomorfeus
           end
         end
 
-        def promise_load_once(key:, instance: nil)
-          instance = self.new(key: key) unless instance
-          if instance.loaded?
-            Promise.new.resolve(instance)
-          else
-            promise_load(key: key, instance: instance)
-          end
-        end
-
         def query(props: {})
           query_result_instance = LucidData::QueryResult.new
           promise_query(props: props, query_result_instance: query_result_instance) unless query_result_instance.loaded?
