@@ -110,15 +110,15 @@ Example:
 class MyNode < LucidData::Node::Base
 end
 
-n = MyNode.new(key: '23')
-n.to_sid # -> ['MyNode', '23']
+n = MyNode.new(key: '231')
+n.to_sid # -> ['MyNode', '231']
 ```
 
 
 ```
-[  'MyNode',   '23' ]   <- Array
+[  'MyNode',   '231'  ]   <- Array
        ^         ^
        |         |
- class nanme    key
+ class name     key
 ```
 
