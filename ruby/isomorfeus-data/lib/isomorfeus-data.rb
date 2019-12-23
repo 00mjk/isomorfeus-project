@@ -1,25 +1,9 @@
 require 'isomorfeus-transport'
 require 'isomorfeus/data/config'
-require 'isomorfeus/data/props'
 require 'isomorfeus/data/attribute_support'
 require 'isomorfeus/data/generic_class_api'
 require 'isomorfeus/data/generic_instance_api'
 require 'isomorfeus/data/element_validator'
-#require 'lucid_arango/node/mixin'
-#require 'lucid_arango/node/base'
-#require 'lucid_arango/document/mixin'
-#require 'lucid_arango/document/base'
-#require 'lucid_arango/vertex/mixin'
-#require 'lucid_arango/vertex/base'
-#require 'lucid_arango/edge/mixin'
-#require 'lucid_arango/edge/base'
-#require 'lucid_arango/collection/mixin'
-#require 'lucid_arango/collection/base'
-#require 'lucid_arango/edge_collection/mixin'
-#require 'lucid_arango/edge_collection/base'
-#require 'lucid_arango/graph/mixin'
-#require 'lucid_arango/graph/base'
-
 
 if RUBY_ENGINE == 'opal'
   require 'isomorfeus/data/reducer'
@@ -31,9 +15,8 @@ else
   require 'oj'
   require 'active_support'
   require 'active_support/core_ext/hash'
-  #require 'arango-driver'
-  #require 'isomorfeus/data/handler/arango'
 
+  require 'isomorfeus_data/lucid_data/query_result'
   require 'isomorfeus_data/lucid_data/array/mixin'
   require 'isomorfeus_data/lucid_data/array/base'
   require 'isomorfeus_data/lucid_data/hash/mixin'
@@ -59,16 +42,10 @@ else
   require 'isomorfeus_data/lucid_data/graph/finders'
   require 'isomorfeus_data/lucid_data/graph/mixin'
   require 'isomorfeus_data/lucid_data/graph/base'
-  require 'isomorfeus_data/lucid_data/object/mixin'
-  require 'isomorfeus_data/lucid_data/object/base'
-  require 'isomorfeus_data/lucid_data/remote_object/mixin'
-  require 'isomorfeus_data/lucid_data/remote_object/base'
   require 'isomorfeus_data/lucid_data/composition/mixin'
   require 'isomorfeus_data/lucid_data/composition/base'
 
   require 'isomorfeus/data/handler/generic'
-  require 'isomorfeus/data/handler/object_call'
-  require 'isomorfeus/data/handler/object_store'
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
