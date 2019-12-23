@@ -5,11 +5,14 @@ module Isomorfeus
     module Handler
       class Generic < LucidHandler::Base
         # responsible for loading:
-        # LucidArray
-        # LucidHash
+        # LucidData::Array
+        # LucidData::Hash
         # LucidData::Edge
         # LucidData::Document
         # LucidData::Collection
+        # LucidData::EdgeCollection
+        # LucidData::Graph
+        # LucidData::Composition
 
         def process_request(pub_sub_client, current_user, response_agent)
           # promise_send_path('Isomorfeus::Data::Handler::Generic', self.to_s, action, props_hash)
@@ -19,8 +22,10 @@ module Isomorfeus
               if type_class
                 response_agent.request[type_class_name].each_key do |action|
                   case action
-                  when 'load' then process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name, action)
-                  when 'store' then process_store(pub_sub_client, current_user, response_agent, type_class, type_class_name, action)
+                  when 'load' then process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+                  when 'query' then process_query(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+                  when 'save' then process_save(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+                  when 'destroy' then process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name)
                   else response_agent.error = { error: { action => 'No such thing!' }}
                   end
                 end
@@ -35,17 +40,13 @@ module Isomorfeus
                                  end
         end
 
-        def process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name, action)
-          props = response_agent.request[type_class_name][action]
-          # STDERR.puts "PROPS_JSON #{props_json}"
-          # props = Oj.load(props_json, mode: :strict)
+        def process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+          props = response_agent.request[type_class_name]['load']
           props.transform_keys!(&:to_sym)
           props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
           if current_user.authorized?(type_class, :load, props)
             loaded_type = type_class.load(**props)
             if loaded_type
-              on_load_block = type_class.instance_variable_get(:@_on_load_block)
-              loaded_type.instance_exec(pub_sub_client, current_user, &on_load_block) if on_load_block
               response_agent.outer_result = { data: loaded_type.to_transport }
               if loaded_type.respond_to?(:included_items_to_transport)
                 response_agent.outer_result.deep_merge!(data: loaded_type.included_items_to_transport)
@@ -57,35 +58,72 @@ module Isomorfeus
           end
         end
 
-        def process_store(pub_sub_client, current_user, response_agent, type_class, type_class_name, action)
-          props_json = response_agent.request[type_class_name][action]
-          props = Oj.load(props_json, mode: :strict)
-          props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
-          if current_user.authorized?(type_class, :store, props)
-            stored_type = type_class.new(**props).store
-            on_store_block = type_class.instance_variable_get(:@_on_store_block)
-            stored_type.instance_exec(pub_sub_client, current_user, &on_store_block) if on_store_block
-            response_agent.outer_result = { data: stored_type.to_transport }
+        def process_query(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+          props = response_agent.request[type_class_name]['query']
+          props.transform_keys!(&:to_sym)
+          props[:props].transform_keys!(&:to_sym)
+          props.deep_merge!({ pub_sub_client: pub_sub_client, current_user: current_user })
+          if current_user.authorized?(type_class, :query, props[:props])
+            queried_type = type_class.query(**props)
+            if queried_type
+              response_agent.outer_result = { data: queried_type.to_transport }
+              if queried_type.respond_to?(:included_items_to_transport)
+                response_agent.outer_result.deep_merge!(data: queried_type.included_items_to_transport)
+              end
+              response_agent.agent_result = { success: 'ok' }
+            else response_agent.error = { error: { type_class_name => 'No such thing!' }}
+            end
+          else response_agent.error = { error: 'Access denied!' }
+          end
+        end
+
+        def process_save(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+          data_hash_json = response_agent.request[type_class_name]['save']
+          data_hash = Oj.load(data_hash_json, mode: :strict)
+          response_agent.outer_result = {}
+          if current_user.authorized?(type_class, :save, { pub_sub_client: pub_sub_client, current_user: current_user })
+            data_hash.each_key do |data_class_name|
+              data_hash[data_class_name].each_key do |key|
+                if Isomorfeus.valid_data_class_name?(type_class_name)
+                  data_class = Isomorfeus.cached_data_class(data_class_name)
+                  if data_class
+                    item_data_hash = data_hash[data_class_name][key]
+                    item_data_hash = item_data_hash.merge({ pub_sub_client: pub_sub_client, current_user: current_user })
+                    if current_user.authorized?(data_class, :save, item_data_hash)
+                      saved_type = data_class.save(**item_data_hash)
+                      if saved_type
+                        response_agent.outer_result.deep_merge!({ data: saved_type.to_transport })
+                      end
+                    else
+                      response_agent.error = { error: 'Access denied!' }
+                      break
+                    end
+                  else
+                    response_agent.error = { error: 'Access denied!' }
+                    break
+                  end
+                end
+              end
+            end
             response_agent.agent_result = { success: 'ok' }
           else response_agent.error = { error: 'Access denied!' }
           end
         end
 
-        #def process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name, action)
-        #  props_json = response_agent.request[type_class_name][action]
-        #  props = Oj.load(props_json, mode: :strict)
-        #  props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
-        #  if current_user.authorized?(type_class, :store, *props)
-        #    # TODO
-        #    stored_type.instance_exec do
-        #      type_class.on_store_block.call(pub_sub_client, current_user) if type_class.on_store_block
-        #    end
-        #    destroyed = type_class.destroy(**props)
-        #    response_agent.outer_result = { data: stored_type.to_transport }
-        #    response_agent.agent_result = { success: 'ok' }
-        #  else response_agent.error = { error: 'Access denied!' }
-        #  end
-        #end
+        def process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+          props_json = response_agent.request[type_class_name]['destroy']
+          props = Oj.load(props_json, mode: :strict)
+          props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
+          if current_user.authorized?(type_class, :destroy, props)
+            destroyed_type = type_class.destroy(**props)
+            if destroyed_type
+              response_agent.outer_result = { data: destroyed_type }
+              response_agent.agent_result = { success: 'ok' }
+            else response_agent.error = { error: { type_class_name => 'No such thing!' }}
+            end
+          else response_agent.error = { error: 'Access denied!' }
+          end
+        end
       end
     end
   end
