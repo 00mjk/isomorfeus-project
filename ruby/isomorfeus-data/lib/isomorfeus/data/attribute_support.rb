@@ -16,11 +16,28 @@ module Isomorfeus
           def validate
             Isomorfeus::Props::ValidateHashProxy.new
           end
+
+          def _validate_attribute(attr_name, attr_val)
+            raise "#{@class_name} No such attribute declared: '#{attr_name}'!" unless attribute_conditions.key?(attr_name)
+            Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, attribute_conditions[attr_name]).validate!
+          end
+
+          def _validate_attributes(attrs)
+            attribute_conditions.each_key do |attr|
+              if attribute_conditions[attr].key?(:required) && attribute_conditions[attr][:required] && !attrs.key?(attr)
+                raise "Required attribute #{attr} not given!"
+              end
+            end
+            attrs.each { |attr, val| _validate_attribute(attr, val) }
+          end
         end
 
-        def _validate_attribute(attr_name, attr_val)
-          raise "#{@class_name} No such attribute declared: '#{attr_name}'!" unless self.class.attribute_conditions.key?(attr_name)
-          Isomorfeus::Props::Validator.new(@class_name, attr_name, attr_val, self.class.attribute_conditions[attr_name]).validate!
+        def _validate_attribute(attr_name, value)
+          self.class._validate_attribute(attr_name, value)
+        end
+
+        def _validate_attributes(attrs)
+          self.class._validate_attributes(attrs)
         end
 
         def exclude_attributes(*attrs)
