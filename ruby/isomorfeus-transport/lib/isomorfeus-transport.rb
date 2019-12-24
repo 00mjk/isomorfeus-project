@@ -1,5 +1,6 @@
 require 'isomorfeus-policy'
 require 'lucid_authentication/mixin'
+require 'isomorfeus/transport/props_proxy'
 if RUBY_ENGINE == 'opal'
   require 'json'
   require 'isomorfeus/config'
