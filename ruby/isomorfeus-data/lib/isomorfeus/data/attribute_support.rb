@@ -54,12 +54,7 @@ module Isomorfeus
               attribute_conditions[name] = options
 
               define_method(name) do
-                v = _get_attribute(name)
-                %x{
-                  if (v instanceof Object && !(v instanceof Array)) {
-                    return Opal.Hash.$new(v);
-                  } else { return v; }
-                }
+                _get_attribute(name)
               end
 
               define_method("#{name}=") do |val|
@@ -74,8 +69,12 @@ module Isomorfeus
             return @_changed_attributes[name] if @_changed_attributes.key?(name)
             path = @_store_path + [name]
             result = Redux.fetch_by_path(*path)
-            return nil if `result === null`
-            result
+            %x{
+              if (result === null) { return nil; }
+              else if (result instanceof Object && !(result instanceof Array)) {
+                return Opal.Hash.$new(result);
+              } else { return result; }
+            }
           end
 
           def _get_attributes
