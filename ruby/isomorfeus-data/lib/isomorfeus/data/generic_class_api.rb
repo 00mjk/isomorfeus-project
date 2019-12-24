@@ -57,13 +57,13 @@ module Isomorfeus
           end
         end
 
-        def query(props: {})
+        def query(props:)
           query_result_instance = LucidData::QueryResult.new
           promise_query(props: props, query_result_instance: query_result_instance) unless query_result_instance.loaded?
           query_result_instance
         end
 
-        def promise_query(props: {}, query_result_instance:)
+        def promise_query(props:, query_result_instance: nil)
           query_result_instance = LucidData::QueryResult.new unless query_result_instance
           props.each_key do |prop_name|
             raise "#{self.to_s} No such query prop declared: '#{prop_name}'!" unless declared_props.key?(prop_name)
@@ -125,7 +125,7 @@ module Isomorfeus
           result_promise
         end
 
-        def query(props:, query_result_instance_key:, pub_sub_client: nil, current_user: nil)
+        def query(props:, query_result_instance_key: nil, pub_sub_client: nil, current_user: nil)
           props.each_key do |prop_name|
             raise "#{self.to_s} No such query prop declared: '#{prop_name}'!" unless declared_props.key?(prop_name)
           end

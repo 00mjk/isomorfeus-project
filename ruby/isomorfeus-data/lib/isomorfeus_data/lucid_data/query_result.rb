@@ -7,7 +7,7 @@ module LucidData
     end
 
     if RUBY_ENGINE == 'opal'
-      def initialize(key:, result_set: {})
+      def initialize(key: nil, result_set: {})
         @class_name = 'LucidData::QueryResult'
         @key = key ? key : self.object_id
         @result_set = result_set
@@ -36,7 +36,7 @@ module LucidData
         Isomorfeus.instance_from_sid(sid)
       end
     else
-      def initialize(key:, result_set: {})
+      def initialize(key: nil, result_set: {})
         @class_name = 'LucidData::QueryResult'
         @key = key ? key : self.object_id
         @result_set = result_set
