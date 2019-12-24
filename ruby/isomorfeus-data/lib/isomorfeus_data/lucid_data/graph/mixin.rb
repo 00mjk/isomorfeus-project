@@ -44,7 +44,7 @@ module LucidData
           alias vertexes nodes
 
           def _validate_nodes(nodes_hash_or_array)
-            if nodes_hash_or_array.class == Hash
+            if nodes_hash_or_array.class == ::Hash
               nodes_hash_or_array.each do |access_name, collection|
                 _validate_node_collection(access_name, collection)
               end
@@ -84,7 +84,7 @@ module LucidData
           alias links edges
 
           def _validate_edges(edges_hash_or_array)
-            if edges_hash_or_array.class == Hash
+            if edges_hash_or_array.class == ::Hash
               edges_hash_or_array.each do |access_name, collection|
                 _validate_edge_collection(access_name, collection)
               end
