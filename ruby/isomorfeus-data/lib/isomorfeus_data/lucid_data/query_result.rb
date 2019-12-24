@@ -1,5 +1,5 @@
 module LucidData
-  module QueryResult
+  class QueryResult
     attr_reader :key
 
     def to_sid
