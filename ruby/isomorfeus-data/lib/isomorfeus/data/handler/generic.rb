@@ -59,7 +59,8 @@ module Isomorfeus
         end
 
         def process_query(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-          props = response_agent.request[type_class_name]['query']
+          props_json = response_agent.request[type_class_name]['query']
+          props = Oj.load(props_json, mode: :strict)
           props.transform_keys!(&:to_sym)
           props[:props].transform_keys!(&:to_sym)
           props.deep_merge!({ pub_sub_client: pub_sub_client, current_user: current_user })
