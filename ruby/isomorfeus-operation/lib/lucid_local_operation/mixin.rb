@@ -10,7 +10,8 @@ module LucidLocalOperation
       base.include(Isomorfeus::Operation::PromiseRun)
 
       base.instance_exec do
-        def promise_run(props_hash)
+        def promise_run(props_hash = nil, props: nil)
+          props_hash = props_hash || props
           validate_props(props_hash)
           self.new(props_hash).promise_run
         end

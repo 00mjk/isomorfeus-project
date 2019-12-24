@@ -8,7 +8,8 @@ module LucidQuickOp
           def op
           end
 
-          def promise_run(props_hash)
+          def promise_run(props_hash = nil, props: nil)
+            props_hash = props_hash || props
             validate_props(props_hash)
             props_json = Isomorfeus::Transport::PropsProxy.new(props_hash).to_json
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |agent|
@@ -38,7 +39,8 @@ module LucidQuickOp
             @op = block
           end
 
-          def promise_run(props_hash)
+          def promise_run(props_hash = nil, props: nil)
+            props_hash = props_hash || props
             validate_props(props_hash)
             self.new(props_hash).promise_run
           end
