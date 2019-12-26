@@ -14,8 +14,8 @@ module LucidData
       def find_nodes(attribute_hash = nil, &block)
         found_nodes = []
         node_collections.each_value do |collection|
-          nodes = collection.find_all(attribute_hash, &block)
-          found_nodes.push(*nodes)
+          coll_nodes = collection.find_all(attribute_hash, &block)
+          found_nodes.push(*coll_nodes)
         end
         found_nodes
       end
@@ -55,8 +55,8 @@ module LucidData
       def find_edges(attribute_hash = nil, &block)
         found_edges = []
         edge_collections.each_value do |collection|
-          edges = collection.find_all(attribute_hash, &block)
-          found_edges.push(*edges)
+          coll_edges = collection.find_all(attribute_hash, &block)
+          found_edges.push(*coll_edges)
         end
         found_edges
       end
