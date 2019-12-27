@@ -36,7 +36,7 @@ module LucidOperation
             @finally_defined = true
           end
 
-          def promise_run(props_hash = nil, props: nil)
+          def promise_run(props_hash = nil)
             props_hash = props_hash || props
             validate_props(props_hash)
             props_json = Isomorfeus::Transport::PropsProxy.new(props_hash).to_json
@@ -56,8 +56,8 @@ module LucidOperation
         end
       else
         Isomorfeus.add_valid_operation_class(base) unless base == LucidOperation::Base
-        base.extend(Isomorfeus::Operation::Mixin)
-        base.include(Isomorfeus::Operation::PromiseRun)
+        base.extend(LucidOperation::Steps)
+        base.include(LucidOperation::PromiseRun)
 
         unless base == LucidOperation::Base
           base.prop :pub_sub_client, default: nil
@@ -65,7 +65,7 @@ module LucidOperation
         end
 
         base.instance_exec do
-          def promise_runpromise_run(props_hash = nil, props: nil)
+          def promise_run(props_hash = nil)
             props_hash = props_hash || props
             validate_props(props_hash)
             self.new(props_hash).promise_run

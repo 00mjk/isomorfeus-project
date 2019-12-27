@@ -8,7 +8,7 @@ module LucidQuickOp
           def op
           end
 
-          def promise_run(props_hash = nil, props: nil)
+          def promise_run(props_hash = nil)
             props_hash = props_hash || props
             validate_props(props_hash)
             props_json = Isomorfeus::Transport::PropsProxy.new(props_hash).to_json
@@ -39,7 +39,7 @@ module LucidQuickOp
             @op = block
           end
 
-          def promise_run(props_hash = nil, props: nil)
+          def promise_run(props_hash = nil)
             props_hash = props_hash || props
             validate_props(props_hash)
             self.new(props_hash).promise_run
@@ -56,7 +56,7 @@ module LucidQuickOp
     end
 
     def promise_run
-      original_promise = Promise.new.then
+      original_promise = Promise.new
 
       operation = self
       promise = original_promise.then do |result|

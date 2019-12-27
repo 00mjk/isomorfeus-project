@@ -1,21 +1,22 @@
 require 'isomorfeus-transport'
 require 'isomorfeus/operation/config'
-require 'isomorfeus/operation/gherkin'
-require 'isomorfeus/operation/mixin'
-require 'isomorfeus/operation/promise_run'
-require 'lucid_local_operation/mixin'
-require 'lucid_local_operation/base'
-require 'lucid_quick_op/mixin'
-require 'lucid_quick_op/base'
-require 'lucid_operation/mixin'
-require 'lucid_operation/base'
 
 if RUBY_ENGINE == 'opal'
+  Isomorfeus.zeitwerk.push_dir('isomorfeus_operation')
+  require_tree 'isomorfeus_operation', :autoload
   Isomorfeus.zeitwerk.push_dir('operations')
 else
   require 'oj'
   require 'isomorfeus/operation/handler/operation_handler'
-
+  require 'isomorfeus_operation/lucid_operation/gherkin'
+  require 'isomorfeus_operation/lucid_operation/steps'
+  require 'isomorfeus_operation/lucid_operation/promise_run'
+  require 'isomorfeus_operation/lucid_local_operation/mixin'
+  require 'isomorfeus_operation/lucid_local_operation/base'
+  require 'isomorfeus_operation/lucid_quick_op/mixin'
+  require 'isomorfeus_operation/lucid_quick_op/base'
+  require 'isomorfeus_operation/lucid_operation/mixin'
+  require 'isomorfeus_operation/lucid_operation/base'
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
   # require 'active_support/dependencies'

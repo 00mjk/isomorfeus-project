@@ -6,8 +6,8 @@ module LucidLocalOperation
       end
 
       base.extend(LucidPropDeclaration::Mixin)
-      base.extend(Isomorfeus::Operation::Mixin)
-      base.include(Isomorfeus::Operation::PromiseRun)
+      base.extend(LucidOperation::Steps)
+      base.include(LucidOperation::PromiseRun)
 
       base.instance_exec do
         def promise_run(props_hash = nil, props: nil)

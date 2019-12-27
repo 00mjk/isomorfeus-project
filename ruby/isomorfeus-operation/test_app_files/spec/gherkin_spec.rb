@@ -52,12 +52,12 @@ RESULT_TWO = { operation: "Can drink beer when thirsty",
                         "there are ghosts in the room"]}
 RSpec.describe 'Isomorfeus::Gherkin' do
   it 'can parse example one' do
-    result = Isomorfeus::Operation::Gherkin.parse(EXAMPLE_ONE)
+    result = LucidOperation::Gherkin.parse(EXAMPLE_ONE)
     expect(result).to eq(RESULT_ONE)
   end
 
   it 'can parse example two' do
-    result = Isomorfeus::Operation::Gherkin.parse(EXAMPLE_TWO)
+    result = LucidOperation::Gherkin.parse(EXAMPLE_TWO)
     expect(result).to eq(RESULT_TWO)
   end
 
@@ -66,7 +66,7 @@ RSpec.describe 'Isomorfeus::Gherkin' do
       result = nil
       mark = Benchmark.measure do
         1000.times do
-          result = Isomorfeus::Operation::Gherkin.parse(EXAMPLE_TWO)
+          result = LucidOperation::Gherkin.parse(EXAMPLE_TWO)
         end
       end
       STDERR.puts mark
@@ -97,7 +97,7 @@ Operation: Can drink beer when thirsty
         result = nil
         start = Time.now
         1000.times do
-          result = Isomorfeus::Operation::Gherkin.parse(EXAMPLE_TWO)
+          result = LucidOperation::Gherkin.parse(EXAMPLE_TWO)
         end
         final = Time.now - start
         [final, result.to_n]
