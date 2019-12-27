@@ -14,11 +14,26 @@ Everything that is not explicitly allowed somewhere is denied.
 
 Place the policy file in your projects `isomorfeus/policies`.
 
+Any class that would like to authorize for accessing a resource needs to include the `LucidAuthorization::Mixin` 
+or inherit from `LucidAuthorization::Base`. Example:
+
+```ruby
+class MyUser
+  include LucdiAuthorization::Mixin
+end
+```
+Any instance of that class then has the following methods available:
+- `authorized?(target_class, method_name, props)` - returning true or false
+- `authorized!(target_class, method_name, props)` - raising a exception if access is denied, otherwise returning true
+
+These methods, when called, look for a Policy class. The Policy classs must be named after the user class plus the word 'Policy'.
+Example:
+
+For a class `MyUser` the policy class must be `MyUserPolicy`.
+
 Example Policy:
 ```ruby
-  class MySimplePolicy < LucidPolicy::Base
-
-    policy_for UserOrRoleClass
+  class MyUserPolicy < LucidPolicy::Base
 
     allow BlaBlaGraph, :load
 
@@ -30,26 +45,26 @@ Example Policy:
     # allow all
     # deny all
 
-    with_condition do |user_or_role_instance, target_class, target_method, *props|
-       user_or_role_instance.class == AdminRole
+    with_condition do |user_instance, target_class, target_method, *props|
+       user_instance.class == AdminRole
     end
 
-    refine BlaGraph, :load, :count do |user_or_role_instance, target_class, target_method, *props|
-      allow if user_or_role_instance.verified?
+    refine BlaGraph, :load, :count do |user_instance, target_class, target_method, *props|
+      allow if user_instance.verified?
       deny
     end
   end
 ```
 and then any of:
 ```ruby
-user_or_role_instance.authorized?(target_class)
-user_or_role_instance.authorized?(target_class, target_method)
-user_or_role_instance.authorized?(target_class, target_method, *props)
+user.authorized?(target_class)
+user.authorized?(target_class, target_method)
+user.authorized?(target_class, target_method, *props)
 ```
 or:
 ```ruby
-user_or_role_instance.authorized!(target_class)
-user_or_role_instance.authorized!(target_class, target_method)
-user_or_role_instance.authorized!(target_class, target_method, *props)
+user.authorized!(target_class)
+user.authorized!(target_class, target_method)
+user.authorized!(target_class, target_method, *props)
 ```
 which will raise a LucidPolicy::Exception unless authorized

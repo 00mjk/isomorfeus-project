@@ -4,13 +4,20 @@ module Isomorfeus
       @cached_array_classes ||= {}
     end
 
-    def cached_policy_class(class_name)
-      return "::#{class_name}".constantize if Isomorfeus.development?
-      return cached_policy_classes[class_name] if cached_policy_classes.key?(class_name)
-      cached_policy_classes[class_name] = "::#{class_name}".constantize
-    end
+    if RUBY_ENGINE == 'opal'
+      def cached_policy_class(class_name)
+        return "::#{class_name}".constantize if Isomorfeus.development?
+        return cached_policy_classes[class_name] if cached_policy_classes.key?(class_name)
+        cached_policy_classes[class_name] = "::#{class_name}".constantize
+      end
+    else
+      def cached_policy_class(class_name)
+        return nil unless valid_policy_class_name?(class_name)
+        return "::#{class_name}".constantize if Isomorfeus.development?
+        return cached_policy_classes[class_name] if cached_policy_classes.key?(class_name)
+        cached_policy_classes[class_name] = "::#{class_name}".constantize
+      end
 
-    if RUBY_ENGINE != 'opal'
       def valid_policy_class_names
         @valid_policy_class_names ||= Set.new
       end
