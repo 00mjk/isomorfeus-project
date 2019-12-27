@@ -9,7 +9,7 @@ class <%= app_class %> < Roda
   include Isomorfeus::ReactViewHelper
 
   use_isomorfeus_middlewares
-  plugin :public, root: 'public'
+  plugin :public, root: 'public', gzip: true
 
   def page_content(env, location)
     locale = env.http_accept_language.preferred_language_from(Isomorfeus.available_locales)
