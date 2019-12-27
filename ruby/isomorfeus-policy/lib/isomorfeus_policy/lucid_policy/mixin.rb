@@ -3,9 +3,7 @@ module LucidPolicy
     def self.included(base)
       base.instance_exec do
         if RUBY_ENGINE != 'opal'
-          unless base == LucidPolicy::Base
-            Isomorfeus.add_valid_policy_class(base)
-          end
+          Isomorfeus.add_valid_policy_class(base) unless base == LucidPolicy::Base
         end
 
         def authorization_rules
