@@ -24,9 +24,7 @@ module Isomorfeus
                   response_agent.error = { error: { handler_class_name => 'No such handler!'}}
                 end
               rescue Exception => e
-                response_agent.error = if Isomorfeus.production? then { error: { handler_class_name => 'No such handler!'}}
-                                       else { response: { error: "#{handler_class_name}: #{e.message}\n#{e.backtrace.join("\n")}" }}
-                                       end
+                response_agent.error = { response: { error: "#{handler_class_name}: #{e.message}\n#{e.backtrace.join("\n")}" }}
               end
             end
           end
@@ -52,9 +50,7 @@ module Isomorfeus
           rescue Exception => e
             response_agent = OpenStruct.new
             response_agent_array << response_agent
-            response_agent.result = if Isomorfeus.production? then { response: { error: 'No such thing!' }}
-                                    else { response: { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }}
-                                    end
+            response_agent.result = { response: { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }}
           end
         elsif request.key?('subscribe') && request['subscribe'].key?('agent_ids')
           begin
@@ -75,9 +71,7 @@ module Isomorfeus
               response_agent.error = { error: "No such thing!"}
             end
           rescue Exception => e
-            response_agent.error = if Isomorfeus.production? then { error: 'No such thing!' }
-                                   else { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }
-                                   end
+            response_agent.error = { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }
           end
         elsif request.key?('unsubscribe') && request['unsubscribe'].key?('agent_ids')
           begin
@@ -98,9 +92,7 @@ module Isomorfeus
               response_agent.error = { error: 'No such thing!'}
             end
           rescue Exception => e
-            response_agent.error = if Isomorfeus.production? then { error: 'No such thing!' }
-                                   else { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }
-                                   end
+            response_agent.error = { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }
           end
         end
       end
