@@ -43,5 +43,5 @@ c[0].key # -> '1' - access key of first node
 ```
 
 ### Example and Specs
-- [Example](https://github.com/isomorfeus/isomorfeus-framework/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_collection.rb)
-- [Specs](https://github.com/isomorfeus/isomorfeus-framework/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_collection_spec.rb)
+- [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_collection.rb)
+- [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_collection_spec.rb)

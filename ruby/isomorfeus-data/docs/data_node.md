@@ -31,8 +31,8 @@ a.color # -> 'FF0000'
 ```
 
 ### Example and Specs
-- [Example](https://github.com/isomorfeus/isomorfeus-framework/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_node.rb)
-- [Specs](https://github.com/isomorfeus/isomorfeus-framework/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_node_spec.rb)
+- [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_node.rb)
+- [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_node_spec.rb)
 
 
 ```

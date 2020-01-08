@@ -72,5 +72,5 @@ g.contractors_other_tasks_edges # -> ContractorOTEdges EdgeCollection instance
 ```
 
 ### Example and Specs
-- [Example](https://github.com/isomorfeus/isomorfeus-framework/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_graph.rb)
-- [Specs](https://github.com/isomorfeus/isomorfeus-framework/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_graph_spec.rb)
+- [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_graph.rb)
+- [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_graph_spec.rb)

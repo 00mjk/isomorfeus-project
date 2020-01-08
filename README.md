@@ -9,4 +9,4 @@ At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ## Ruby
 Currently there is a Opal Ruby implementation in the ruby directory of this repo:
-- [isomorfeus ruby implementation](https://github.com/isomorfeus/isomorfeus-framework/tree/ulysses/ruby)
+- [isomorfeus ruby implementation](https://github.com/isomorfeus/isomorfeus-project/tree/master/ruby)

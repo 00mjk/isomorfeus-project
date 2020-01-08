@@ -64,5 +64,5 @@ c.a_hash # -> MyHash instance
 ```
 
 ### Example and Specs
-- [Example](https://github.com/isomorfeus/isomorfeus-framework/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_composition.rb)
-- [Specs](https://github.com/isomorfeus/isomorfeus-framework/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_composition_spec.rb)
+- [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_composition.rb)
+- [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_composition_spec.rb)
