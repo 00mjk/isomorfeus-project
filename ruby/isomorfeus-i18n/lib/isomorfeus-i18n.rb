@@ -28,7 +28,7 @@ else
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
-  Isomorfeus.locale_path = File.expand_path(File.join('isomorfeus', 'locales'))
+  Isomorfeus.locale_path = File.expand_path(File.join('app', 'locales'))
 
   # identify available locales
   locales = []

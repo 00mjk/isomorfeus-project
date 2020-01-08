@@ -90,7 +90,7 @@ module Isomorfeus
     end
 
     def self.isomorfeus_path
-      'isomorfeus'
+      'app'
     end
 
     def self.webpack_config_path(config_file)

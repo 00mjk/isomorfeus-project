@@ -15,6 +15,6 @@ else
   require 'isomorfeus_policy/anonymous'
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
-  path = File.expand_path(File.join('isomorfeus', 'policies'))
+  path = File.expand_path(File.join('app', 'policies'))
   Isomorfeus.zeitwerk.push_dir(path)
 end

@@ -21,7 +21,7 @@ else
 
   # require 'active_support/dependencies'
 
-  path = File.expand_path(File.join('isomorfeus', 'operations'))
+  path = File.expand_path(File.join('app', 'operations'))
 
   Isomorfeus.zeitwerk.push_dir(path)
 end

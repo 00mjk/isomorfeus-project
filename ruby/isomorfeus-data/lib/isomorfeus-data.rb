@@ -49,7 +49,7 @@ else
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 
-  path = File.expand_path(File.join('isomorfeus', 'data'))
+  path = File.expand_path(File.join('app', 'data'))
 
   Isomorfeus.zeitwerk.push_dir(path)
 end

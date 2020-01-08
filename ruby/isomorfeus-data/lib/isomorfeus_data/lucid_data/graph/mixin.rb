@@ -437,7 +437,7 @@ module LucidData
               end
             else
               _validate_nodes(nodes) if nodes
-              @_node_collections[:nodes] = nodes ? nodes : []
+              @_node_collections[:nodes] = nodes
               @_node_collections[:nodes].graph = self if @_node_collections[:nodes].respond_to?(:graph=)
             end
 
@@ -454,7 +454,7 @@ module LucidData
               end
             else
               _validate_edges(edges) if edges
-              @_edge_collections[:edges] = edges ? edges : []
+              @_edge_collections[:edges] = edges
               @_edge_collections[:edges].graph = self if @_edge_collections[:edges].respond_to?(:graph=)
             end
           end
