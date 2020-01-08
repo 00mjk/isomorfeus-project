@@ -13,6 +13,7 @@
     "ws": "^7.2.0"
   },
   "scripts": {
+    "build": "parallel-webpack --config=webpack/production.js",
     "debug": "webpack-dev-server --config=webpack/debug.js",
     "development": "webpack-dev-server --config=webpack/development.js",
     "development_ssr": "webpack-dev-server --config=webpack/development_ssr.js",
