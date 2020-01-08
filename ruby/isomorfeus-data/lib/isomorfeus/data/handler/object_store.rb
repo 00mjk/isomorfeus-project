@@ -25,11 +25,7 @@ module Isomorfeus
                     response_agent.error = { error: 'Access denied!' }
                   end
                 rescue Exception => e
-                  response_agent.error = if Isomorfeus.production?
-                                           { error: { array_class_name => 'No such thing!' }}
-                                         else
-                                           { error: { array_class_name => "Isomorfeus::Data::Handler::ArrayLoadHandler: #{e.message}" }}
-                                         end
+                  response_agent.error = { error: { array_class_name => "Isomorfeus::Data::Handler::Object: #{e.message}" }}
                 end
               else
                 response_agent.error = { error: { array_class_name => 'No such thing!' }}

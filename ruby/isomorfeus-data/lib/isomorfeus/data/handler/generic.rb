@@ -35,9 +35,7 @@ module Isomorfeus
             end
           end
         rescue Exception => e
-          response_agent.error = if Isomorfeus.production? then { error: 'No such thing!' }
-                                 else { error: "Isomorfeus::Data::Handler::Generic: #{e.message}\n#{e.backtrace.join("\n")}" }
-                                 end
+          response_agent.error = { error: "Isomorfeus::Data::Handler::Generic: #{e.message}\n#{e.backtrace.join("\n")}" }
         end
 
         def process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
