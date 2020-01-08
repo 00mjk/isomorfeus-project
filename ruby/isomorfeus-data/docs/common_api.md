@@ -110,7 +110,7 @@ Declaration of attributes for LucidData::Hash is optional.
 
 For all other classes, when attributes are used, they *must* be declared.
 
-### Props (ignore for now)
+### Props
 Props are used by queries and *must* be declared.
 See [the isomorfeus-react props documentation](https://github.com/isomorfeus/isomorfeus-react/blob/master/ruby/docs/props.md#prop-declaration).
 
