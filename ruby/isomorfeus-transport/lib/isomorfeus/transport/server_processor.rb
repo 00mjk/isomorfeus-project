@@ -94,6 +94,8 @@ module Isomorfeus
           rescue Exception => e
             response_agent.error = { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }
           end
+        else
+          response_agent.error = { error: "No such thing!" }
         end
       end
     end
