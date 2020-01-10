@@ -5,12 +5,13 @@ module Isomorfeus
         attr_accessor :socket
 
         def delay(ms = 1000, &block)
-          `setTimeout(#{block.to_n}, ms)`
+          `setTimeout(#{block.to_n}, #{ms})`
         end
 
         def init
           @requests_in_progress = { requests: {}, agent_ids: {} }
           @socket = nil
+          @initialized = false
           promise_connect if Isomorfeus.on_browser?
           true
         end
@@ -31,7 +32,7 @@ module Isomorfeus
           @socket = Isomorfeus::Transport::Websocket.new(ws_url)
           @socket.on_error do
             @socket.close
-            delay do
+            delay 1000 do
               Isomorfeus::Transport.promise_connect
             end
           end
@@ -40,15 +41,22 @@ module Isomorfeus
             Isomorfeus::Transport::ClientProcessor.process(json_hash)
           end
           @socket.on_open do |event|
-            init_promises = []
-            Isomorfeus.transport_init_class_names.each do |constant|
-              result = constant.constantize.send(:init)
-              init_promises << result if result.class == Promise
-            end
-            if init_promises.size > 0
-              Promise.when(*init_promises).then { promise.resolve(true) }
-            else
+            if @initialized
+              requests_in_progress[:requests].each_key do |request|
+                agent = get_agent_for_request_in_progress(request)
+                promise_send_request(request) if agent && !agent.sent
+              end
               promise.resolve(true)
+            else
+              @initialized = true
+              init_promises = []
+              Isomorfeus.transport_init_class_names.each do |constant|
+                result = constant.constantize.send(:init)
+                init_promises << result if result.class == Promise
+              end
+              if init_promises.size > 0
+                Promise.when(*init_promises).then { promise.resolve(true) }
+              end
             end
           end
           promise
@@ -75,10 +83,12 @@ module Isomorfeus
         end
 
         def promise_send_request(request, &block)
-          if request_in_progress?(request)
-            agent = get_agent_for_request_in_progress(request)
-          else
-            agent = Isomorfeus::Transport::RequestAgent.new(request)
+          agent = if request_in_progress?(request)
+                    get_agent_for_request_in_progress(request)
+                  else
+                    Isomorfeus::Transport::RequestAgent.new(request)
+                  end
+          unless agent.sent
             if block_given?
               agent.promise.then do |response|
                 block.call(response)
@@ -86,10 +96,18 @@ module Isomorfeus
             end
             register_request_in_progress(request, agent.id)
             raise 'No socket!' unless @socket
-            @socket.send(`JSON.stringify(#{{request: { agent_ids: { agent.id => request }}}.to_n})`)
-            delay(Isomorfeus.on_ssr? ? 8000 : 20000) do
-              unless agent.promise.realized?
-                agent.promise.reject({agent_response: { error: 'Request timeout!' }, full_response: {}})
+            begin
+              @socket.send(`JSON.stringify(#{{request: { agent_ids: { agent.id => request }}}.to_n})`)
+              agent.sent = true
+              delay(Isomorfeus.on_ssr? ? 8000 : 20000) do
+                unless agent.promise.realized?
+                  agent.promise.reject({agent_response: { error: 'Request timeout!' }, full_response: {}})
+                end
+              end
+            rescue
+              @socket.close
+              delay 5000 do
+                Isomorfeus::Transport.promise_connect
               end
             end
           end

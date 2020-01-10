@@ -17,6 +17,7 @@ module Isomorfeus
       attr_accessor :result
       attr_accessor :response
       attr_accessor :full_response
+      attr_accessor :sent
       attr_reader :id
       attr_reader :promise
       attr_reader :request
@@ -26,6 +27,7 @@ module Isomorfeus
         self.class.agents[@id] = self
         @promise = Promise.new
         @request = request
+        @sent = false
       end
     end
   end
