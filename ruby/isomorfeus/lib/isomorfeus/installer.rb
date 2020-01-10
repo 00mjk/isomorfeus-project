@@ -229,6 +229,7 @@ module Isomorfeus
     def self.create_procfile
       data_hash = { rack_server_start_command: rack_server[:start_command] }
       create_file_from_template('Procfile.erb', 'Procfile', data_hash)
+      create_file_from_template('ProcfileDev.erb', 'ProcfileDev', data_hash)
       create_file_from_template('ProcfileDebug.erb', 'ProcfileDebug', data_hash)
     end
 
