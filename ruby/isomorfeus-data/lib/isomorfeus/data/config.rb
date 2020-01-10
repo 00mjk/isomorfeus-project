@@ -95,7 +95,7 @@ module Isomorfeus
       end
 
       def arango_configured?
-        !!(Isomorfeus.arango_production && Isomorfeus.arango_development && Isomorfeus.arango_test)
+        (defined? ::Arango) && !!(Isomorfeus.arango_production && Isomorfeus.arango_development && Isomorfeus.arango_test)
       end
 
       attr_accessor :arango_production
