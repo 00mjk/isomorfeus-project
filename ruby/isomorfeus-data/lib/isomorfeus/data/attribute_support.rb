@@ -65,6 +65,31 @@ module Isomorfeus
             end
           end
 
+          def validate_attributes_function
+            %x{
+              if (typeof self.validate_attributes_function === 'undefined') {
+                self.validate_attributes_function = function(attributes_object) {
+                  try { self.$_validate_attributes(Opal.Hash.$new(attributes_object)) }
+                  catch (e) { return e.message; }
+                }
+              }
+              return self.validate_attributes_function;
+            }
+          end
+
+          def validate_attribute_function(attr)
+            function_name = "validate_attribute_#{attr}_function"
+            %x{
+              if (typeof self[function_name] === 'undefined') {
+                self[function_name] = function(value) {
+                  try { self.$_validate_attribute(attribute, value); }
+                  catch (e) { return e.message; }
+                }
+              }
+              return self[function_name];
+            }
+          end
+
           def _get_attribute(name)
             return @_changed_attributes[name] if @_changed_attributes.key?(name)
             path = @_store_path + [name]
