@@ -73,7 +73,7 @@ module LucidData
           hash = { 'attributes' => _get_selected_attributes, 'parts' => {} }
           hash.merge!('revision' => revision) if revision
           parts.each do |name, instance|
-            hash['parts'][name.to_s] = instance.to_sid
+            hash['parts'][name.to_s] = instance.to_sid if instance
           end
           { @class_name => { @key => hash }}
         end
@@ -81,8 +81,10 @@ module LucidData
         def included_items_to_transport
           hash = {}
           parts.each_value do |instance|
-            hash.deep_merge!(instance.to_transport)
-            hash.deep_merge!(instance.included_items_to_transport) if instance.respond_to?(:included_items_to_transport)
+            if instance
+              hash.deep_merge!(instance.to_transport)
+              hash.deep_merge!(instance.included_items_to_transport) if instance.respond_to?(:included_items_to_transport)
+            end
           end
           hash
         end

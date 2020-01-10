@@ -216,8 +216,12 @@ module LucidData
 
         def to_transport
           hash = { 'attributes' => _get_selected_attributes, 'nodes' => {}, 'edges' => {} }
-          node_collections.each { |name, collection| hash['nodes'][name.to_s] = collection.to_sid }
-          edge_collections.each { |name, collection| hash['edges'][name.to_s] = collection.to_sid }
+          node_collections.each do |name, collection|
+            hash['nodes'][name.to_s] = collection.to_sid if collection
+          end
+          edge_collections.each do |name, collection|
+            hash['edges'][name.to_s] = collection.to_sid if collection
+          end
           hash.merge!('revision' => revision) if revision
           { @class_name => { @key => hash }}
         end
@@ -225,12 +229,16 @@ module LucidData
         def included_items_to_transport
           hash = {}
           node_collections.each_value do |collection|
-            hash.deep_merge!(collection.to_transport)
-            hash.deep_merge!(collection.included_items_to_transport)
+            if collection
+              hash.deep_merge!(collection.to_transport)
+              hash.deep_merge!(collection.included_items_to_transport)
+            end
           end
           edge_collections.each_value do |collection|
-            hash.deep_merge!(collection.to_transport)
-            hash.deep_merge!(collection.included_items_to_transport)
+            if collection
+              hash.deep_merge!(collection.to_transport)
+              hash.deep_merge!(collection.included_items_to_transport)
+            end
           end
           hash
         end
