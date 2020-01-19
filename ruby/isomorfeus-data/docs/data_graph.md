@@ -42,7 +42,7 @@ c = MyGraph.new(key: '1234',
 #### Loading
 ```
 class MyGraph < LucidData::Graph::Base
-  execute_load do |key:|
+  execute_load do |key:, current_user:, pub_sub_client:|
     { key: '1234',
       nodes: {
         # pass node collections as hash with keys names as declared

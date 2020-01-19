@@ -29,7 +29,7 @@ c[0].key # -> '1' - access key of first node
 #### Loading
 ```
 class MyEdgeCollection < LucidData::EdgeCollection::Base
-  execute_load do |key:|
+  execute_load do |key:, current_user:, pub_sub_client:|
     a = MyEdge.new(key: '1') # also add to and from
     b = MyEdge.new(key: '2') # also add to and from
     { key: key, edges: [a, b] } # also here :links can be used.

@@ -30,6 +30,22 @@ All LucidData *classes* support the following methods for querying data:
   
 The allowed props *must* be declared. See section Props belows.
 
+On the server `execute_query` blocks must be defined. These blocks must return a hash of LucidData objects,
+which get then wrapped in a LucidData::QueryResult. Example:
+```ruby
+class MyGraph < LucidData::Graph::Base
+  execute_query do |props:, current_user:, pub_sub_client:|
+    { queried_graph: self.new(key: '2') } 
+  end
+end
+```
+MyGraph can then be queried and the result be accessed:
+```ruby
+MyGraph.promise_query(props: {}).then do |query_result|
+  query_result.queried_graph # The graph as returned in the hash above. The hash key can accessed with a method. 
+end
+```
+
 ### Saving Data
 
 All LucidData *instances* support the following methods for saving data:

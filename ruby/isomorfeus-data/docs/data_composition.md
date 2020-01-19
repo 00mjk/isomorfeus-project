@@ -36,7 +36,7 @@ c = MyComposition.new(key: '1234', parts: {
 #### Loading
 ```
 class MyComposition < LucidData::Composition::Base
-  execute_load do |key:|
+  execute_load do |key:, current_user:, pub_sub_client:|
     { key: '1234', parts: {
       # parts are passed as hash with keys as declared:
       a_collection: MyCollection.new(key: '1'),

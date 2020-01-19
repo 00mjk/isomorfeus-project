@@ -17,7 +17,7 @@ a = MyHash.new(key: '1234', attributes: { color: 'FF0000', shape: 'round' })
 #### Loading
 ```
 class MyHash < LucidData::Hash::Base
-  execute_load do |key:|
+  execute_load do |key:, current_user:, pub_sub_client:|
     { key: key, attributes: { color: 'FF0000', shape: 'round' } }
   end
 end
