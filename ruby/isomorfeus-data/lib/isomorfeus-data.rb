@@ -45,6 +45,11 @@ else
   require 'isomorfeus_data/lucid_data/composition/mixin'
   require 'isomorfeus_data/lucid_data/composition/base'
 
+  require 'isomorfeus_data/lucid_data/generic_collection'
+  require 'isomorfeus_data/lucid_data/generic_edge'
+  require 'isomorfeus_data/lucid_data/generic_edge_collection'
+  require 'isomorfeus_data/lucid_data/generic_node'
+
   require 'isomorfeus/data/handler/generic'
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
