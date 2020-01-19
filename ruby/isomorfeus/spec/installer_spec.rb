@@ -109,11 +109,16 @@ RSpec.describe 'isomorfeus installer' do
           gem_name = line.split("'")[1]
           new_line_items[1] = "path: '../../../../#{gem_name}'"
           new_gemfile_lines << new_line_items.join(', ')
+        elsif (line.start_with?("gem 'isomorfeus'") || line.start_with?("  gem 'isomorfeus'")) && line.include?(Isomorfeus::VERSION)
+          new_line_items = line.split(',')
+          gem_name = line.split("'")[1]
+          new_line_items[1] = "path: '../../../../#{gem_name}'"
+          new_gemfile_lines << new_line_items.join(', ')
         else
           new_gemfile_lines << line
         end
       end
-      File.write('Gemfile', new_gemfile_lines.join("\n"))
+      File.write('Gemfile', new_gemfile_lines.join(""))
       Bundler.with_original_env do
         system('yarn install')
         system('bundle install')
@@ -180,11 +185,16 @@ RSpec.describe 'isomorfeus installer' do
           gem_name = line.split("'")[1]
           new_line_items[1] = "path: '../../../../#{gem_name}'"
           new_gemfile_lines << new_line_items.join(', ')
+        elsif (line.start_with?("gem 'isomorfeus'") || line.start_with?("  gem 'isomorfeus'")) && line.include?(Isomorfeus::VERSION)
+          new_line_items = line.split(',')
+          gem_name = line.split("'")[1]
+          new_line_items[1] = "path: '../../../../#{gem_name}'"
+          new_gemfile_lines << new_line_items.join(', ')
         else
           new_gemfile_lines << line
         end
       end
-      File.write('Gemfile', new_gemfile_lines.join("\n"))
+      File.write('Gemfile', new_gemfile_lines.join(""))
 
       test_result = Bundler.with_original_env do
         system('yarn install')
