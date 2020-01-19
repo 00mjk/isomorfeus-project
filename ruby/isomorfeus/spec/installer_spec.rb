@@ -132,7 +132,7 @@ RSpec.describe 'isomorfeus installer' do
       Dir.chdir('..')
     end
 
-    it 'can bundle the assets' do
+    it 'can build the assets' do
       Bundler.with_original_env do
         system('yarn run production_build')
       end
