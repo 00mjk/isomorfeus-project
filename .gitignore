@@ -46,3 +46,4 @@ Gemfile.lock
 ruby/*/spec/test_apps/*
 ruby/*/test_app
 .rakeTasks
+ruby/gems/*
