@@ -83,6 +83,39 @@ RSpec.describe 'LucidGraph' do
                                              "4"=>{"one"=>4},
                                              "5"=>{"one"=>5}})
     end
+
+    it 'converts a partial graph to transport' do
+      result = on_server do
+        class TestGraphPGT < LucidData::Graph::Base
+          nodes :given_nodes
+          nodes :empty_nodes
+
+          edges :given_edges
+          edges :empty_edges
+
+          execute_load do |key:, current_user:, pub_sub_client:|
+            node = LucidData::GenericNode.new(key: "#{key}_node")
+            edge = LucidData::GenericEdge.new(key: "#{key}_edge", from: node, to: node)
+            { key: key,
+              nodes: { given_nodes: LucidData::GenericCollection.new(key: "#{key}_gc", nodes: [node]) },
+              edges: { given_edges: LucidData::GenericEdgeCollection.new(key: "#{key}_gec", edges: [edge])}}
+          end
+        end
+
+        graph = TestGraphPGT.load(key: '1')
+        [graph.to_transport, graph.included_items_to_transport]
+      end
+      expect(result).to eq([{ "TestGraphPGT" => { "1" => {"attributes" => {},
+                                                          "edges" => {"given_edges" => ["LucidData::GenericEdgeCollection", "1_gec"] },
+                                                          "nodes" => {"given_nodes" => ["LucidData::GenericCollection", "1_gc"] }}}},
+                            { "LucidData::GenericCollection" => { "1_gc" => { "attributes" => {}, "nodes" => [["LucidData::GenericNode", "1_node"]] }},
+                              "LucidData::GenericEdge" => { "1_edge" => { "attributes" => {},
+                                                                          "from" => ["LucidData::GenericNode", "1_node"],
+                                                                          "to" => ["LucidData::GenericNode", "1_node"] }},
+                              "LucidData::GenericEdgeCollection" => {"1_gec"=> { "attributes" => {},
+                                                                                 "edges" => [["LucidData::GenericEdge", "1_edge"]] }},
+                              "LucidData::GenericNode" => { "1_node" => {}}}])
+    end
   end
 
   context 'on client' do
