@@ -86,9 +86,11 @@ end
 task :push_ruby_packages_to_isomorfeus do
   puts "Publishing to isomorfeus"
   %w[data i18n operation policy transport].each do |mod|
-    system("gem inabox ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem --host http://localhost:5555/")
+    system("scp ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem iso:~/gems/")
+    system("ssh iso \"bash -l -c 'gem inabox gems/isomorfeus-#{mod}-#{VERSION}.gem --host http://localhost:5555/'\"")
   end
-  system("gem inabox ruby/isomorfeus/isomorfeus-#{VERSION}.gem --host http://localhost:5555/")
+  system("scp ruby/isomorfeus/isomorfeus-#{VERSION}.gem iso:~/gems/")
+  system("ssh iso \"bash -l -c 'gem inabox gems/isomorfeus-#{VERSION}.gem --host http://localhost:5555/'\"")
 end
 
 task :build_ruby_packages do
@@ -157,8 +159,13 @@ task :ruby_i18n_spec do
   run_rake_spec_for('i18n')
 end
 
-task :ruby_installer_spec do
+task :ruby_installer_spec => [:build_ruby_packages] do
   pwd = Dir.pwd
+  # copy gems
+  system('cp ruby/iso*/*.gem ruby/gems/gems/')
+  Dir.chdir(File.join('ruby','gems'))
+  system('gem generate_index')
+  Dir.chdir(pwd)
   Dir.chdir(File.join('ruby', "isomorfeus"))
   system('bundle install')
   options = { keep_file_descriptors: false }
