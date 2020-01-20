@@ -33,7 +33,7 @@ const common_config = {
     plugins: [
         // dont split ssr asset in chunks
         new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
-        // watch for added files in opal dir
+        // watch for added files in app dir
         new ExtraWatchWebpackPlugin({ dirs: [ path.resolve(__dirname, '../app') ] })
     ],
     module: {

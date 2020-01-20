@@ -37,7 +37,7 @@ const common_config = {
     plugins: [
         // both for hot reloading
         new webpack.HotModuleReplacementPlugin(),
-        // watch for added files in opal dir
+        // watch for added files in app dir
         new ExtraWatchWebpackPlugin({ dirs: [path.resolve(__dirname, '../app')] }),
         new webpack.DefinePlugin({
             OPAL_DEVTOOLS_OBJECT_REGISTRY: true
