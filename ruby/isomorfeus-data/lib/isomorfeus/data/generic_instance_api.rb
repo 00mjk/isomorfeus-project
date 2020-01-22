@@ -51,7 +51,7 @@ module Isomorfeus
           if self.respond_to?(:included_changed_items)
             data_hash.deep_merge!(self.included_changed_items)
           end
-          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, 'save', data_hash).then do |agent|
+          Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :save, data_hash).then do |agent|
             if agent.processed
               agent.result
             else
