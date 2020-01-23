@@ -29,9 +29,9 @@ module Isomorfeus
                   else response_agent.error = { error: { action => 'No such thing!' }}
                   end
                 end
-              else response_agent.error = { error: { type_class_name => 'No such thing!' }}
+              else response_agent.error = { error: { type_class_name => 'No such class!' }}
               end
-            else response_agent.error = { error: { type_class_name => 'No such thing!' }}
+            else response_agent.error = { error: { type_class_name => 'Not a valid LucidData class!' }}
             end
           end
         rescue Exception => e
@@ -39,24 +39,26 @@ module Isomorfeus
         end
 
         def process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+          # 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key
           props = response_agent.request[type_class_name]['load']
           props.transform_keys!(&:to_sym)
           props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
           if current_user.authorized?(type_class, :load, props)
             loaded_type = type_class.load(**props)
             if loaded_type
-              response_agent.outer_result = { data: loaded_type.to_transport }
+              response_agent.outer_result.deep_merge!(data: loaded_type.to_transport)
               if loaded_type.respond_to?(:included_items_to_transport)
                 response_agent.outer_result.deep_merge!(data: loaded_type.included_items_to_transport)
               end
               response_agent.agent_result = { success: 'ok' }
-            else response_agent.error = { error: { type_class_name => 'No such thing!' }}
+            else response_agent.error = { error: { type_class_name => 'Load returned nothing!' }}
             end
           else response_agent.error = { error: 'Access denied!' }
           end
         end
 
         def process_query(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+          # 'Isomorfeus::Data::Handler::Generic', self.name, :query, props_json
           props_json = response_agent.request[type_class_name]['query']
           props = Oj.load(props_json, mode: :strict)
           props.transform_keys!(&:to_sym)
@@ -70,55 +72,41 @@ module Isomorfeus
                 response_agent.outer_result.deep_merge!(data: queried_type.included_items_to_transport)
               end
               response_agent.agent_result = { success: 'ok' }
-            else response_agent.error = { error: { type_class_name => 'No such thing!' }}
+            else response_agent.error = { error: { type_class_name => 'Query returned nothing!' }}
             end
           else response_agent.error = { error: 'Access denied!' }
           end
         end
 
         def process_save(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-          data_hash_json = response_agent.request[type_class_name]['save']
-          data_hash = Oj.load(data_hash_json, mode: :strict)
-          response_agent.outer_result = {}
-          if current_user.authorized?(type_class, :save, { pub_sub_client: pub_sub_client, current_user: current_user })
-            data_hash.each_key do |data_class_name|
-              data_hash[data_class_name].each_key do |key|
-                if Isomorfeus.valid_data_class_name?(type_class_name)
-                  data_class = Isomorfeus.cached_data_class(data_class_name)
-                  if data_class
-                    item_data_hash = data_hash[data_class_name][key]
-                    item_data_hash = item_data_hash.merge({ pub_sub_client: pub_sub_client, current_user: current_user })
-                    if current_user.authorized?(data_class, :save, item_data_hash)
-                      saved_type = data_class.save(**item_data_hash)
-                      if saved_type
-                        response_agent.outer_result.deep_merge!({ data: saved_type.to_transport })
-                      end
-                    else
-                      response_agent.error = { error: 'Access denied!' }
-                      break
-                    end
-                  else
-                    response_agent.error = { error: 'Access denied!' }
-                    break
-                  end
-                end
+          # 'Isomorfeus::Data::Handler::Generic', self.name, :save, data_hash
+          props = response_agent.request[type_class_name]['save']
+          props.transform_keys!(&:to_sym)
+          props.deep_merge!({ pub_sub_client: pub_sub_client, current_user: current_user })
+          if current_user.authorized?(type_class, :save, props)
+            saved_type = type_class.save(**props)
+            if saved_type
+              response_agent.outer_result.deep_merge!(data: saved_type.to_transport)
+              if saved_type.respond_to?(:included_items_to_transport)
+                response_agent.outer_result.deep_merge!(data: saved_type.included_items_to_transport)
               end
+              response_agent.agent_result = { success: 'ok' }
+            else response_agent.error = { error: { type_class_name => 'Save returned nothing!' }}
             end
-            response_agent.agent_result = { success: 'ok' }
           else response_agent.error = { error: 'Access denied!' }
           end
         end
 
         def process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-          props_json = response_agent.request[type_class_name]['destroy']
-          props = Oj.load(props_json, mode: :strict)
+          props = response_agent.request[type_class_name]['destroy']
+          props.transform_keys!(&:to_sym)
           props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
           if current_user.authorized?(type_class, :destroy, props)
             destroyed_type = type_class.destroy(**props)
             if destroyed_type
               response_agent.outer_result = { data: destroyed_type }
               response_agent.agent_result = { success: 'ok' }
-            else response_agent.error = { error: { type_class_name => 'No such thing!' }}
+            else response_agent.error = { error: { type_class_name => 'Destroy failed!' }}
             end
           else response_agent.error = { error: 'Access denied!' }
           end
