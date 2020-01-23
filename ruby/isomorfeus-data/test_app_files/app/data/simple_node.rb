@@ -6,11 +6,14 @@ class SimpleNode < LucidData::Document::Base
   end
 
   execute_query do |props:, current_user:, pub_sub_client:|
+    { node: self.new(key: key, attributes: { one: key }) }
   end
 
   execute_save do |key:, revision: nil, attributes: nil, current_user:, pub_sub_client:|
+    { key: key, attributes: attributes }
   end
 
   execute_destroy do |key:, current_user:, pub_sub_client:|
+    { key: key }
   end
 end

@@ -332,5 +332,33 @@ RSpec.describe 'LucidData::Document' do
       end
       expect(result).to eq("TestDocumentMixinC" => {"28"=>{"test_attribute" => "test"}})
     end
+
+    it 'can load' do
+      result = @doc.await_ruby do
+        SimpleNode.promise_load(key: '123456').then do |node|
+          node.one
+        end
+      end
+      expect(result).to eq('123456')
+    end
+
+    #it 'can query' do
+      #
+    #end
+
+    it 'can save' do
+      result = @doc.await_ruby do
+        node = SimpleNode.new(key: '123456')
+        node.one = 654321
+        node.promise_save.then do |node|
+          node.one
+        end
+      end
+      expect(result).to eq(654321)
+    end
+
+    #it 'can destroy' do
+      #
+    #end
   end
 end
