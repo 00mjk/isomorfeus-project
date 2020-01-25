@@ -365,6 +365,9 @@ module LucidData
               _validate_elements(elements)
               data = instance_exec(key: key, revision: revision, elements: elements,
                                    pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              return nil unless data
+              return data if data.class == self
+              Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
               revision = data.delete(:revision)
               elements = data.delete(:elements)
               self.new(key: key, revision: revision, elements: elements)
