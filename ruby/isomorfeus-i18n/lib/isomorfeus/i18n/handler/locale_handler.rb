@@ -53,7 +53,7 @@ module Isomorfeus
                                         when 'Dp_' then Dp_(*method_args)
                                         when 'Ds_' then Ds_(*method_args)
                                         else
-                                          Isomorfeus.raise_error(message: "No such locale method) #{locale_method}"
+                                          Isomorfeus.raise_error(message: "No such locale method #{locale_method}")
                                         end
                         response_agent.agent_result[domain][locale].deep_merge!(locale_method => { Oj.dump(method_args, mode: :strict) => method_result })
                       end
