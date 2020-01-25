@@ -16,7 +16,7 @@ module LucidTranslation
       def _(*keys, &block)
         domain = Isomorfeus.i18n_domain
         locale = Isomorfeus.locale
-        raise "I18n _(): no key given!" if keys.empty?
+        Isomorfeus.raise_error(message: "I18n _(): no key given!") if keys.empty?
         result = Redux.fetch_by_path(:i18n_state, domain, locale, '_', keys)
         return result if result
         if Isomorfeus::I18n::Init.initialized?
@@ -27,7 +27,7 @@ module LucidTranslation
               agent.processed = true
               if agent.response.key?(:error)
                 `console.error(#{agent.response[:error].to_n})`
-                raise agent.response[:error]
+                Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
@@ -39,7 +39,7 @@ module LucidTranslation
       def n_(*keys, count, &block)
         domain = Isomorfeus.i18n_domain
         locale = Isomorfeus.locale
-        raise "I18n n_(): no key given!" if keys.empty?
+        Isomorfeus.raise_error(message: "I18n n_(): no key given!") if keys.empty?
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 'n_', keys + [count])
         return result if result
         if Isomorfeus::I18n::Init.initialized?
@@ -50,7 +50,7 @@ module LucidTranslation
               agent.processed = true
               if agent.response.key?(:error)
                 `console.error(#{agent.response[:error].to_n})`
-                raise agent.response[:error]
+                Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
@@ -70,7 +70,7 @@ module LucidTranslation
       def ns_(*args, &block)
         domain = Isomorfeus.i18n_domain
         locale = Isomorfeus.locale
-        raise "I18n ns_(): no args given!" if args.empty?
+        Isomorfeus.raise_error(message: "I18n ns_(): no args given!") if args.empty?
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 'ns_', args)
         return result if result
         if Isomorfeus::I18n::Init.initialized?
@@ -81,7 +81,7 @@ module LucidTranslation
               agent.processed = true
               if agent.response.key?(:error)
                 `console.error(#{agent.response[:error].to_n})`
-                raise agent.response[:error]
+                Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
@@ -104,7 +104,7 @@ module LucidTranslation
               agent.processed = true
               if agent.response.key?(:error)
                 `console.error(#{agent.response[:error].to_n})`
-                raise agent.response[:error]
+                Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
@@ -127,7 +127,7 @@ module LucidTranslation
               agent.processed = true
               if agent.response.key?(:error)
                 `console.error(#{agent.response[:error].to_n})`
-                raise agent.response[:error]
+                Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
@@ -158,7 +158,7 @@ module LucidTranslation
         define_method("D#{method}") do |*args, &block|
           domain = Isomorfeus.i18n_domain
           locale = Isomorfeus.locale
-          raise "I18n D#{method}(): no args given!" if args.empty?
+          Isomorfeus.raise_error(message: "I18n D#{method}(): no args given!") if args.empty?
           result = Redux.fetch_by_path(:i18n_state, domain, locale, "D#{method}", args)
           return result if result
           if Isomorfeus::I18n::Init.initialized?
@@ -169,7 +169,7 @@ module LucidTranslation
                 agent.processed = true
                 if agent.response.key?(:error)
                   `console.error(#{agent.response[:error].to_n})`
-                  raise agent.response[:error]
+                  Isomorfeus.raise_error(message: agent.response[:error])
                 end
                 Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
               end

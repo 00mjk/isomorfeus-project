@@ -237,7 +237,7 @@ module LucidData
           end
 
           def from=(node)
-            raise "A invalid 'from' was given" unless node
+            Isomorfeus.raise_error(message: "A invalid 'from' was given") unless node
             changed!
             old_from = from
             if node.respond_to?(:to_sid)
@@ -257,7 +257,7 @@ module LucidData
           end
 
           def to=(node)
-            raise "A invalid 'to' was given" unless node
+            Isomorfeus.raise_error(message: "A invalid 'to' was given") unless node
             old_to = to
             changed!
             if node.respond_to?(:to_sid)

@@ -36,7 +36,7 @@ module LucidData
       end
 
       def method_missing(accessor_name, *args, &block)
-        raise "#{@class_name}: no such thing '#{accessor_name}‘in the results!" unless @result_set.key?(accessor_name)
+        Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}‘in the results!") unless @result_set.key?(accessor_name)
         sid = if @result_set.any?
                 @result_set[accessor_name]
               else
@@ -66,7 +66,7 @@ module LucidData
       end
 
       def method_missing(accessor_name, *args, &block)
-        raise "#{@class_name}: no such thing '#{accessor_name}‘in the results!" unless @result_set.key?(accessor_name)
+        Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}‘in the results!") unless @result_set.key?(accessor_name)
         @result_set[accessor_name]
       end
 

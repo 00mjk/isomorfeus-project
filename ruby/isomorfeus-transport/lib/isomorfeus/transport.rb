@@ -95,7 +95,7 @@ module Isomorfeus
               end
             end
             register_request_in_progress(request, agent.id)
-            raise 'No socket!' unless @socket
+            Isomorfeus.raise_error(message: 'No socket!') unless @socket
             begin
               @socket.send(`JSON.stringify(#{{request: { agent_ids: { agent.id => request }}}.to_n})`)
               agent.sent = true
@@ -115,7 +115,7 @@ module Isomorfeus
         end
 
         def send_notification(channel_class, channel, message)
-          raise 'No socket!' unless @socket
+          Isomorfeus.raise_error(message: 'No socket!') unless @socket
           @socket.send(`JSON.stringify(#{{notification: { class: channel_class.name, channel: channel, message: message}}.to_n})`)
           true
         end
@@ -127,7 +127,7 @@ module Isomorfeus
           else
             agent = Isomorfeus::Transport::RequestAgent.new(request)
             register_request_in_progress(request, agent.id)
-            raise 'No socket!' unless @socket
+            Isomorfeus.raise_error(message: 'No socket!') unless @socket
             @socket.send(`JSON.stringify(#{{subscribe: { agent_ids: { agent.id => request }}}.to_n})`)
           end
           result_promise = agent.promise.then do |agent|
@@ -148,7 +148,7 @@ module Isomorfeus
           else
             agent = Isomorfeus::Transport::RequestAgent.new(request)
             register_request_in_progress(request, agent.id)
-            raise 'No socket!' unless @socket
+            Isomorfeus.raise_error(message: 'No socket!') unless @socket
             @socket.send(`JSON.stringify(#{{unsubscribe: { agent_ids: { agent.id => request }}}.to_n})`)
           end
           result_promise = agent.promise.then do |agent|

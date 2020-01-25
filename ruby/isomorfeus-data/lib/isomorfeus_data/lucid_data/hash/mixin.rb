@@ -26,7 +26,7 @@ module LucidData
           def _relaxed_validate_attributes(attrs)
             attribute_conditions.each_key do |attr|
               if attribute_conditions[attr].key?(:required) && attribute_conditions[attr][:required] && !attrs.key?(attr)
-                raise "Required attribute #{attr} not given!"
+                Isomorfeus.raise_error(message: "Required attribute #{attr} not given!")
               end
             end
             attrs.each { |attr, val| _relaxed_validate_attribute(attr, val) } if attribute_conditions.any?

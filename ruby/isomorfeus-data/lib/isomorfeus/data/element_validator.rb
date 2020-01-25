@@ -33,7 +33,7 @@ module Isomorfeus
                  end
             @e = !!@e if @o[:type] == :boolean
           rescue
-            raise "#{@c}: #{@p} cast failed" unless @e.class == @o[:class]
+            Isomorfeus.raise_error(message: "#{@c}: #{@p} cast failed") unless @e.class == @o[:class]
           end
         end
       end
@@ -53,13 +53,13 @@ module Isomorfeus
       def type!
         return if @o[:allow_nil] && @e.nil?
         if @o.key?(:class)
-          raise "#{@c}: #{@p} class not #{@o[:class]}" unless @e.class == @o[:class]
+          Isomorfeus.raise_error(message: "#{@c}: #{@p} class not #{@o[:class]}") unless @e.class == @o[:class]
         elsif @o.key?(:is_a)
-          raise "#{@c}: #{@p} is not a #{@o[:is_a]}" unless @e.is_a?(@o[:is_a])
+          Isomorfeus.raise_error(message: "#{@c}: #{@p} is not a #{@o[:is_a]}") unless @e.is_a?(@o[:is_a])
         elsif @o.key?(:type)
           case @o[:type]
           when :boolean
-            raise "#{@c}: #{@p} is not a boolean" unless @e.class == TrueClass || @e.class == FalseClass
+            Isomorfeus.raise_error(message: "#{@c}: #{@p} is not a boolean") unless @e.class == TrueClass || @e.class == FalseClass
           end
         end
       end
@@ -76,48 +76,48 @@ module Isomorfeus
 
       # specific validations
       def c_gt(v)
-        raise "#{@c}: #{@p} not greater than #{v}!" unless @e > v
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} not greater than #{v}!") unless @e > v
       end
 
       def c_lt(v)
-        raise "#{@c}: #{@p} not less than #{v}!" unless @e < v
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} not less than #{v}!") unless @e < v
       end
 
       def c_keys(v)
-        raise "#{@c}: #{@p} keys dont fit!" unless @e.keys.sort == v.sort
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} keys dont fit!") unless @e.keys.sort == v.sort
       end
 
       def c_size(v)
-        raise "#{@c}: #{@p} length/size is not #{v}" unless @e.size == v
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} length/size is not #{v}") unless @e.size == v
       end
 
       def c_matches(v)
-        raise "#{@c}: #{@p} does not match #{v}" unless v.match?(@e)
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} does not match #{v}") unless v.match?(@e)
       end
 
       def c_max(v)
-        raise "#{@c}: #{@p} is larger than #{v}" unless @e <= v
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} is larger than #{v}") unless @e <= v
       end
 
       def c_min(v)
-        raise "#{@c}: #{@p} is smaller than #{v}" unless @e >= v
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} is smaller than #{v}") unless @e >= v
       end
 
       def c_max_size(v)
-        raise "#{@c}: #{@p} is larger than #{v}" unless @e.size <= v
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} is larger than #{v}") unless @e.size <= v
       end
 
       def c_min_size(v)
-        raise "#{@c}: #{@p} is smaller than #{v}" unless @e.size >= v
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} is smaller than #{v}") unless @e.size >= v
       end
 
       def c_direction(v)
-        raise "#{@c}: #{@p} is positive" if v == :negative && @e >= 0
-        raise "#{@c}: #{@p} is negative" if v == :positive && @e < 0
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} is positive") if v == :negative && @e >= 0
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} is negative") if v == :positive && @e < 0
       end
 
       def c_test
-        raise "#{@c}: #{@p} test condition check failed" unless @o[:test].call(@e)
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} test condition check failed") unless @o[:test].call(@e)
       end
 
       def c_sub_type(v)

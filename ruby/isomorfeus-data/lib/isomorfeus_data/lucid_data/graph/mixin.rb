@@ -55,7 +55,7 @@ module LucidData
 
           def _validate_node_collection(access_name, collection)
             unless node_collections.key?(access_name) || access_name == :nodes
-              raise "#{self.name}: No such node collection declared: '#{access_name}'!"
+              Isomorfeus.raise_error(message: "#{self.name}: No such node collection declared: '#{access_name}'!")
             end
             Isomorfeus::Data::ElementValidator.new(self.name, collection, node_collections[access_name]).validate! if node_collections[access_name]
           end
@@ -95,7 +95,7 @@ module LucidData
 
           def _validate_edge_collection(access_name, collection)
             unless edge_collections.key?(access_name) || access_name == :edges
-              raise "#{self.name}: No such edge collection declared: '#{access_name}'!"
+              Isomorfeus.raise_error(message: "#{self.name}: No such edge collection declared: '#{access_name}'!")
             end
             Isomorfeus::Data::ElementValidator.new(self.name, collection, edge_collections[access_name]).validate! if edge_collections[access_name]
           end

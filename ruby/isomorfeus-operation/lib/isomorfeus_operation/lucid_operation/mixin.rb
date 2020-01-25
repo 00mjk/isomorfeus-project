@@ -27,12 +27,12 @@ module LucidOperation
           alias :If_that_failed :steps
 
           def First(regular_expression, &block)
-            raise "#{self}: First already defined, can only be defined once!" if @first_defined
+            Isomorfeus.raise_error(message: "#{self}: First already defined, can only be defined once!") if @first_defined
             @first_defined = true
           end
 
           def Finally(regular_expression, &block)
-            raise "#{self}: Finally already defined, can only be defined once!" if @finally_defined
+            Isomorfeus.raise_error(message: "#{self}: Finally already defined, can only be defined once!") if @finally_defined
             @finally_defined = true
           end
 
@@ -47,7 +47,7 @@ module LucidOperation
                 agent.processed = true
                 if agent.response.key?(:error)
                   `console.error(#{agent.response[:error].to_n})`
-                  raise agent.response[:error]
+                  Isomorfeus.raise_error(message: agent.response[:error])
                 end
                 agent.result = agent.response[:result]
               end

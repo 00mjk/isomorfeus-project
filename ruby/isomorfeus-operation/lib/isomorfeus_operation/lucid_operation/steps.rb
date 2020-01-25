@@ -25,7 +25,7 @@ module LucidOperation
     end
 
     def First(regular_expression, &block)
-      raise "#{self}: First already defined, can only be defined once!" if @first_defined
+      Isomorfeus.raise_error(message: "#{self}: First already defined, can only be defined once!") if @first_defined
       @first_defined = true
       steps << [regular_expression, block]
     end
@@ -38,7 +38,7 @@ module LucidOperation
     alias :When :Given
 
     def Finally(regular_expression, &block)
-      raise "#{self}: Finally already defined, can only be defined once!" if @finally_defined
+      Isomorfeus.raise_error(message: "#{self}: Finally already defined, can only be defined once!") if @finally_defined
       @finally_defined = true
       steps << [regular_expression, block]
     end

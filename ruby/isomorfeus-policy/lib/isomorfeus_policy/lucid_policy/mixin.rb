@@ -43,7 +43,7 @@ module LucidPolicy
         private
 
         def _raise_allow_deny_first
-          raise LucidPolicy::Exception, "#{self}: 'allow' or 'deny' must appear before 'refine'"
+          Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{self}: 'allow' or 'deny' must appear before 'refine'")
         end
 
         def _allow_or_deny(allow_or_deny, *classes_and_methods, &block)
@@ -86,7 +86,7 @@ module LucidPolicy
       end
 
       def authorized?(target_class, target_method = nil, *props)
-        raise LucidPolicy::Exception, "#{self}: At least the class must be given!" unless target_class
+        Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{self}: At least the class must be given!") unless target_class
         result = :deny
 
         rules = self.class.authorization_rules
@@ -121,7 +121,7 @@ module LucidPolicy
 
       def authorized!(target_class, target_method = nil, *props)
         return true if authorized?(target_class, target_method, *props)
-        raise LucidPolicy::Exception, "#{@object}: not authorized to call #{target_class}.#{target_method}(#{props})!"
+        Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{@object}: not authorized to call #{target_class}.#{target_method}(#{props})!")
       end
     end
   end

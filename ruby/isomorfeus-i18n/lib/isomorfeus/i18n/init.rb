@@ -22,7 +22,7 @@ module Isomorfeus
               agent.processed = true
               if agent.response.key?(:error)
                 `console.error(#{agent.response[:error].to_n})`
-                raise agent.response[:error]
+                Isomorfeus.raise_error(message: agent.response[:error])
               end
               @initializing = false
               Isomorfeus.store.dispatch(type: 'I18N_LOAD', data: agent.response[:data])

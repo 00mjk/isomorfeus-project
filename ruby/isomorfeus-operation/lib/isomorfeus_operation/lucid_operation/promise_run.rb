@@ -24,7 +24,7 @@ module LucidOperation
             end
           end
         end
-        raise "No match found for step #{gherkin_step}!" unless matched
+        Isomorfeus.raise_error(message: "No match found for step #{gherkin_step}!") unless matched
       end
 
       # fail track
@@ -42,7 +42,7 @@ module LucidOperation
             end
           end
         end
-        raise "No match found for failure step #{gherkin_step}!" unless matched
+        Isomorfeus.raise_error(message: "No match found for failure step #{gherkin_step}!") unless matched
       end
 
       # ensure
@@ -64,7 +64,7 @@ module LucidOperation
             end
           end
         end
-        raise "No match found for ensure step #{gherkin_step}!" unless matched
+        Isomorfeus.raise_error(message: "No match found for ensure step #{gherkin_step}!") unless matched
       end
 
       original_promise.resolve

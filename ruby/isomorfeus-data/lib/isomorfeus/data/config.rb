@@ -50,7 +50,7 @@ module Isomorfeus
         begin
           Arango.current_server.get_database(database)
         rescue Exception => e
-          raise "Can't connect to database '#{database}' (#{e.message})."
+          Isomorfeus.raise_error(message: "Can't connect to database '#{database}' (#{e.message}).")
         end
       end
 

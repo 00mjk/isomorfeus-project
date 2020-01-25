@@ -18,14 +18,14 @@ module Isomorfeus
           end
 
           def _validate_attribute(attr_name, attr_val)
-            raise "#{self.name}: No such attribute declared: '#{attr_name}'!" unless attribute_conditions.key?(attr_name)
+            Isomorfeus.raise_error(message: "#{self.name}: No such attribute declared: '#{attr_name}'!") unless attribute_conditions.key?(attr_name)
             Isomorfeus::Props::Validator.new(self.name, attr_name, attr_val, attribute_conditions[attr_name]).validate!
           end
 
           def _validate_attributes(attrs)
             attribute_conditions.each_key do |attr|
               if attribute_conditions[attr].key?(:required) && attribute_conditions[attr][:required] && !attrs.key?(attr)
-                raise "Required attribute #{attr} not given!"
+                Isomorfeus.raise_error(message: "Required attribute #{attr} not given!")
               end
             end
             attrs.each { |attr, val| _validate_attribute(attr, val) }

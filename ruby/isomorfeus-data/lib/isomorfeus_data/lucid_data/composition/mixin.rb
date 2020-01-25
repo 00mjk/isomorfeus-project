@@ -39,14 +39,14 @@ module LucidData
           end
 
           def _validate_part(access_name, part)
-            raise "#{self.name}: No such part declared: '#{access_name}'!" unless parts.key?(access_name)
+            Isomorfeus.raise_error(message: "#{self.name}: No such part declared: '#{access_name}'!") unless parts.key?(access_name)
             Isomorfeus::Data::ElementValidator.new(self.name, part, parts[access_name]).validate!
           end
 
           def _validate_parts(many_parts)
             parts.each_key do |access_name|
               if parts[access_name].key?(:required) && parts[access_name][:required] && !many_parts.key?(attr)
-                raise "Required part #{access_name} not given!"
+                Isomorfeus.raise_error(message: "Required part #{access_name} not given!")
               end
             end
             many_parts.each { |access_name, part| _validate_part(access_name, part) } if parts.any?
