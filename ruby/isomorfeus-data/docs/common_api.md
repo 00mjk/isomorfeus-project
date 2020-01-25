@@ -14,6 +14,10 @@ All LucidData *classes* support the following methods for loading data based on 
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
 
+A `execute_load` block must be defined, to execute the actual load of data. This blocks must return a instance if the class at hand or a Hash
+resembling the arguments to `self.new`, see documentation of the individual classes.
+Returning nil indicates that the requested item does not exist. Alternatively a exception may be thrown.
+
 ### Querying Data
 
 All LucidData *classes* support the following methods for querying data:
@@ -30,7 +34,7 @@ All LucidData *classes* support the following methods for querying data:
   
 The allowed props *must* be declared. See section Props belows.
 
-On the server `execute_query` blocks must be defined. These blocks must return a hash of LucidData objects,
+A `execute_query` blocks must be defined. These blocks must return a hash of LucidData objects,
 which get then wrapped in a LucidData::QueryResult. Example:
 ```ruby
 class MyGraph < LucidData::Graph::Base
@@ -58,6 +62,10 @@ All LucidData *instances* support the following methods for saving data:
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
   but not from within render blocks.
 
+A `execute_save` block must be defined, to execute the actual save of data. This block must return a instance if the class at hand or a Hash
+resembling the arguments to `self.new`, see documentation of the individual classes.
+Returning nil indicates that the save failed for some reason. Alternatively a exception may be thrown.
+
 ### Destroying Data
 
 All LucidData *instances* support the following methods for destroying data:
@@ -79,7 +87,10 @@ All LucidData *classes* support the following methods for destroying data:
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
   but not from within render blocks.
- 
+
+A `execute_destry` block must be defined, to execute the actual load of data. These blocks must return a instance if the class at hand or a Hash
+resembling the arguments to `self.new`, see documentation of the individual classes.
+
 ### Creating Data
 
 Creating is the same as instantiating with new and then saving the object.
@@ -93,6 +104,8 @@ All LucidData *classes* support the following methods for creating data:
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
   but not from within render blocks.
+  
+For creating the `execute_save` block is used.
 
 ### Reloading Data
 
@@ -105,7 +118,6 @@ All LucidData *instances* support the following methods for reloading data from 
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
   but not from within render blocks.
-
 
 ### Attributes
 
