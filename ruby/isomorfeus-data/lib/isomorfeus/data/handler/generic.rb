@@ -46,6 +46,7 @@ module Isomorfeus
           if current_user.authorized?(type_class, :load, props)
             loaded_type = type_class.load(**props)
             if loaded_type
+              response_agent.outer_result = {} unless response_agent.outer_result
               response_agent.outer_result.deep_merge!(data: loaded_type.to_transport)
               if loaded_type.respond_to?(:included_items_to_transport)
                 response_agent.outer_result.deep_merge!(data: loaded_type.included_items_to_transport)
@@ -67,7 +68,8 @@ module Isomorfeus
           if current_user.authorized?(type_class, :query, props[:props])
             queried_type = type_class.query(**props)
             if queried_type
-              response_agent.outer_result = { data: queried_type.to_transport }
+              response_agent.outer_result = {} unless response_agent.outer_result
+              response_agent.outer_result.deep_merge!(data: queried_type.to_transport)
               if queried_type.respond_to?(:included_items_to_transport)
                 response_agent.outer_result.deep_merge!(data: queried_type.included_items_to_transport)
               end
@@ -86,6 +88,7 @@ module Isomorfeus
           if current_user.authorized?(type_class, :save, props)
             saved_type = type_class.save(**props)
             if saved_type
+              response_agent.outer_result = {} unless response_agent.outer_result
               response_agent.outer_result.deep_merge!(data: saved_type.to_transport)
               if saved_type.respond_to?(:included_items_to_transport)
                 response_agent.outer_result.deep_merge!(data: saved_type.included_items_to_transport)
@@ -104,7 +107,8 @@ module Isomorfeus
           if current_user.authorized?(type_class, :destroy, props)
             destroyed_type = type_class.destroy(**props)
             if destroyed_type
-              response_agent.outer_result = { data: destroyed_type }
+              response_agent.outer_result = {} unless response_agent.outer_result
+              response_agent.outer_result.deep_merge!(data: destroyed_type)
               response_agent.agent_result = { success: 'ok' }
             else response_agent.error = { error: { type_class_name => 'Destroy failed!' }}
             end
