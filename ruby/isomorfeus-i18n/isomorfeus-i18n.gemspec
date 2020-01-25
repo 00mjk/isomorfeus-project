@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'oj', '>= 3.10.0'
   s.add_dependency 'opal', '>= 1.0.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
-  s.add_dependency 'isomorfeus-react', '>= 16.12.12'
+  s.add_dependency 'isomorfeus-react', '>= 16.12.13'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.17'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::I18n::VERSION
   s.add_dependency 'isomorfeus-data', Isomorfeus::I18n::VERSION
