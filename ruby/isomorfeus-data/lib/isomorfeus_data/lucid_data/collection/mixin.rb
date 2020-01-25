@@ -459,6 +459,8 @@ module LucidData
           base.instance_exec do
             def load(key:, pub_sub_client: nil, current_user: nil)
               data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+              return data if data.class == self
+              Isomorfeus.raise_error "#{self.to_s}: execute_load must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
               revision = data.delete(:revision)
               attributes = data.delete(:attributes)
               documents = data.delete(:documents)
@@ -466,7 +468,7 @@ module LucidData
               vertices = data.delete(:vertices)
               nodes = data.delete(:nodes)
               self.new(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
-                       nodes: nodes)
+                     nodes: nodes)
             end
 
             def save(key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil,
