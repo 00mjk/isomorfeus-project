@@ -3,7 +3,6 @@ module LucidData
     module Mixin
       def self.included(base)
         base.include(Enumerable)
-        base.extend(LucidPropDeclaration::Mixin)
         base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
@@ -262,11 +261,7 @@ module LucidData
             self
           end
         else # RUBY_ENGINE
-          unless base == LucidData::Hash::Base
-            Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
-          end
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Hash::Base
 
           base.instance_exec do
             def attribute(name, options = {})

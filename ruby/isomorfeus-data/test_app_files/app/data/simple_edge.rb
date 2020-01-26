@@ -7,9 +7,6 @@ class SimpleEdge < LucidData::Edge::Base
     { key: key, attributes: { one: key }, from: ['SimpleNode', key], to: ['SimpleNode', target_key] }
   end
 
-  execute_query do |props:, current_user:, pub_sub_client:|
-  end
-
   execute_save do |key:, revision: nil, from:, to:, attributes: nil, current_user:, pub_sub_client:|
   end
 

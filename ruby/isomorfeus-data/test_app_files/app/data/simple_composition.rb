@@ -13,9 +13,6 @@ class SimpleComposition < LucidData::Composition::Base
                          a_hash: SimpleHash.load(key: key) }}
   end
 
-  execute_query do |props:, current_user:, pub_sub_client:|
-  end
-
   execute_save do |key:, revision: nil, parts:, attributes:, current_user:, pub_sub_client:|
   end
 

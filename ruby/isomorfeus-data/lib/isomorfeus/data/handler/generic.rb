@@ -23,7 +23,7 @@ module Isomorfeus
                 response_agent.request[type_class_name].each_key do |action|
                   case action
                   when 'load' then process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-                  when 'query' then process_query(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+                  when 'execute' then process_execute(pub_sub_client, current_user, response_agent, type_class, type_class_name)
                   when 'save' then process_save(pub_sub_client, current_user, response_agent, type_class, type_class_name)
                   when 'destroy' then process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name)
                   else response_agent.error = { error: { action => 'No such thing!' }}
@@ -58,15 +58,15 @@ module Isomorfeus
           end
         end
 
-        def process_query(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-          # 'Isomorfeus::Data::Handler::Generic', self.name, :query, props_json
-          props_json = response_agent.request[type_class_name]['query']
+        def process_execute(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+          # 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props_json
+          props_json = response_agent.request[type_class_name]['execute']
           props = Oj.load(props_json, mode: :strict)
           props.transform_keys!(&:to_sym)
           props[:props].transform_keys!(&:to_sym)
           props.deep_merge!({ pub_sub_client: pub_sub_client, current_user: current_user })
-          if current_user.authorized?(type_class, :query, props[:props])
-            queried_type = type_class.query(**props)
+          if current_user.authorized?(type_class, :execute, props[:props])
+            queried_type = type_class.execute(**props)
             if queried_type
               response_agent.outer_result = {} unless response_agent.outer_result
               response_agent.outer_result.deep_merge!(data: queried_type.to_transport)

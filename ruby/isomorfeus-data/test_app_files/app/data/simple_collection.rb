@@ -6,9 +6,6 @@ class SimpleCollection < LucidData::Collection::Base
     { key: key, nodes: nodes }
   end
 
-  execute_query do |props:, current_user:, pub_sub_client:|
-  end
-
   execute_save do |key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil, current_user:, pub_sub_client:|
   end
 

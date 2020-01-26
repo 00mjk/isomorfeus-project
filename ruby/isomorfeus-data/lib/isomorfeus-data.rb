@@ -44,6 +44,8 @@ else
   require 'isomorfeus_data/lucid_data/graph/base'
   require 'isomorfeus_data/lucid_data/composition/mixin'
   require 'isomorfeus_data/lucid_data/composition/base'
+  require 'isomorfeus_data/lucid_data/query/mixin'
+  require 'isomorfeus_data/lucid_data/query/base'
 
   require 'isomorfeus_data/lucid_data/generic_collection'
   require 'isomorfeus_data/lucid_data/generic_edge'

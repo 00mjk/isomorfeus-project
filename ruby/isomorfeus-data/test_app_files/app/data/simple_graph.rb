@@ -10,9 +10,6 @@ class SimpleGraph < LucidData::Graph::Base
     end
   end
 
-  execute_query do |props:, current_user:, pub_sub_client:|
-  end
-
   execute_save do |key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil,
     current_user:, pub_sub_client:|
   end

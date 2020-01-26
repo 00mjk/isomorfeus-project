@@ -3,9 +3,6 @@ class SimpleArray < LucidData::Array::Base
     { key: key, elements: [1, 2, 3] }
   end
 
-  execute_query do |props:, current_user:, pub_sub_client:|
-  end
-
   execute_save do |key:, revision: nil, elements:, current_user:, pub_sub_client:|
   end
 
