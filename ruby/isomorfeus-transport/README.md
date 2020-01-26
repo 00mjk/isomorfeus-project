@@ -34,11 +34,11 @@ Server only:
 
 For authentication in isomorfeus there is a class `Anonymous`, so whenever no user is logged in, the anonymous user is passed on to operations
 or data loads. In my opinion it is more true than no user (nil), because in fact there probably is a user, just the user is unknown.
-The Anonymous user has a default policy that denies everything, the user will respond to .authorized?(whatever) always with false by default.
-Of  course, the developer can add a Policy easily, to allow certain operations or data loads, or whatever or everything:
+The Anonymous user has a default policy that allows everything, the user will respond to .authorized?(whatever) always with true by default.
+Of  course, the developer can add a Policy easily, to deny certain operations or data loads, or whatever or deny everything:
 ```ruby
 class AnonymousPolicy < LucidPolicy::Base
- allow all
+ deny all
 end
 ```
 For more information about policy see [the policy docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-policy/README.md).
