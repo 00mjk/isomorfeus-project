@@ -64,7 +64,7 @@ task default: %w[ruby_specs]
 task :push_ruby_packages do
   Rake::Task['push_ruby_packages_to_rubygems'].invoke
   Rake::Task['push_ruby_packages_to_github'].invoke
-  Rake::Task['push_ruby_packages_to_isomorfeus'].invoke
+  # Rake::Task['push_ruby_packages_to_isomorfeus'].invoke
 end
 
 task :push_ruby_packages_to_rubygems do
