@@ -18,6 +18,22 @@ A `execute_load` block must be defined, to execute the actual load of data. This
 resembling the arguments to `self.new`, see documentation of the individual classes.
 Returning nil indicates that the requested item does not exist. Alternatively a exception may be thrown.
 
+### Creating Data
+
+All LucidData *classes* support the following methods for creating data:
+- `create` -> new_instance
+  Identical to calling `.new.save`
+  Optimistic convenience method, assuming success. Failure cannot be handled.
+
+- `promise_save` -> promise with the new instance when resolved
+  Identical to calling `.new.promise_save`
+  This method returns a promise. This method always triggers a save when called, but subject to transport request bundling, the actual request may be
+  delayed, bundled together with other request or fulfilled by another identical request.
+  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
+  but not from within render blocks.
+  
+The `execute_save` block must be defined, see below.
+
 ### Saving Data
 
 All LucidData *instances* support the following methods for saving data:
