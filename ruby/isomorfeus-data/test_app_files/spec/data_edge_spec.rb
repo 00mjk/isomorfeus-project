@@ -332,6 +332,22 @@ RSpec.describe 'LucidData::Edge' do
       expect(result).to be(true)
     end
 
+    it 'can load a simple edge' do
+      result = @doc.await_ruby do
+        SimpleEdge.promise_load(key: '123').then do |edge|
+          edge.one
+        end
+      end
+      expect(result).to eq('123')
+    end
+
+    it 'can destroy a simple edge' do
+      result = @doc.await_ruby do
+        SimpleEdge.promise_destroy(key: '123').then { |result| result }
+      end
+      expect(result).to eq(true)
+    end
+
     it 'converts to sid' do
       result = @doc.evaluate_ruby do
         class TestDocumentBase < LucidData::Document::Base; end

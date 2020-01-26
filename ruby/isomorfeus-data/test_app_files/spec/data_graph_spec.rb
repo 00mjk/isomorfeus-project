@@ -47,7 +47,7 @@ RSpec.describe 'LucidGraph' do
       expect(result).to eq([5,5])
     end
 
-    it 'can load a simple graph' do
+    it 'can destroy a simple graph' do
       result = on_server do
         SimpleGraph.destroy(key: '123')
       end
@@ -151,7 +151,7 @@ RSpec.describe 'LucidGraph' do
       expect(result).to eq('TestGraphM')
     end
 
-    it 'can load a simple graph on the client' do
+    it 'can load a simple graph' do
       result = @doc.await_ruby do
         SimpleGraph.promise_load(key: 8).then do |graph|
           n_nodes = graph.nodes.size
@@ -160,6 +160,13 @@ RSpec.describe 'LucidGraph' do
         end
       end
       expect(result).to eq([5,5])
+    end
+
+    it 'can destroy a simple graph' do
+      result = @doc.await_ruby do
+        SimpleGraph.promise_destroy(key: '123').then { |result| result }
+      end
+      expect(result).to eq(true)
     end
   end
 

@@ -103,13 +103,20 @@ RSpec.describe 'LucidData::EdgeCollection' do
       expect(result).to eq('TestEdgeCollectionM')
     end
 
-    it 'can load a simple collection on the client' do
+    it 'can load a simple edge collection' do
       result = @doc.await_ruby do
         SimpleEdgeCollection.promise_load(key: 6).then do |collection|
           collection.size
         end
       end
       expect(result).to eq(5)
+    end
+
+    it 'can destroy a simple edge collection' do
+      result = @doc.await_ruby do
+        SimpleEdgeCollection.promise_destroy(key: '123').then { |result| result }
+      end
+      expect(result).to eq(true)
     end
   end
 

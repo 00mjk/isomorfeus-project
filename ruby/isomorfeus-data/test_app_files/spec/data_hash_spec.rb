@@ -310,5 +310,21 @@ RSpec.describe 'LucidData::Hash' do
       end
       expect(JSON.parse(result)).to eq("TestHashG" => {"13"=>{"attributes"=>{"experiment"=>2, "probe"=>3, "test"=>1}}})
     end
+
+    it 'can load a simple hash' do
+      result = @doc.await_ruby do
+        SimpleHash.promise_load(key: '123').then do |hash|
+          hash[:three]
+        end
+      end
+      expect(result).to eq(3)
+    end
+
+    it 'can destroy a simple hash' do
+      result = @doc.await_ruby do
+        SimpleHash.promise_destroy(key: '123').then { |result| result }
+      end
+      expect(result).to eq(true)
+    end
   end
 end
