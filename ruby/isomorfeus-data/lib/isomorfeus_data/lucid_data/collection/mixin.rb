@@ -452,8 +452,8 @@ module LucidData
           Isomorfeus.add_valid_data_class(base) unless base == LucidData::Collection::Base
 
           base.instance_exec do
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+            def load(key:)
+              data = instance_exec(key: key, &@_load_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_load must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
@@ -467,13 +467,8 @@ module LucidData
                      nodes: nodes)
             end
 
-            def save(key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil,
-                     pub_sub_client: nil, current_user: nil)
-              val_nodes = documents || nodes || vertexes || vertices
-              _validate_attributes(attributes) if self.class.attribute_conditions.any?
-              _validate_nodes(val_nodes) if self.class.node_conditions.any?
-              data = instance_exec(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
-                                   nodes: nodes, pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+            def save(key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil)
+              data = instance_exec(key: key, instance: self.new(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices, nodes: nodes), &@_save_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
@@ -483,8 +478,8 @@ module LucidData
               vertexes = data.delete(:vertexes)
               vertices = data.delete(:vertices)
               nodes = data.delete(:nodes)
-              self.new(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
-                       nodes: nodes)
+              key = data.delete(:key) || key
+              self.new(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices, nodes: nodes)
             end
           end
 

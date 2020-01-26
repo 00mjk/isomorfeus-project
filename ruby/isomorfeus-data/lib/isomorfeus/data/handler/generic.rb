@@ -14,7 +14,7 @@ module Isomorfeus
         # LucidData::Graph
         # LucidData::Composition
 
-        def process_request(pub_sub_client, current_user, response_agent)
+        def process_request(response_agent)
           # promise_send_path('Isomorfeus::Data::Handler::Generic', self.to_s, action, props_hash)
           response_agent.request.each_key do |type_class_name|
             if Isomorfeus.valid_data_class_name?(type_class_name)
@@ -22,10 +22,10 @@ module Isomorfeus
               if type_class
                 response_agent.request[type_class_name].each_key do |action|
                   case action
-                  when 'load' then process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-                  when 'execute' then process_execute(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-                  when 'save' then process_save(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-                  when 'destroy' then process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+                  when 'load' then process_load(response_agent, type_class, type_class_name)
+                  when 'execute' then process_execute(response_agent, type_class, type_class_name)
+                  when 'save' then process_save(response_agent, type_class, type_class_name)
+                  when 'destroy' then process_destroy(response_agent, type_class, type_class_name)
                   else response_agent.error = { error: { action => 'No such thing!' }}
                   end
                 end
@@ -38,12 +38,11 @@ module Isomorfeus
           response_agent.error = { error: "Isomorfeus::Data::Handler::Generic: #{e.message}\n#{e.backtrace.join("\n")}" }
         end
 
-        def process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+        def process_load(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key
           props = response_agent.request[type_class_name]['load']
           props.transform_keys!(&:to_sym)
-          props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
-          if current_user.authorized?(type_class, :load, props)
+          if Isomorfeus.current_user.authorized?(type_class, :load, props)
             loaded_type = type_class.load(**props)
             if loaded_type
               response_agent.outer_result = {} unless response_agent.outer_result
@@ -58,14 +57,13 @@ module Isomorfeus
           end
         end
 
-        def process_execute(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+        def process_execute(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props_json
           props_json = response_agent.request[type_class_name]['execute']
           props = Oj.load(props_json, mode: :strict)
           props.transform_keys!(&:to_sym)
           props[:props].transform_keys!(&:to_sym)
-          props.deep_merge!({ pub_sub_client: pub_sub_client, current_user: current_user })
-          if current_user.authorized?(type_class, :execute, props[:props])
+          if Isomorfeus.current_user.authorized?(type_class, :execute, props[:props])
             queried_type = type_class.execute(**props)
             if queried_type
               response_agent.outer_result = {} unless response_agent.outer_result
@@ -80,12 +78,11 @@ module Isomorfeus
           end
         end
 
-        def process_save(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+        def process_save(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :save, data_hash
           props = response_agent.request[type_class_name]['save']
           props.transform_keys!(&:to_sym)
-          props.deep_merge!({ pub_sub_client: pub_sub_client, current_user: current_user })
-          if current_user.authorized?(type_class, :save, props)
+          if Isomorfeus.current_user.authorized?(type_class, :save, props)
             saved_type = type_class.save(**props)
             if saved_type
               response_agent.outer_result = {} unless response_agent.outer_result
@@ -100,11 +97,10 @@ module Isomorfeus
           end
         end
 
-        def process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+        def process_destroy(response_agent, type_class, type_class_name)
           props = response_agent.request[type_class_name]['destroy']
           props.transform_keys!(&:to_sym)
-          props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
-          if current_user.authorized?(type_class, :destroy, props)
+          if Isomorfeus.current_user.authorized?(type_class, :destroy, props)
             result = type_class.destroy(**props)
             if result
               response_agent.agent_result = { success: 'ok' }

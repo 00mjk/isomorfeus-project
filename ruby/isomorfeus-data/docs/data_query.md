@@ -20,7 +20,7 @@ A `execute_query` block must be defined. This block must return a hash of LucidD
 which get then wrapped in a LucidData::QueryResult. Example:
 ```ruby
 class MyQuery < LucidData::Query::Base
-  execute_query do |props:, current_user:, pub_sub_client:|
+  execute_query do |props:|
     { queried_graph: MyGraph.new(key: '2') } # supply graph as instance
   end
 end

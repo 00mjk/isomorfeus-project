@@ -4,7 +4,7 @@ module Isomorfeus
   module Data
     module Handler
       class Arango < LucidHandler::Base
-        on_request do |pub_sub_client, current_user, response_agent|
+        on_request do |response_agent|
           # promise_send_path('Isomorfeus::Data::Handler::Generic', action, type, self.to_s, props_hash)
           response_agent.request.each_key do |action|
             if action == 'load'
@@ -17,11 +17,10 @@ module Isomorfeus
                         props_json = response_agent.request[type_class_name]
                         begin
                           props = Oj.load(props_json, mode: :strict)
-                          props.merge!({pub_sub_client: pub_sub_client, current_user: current_user})
                           if current_user.authorized?(type_class, :load, *props)
                             loaded_type = type_class.load(props)
                             loaded_type.instance_exec do
-                              type_class.on_load_block.call(pub_sub_client, current_user) if type_class.on_load_block
+                              type_class.on_load_block.call() if type_class.on_load_block
                             end
                             response_agent.outer_result = { data: loaded_type.to_transport }
                             if %w[collection graph].include?(type)

@@ -346,8 +346,8 @@ module LucidData
           Isomorfeus.add_valid_data_class(base) unless base == LucidData::Array::Base
 
           base.instance_exec do
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+            def load(key:)
+              data = instance_exec(key: key, &@_load_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_load must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
@@ -356,15 +356,15 @@ module LucidData
               self.new(key: key, revision: revision, elements: elements)
             end
 
-            def save(key:, revision: nil, elements: nil, pub_sub_client: nil, current_user: nil)
-              _validate_elements(elements)
-              data = instance_exec(key: key, revision: revision, elements: elements,
-                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+            def save(key:, instance: nil)
+              self.new(key: key, revision: revision, elements: elements).save
+              data = instance_exec(key: key, instance: self, &@_save_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
               revision = data.delete(:revision)
               elements = data.delete(:elements)
+              key = data.delete(:key) || key
               self.new(key: key, revision: revision, elements: elements)
             end
           end

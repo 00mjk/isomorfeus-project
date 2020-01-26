@@ -1,12 +1,12 @@
 class SimpleArray < LucidData::Array::Base
-  execute_load do |key:, current_user:, pub_sub_client:|
+  execute_load do |key:|
     { key: key, elements: [1, 2, 3] }
   end
 
-  execute_save do |key:, revision: nil, elements:, current_user:, pub_sub_client:|
+  execute_save do |key:, revision: nil, elements:|
   end
 
-  execute_destroy do |key:, current_user:, pub_sub_client:|
+  execute_destroy do |key:|
     true
   end
 end

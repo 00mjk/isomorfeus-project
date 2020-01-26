@@ -3,6 +3,10 @@ module LucidLocalOperation
     def self.included(base)
       if RUBY_ENGINE != 'opal'
         Isomorfeus.add_valid_operation_class(base) unless base == LucidLocalOperation::Base
+
+        def pub_sub_client
+          Isomorfeus.pub_sub_client
+        end
       end
 
       base.extend(LucidPropDeclaration::Mixin)
@@ -20,5 +24,9 @@ module LucidLocalOperation
 
     attr_accessor :props
     attr_accessor :step_result
+
+    def current_user
+      Isomorfeus.current_user
+    end
   end
 end

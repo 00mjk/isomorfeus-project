@@ -5,7 +5,7 @@ class SimpleComposition < LucidData::Composition::Base
   compose_with :a_array
   compose_with :a_hash
 
-  execute_load do |key:, current_user:, pub_sub_client:|
+  execute_load do |key:|
     { key: key, parts: { a_collection: SimpleCollection.load(key: key),
                          a_graph: SimpleGraph.load(key: key),
                          a_node: SimpleNode.load(key: key),
@@ -13,10 +13,10 @@ class SimpleComposition < LucidData::Composition::Base
                          a_hash: SimpleHash.load(key: key) }}
   end
 
-  execute_save do |key:, revision: nil, parts:, attributes:, current_user:, pub_sub_client:|
+  execute_save do |key:, revision: nil, parts:, attributes:|
   end
 
-  execute_destroy do |key:, current_user:, pub_sub_client:|
+  execute_destroy do |key:|
     true
   end
 end

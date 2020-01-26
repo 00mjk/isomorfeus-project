@@ -278,8 +278,8 @@ module LucidData
               end
             end
 
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
+            def load(key:)
+              data = instance_exec(key: key, &@_load_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_load must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
@@ -288,11 +288,10 @@ module LucidData
               self.new(key: key, revision: revision, attributes: attributes)
             end
 
-            def save(key:, revision: nil, attributes: nil, pub_sub_client: nil, current_user: nil)
+            def save(key:, revision: nil, attributes: nil)
               attributes = {} unless attributes
               _relaxed_validate_attributes(attributes)
-              data = instance_exec(key: key, revision: revision, attributes: attributes,
-                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
+              data = instance_exec(key: key, revision: revision, attributes: attributes, &@_save_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash

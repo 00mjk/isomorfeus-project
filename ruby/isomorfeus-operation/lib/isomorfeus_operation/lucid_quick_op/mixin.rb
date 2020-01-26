@@ -29,11 +29,6 @@ module LucidQuickOp
       else
         Isomorfeus.add_valid_operation_class(base) unless base == LucidQuickOp::Base
 
-        unless base == LucidQuickOp::Base
-          base.prop :pub_sub_client, default: nil
-          base.prop :current_user, default: Anonymous.new
-        end
-
         base.instance_exec do
           def op(&block)
             @op = block
@@ -65,6 +60,14 @@ module LucidQuickOp
 
       original_promise.resolve(true)
       promise
+    end
+
+    def current_user
+      Isomorfeus.current_user
+    end
+
+    def pub_sub_client
+      Isomorfeus.pub_sub_client
     end
   end
 end

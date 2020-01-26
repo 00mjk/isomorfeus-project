@@ -76,8 +76,8 @@ module Isomorfeus
           result_promise
         end
 
-        def destroy(key:, pub_sub_client: nil, current_user: nil)
-          !!instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_destroy_block)
+        def destroy(key:)
+          !!instance_exec(key: key, &@_destroy_block)
         end
 
         def promise_load(key:)
@@ -99,6 +99,14 @@ module Isomorfeus
         def execute_save(&block)
           @_save_block = block
         end
+      end
+
+      def current_user
+        Isomorfeus.current_user
+      end
+
+      def pub_sub_client
+        Isomorfeus.pub_sub_client
       end
     end
   end

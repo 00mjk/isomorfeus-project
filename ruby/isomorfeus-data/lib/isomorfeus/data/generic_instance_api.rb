@@ -71,6 +71,14 @@ module Isomorfeus
           true
         end
       end # RUBY_ENGINE
+
+      def current_user
+        Isomorfeus.current_user
+      end
+
+      def pub_sub_client
+        Isomorfeus.pub_sub_client
+      end
     end
   end
 end

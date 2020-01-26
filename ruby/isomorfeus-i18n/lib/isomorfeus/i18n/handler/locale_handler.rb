@@ -7,7 +7,7 @@ module Isomorfeus
         include FastGettext::Translation
         include FastGettext::TranslationMultidomain
 
-        on_request do |pub_sub_client, current_user, response_agent|
+        on_request do |response_agent|
           Isomorfeus::I18n::Init.init unless Thread.current[:isomorfeus_i18n_initialized] == true
           response_agent.agent_result = {}
           # promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, method, [args])

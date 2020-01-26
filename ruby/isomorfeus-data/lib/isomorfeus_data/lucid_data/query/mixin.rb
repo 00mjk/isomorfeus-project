@@ -41,8 +41,6 @@ module LucidData
         else
           unless base == LucidData::Node::Base || base == LucidData::Document::Base || base == LucidData::Vertex::Base
             Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
           end
 
           base.instance_exec do
@@ -53,20 +51,35 @@ module LucidData
               result_promise
             end
 
-            def execute(props:, query_result_instance_key: nil, pub_sub_client: nil, current_user: nil)
+            def execute(props:, query_result_instance_key: nil)
               props.each_key do |prop_name|
                 Isomorfeus.raise_error(message: "#{self.to_s} No such query prop declared: '#{prop_name}'!") unless declared_props.key?(prop_name)
               end
               validate_props(props)
               query_result = LucidData::QueryResult.new(key: query_result_instance_key)
-              query_result.result_set = instance_exec(props: Isomorfeus::PropsProxy.new(props),
-                                                      pub_sub_client: pub_sub_client, current_user: current_user, &@_query_block)
+              query_result.result_set = instance_exec(props: Isomorfeus::PropsProxy.new(props), &@_query_block)
               query_result
             end
 
             def execute_query(&block)
               @_query_block = block
             end
+
+            def current_user
+              Isomorfeus.current_user
+            end
+
+            def pub_sub_client
+              Isomorfeus.pub_sub_client
+            end
+          end
+
+          def current_user
+            Isomorfeus.current_user
+          end
+
+          def pub_sub_client
+            Isomorfeus.pub_sub_client
           end
         end
       end

@@ -93,8 +93,6 @@ module LucidStorableObject
       else # RUBY_ENGINE
         unless base == LucidStorableObject::Base
           Isomorfeus.add_valid_data_class(base)
-          base.prop :pub_sub_client, default: nil
-          base.prop :current_user, default: Anonymous.new
         end
 
         def initialize(store_path: nil, validated_props: nil)

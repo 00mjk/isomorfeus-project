@@ -37,7 +37,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -52,7 +52,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -71,7 +71,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -93,7 +93,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -108,7 +108,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -127,7 +127,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -149,7 +149,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -233,7 +233,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -248,7 +248,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -267,7 +267,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String, required: true
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -289,7 +289,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -304,7 +304,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
@@ -323,7 +323,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable, required: true
 
-          execute_query do |props:, current_user:, pub_sub_client:|
+          execute_query do |props:|
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end

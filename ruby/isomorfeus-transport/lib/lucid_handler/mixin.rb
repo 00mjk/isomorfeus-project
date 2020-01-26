@@ -15,5 +15,13 @@ module LucidHandler
     def resolving?
       false
     end
+
+    def current_user
+      Isomorfeus.current_user
+    end
+
+    def pub_sub_client
+      Isomorfeus.pub_sub_client
+    end
   end
 end

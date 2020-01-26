@@ -59,11 +59,6 @@ module LucidOperation
         base.extend(LucidOperation::Steps)
         base.include(LucidOperation::PromiseRun)
 
-        unless base == LucidOperation::Base
-          base.prop :pub_sub_client, default: nil
-          base.prop :current_user, default: Anonymous.new
-        end
-
         base.instance_exec do
           def promise_run(props_hash = nil)
             props_hash = props_hash || props
@@ -74,6 +69,14 @@ module LucidOperation
 
         attr_accessor :props
         attr_accessor :step_result
+
+        def current_user
+          Isomorfeus.current_user
+        end
+
+        def pub_sub_client
+          Isomorfeus.pub_sub_client
+        end
       end
     end
   end

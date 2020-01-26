@@ -82,8 +82,6 @@ module Isomorfeus
 
       def to_transport
         transport_hash = {}.merge(@props_hash)
-        transport_hash.delete(:pub_sub_client)
-        transport_hash.delete(:current_user)
         transport_hash
       end
     end # RUBY_ENGINE

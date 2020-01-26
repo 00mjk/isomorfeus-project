@@ -4,7 +4,7 @@ module Isomorfeus
   module Data
     module Handler
       class Object < LucidHandler::Base
-        on_request do |pub_sub_client, current_user, response_agent|
+        on_request do |response_agent|
           # promise_send_path('Isomorfeus::Data::Handler::Object', action, object_hash)
           response_agent.request.each_key do |array_class_name|
             if Isomorfeus.valid_array_class_name?(array_class_name)
@@ -13,11 +13,10 @@ module Isomorfeus
                 props_json = response_agent.request[array_class_name]
                 begin
                   props = Oj.load(props_json, mode: :strict)
-                  props.merge!({pub_sub_client: pub_sub_client, current_user: current_user})
                   if current_user.authorized?(array_class, :load, *props)
                     array = array_class.load(props)
                     array.instance_exec do
-                      array_class.on_load_block.call(pub_sub_client, current_user) if array_class.on_load_block
+                      array_class.on_load_block.call() if array_class.on_load_block
                     end
                     response_agent.outer_result = { data: array.to_transport }
                     response_agent.agent_result = { success: 'ok' }

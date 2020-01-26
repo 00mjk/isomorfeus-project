@@ -16,7 +16,7 @@ a[0] # -> 'a'
 #### Loading
 ```
 class MyArray < LucidData::Array::Base
-  execute_load do |key:, current_user:, pub_sub_client:|
+  execute_load do |key:|
     { key: key, elements: ['a', 'b', 3, 4] }
   end
 end

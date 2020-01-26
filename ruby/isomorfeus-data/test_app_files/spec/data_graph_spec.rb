@@ -100,7 +100,7 @@ RSpec.describe 'LucidGraph' do
           edges :given_edges
           edges :empty_edges
 
-          execute_load do |key:, current_user:, pub_sub_client:|
+          execute_load do |key:|
             node = LucidData::GenericNode.new(key: "#{key}_node")
             edge = LucidData::GenericEdge.new(key: "#{key}_edge", from: node, to: node)
             { key: key,

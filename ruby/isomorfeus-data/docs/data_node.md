@@ -21,7 +21,7 @@ a = MyNode.new(key: '1234', attributes: { color: 'FF0000' })
 #### Loading
 ```
 class MyNode < LucidData::Node::Base
-  execute_load do |key:, current_user:, pub_sub_client:|
+  execute_load do |key:|
     { key: key, attributes: { color: 'FF0000' } }
   end
 end

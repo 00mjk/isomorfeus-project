@@ -113,6 +113,14 @@ module Isomorfeus
         class_name = class_name.split('>::').last if class_name.start_with?('#<')
         class_name
       end
+
+      def current_user
+        Thread.current[:isomorfeus_user]
+      end
+
+      def pub_sub_client
+        Thread.current[:isomorfeus_pub_sub_client]
+      end
     end
   end
 
