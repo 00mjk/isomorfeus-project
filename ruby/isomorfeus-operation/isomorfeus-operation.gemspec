@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.summary      = 'Natural language operations for Isomorfeus.'
   s.description  = 'Write operations for Isomorfeus in your natural language.'
   s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
-  s.files        = `git ls-files -- {lib,LICENSE,README.md}`.split("\n")
+  s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
 
