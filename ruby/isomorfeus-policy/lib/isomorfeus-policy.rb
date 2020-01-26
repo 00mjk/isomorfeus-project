@@ -1,5 +1,6 @@
 require 'isomorfeus-react'
 require 'isomorfeus/policy/config'
+require 'isomorfeus/props_proxy'
 
 if RUBY_ENGINE == 'opal'
   Isomorfeus.zeitwerk.push_dir('isomorfeus_policy')

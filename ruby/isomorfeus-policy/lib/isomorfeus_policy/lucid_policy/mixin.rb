@@ -85,15 +85,17 @@ module LucidPolicy
         @object = object
       end
 
-      def authorized?(target_class, target_method = nil, *props)
+      def authorized?(target_class, target_method = nil, props)
         Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{self}: At least the class must be given!") unless target_class
         result = :deny
 
         rules = self.class.authorization_rules
 
+        props = Isomorfeus::PropsProxy.new(props) unless props.class == Isomorfeus::PropsProxy
+
         condition_result = true
         rules[:conditions].each do |condition|
-          condition_result = condition.call(@object, target_class, target_method, *props, &condition)
+          condition_result = condition.call(@object, target_class, target_method, props, &condition)
           break unless condition_result == true
         end
 
@@ -111,7 +113,7 @@ module LucidPolicy
 
           if result.class == Proc
             policy_helper = LucidPolicy::Helper.new
-            policy_helper.instance_exec(@object, target_class, target_method, *props, &result)
+            policy_helper.instance_exec(@object, target_class, target_method, props, &result)
             result = policy_helper.result
           end
         end

@@ -1,7 +1,7 @@
 module LucidOperation
   module PromiseRun
     def initialize(validated_props_hash)
-      @props = Isomorfeus::Transport::PropsProxy.new(validated_props_hash)
+      @props = Isomorfeus::PropsProxy.new(validated_props_hash)
     end
 
     def promise_run

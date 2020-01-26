@@ -11,7 +11,7 @@ module LucidQuickOp
           def promise_run(props_hash = nil)
             props_hash = props_hash || props
             validate_props(props_hash)
-            props_json = Isomorfeus::Transport::PropsProxy.new(props_hash).to_json
+            props_json = Isomorfeus::PropsProxy.new(props_hash).to_json
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |agent|
               if agent.processed
                 agent.result
@@ -51,7 +51,7 @@ module LucidQuickOp
     attr_accessor :props
 
     def initialize(validated_props_hash)
-      @props = Isomorfeus::Transport::PropsProxy.new(validated_props_hash)
+      @props = Isomorfeus::PropsProxy.new(validated_props_hash)
       @on_fail_track = false
     end
 
