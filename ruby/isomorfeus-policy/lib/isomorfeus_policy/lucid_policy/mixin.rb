@@ -85,7 +85,7 @@ module LucidPolicy
         @object = object
       end
 
-      def authorized?(target_class, target_method = nil, props)
+      def authorized?(target_class, target_method = nil, props = nil)
         Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{self}: At least the class must be given!") unless target_class
         result = :deny
 
@@ -121,8 +121,8 @@ module LucidPolicy
         result == :allow ? true : false
       end
 
-      def authorized!(target_class, target_method = nil, *props)
-        return true if authorized?(target_class, target_method, *props)
+      def authorized!(target_class, target_method = nil, props = nil)
+        return true if authorized?(target_class, target_method, props)
         Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{@object}: not authorized to call #{target_class}.#{target_method}(#{props})!")
       end
     end
