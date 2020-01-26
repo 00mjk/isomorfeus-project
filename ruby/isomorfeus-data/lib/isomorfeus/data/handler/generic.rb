@@ -105,12 +105,11 @@ module Isomorfeus
           props.transform_keys!(&:to_sym)
           props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
           if current_user.authorized?(type_class, :destroy, props)
-            destroyed_type = type_class.destroy(**props)
-            if destroyed_type
-              response_agent.outer_result = {} unless response_agent.outer_result
-              response_agent.outer_result.deep_merge!(data: destroyed_type)
+            result = type_class.destroy(**props)
+            if result
               response_agent.agent_result = { success: 'ok' }
-            else response_agent.error = { error: { type_class_name => 'Destroy failed!' }}
+            else
+              response_agent.error = { error: { type_class_name => 'Destroy failed!' }}
             end
           else response_agent.error = { error: 'Access denied!' }
           end

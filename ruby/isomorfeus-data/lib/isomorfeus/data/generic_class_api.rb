@@ -77,7 +77,7 @@ module Isomorfeus
         end
 
         def destroy(key:, pub_sub_client: nil, current_user: nil)
-          instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_destroy_block)
+          !!instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_destroy_block)
         end
 
         def promise_load(key:)
