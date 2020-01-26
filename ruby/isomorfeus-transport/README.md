@@ -47,14 +47,14 @@ A class representing a user should be a LucidNode and include LucidAuthenticatio
 ```ruby
 class User < LucidGenericDocument::Base
   include LucidAuthentication::Mixin
-  authentication do |user_identifier, user_password_or token|
+  authentication do |user:, pass:|
     # should return either a User instance or a Promise which reselves to a User instance
   end
 end
 ```
 With that its possible to do on the client (or server):
 ```ruby
-User.promise_login(user_identifier, user_password_or_token).then do |user|
+User.promise_login(user: user_identifier, pass: user_password_or_token).then do |user|
    # do something with user
 end
 ```
@@ -64,13 +64,13 @@ user.promise_logout
 ```
 The authentication in isomorfeus is prepared for external or alternate authentication schemes, example:
 ```ruby
-User.promise_login(user_identifier, token, :facebook).then do |user|
+User.promise_login(user: user_identifier, pass: token, :facebook).then do |user|
    # do something with user
 end
 ```
 will call:
 ```ruby
-User.promise_authentication_with_facebook(user_identifier, token)
+User.promise_authentication_with_facebook(user: user_identifier, pass: token)
 ```
 which would have to be implemented.
 
