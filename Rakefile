@@ -163,6 +163,7 @@ task :ruby_installer_spec => [:build_ruby_packages] do
   pwd = Dir.pwd
   # copy gems
   system('cp ruby/iso*/*.gem ruby/gems/gems/')
+  system('ls -al ruby/gems/gems/')
   Dir.chdir(File.join('ruby','gems'))
   system('gem generate_index')
   Dir.chdir(pwd)
