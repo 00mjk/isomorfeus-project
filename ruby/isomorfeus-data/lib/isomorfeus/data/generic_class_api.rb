@@ -27,7 +27,7 @@ module Isomorfeus
                 `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
-              Isomorfeus.store.dispatch(type: 'DATA_DESTROY', data: agent.full_response[:data])
+              Isomorfeus.store.dispatch(type: 'DATA_DESTROY', data: [self.name, key])
               agent.result = true
             end
           end
@@ -70,9 +70,9 @@ module Isomorfeus
         end
 
         def promise_destroy(key:)
-          sid = self.destroy(key: key)
+          result = self.destroy(key: key)
           result_promise = Promise.new
-          result_promise.resolve(sid)
+          result_promise.resolve(result)
           result_promise
         end
 
