@@ -45,11 +45,11 @@ Example Policy:
     # allow all
     # deny all
 
-    with_condition do |user_instance, target_class, target_method, *props|
+    with_condition do |user_instance, target_class, target_method, props|
        user_instance.class == AdminRole
     end
 
-    refine BlaGraph, :load, :count do |user_instance, target_class, target_method, *props|
+    refine BlaGraph, :load, :count do |user_instance, target_class, target_method, props|
       allow if user_instance.verified?
       deny
     end
