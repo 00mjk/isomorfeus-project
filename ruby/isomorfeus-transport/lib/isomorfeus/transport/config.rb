@@ -8,6 +8,14 @@ module Isomorfeus
     def self.add_transport_init_class_name(init_class_name)
       transport_init_class_names << init_class_name
     end
+
+    def self.current_user
+      @current_user ||= Anonymous.new
+    end
+
+    def self.set_current_user(user)
+      @current_user = user ? user : Anonymous.new
+    end
   else
     class << self
       attr_accessor :api_websocket_path

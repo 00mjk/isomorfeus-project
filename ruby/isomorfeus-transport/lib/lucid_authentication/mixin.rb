@@ -7,17 +7,17 @@ module LucidAuthentication
           def authentication(&block)
           end
 
-          def promise_login(user_identifier, user_password, scheme = :isomorfeus)
-              send("promise_authentication_with_#{scheme}", user_identifier, user_password)
+          def promise_login(user: nil, pass: nil, scheme: :isomorfeus)
+              send("promise_authentication_with_#{scheme}",user: user, pass: pass)
           end
 
-          def promise_authentication_with_isomorfeus(user_identifier, user_password)
+          def promise_authentication_with_isomorfeus(user: nil, pass: nil)
             if Isomorfeus.production?
               Isomorfeus.raise_error(message: "Connection not secure, can't login") unless Isomorfeus::Transport.socket.url.start_with?('wss:')
             else
               `console.warn("Connection not secure, ensure a secure connection in production, otherwise login will fail!")` unless Isomorfeus::Transport.socket.url.start_with?('wss:')
             end
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', self.name, user_identifier, user_password).then do |agent|
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', self.name, user, pass).then do |agent|
               if agent.processed
                 agent.result
               else
@@ -29,7 +29,9 @@ module LucidAuthentication
 
                   # TODO set session cookie
                   # agent.response[:session_cookie]
-                  agent.result = Isomorfeus.cached_data_class(class_name).new(key: key)
+                  logged_in_user = Isomorfeus.cached_data_class(class_name).new(key: key)
+                  Isomorfeus.set_current_user(logged_in_user)
+                  agent.result = logged_in_user
                 else
                   error = agent.response[:error]
                   `console.err(error)` if error
@@ -41,12 +43,15 @@ module LucidAuthentication
         end
       end
 
-      def promise_logout(scheme = :isomorfeus)
+      def promise_logout(scheme: :isomorfeus)
         send("promise_deauthentication_with_#{scheme}")
       end
 
       def promise_deauthentication_with_isomorfeus
         Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'logout', 'logout').then do |agent|
+          # TODO unset session cookie
+          # agent.response[:session_cookie]
+          Isomorfeus.set_current_user(nil)
           agent.processed = true
           agent.response.key?(:success) ? true : raise('Logout failed!')
         end
@@ -60,12 +65,12 @@ module LucidAuthentication
             @authentication_block = block
           end
 
-          def promise_login(user_identifier, user_password_or_token, scheme = :isomorfeus)
-            send("promise_authentication_with_#{scheme}", user_identifier, user_password_or_token)
+          def promise_login(user: nil, pass: nil, scheme: :isomorfeus)
+            send("promise_authentication_with_#{scheme}", user: user, pass: pass)
           end
 
-          def promise_authentication_with_isomorfeus(user_identifier, user_password_or_token)
-            promise_or_user = @authentication_block.call(user_identifier, user_password_or_token)
+          def promise_authentication_with_isomorfeus(user: nil, pass: nil)
+            promise_or_user = @authentication_block.call(user: user, pass: pass)
             if promise_or_user.class == Promise
               promise_or_user
             else
@@ -75,7 +80,7 @@ module LucidAuthentication
         end
       end
 
-      def promise_logout(scheme = :isomorfeus)
+      def promise_logout(scheme: :isomorfeus)
         send("promise_deauthentication_with_#{scheme}")
       end
 

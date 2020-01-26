@@ -15,7 +15,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate successfully' do
       result = on_server do
-        promise = SimpleUser.promise_login('joe_simple', 'my_pass')
+        promise = SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pass')
         promise.value.key
       end
       expect(result).to eq('123')
@@ -23,7 +23,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate to failure, password' do
       result = on_server do
-        promise = SimpleUser.promise_login('joe_simple', 'my_pas')
+        promise = SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pas')
         promise.value
       end
       expect(result).to be_nil
@@ -31,7 +31,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate to failure, user_id' do
       result = on_server do
-        promise = SimpleUser.promise_login('joe_simpl', 'my_pass')
+        promise = SimpleUser.promise_login(user: 'joe_simpl', pass: 'my_pass')
         promise.value
       end
       expect(result).to be_nil
@@ -56,8 +56,17 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate successfully' do
       result = @doc.await_ruby do
-        SimpleUser.promise_login('joe_simple', 'my_pass').then do |user|
+        SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pass').then do |user|
           user.key
+        end
+      end
+      expect(result).to eq('123')
+    end
+
+    it 'can authenticate successfully and current_user is available' do
+      result = @doc.await_ruby do
+        SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pass').then do |user|
+          Isomorfeus.current_user.key
         end
       end
       expect(result).to eq('123')
@@ -65,7 +74,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate to failure, password' do
       result = @doc.await_ruby do
-        SimpleUser.promise_login('joe_simple', 'my_pas').fail do
+        SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pas').fail do
           true
         end
       end
@@ -74,7 +83,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
     it 'can authenticate to failure, user_id' do
       result = @doc.await_ruby do
-        SimpleUser.promise_login('joe_simpl', 'my_pass').fail do
+        SimpleUser.promise_login(user: 'joe_simpl', pass: 'my_pass').fail do
           true
         end
       end

@@ -19,7 +19,7 @@ module Isomorfeus
                 if Isomorfeus.valid_user_class_name?(user_class_name)
                   user_class = Isomorfeus.cached_user_class(user_class_name)
                   response_agent.request['login'][user_class_name].each_key do |user_identifier|
-                    promise = user_class.promise_login(user_identifier, response_agent.request['login'][user_class_name][user_identifier])
+                    promise = user_class.promise_login(user: user_identifier, pass: response_agent.request['login'][user_class_name][user_identifier])
                     unless promise.realized?
                       start = Time.now
                       until promise.realized?
@@ -41,6 +41,8 @@ module Isomorfeus
             elsif login_or_logout == 'logout'
               begin
                 promise = Isomorfeus.current_user.promise_logout
+                # TODO remove session from db
+                # response_agent.agent_result = { success: 'ok', data: user.to_transport }
                 unless promise.realized?
                   start = Time.now
                   until promise.realized?
