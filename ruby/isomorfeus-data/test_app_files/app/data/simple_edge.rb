@@ -11,5 +11,6 @@ class SimpleEdge < LucidData::Edge::Base
   end
 
   execute_destroy do |key:, current_user:, pub_sub_client:|
+    true
   end
 end

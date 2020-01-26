@@ -52,6 +52,13 @@ RSpec.describe 'LucidData::Composition' do
       expect(result).to eq(CG_NODES_EDGES)
     end
 
+    it 'can destroy a simple composition' do
+      result = on_server do
+        SimpleComposition.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
+
     it 'can access the included simple array' do
       result = on_server do
         graph =  SimpleComposition.load(key: 2)

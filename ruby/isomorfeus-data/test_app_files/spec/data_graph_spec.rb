@@ -47,6 +47,13 @@ RSpec.describe 'LucidGraph' do
       expect(result).to eq([5,5])
     end
 
+    it 'can load a simple graph' do
+      result = on_server do
+        SimpleGraph.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
+
     it 'can converts a simple graph on the server to transport' do
       result = on_server do
         graph = SimpleGraph.load(key: 4)

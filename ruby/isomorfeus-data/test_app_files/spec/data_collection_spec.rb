@@ -37,12 +37,19 @@ RSpec.describe 'LucidData::Collection' do
       expect(result).to be true
     end
 
-    it 'can load a simple collection on the server' do
+    it 'can load a simple collection' do
       result = on_server do
         collection = SimpleCollection.load(key: 1)
         collection.size
       end
       expect(result).to eq(5)
+    end
+
+    it 'can destroy a simple collection' do
+      result = on_server do
+        SimpleCollection.destroy(key: '123')
+      end
+      expect(result).to eq(true)
     end
 
     it 'can convert a simple collection on the server to transport' do

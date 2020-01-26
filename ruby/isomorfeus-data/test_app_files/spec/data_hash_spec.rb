@@ -145,6 +145,21 @@ RSpec.describe 'LucidData::Hash' do
       end
       expect(JSON.load(result)).to eq("TestHashG" => {"13"=>{"attributes"=>{"experiment"=>2, "probe"=>3, "test"=>1}}})
     end
+
+    it 'can load a simple hash' do
+      result = on_server do
+        hash = SimpleHash.load(key: '123')
+        hash[:three]
+      end
+      expect(result).to eq(3)
+    end
+
+    it 'can destroy a simple hash' do
+      result = on_server do
+        SimpleHash.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
   end
 
   context 'on the client' do

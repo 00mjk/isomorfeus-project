@@ -113,6 +113,21 @@ RSpec.describe 'LucidData::Document' do
       expect(result).to be(true)
     end
 
+    it 'can load a simple node' do
+      result = on_server do
+        node = SimpleNode.load(key: '123')
+        node.one
+      end
+      expect(result).to eq('123')
+    end
+
+    it 'can destroy a simple node' do
+      result = on_server do
+        SimpleNode.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
+
     it 'converts to sid' do
       result = on_server do
         class TestDocumentMixinC < LucidData::Document::Base

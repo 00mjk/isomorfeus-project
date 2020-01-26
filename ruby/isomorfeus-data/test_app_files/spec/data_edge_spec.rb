@@ -123,6 +123,21 @@ RSpec.describe 'LucidData::Edge' do
       expect(result).to be(true)
     end
 
+    it 'can load a simple edge' do
+      result = on_server do
+        edge = SimpleEdge.load(key: '123')
+        edge.one
+      end
+      expect(result).to eq('123')
+    end
+
+    it 'can destroy a simple edge' do
+      result = on_server do
+        SimpleEdge.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
+
     it 'converts to sid' do
       result = on_server do
         class TestDocumentBase < LucidData::Document::Base; end

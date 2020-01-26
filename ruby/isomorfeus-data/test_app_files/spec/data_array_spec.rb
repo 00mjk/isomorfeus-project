@@ -145,6 +145,21 @@ RSpec.describe 'LucidData::Array' do
       end
       expect(result).to eq("TestArrayG"=>{"13"=>{"elements"=>[1, 2, 3]}})
     end
+
+    it 'can load a simple array' do
+      result = on_server do
+        array = SimpleArray.load(key: '123')
+        array.size
+      end
+      expect(result).to eq(3)
+    end
+
+    it 'can destroy a simple array' do
+      result = on_server do
+        SimpleArray.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
   end
 
   context 'on the client' do
