@@ -470,18 +470,18 @@ module LucidData
             def instance_from_transport(instance_data, included_items_data)
               key = instance_data[self.name].keys.first
               revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
-              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
               edges_sids = instance_data[self.name][key].key?('edges') ? instance_data[self.name][key]['edges'] : []
               edges = []
               edges_sids.each do |sid|
                 edge_class_name = sid[0]
                 edge_key = sid[1]
-                Isomorfeus.raise_error "#{self.name}: #{edge_class_name}: Not a valid LucidData class!" unless Isomorfeus.valid_data_class_name?(edge_class_name)
+                Isomorfeus.raise_error(message: "#{self.name}: #{edge_class_name}: Not a valid LucidData class!") unless Isomorfeus.valid_data_class_name?(edge_class_name)
                 if included_items_data.key?(edge_class_name) && included_items_data[edge_class_name].key?(edge_key)
                   edge_class = Isomorfeus.cached_data_class(edge_class_name)
-                  Isomorfeus.raise_error "#{self.name}: #{edge_class_name}: Cannot get class!" unless edge_class
+                  Isomorfeus.raise_error(message: "#{self.name}: #{edge_class_name}: Cannot get class!") unless edge_class
                   edge = edge_class.instance_from_transport({ edge_class_name => { edge_key => included_items_data[edge_class_name][edge_key] }}, included_items_data)
-                  Isomorfeus.raise_error "#{self.name}: #{edge_class_name} with key #{edge_key} could not be extracted from transport data!" unless edge
+                  Isomorfeus.raise_error(message: "#{self.name}: #{edge_class_name} with key #{edge_key} could not be extracted from transport data!") unless edge
                   edges << edge
                 end
               end

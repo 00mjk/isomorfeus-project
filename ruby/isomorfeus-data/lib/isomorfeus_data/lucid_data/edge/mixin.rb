@@ -173,7 +173,7 @@ module LucidData
             def instance_from_transport(instance_data, included_items_data)
               key = instance_data[self.name].keys.first
               revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
-              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
               from_node_sid = instance_data[self.name][key].key?('from') ? instance_data[self.name][key]['from'] : nil
               to_node_sid = instance_data[self.name][key].key?('to') ? instance_data[self.name][key]['to'] : nil
               from_to = []
@@ -181,12 +181,12 @@ module LucidData
                 [from_node_sid, to_node_sid].each do |sid|
                   node_class_name = sid[0]
                   node_key = sid[1]
-                  Isomorfeus.raise_error "#{self.name}: #{node_class_name}: Not a valid LucidData class!" unless Isomorfeus.valid_data_class_name?(node_class_name)
+                  Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Not a valid LucidData class!") unless Isomorfeus.valid_data_class_name?(node_class_name)
                   if included_items_data.key?(node_class_name) && included_items_data[node_class_name].key?(node_key)
                     node_class = Isomorfeus.cached_data_class(node_class_name)
-                    Isomorfeus.raise_error "#{self.name}: #{node_class_name}: Cannot get class!" unless node_class
+                    Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Cannot get class!") unless node_class
                     node = node_class.instance_from_transport({ node_class_name => { node_key => included_items_data[node_class_name][node_key] }}, included_items_data)
-                    Isomorfeus.raise_error "#{self.name}: #{node_class_name} with key #{node_key} could not be extracted from transport data!" unless node
+                    Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name} with key #{node_key} could not be extracted from transport data!") unless node
                     from_to << node
                   end
                 end

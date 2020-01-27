@@ -176,18 +176,18 @@ module LucidData
             def instance_from_transport(instance_data, included_items_data)
               key = instance_data[self.name].keys.first
               revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
-              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
               source_parts = instance_data[self.name][key].key?('parts') ? instance_data[self.name][key]['parts'] : {}
               parts = {}
               source_parts.each do |part_name, sid|
                 part_class_name = sid[0]
                 part_key = sid[1]
-                Isomorfeus.raise_error "#{self.name}: #{part_class_name}: Not a valid LucidData class!" unless Isomorfeus.valid_data_class_name?(part_class_name)
+                Isomorfeus.raise_error(message: "#{self.name}: #{part_class_name}: Not a valid LucidData class!") unless Isomorfeus.valid_data_class_name?(part_class_name)
                 if included_items_data.key?(part_class_name) && included_items_data[part_class_name].key?(part_key)
                   part_class = Isomorfeus.cached_data_class(part_class_name)
-                  Isomorfeus.raise_error "#{self.name}: #{part_class_name}: Cannot get class!" unless part_class
+                  Isomorfeus.raise_error(message: "#{self.name}: #{part_class_name}: Cannot get class!") unless part_class
                   part = part_class.instance_from_transport({ part_class_name => { part_key => included_items_data[part_class_name][part_key] }}, included_items_data)
-                  Isomorfeus.raise_error "#{self.name}: #{part_class_name} with key #{part_key} could not be extracted from transport data!" unless part
+                  Isomorfeus.raise_error(message: "#{self.name}: #{part_class_name} with key #{part_key} could not be extracted from transport data!") unless part
                   parts[part_name.to_sym] = part
                 end
               end
