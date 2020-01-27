@@ -174,7 +174,7 @@ module LucidData
 
           base.instance_exec do
             def instance_from_transport(instance_data, included_items_data)
-              key = instance_data[self.name]
+              key = instance_data[self.name].keys.first
               revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
               attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'] : nil
               source_parts = instance_data[self.name][key].key?('parts') ? instance_data[self.name][key]['parts'] : {}

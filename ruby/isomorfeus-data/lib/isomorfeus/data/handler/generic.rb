@@ -80,11 +80,10 @@ module Isomorfeus
 
         def process_save(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :save, data_hash
-          props = response_agent.request[type_class_name]['save']
-          props.transform_keys!(&:to_sym)
-          instance_data = props[:instance]
-          included_items_data = props.key?(:included_items) ? props[:included_items] : nil
-          if Isomorfeus.current_user.authorized?(type_class, :save, props)
+          data = response_agent.request[type_class_name]['save']
+          instance_data = data['instance']
+          included_items_data = data.key?('included_items') ? data['included_items'] : nil
+          if Isomorfeus.current_user.authorized?(type_class, :save, data)
             instance = type_class.instance_from_transport(instance_data, included_items_data)
             saved_type = type_class.save(instance: instance)
             if saved_type

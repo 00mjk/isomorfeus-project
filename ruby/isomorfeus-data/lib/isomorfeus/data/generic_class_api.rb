@@ -57,6 +57,15 @@ module Isomorfeus
           end
         end
 
+        def save(instance:)
+          instance.promise_save
+          instance
+        end
+
+        def promise_save(instance:)
+          instance.promise_save
+        end
+
         # execute
         def execute_destroy(_); end
         def execute_load(_); end

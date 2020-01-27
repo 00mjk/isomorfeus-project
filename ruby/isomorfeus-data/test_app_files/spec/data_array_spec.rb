@@ -160,6 +160,18 @@ RSpec.describe 'LucidData::Array' do
       end
       expect(result).to eq(true)
     end
+
+    it 'can save a simple array' do
+      result = on_server do
+        array = SimpleArray.load(key: '123')
+        array.push(4)
+        before_changed = array.changed?
+        array.save
+        after_changed = array.changed?
+        [array.size, before_changed, after_changed]
+      end
+      expect(result).to eq([4, true, false])
+    end
   end
 
   context 'on the client' do
@@ -327,6 +339,19 @@ RSpec.describe 'LucidData::Array' do
         end
       end
       expect(result).to eq(true)
+    end
+
+    it 'can save a simple array' do
+      result = @doc.await_ruby do
+        SimpleArray.promise_load(key: '123').then do |array|
+          array.push(4)
+          before_changed = array.changed?
+          array.promise_save.then do |array|
+            [array.size, before_changed, array.changed?]
+          end
+        end
+      end
+      expect(result).to eq([4, true, false])
     end
   end
 end
