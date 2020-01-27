@@ -64,6 +64,7 @@ module Isomorfeus
                 @revision = data[self.name][@key]['revision'] if data[self.name][@key].key?('revision')
                 _update_paths
               end
+              instance._load_from_store!
               Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: data)
               agent.result = true
             end
