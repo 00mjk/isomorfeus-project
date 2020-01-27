@@ -84,11 +84,11 @@ RSpec.describe 'LucidGraph' do
                                                                                          ["SimpleEdge", "3"],
                                                                                          ["SimpleEdge", "4"],
                                                                                          ["SimpleEdge", "5"]]}},
-                           "SimpleNode" => {"1"=>{"one"=>1},
-                                             "2"=>{"one"=>2},
-                                             "3"=>{"one"=>3},
-                                             "4"=>{"one"=>4},
-                                             "5"=>{"one"=>5}})
+                           "SimpleNode" => {"1"=>{"attributes"=>{"one"=>1}},
+                                             "2"=>{"attributes"=>{"one"=>2}},
+                                             "3"=>{"attributes"=>{"one"=>3}},
+                                             "4"=>{"attributes"=>{"one"=>4}},
+                                             "5"=>{"attributes"=>{"one"=>5}}})
     end
 
     it 'converts a partial graph to transport' do
@@ -121,7 +121,7 @@ RSpec.describe 'LucidGraph' do
                                                                           "to" => ["LucidData::GenericNode", "1_node"] }},
                               "LucidData::GenericEdgeCollection" => {"1_gec"=> { "attributes" => {},
                                                                                  "edges" => [["LucidData::GenericEdge", "1_edge"]] }},
-                              "LucidData::GenericNode" => { "1_node" => {}}}])
+                              "LucidData::GenericNode" => { "1_node" => {"attributes"=>{}}}}])
     end
   end
 

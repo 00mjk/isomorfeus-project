@@ -45,8 +45,8 @@ module LucidData
         end
 
         def to_transport
-          hash = _get_selected_attributes
-          hash.merge!("revision" => revision) if revision
+          hash = { 'attributes' => _get_selected_attributes }
+          hash.merge!('revision' => revision) if revision
           result = { @class_name => { @key => hash }}
           result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
           result
@@ -86,7 +86,7 @@ module LucidData
           end
 
           def _update_paths
-            @_store_path = [:data_state, @class_name, @key]
+            @_store_path = [:data_state, @class_name, @key, :attributes]
           end
 
           def each(&block)
@@ -149,7 +149,7 @@ module LucidData
             def instance_from_transport(instance_data, _included_items_data)
               key = instance_data[self.name].keys.first
               revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
-              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
               new(key: key, revision: revision, attributes: attributes)
             end
           end

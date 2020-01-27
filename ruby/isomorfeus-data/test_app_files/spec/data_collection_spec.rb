@@ -80,11 +80,11 @@ RSpec.describe 'LucidData::Collection' do
         collection = SimpleCollection.load(key: 3)
         collection.included_items_to_transport
       end
-      expect(result).to eq({"SimpleNode"=>{"1"=>{"one"=>1},
-                                           "2"=>{"one"=>2},
-                                           "3"=>{"one"=>3},
-                                           "4"=>{"one"=>4},
-                                           "5"=>{"one"=>5}}})
+      expect(result).to eq({"SimpleNode"=>{"1"=>{"attributes"=>{"one"=>1}},
+                                           "2"=>{"attributes"=>{"one"=>2}},
+                                           "3"=>{"attributes"=>{"one"=>3}},
+                                           "4"=>{"attributes"=>{"one"=>4}},
+                                           "5"=>{"attributes"=>{"one"=>5}}}})
     end
   end
 
