@@ -52,6 +52,17 @@ RSpec.describe 'LucidData::Collection' do
       expect(result).to eq(true)
     end
 
+    it 'can save a simple collection' do
+      result = on_server do
+        collection = SimpleCollection.load(key: '123')
+        collection.push(SimpleNode.new(key: '4', attributes: { one: 1}))
+        before_changed = collection.changed?
+        collection.save
+        [collection.size, before_changed, collection.changed?]
+      end
+      expect(result).to eq([6, true, false])
+    end
+
     it 'can convert a simple collection on the server to transport' do
       result = on_server do
         collection = SimpleCollection.load(key: 2)
@@ -117,6 +128,19 @@ RSpec.describe 'LucidData::Collection' do
         SimpleCollection.promise_destroy(key: '123').then { |result| result }
       end
       expect(result).to eq(true)
+    end
+
+    it 'can save a simple collection' do
+      result = @doc.await_ruby do
+        SimpleCollection.promise_load(key: '123').then do |collection|
+          collection.push(SimpleNode.new(key: 4, attributes: {one: 1}))
+          before_changed = collection.changed?
+          collection.promise_save.then do |collection|
+            [collection.size, before_changed, collection.changed?]
+          end
+        end
+      end
+      expect(result).to eq([6, true, false])
     end
   end
 
