@@ -34,7 +34,7 @@ class MyCollection < LucidData::Collection::Base
   execute_load do |key:|
     a = MyNode.new(key: '1')
     b = MyNode.new(key: '2')
-    { key: key, nodes: [a, b] } # also here the other terms work instead of nodes: documents, vertices, vertexes
+    new(key: key, nodes: [a, b]) # also here the other terms work instead of nodes: documents, vertices, vertexes
   end
 end
 

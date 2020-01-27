@@ -32,7 +32,7 @@ class MyEdgeCollection < LucidData::EdgeCollection::Base
   execute_load do |key:|
     a = MyEdge.new(key: '1') # also add to and from
     b = MyEdge.new(key: '2') # also add to and from
-    { key: key, edges: [a, b] } # also here :links can be used.
+    new(key: key, edges: [a, b]) # also here :links can be used.
   end
 end
 

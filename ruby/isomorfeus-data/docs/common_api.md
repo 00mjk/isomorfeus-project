@@ -14,8 +14,7 @@ All LucidData *classes* support the following methods for loading data based on 
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
 
-A `execute_load` block must be defined, to execute the actual load of data. This blocks must return a instance if the class at hand or a Hash
-resembling the arguments to `self.new`, see documentation of the individual classes.
+A `execute_load` block must be defined, to execute the actual load of data. This blocks must return a instance if the class.
 Returning nil indicates that the requested item does not exist. Alternatively a exception may be thrown.
 
 ### Creating Data
@@ -48,8 +47,7 @@ All LucidData *instances* support the following methods for saving data:
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
   but not from within render blocks.
 
-A `execute_save` block must be defined, to execute the actual save of data. This block must return a instance if the class at hand or a Hash
-resembling the arguments to `self.new`, see documentation of the individual classes.
+A `execute_save` block must be defined, to execute the actual save of data. This block must return a instance if the class at hand.
 Returning nil indicates that the save failed for some reason. Alternatively a exception may be thrown.
 
 ### Destroying Data

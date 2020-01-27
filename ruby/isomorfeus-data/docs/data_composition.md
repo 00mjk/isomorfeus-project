@@ -37,14 +37,14 @@ c = MyComposition.new(key: '1234', parts: {
 ```
 class MyComposition < LucidData::Composition::Base
   execute_load do |key:|
-    { key: '1234', parts: {
-      # parts are passed as hash with keys as declared:
-      a_collection: MyCollection.new(key: '1'),
-      a_graph: MyGraph.new(key: '1'),
-      another_graph: MyGraph.new(key: '2'),
-      a_node: MyNode.new(key: '1'),
-      a_hash: MyHash.new(key: '1') 
-    }
+    new(key: '1234', parts: {
+        # parts are passed as hash with keys as declared:
+        a_collection: MyCollection.new(key: '1'),
+        a_graph: MyGraph.new(key: '1'),
+        another_graph: MyGraph.new(key: '2'),
+        a_node: MyNode.new(key: '1'),
+        a_hash: MyHash.new(key: '1')
+      })
   end
 end
 ```

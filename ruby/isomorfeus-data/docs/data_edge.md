@@ -23,7 +23,9 @@ a = MyEdge.new(key: '1234', attributes: { color: 'FF0000' }, from: my_node.to_si
 ```
 class MyEdge < LucidData::Edge::Base
   execute_load do |key:|
-    { key: key, attributes: { color: 'FF0000' }, from: my_node.to_sid, to: my_other_node.to_sid }
+    my_node = MyNode.load(key: '1')
+    my_other_node = MyOtherNode.load(key: '2')
+    new(key: key, attributes: { color: 'FF0000' }, from: my_node, to: my_other_node)
   end
 end
 
