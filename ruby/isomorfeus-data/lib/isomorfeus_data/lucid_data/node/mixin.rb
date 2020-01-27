@@ -167,6 +167,10 @@ module LucidData
             @_raw_attributes = attributes
           end
 
+          def _unchange!
+            @_changed = false
+          end
+
           def each(&block)
             @_raw_attributes.each(&block)
           end

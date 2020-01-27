@@ -222,6 +222,10 @@ module LucidData
                        end
           end
 
+          def _unchange!
+            @_changed =false
+          end
+
           def each(&block)
             @_raw_attributes.each(&block)
           end

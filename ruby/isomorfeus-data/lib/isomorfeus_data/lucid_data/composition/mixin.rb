@@ -216,6 +216,10 @@ module LucidData
             end
           end
 
+          def _unchange!
+            @_changed = false
+          end
+
           def parts
             @_parts
           end

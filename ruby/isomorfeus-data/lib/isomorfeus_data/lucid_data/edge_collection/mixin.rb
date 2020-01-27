@@ -512,6 +512,10 @@ module LucidData
             @_raw_collection = edges
           end
 
+          def _unchange!
+            @changed = false
+          end
+
           def edges
             @_raw_collection
           end

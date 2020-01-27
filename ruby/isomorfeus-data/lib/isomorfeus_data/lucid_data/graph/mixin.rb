@@ -464,6 +464,10 @@ module LucidData
             end
           end
 
+          def _unchange!
+            @_changed = false
+          end
+
           def edge_collections
             @_edge_collections
           end

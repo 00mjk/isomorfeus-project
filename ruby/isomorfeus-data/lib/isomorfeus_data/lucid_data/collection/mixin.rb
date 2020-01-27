@@ -503,6 +503,10 @@ module LucidData
             @_sid_to_node_cache = {}
           end
 
+          def _unchange!
+            @_changed = false
+          end
+
           def nodes
             @_raw_collection
           end

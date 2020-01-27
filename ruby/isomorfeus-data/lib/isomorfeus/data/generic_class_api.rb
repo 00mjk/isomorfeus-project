@@ -101,6 +101,7 @@ module Isomorfeus
           return nil unless data
           Isomorfeus.raise_error "#{self.to_s}: execute_save must return a instance of #{self.to_s} or nil. Returned was: #{data.class}." if data.class != self
           data.instance_variable_set(:@previous_key, previous_key) if data.key != previous_key
+          data._unchange!
           data
         end
 

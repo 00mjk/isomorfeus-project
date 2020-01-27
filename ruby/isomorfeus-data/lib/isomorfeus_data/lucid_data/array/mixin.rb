@@ -371,6 +371,10 @@ module LucidData
             @_raw_array = elements
           end
 
+          def _unchange!
+            @_changed = false
+          end
+
           def changed?
             @_changed
           end

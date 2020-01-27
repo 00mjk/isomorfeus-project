@@ -305,6 +305,10 @@ module LucidData
             @_raw_attributes = attributes
           end
 
+          def _unchange!
+            @_changed = false
+          end
+
           def changed?
             @_changed
           end
