@@ -461,6 +461,27 @@ module LucidData
           Isomorfeus.add_valid_data_class(base) unless base == LucidData::EdgeCollection::Base || base == LucidData::LinkCollection::Base
 
           base.instance_exec do
+            def instance_from_transport(instance_data, included_items_data)
+              key = instance_data[self.name]
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'] : nil
+              edges_sids = instance_data[self.name][key].key?('edges') ? instance_data[self.name][key]['edges'] : []
+              edges = []
+              edges_sids.each do |sid|
+                edge_class_name = sid[0]
+                edge_key = sid[1]
+                Isomorfeus.raise_error "#{self.name}: #{edge_class_name}: Not a valid LucidData class!" unless Isomorfeus.valid_data_class_name?(edge_class_name)
+                if included_items_data.key?(edge_class_name) && included_items_data[edge_class_name].key?(edge_key)
+                  edge_class = Isomorfeus.cached_data_class(edge_class_name)
+                  Isomorfeus.raise_error "#{self.name}: #{edge_class_name}: Cannot get class!" unless edge_class
+                  edge = edge_class.instance_from_transport(edge_class_name => { edge_key => included_items_data[edge_class_name][edge_key] }, included_items_data)
+                  Isomorfeus.raise_error "#{self.name}: #{edge_class_name} with key #{edge_key} could not be extracted from transport data!" unless edge
+                  edges << edge
+                end
+              end
+              new(key: key, revision: revision, attributes: attributes, edges: edges)
+            end
+
             def load(key:)
               data = instance_exec(key: key, &@_load_block)
               return nil unless data
@@ -473,14 +494,12 @@ module LucidData
               self.new(key: key, revision: revision, attributes: attributes, edges: edges, links: links)
             end
 
-            def save(key:, revision: nil, attributes: nil, edges: nil, links: nil)
-              val_edges = edges || links
-              _validate_attributes(attributes) if attributes
-              _validate_edges(val_edges)
-              data = instance_exec(key: key, revision: revision, attributes: attributes, edges: edges, links: links, &@_save_block)
+            def save(instance:)
+              data = instance_exec(instance: instance, &@_save_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
+              # TODO use existing instance instead of new
               revision = data.delete(:revision)
               attributes = data.delete(:attributes)
               edges = data.delete(:edges)

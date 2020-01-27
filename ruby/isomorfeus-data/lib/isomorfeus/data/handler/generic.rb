@@ -82,8 +82,11 @@ module Isomorfeus
           # 'Isomorfeus::Data::Handler::Generic', self.name, :save, data_hash
           props = response_agent.request[type_class_name]['save']
           props.transform_keys!(&:to_sym)
+          instance_data = props[:instance]
+          included_items_data = props.key?(:included_items) ? props[:included_items] : nil
           if Isomorfeus.current_user.authorized?(type_class, :save, props)
-            saved_type = type_class.save(**props)
+            instance = type_class.instance_from_transport(instance_data, included_items_data)
+            saved_type = type_class.save(instance: instance)
             if saved_type
               response_agent.outer_result = {} unless response_agent.outer_result
               response_agent.outer_result.deep_merge!(data: saved_type.to_transport)

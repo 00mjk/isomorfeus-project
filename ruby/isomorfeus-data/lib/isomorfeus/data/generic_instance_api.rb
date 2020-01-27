@@ -47,10 +47,8 @@ module Isomorfeus
         alias create save
 
         def promise_save
-          data_hash = to_transport
-          if self.respond_to?(:included_changed_items)
-            data_hash.deep_merge!(self.included_changed_items)
-          end
+          data_hash = { instance: to_transport }
+          data_hash.deep_merge!(included_items: included_items_to_transport) if respond_to?(:included_items_to_transport)
           Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :save, data_hash).then do |agent|
             if agent.processed
               agent.result
@@ -66,11 +64,24 @@ module Isomorfeus
           end
         end
         alias promise_create promise_save
+
+        # TODO update -> only send partial change
+        # included_changed_items
       else # RUBY_ENGINE
         def loaded?
           true
         end
       end # RUBY_ENGINE
+
+      def save
+        self.class.save(instance: self)
+        self
+      end
+
+      def promise_save
+        promise = Promise.new
+        promise.resolve(save)
+      end
 
       def current_user
         Isomorfeus.current_user

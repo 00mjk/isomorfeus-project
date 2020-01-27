@@ -140,6 +140,13 @@ module LucidData
           Isomorfeus.add_valid_data_class(base) unless base == LucidData::Node::Base || base == LucidData::Document::Base || base == LucidData::Vertex::Base
 
           base.instance_exec do
+            def instance_from_transport(instance_data, _included_items_data)
+              key = instance_data[self.name]
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'] : nil
+              new(key: key, revision: revision, attributes: attributes)
+            end
+
             def load(key:)
               data = instance_exec(key: key, &@_load_block)
               return nil unless data
@@ -150,13 +157,12 @@ module LucidData
               self.new(key: key, revision: revision, attributes: attributes)
             end
 
-            def save(key:, revision: nil, attributes: nil)
-              attributes = {} unless attributes
-              _validate_attributes(attributes)
-              data = instance_exec(key: key, revision: revision, attributes: attributes, &@_save_block)
+            def save(instance:)
+              data = instance_exec(instance: instance, &@_save_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
+              # TODO use existing instance instead of new
               revision = data.delete(:revision)
               attributes = data.delete(:attributes)
               self.new(key: key, revision: revision, attributes: attributes)

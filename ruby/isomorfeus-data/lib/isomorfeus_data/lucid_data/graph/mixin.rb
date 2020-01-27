@@ -383,6 +383,33 @@ module LucidData
           Isomorfeus.add_valid_data_class(base) unless base == LucidData::Graph::Base
 
           base.instance_exec do
+            def instance_from_transport(instance_data, included_items_data)
+              key = instance_data[self.name]
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'] : nil
+
+              nodes_sids = instance_data[self.name][key].key?('nodes') ? instance_data[self.name][key]['nodes'] : []
+              edges_sids = instance_data[self.name][key].key?('edges') ? instance_data[self.name][key]['edges'] : []
+
+              nodes_edges = [[],[]]
+              [nodes_sids, edges_sids].each_with_index do |sids, nodes_edges_index|
+                sids.each do |sid|
+                  node_class_name = sid[0]
+                  node_key = sid[1]
+                  Isomorfeus.raise_error "#{self.name}: #{node_class_name}: Not a valid LucidData class!" unless Isomorfeus.valid_data_class_name?(node_class_name)
+                  if included_items_data.key?(node_class_name) && included_items_data[node_class_name].key?(node_key)
+                    node_class = Isomorfeus.cached_data_class(node_class_name)
+                    Isomorfeus.raise_error "#{self.name}: #{node_class_name}: Cannot get class!" unless node_class
+                    node = node_class.instance_from_transport(node_class_name => { node_key => included_items_data[node_class_name][node_key] }, included_items_data)
+                    Isomorfeus.raise_error "#{self.name}: #{node_class_name} with key #{node_key} could not be extracted from transport data!" unless node
+                    nodes_edges[nodes_edges_index] << node
+                  end
+                end
+              end
+
+              new(key: key, revision: revision, attributes: attributes, nodes: nodes_edges[0], edges: nodes_edges[1])
+            end
+
             def load(key:)
               data = instance_exec(key: key, &@_load_block)
               return nil unless data
@@ -395,17 +422,12 @@ module LucidData
               self.new(key: key, revision: revision, edges: edges, nodes: nodes, attributes: attributes)
             end
 
-            def save(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil)
-              attributes = {} unless attributes
-              val_edges = edges || links
-              val_nodes = documents || nodes || vertexes || vertices
-              _validate_attributes(attributes) if attributes.any?
-              _validate_edges(val_edges)
-              _validate_nodes(val_nodes)
-              data = instance_exec(key: key, revision: revision, parts: parts, attributes: attributes, &@_save_block)
+            def save(instance:)
+              data = instance_exec(instance: instance, &@_save_block)
               return nil unless data
               return data if data.class == self
               Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
+              # TODO use existing instance instead of new
               revision = data.delete(:revision)
               attributes = data.delete(:attributes)
               documents = data.delete(:documents)
