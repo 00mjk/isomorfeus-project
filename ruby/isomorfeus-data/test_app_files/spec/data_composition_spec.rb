@@ -123,7 +123,7 @@ RSpec.describe 'LucidData::Composition' do
       @doc = visit('/')
     end
 
-    it 'can load a combined graph' do
+    it 'can load a composition' do
       result = @doc.await_ruby do
          SimpleComposition.promise_load(key: 1).then do |graph|
           n_nodes = graph.a_collection.nodes.size
