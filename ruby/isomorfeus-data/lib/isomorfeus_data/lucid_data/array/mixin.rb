@@ -58,7 +58,7 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key, :elements]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_changed_array = nil
             @_composition = composition
@@ -81,6 +81,10 @@ module LucidData
           def _get_array
             return @_changed_array if @_changed_array
             Redux.fetch_by_path(*@_store_path)
+          end
+
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :elements]
           end
 
           def changed?
@@ -352,28 +356,6 @@ module LucidData
               elements = instance_data[self.name][key].key?('elements') ? instance_data[self.name][key]['elements'] : nil
               new(key: key, revision: revision, elements: elements)
             end
-
-            def load(key:)
-              data = instance_exec(key: key, &@_load_block)
-              return nil unless data
-              return data if data.class == self
-              Isomorfeus.raise_error "#{self.to_s}: execute_load must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
-              revision = data.delete(:revision)
-              elements = data.delete(:elements)
-              self.new(key: key, revision: revision, elements: elements)
-            end
-
-            def save(instance:)
-              data = instance_exec(instance: instance, &@_save_block)
-              return nil unless data
-              return data if data.class == self
-              Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
-              # TODO use existing instance instead of new
-              revision = data.delete(:revision)
-              elements = data.delete(:elements)
-              key = data.delete(:key) || key
-              self.new(key: key, revision: revision, elements: elements)
-            end
           end
 
           def initialize(key:, revision: nil, elements: nil, composition: nil)
@@ -400,7 +382,9 @@ module LucidData
           def to_transport
             hash = { 'elements' => @_raw_array }
             hash.merge!('revision' => revision) if revision
-            { @class_name => { @key => hash }}
+            result = { @class_name => { @key => hash }}
+            result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+            result
           end
 
           # Array methods

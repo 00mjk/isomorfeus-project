@@ -56,7 +56,9 @@ module LucidData
                    "from" => from_as_sid,
                    "to" => to_as_sid }
           hash.merge!("revision" => revision) if revision
-          { @class_name => { @key => hash }}
+          result = { @class_name => { @key => hash }}
+          result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+          result
         end
 
         if RUBY_ENGINE == 'opal'
@@ -64,9 +66,7 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_from_path = [:data_state, @class_name, @key, :from]
-            @_to_path = [:data_state, @class_name, @key, :to]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_collection = collection
             @_composition = composition
@@ -110,6 +110,12 @@ module LucidData
             @_changed_from = nil
             @_changed_to = nil
             @_changed = false
+          end
+
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_from_path = [:data_state, @class_name, @key, :from]
+            @_to_path = [:data_state, @class_name, @key, :to]
           end
 
           def each(&block)
@@ -186,31 +192,6 @@ module LucidData
                 end
               end
               new(key: key, revision: revision, attributes: attributes, from: from_to[0], to: from_to[1])
-            end
-
-            def load(key:)
-              data = instance_exec(key: key, &@_load_block)
-              return nil unless data
-              return data if data.class == self
-              Isomorfeus.raise_error "#{self.to_s}: execute_load must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
-              revision = data.delete(:revision)
-              from = data.delete(:from)
-              to = data.delete(:to)
-              attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, from: from, to: to, attributes: attributes)
-            end
-
-            def save(instance:)
-              data = instance_exec(instance: instance, &@_save_block)
-              return nil unless data
-              return data if data.class == self
-              Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
-              # TODO use existing instance instead of new
-              revision = data.delete(:revision)
-              from = data.delete(:from)
-              to = data.delete(:to)
-              attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, from: from, to: to, attributes: attributes)
             end
           end
 

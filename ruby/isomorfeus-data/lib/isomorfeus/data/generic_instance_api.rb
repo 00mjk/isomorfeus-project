@@ -58,7 +58,13 @@ module Isomorfeus
                 `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
-              Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
+              data = agent.full_response[:data]
+              if data.key?(self.name) && data[self.name].key?(@key) && data[self.name][@key].key?('new_key')
+                @key = data[self.name][@key]['new_key']
+                @revision = data[self.name][@key]['revision'] if data[self.name][@key].key?('revision')
+                _update_paths
+              end
+              Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: data)
               agent.result = true
             end
           end

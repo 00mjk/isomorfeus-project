@@ -74,7 +74,9 @@ module LucidData
           parts.each do |name, instance|
             hash['parts'][name.to_s] = instance.to_sid if instance
           end
-          { @class_name => { @key => hash }}
+          result = { @class_name => { @key => hash }}
+          result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+          result
         end
 
         def included_items_to_transport
@@ -93,8 +95,7 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_parts_path = [:data_state, @class_name, @key, :parts]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_changed = false
 
@@ -145,6 +146,11 @@ module LucidData
             nil
           end
 
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_parts_path = [:data_state, @class_name, @key, :parts]
+          end
+
           def _init_parts
             self.class.parts.each_key do |access_name|
               sid = Redux.fetch_by_path(*(@_parts_path + [access_name]))
@@ -186,29 +192,6 @@ module LucidData
                 end
               end
               new(key: key, revision: revision, attributes: attributes, parts: parts)
-            end
-
-            def load(key:)
-              data = instance_exec(key: key, &@_load_block)
-              return nil unless data
-              return data if data.class == self
-              Isomorfeus.raise_error "#{self.to_s}: execute_load must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              parts = data.delete(:parts)
-              self.new(key: key, revision: revision, parts: parts, attributes: attributes)
-            end
-
-            def save(instance: nil)
-              data = instance_exec(instance: instance, &@_save_block)
-              return nil unless data
-              return data if data.class == self
-              Isomorfeus.raise_error "#{self.to_s}: execute_save must return either a Hash or a instance of #{self.to_s}. Returned was: #{data.class}." if data.class != ::Hash
-              # TODO use existing instance instead of new
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              parts = data.delete(:parts)
-              self.new(key: key, revision: revision, parts: parts, attributes: attributes)
             end
           end
 
