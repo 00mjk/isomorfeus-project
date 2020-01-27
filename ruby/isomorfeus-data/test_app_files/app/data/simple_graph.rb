@@ -3,14 +3,15 @@ class SimpleGraph < LucidData::Graph::Base
 
   execute_load do |key:|
     if RUBY_ENGINE != 'opal'
-    { key: key,
-      edges: SimpleEdgeCollection.load(key: 1),
-      nodes: SimpleCollection.load(key: 1),
-      attributes: { one: key }}
+      new(key: key,
+          edges: SimpleEdgeCollection.load(key: 1),
+          nodes: SimpleCollection.load(key: 1),
+          attributes: { one: key })
     end
   end
 
-  execute_save do |key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil|
+  execute_save do |instance:|
+    instance
   end
 
   execute_destroy do |key:|

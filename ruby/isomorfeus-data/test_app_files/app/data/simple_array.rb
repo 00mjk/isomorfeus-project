@@ -1,9 +1,10 @@
 class SimpleArray < LucidData::Array::Base
   execute_load do |key:|
-    { key: key, elements: [1, 2, 3] }
+    new(key: key, elements: [1, 2, 3])
   end
 
-  execute_save do |key:, revision: nil, elements:|
+  execute_save do |instance:|
+    instance
   end
 
   execute_destroy do |key:|

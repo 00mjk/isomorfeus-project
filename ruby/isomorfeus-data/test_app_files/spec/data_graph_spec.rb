@@ -103,9 +103,9 @@ RSpec.describe 'LucidGraph' do
           execute_load do |key:|
             node = LucidData::GenericNode.new(key: "#{key}_node")
             edge = LucidData::GenericEdge.new(key: "#{key}_edge", from: node, to: node)
-            { key: key,
-              nodes: { given_nodes: LucidData::GenericCollection.new(key: "#{key}_gc", nodes: [node]) },
-              edges: { given_edges: LucidData::GenericEdgeCollection.new(key: "#{key}_gec", edges: [edge])}}
+            new(key: key,
+                nodes: { given_nodes: LucidData::GenericCollection.new(key: "#{key}_gc", nodes: [node]) },
+                edges: { given_edges: LucidData::GenericEdgeCollection.new(key: "#{key}_gec", edges: [edge])})
           end
         end
 

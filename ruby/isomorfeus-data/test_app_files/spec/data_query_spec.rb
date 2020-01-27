@@ -7,7 +7,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryBase < LucidData::Query::Base
           prop :test_prop
 
-          execute_query do
+          execute_query do |props:|
           end
         end
         TestQueryBase.to_s.split('::').last
@@ -21,7 +21,7 @@ RSpec.describe 'LucidData::Query' do
           include LucidData::Query::Mixin
           prop :test_prop
 
-          execute_query do
+          execute_query do |props:|
           end
         end
         TestQueryMixin.to_s.split('::').last
@@ -203,7 +203,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryBase < LucidData::Query::Base
           prop :test_prop
 
-          execute_query do
+          execute_query do |props:|
           end
         end
         TestQueryBase.to_s.split('::').last
@@ -217,7 +217,7 @@ RSpec.describe 'LucidData::Query' do
           include LucidData::Query::Mixin
           prop :test_prop
 
-          execute_query do
+          execute_query do |props:|
           end
         end
         TestQueryMixin.to_s.split('::').last
