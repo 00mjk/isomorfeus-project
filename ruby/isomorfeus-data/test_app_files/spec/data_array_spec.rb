@@ -167,8 +167,7 @@ RSpec.describe 'LucidData::Array' do
         array.push(4)
         before_changed = array.changed?
         array.save
-        after_changed = array.changed?
-        [array.size, before_changed, after_changed]
+        [array.size, before_changed, array.changed?]
       end
       expect(result).to eq([4, true, false])
     end
