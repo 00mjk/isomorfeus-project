@@ -180,7 +180,7 @@ module LucidData
                 if included_items_data.key?(part_class_name) && included_items_data[part_class_name].key?(part_key)
                   part_class = Isomorfeus.cached_data_class(part_class_name)
                   Isomorfeus.raise_error "#{self.name}: #{part_class_name}: Cannot get class!" unless part_class
-                  part = part_class.instance_from_transport(part_class_name => { part_key => included_items_data[part_class_name][part_key] }, included_items_data)
+                  part = part_class.instance_from_transport({ part_class_name => { part_key => included_items_data[part_class_name][part_key] }}, included_items_data)
                   Isomorfeus.raise_error "#{self.name}: #{part_class_name} with key #{part_key} could not be extracted from transport data!" unless part
                   parts[part_name.to_sym] = part
                 end

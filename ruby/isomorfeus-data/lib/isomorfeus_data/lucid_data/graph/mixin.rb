@@ -400,7 +400,7 @@ module LucidData
                   if included_items_data.key?(node_class_name) && included_items_data[node_class_name].key?(node_key)
                     node_class = Isomorfeus.cached_data_class(node_class_name)
                     Isomorfeus.raise_error "#{self.name}: #{node_class_name}: Cannot get class!" unless node_class
-                    node = node_class.instance_from_transport(node_class_name => { node_key => included_items_data[node_class_name][node_key] }, included_items_data)
+                    node = node_class.instance_from_transport({ node_class_name => { node_key => included_items_data[node_class_name][node_key] }}, included_items_data)
                     Isomorfeus.raise_error "#{self.name}: #{node_class_name} with key #{node_key} could not be extracted from transport data!" unless node
                     nodes_edges[nodes_edges_index] << node
                   end
