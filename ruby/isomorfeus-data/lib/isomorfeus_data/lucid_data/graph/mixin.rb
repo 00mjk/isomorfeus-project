@@ -402,7 +402,7 @@ module LucidData
                 hash.each do |name, value|
                   namsy = name.to_sym
                   nodes_edges[namsy] = []
-                  hash[name].each do |sid|
+                  value.each do |sid|
                     node_class_name = sid[0]
                     node_key = sid[1]
                     Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Not a valid LucidData class!") unless Isomorfeus.valid_data_class_name?(node_class_name)
@@ -411,7 +411,7 @@ module LucidData
                       Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Cannot get class!") unless node_class
                       node = node_class.instance_from_transport({ node_class_name => { node_key => included_items_data[node_class_name][node_key] }}, included_items_data)
                       Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name} with key #{node_key} could not be extracted from transport data!") unless node
-                      nodes_edges[namsy] << node
+                      nodes_edges[hash_index][namsy] << node
                     end
                   end
                 end
