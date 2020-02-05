@@ -91,7 +91,7 @@ module LucidPolicy
 
         rules = self.class.authorization_rules
 
-        props = Isomorfeus::PropsProxy.new(props) unless props.class == Isomorfeus::PropsProxy
+        props = LucidProps.new(props) unless props.class == LucidProps
 
         condition_result = true
         rules[:conditions].each do |condition|

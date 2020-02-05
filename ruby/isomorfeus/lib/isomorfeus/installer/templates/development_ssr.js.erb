@@ -106,6 +106,10 @@ const ssr_config = {
     entry: { application_ssr: [path.resolve(__dirname, '../app/imports/application_ssr.js')] }
 };
 
-const ssr = Object.assign({}, common_config, ssr_config);
+const mail_components_config = {
+    entry: { mail_components: [path.resolve(__dirname, '../app/imports/mail_components.js')] }
+};
 
-module.exports = ssr;
+const ssr = Object.assign({}, common_config, ssr_config);
+const mail_components = Object.assign({}, common_config, mail_components_config);
+module.exports = [ ssr, mail_components ];

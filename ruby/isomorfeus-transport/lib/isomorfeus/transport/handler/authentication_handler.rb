@@ -5,10 +5,10 @@ module Isomorfeus
         TIMEOUT = 30
 
         on_request do |response_agent|
-          result = { error: 'Authentication failed' }
           # promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_class_name, user_identifier, user_password)
           response_agent.request.each_key do |login_or_logout|
             if login_or_logout == 'login'
+              response_agent.agent_result = { error: 'Authentication failed' }
               tries = pub_sub_client.instance_variable_get(:@isomorfeus_authentication_tries)
               tries = 0 unless tries
               tries += 1
@@ -32,26 +32,22 @@ module Isomorfeus
                   end
                 end
                 if user
+                  session_cookie = "session=#{SecureRandom.uuid};max-age=2592000"
                   Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_user, user)
                   Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
-                  # TODO store session in db and supply session cookie: session_cookie: uuid or so
-                  response_agent.agent_result = { success: 'ok', data: user.to_transport }
+                  Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, session_cookie)
+                  Isomorfeus.session_store.add(cookie: session_cookie, user: user)
+                  response_agent.agent_result = { success: 'ok', data: user.to_transport, session_cookie: session_cookie }
                 end
               end
             elsif login_or_logout == 'logout'
               begin
-                promise = Isomorfeus.current_user.promise_logout
-                # TODO remove session from db
-                # response_agent.agent_result = { success: 'ok', data: user.to_transport }
-                unless promise.realized?
-                  start = Time.now
-                  until promise.realized?
-                    break if (Time.now - start) > TIMEOUT
-                    sleep 0.01
-                  end
-                end
+
               ensure
                 Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_user, nil)
+                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
+                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, nil)
+                Isomorfeus.session_store.remove(cookie: session_cookie, user: user)
                 response_agent.agent_result = { success: 'ok' }
               end
             end

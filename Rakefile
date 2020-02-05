@@ -12,6 +12,8 @@ GEMFILE_DIRS = %w[
   isomorfeus-data/test_app
   isomorfeus-i18n
   isomorfeus
+  isomorfeus-mailer
+  isomorfeus-mailer/test_app
   isomorfeus-operation
   isomorfeus-operation/test_app
   isomorfeus-policy
@@ -97,6 +99,7 @@ task :build_ruby_packages do
   Rake::Task['build_ruby_data_package'].invoke
   Rake::Task['build_ruby_i18n_package'].invoke
   Rake::Task['build_ruby_installer_package'].invoke
+  Rake::Task['build_ruby_mailer_package'].invoke
   Rake::Task['build_ruby_operation_package'].invoke
   Rake::Task['build_ruby_policy_package'].invoke
   Rake::Task['build_ruby_transport_package'].invoke
@@ -130,6 +133,10 @@ task :build_ruby_installer_package do
   Dir.chdir(pwd)
 end
 
+task :build_ruby_mailer_package do
+  update_version_and_build_gem_for('mailer')
+end
+
 task :build_ruby_operation_package do
   update_version_and_build_gem_for('operation')
 end
@@ -146,6 +153,7 @@ task :ruby_specs do
   Rake::Task['ruby_installer_spec'].invoke
   Rake::Task['ruby_data_spec'].invoke
   Rake::Task['ruby_i18n_spec'].invoke
+  Rake::Task['ruby_mailer_spec'].invoke
   Rake::Task['ruby_operation_spec'].invoke
   Rake::Task['ruby_policy_spec'].invoke
   Rake::Task['ruby_transport_spec'].invoke
@@ -178,6 +186,10 @@ task :ruby_installer_spec => [:build_ruby_packages] do
   end
   Process.waitpid(pid)
   Dir.chdir(pwd)
+end
+
+task :ruby_mailer_spec do
+  run_rake_spec_for('mailer')
 end
 
 task :ruby_operation_spec do

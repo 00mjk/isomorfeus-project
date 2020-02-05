@@ -74,6 +74,5 @@ module Isomorfeus
         @locale_path = path
       end
     end
-
   end
 end

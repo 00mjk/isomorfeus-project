@@ -39,7 +39,7 @@ module LucidOperation
           def promise_run(props_hash = nil)
             props_hash = props_hash || props
             validate_props(props_hash)
-            props_json = Isomorfeus::PropsProxy.new(props_hash).to_json
+            props_json = LucidProps.new(props_hash).to_json
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |agent|
               if agent.processed
                 agent.result

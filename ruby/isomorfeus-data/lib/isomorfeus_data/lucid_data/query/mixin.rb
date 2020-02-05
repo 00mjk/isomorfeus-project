@@ -57,7 +57,7 @@ module LucidData
               end
               validate_props(props)
               query_result = LucidData::QueryResult.new(key: query_result_instance_key)
-              query_result.result_set = instance_exec(props: Isomorfeus::PropsProxy.new(props), &@_query_block)
+              query_result.result_set = instance_exec(props: LucidProps.new(props), &@_query_block)
               query_result
             end
 
