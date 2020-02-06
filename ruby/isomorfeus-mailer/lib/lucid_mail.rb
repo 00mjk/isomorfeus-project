@@ -25,7 +25,7 @@ class LucidMail
     rendered_tree = mount_static_component(props.component, props.props, 'mail_components.js')
     @rendered_component = <<~HTML
     <!DOCTYPE html>
-    <html><head></head><body>#{rendered_tree}</body></html>
+    <html><head><style type="text/css">#{ssr_styles}</style></head><body>#{rendered_tree}</body></html>
     HTML
     self
   end
