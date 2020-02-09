@@ -20,14 +20,14 @@ A `execute_query` block must be defined. This block must return a hash of LucidD
 which get then wrapped in a LucidData::QueryResult. Example:
 ```ruby
 class MyQuery < LucidData::Query::Base
-  execute_query do |props:|
+  execute_query do
     { queried_graph: MyGraph.new(key: '2') } # supply graph as instance
   end
 end
 ```
 MyQuery can then be executed and the result be accessed:
 ```ruby
-MyQuery.promise_execute(props: {}).then do |query_result|
+MyQuery.promise_execute.then do |query_result|
   query_result.queried_graph # The graph as returned in the hash above. The hash key can be accessed with a method. 
 end
 ```
@@ -53,7 +53,7 @@ class MyQuery < LucidData::Query::Base
 
   # for style and readability it is recommended to keep props and execute_query close:
   prop :count, class: Integer
-  execute_query do |props:|
+  execute_query do
     c = props.count # access props as usual 
     # etc. ... 
   end

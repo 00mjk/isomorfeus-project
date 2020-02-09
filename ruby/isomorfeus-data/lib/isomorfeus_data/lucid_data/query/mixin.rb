@@ -6,21 +6,21 @@ module LucidData
 
         if RUBY_ENGINE == 'opal'
           base.instance_exec do
-            def execute(props:)
-              query_result_instance = LucidData::QueryResult.new
-              promise_execute(props: props, query_result_instance: query_result_instance) unless query_result_instance.loaded?
-              query_result_instance
+            def execute(**props)
+              props[:query_result_instance] = LucidData::QueryResult.new
+              promise_execute(props) unless props[:query_result_instance].loaded?
+              props[:query_result_instance]
             end
 
-            def promise_execute(props:, query_result_instance: nil)
+            def promise_execute(**props)
+              query_result_instance = props.delete(:query_result_instance)
               query_result_instance = LucidData::QueryResult.new unless query_result_instance
               props.each_key do |prop_name|
                 Isomorfeus.raise_error(message: "#{self.to_s} No such query prop declared: '#{prop_name}'!") unless declared_props.key?(prop_name)
               end
               validate_props(props)
               data_props = { props: props, query_result_instance_key: query_result_instance.key }
-              props_json = data_props.to_json
-              Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props_json).then do |agent|
+              Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :execute, data_props).then do |agent|
                 if agent.processed
                   agent.result
                 else
@@ -44,20 +44,19 @@ module LucidData
           end
 
           base.instance_exec do
-            def promise_execute(props:)
-              instance = self.execute(props: props)
+            def promise_execute(**props)
+              instance = self.execute(**props)
               result_promise = Promise.new
               result_promise.resolve(instance)
               result_promise
             end
 
-            def execute(props:, query_result_instance_key: nil)
-              props.each_key do |prop_name|
-                Isomorfeus.raise_error(message: "#{self.to_s} No such query prop declared: '#{prop_name}'!") unless declared_props.key?(prop_name)
-              end
-              validate_props(props)
+            def execute(**props)
+              query_result_instance_key = props.delete(:query_result_instance_key)
+              props = validated_props(props)
+              @props = LucidProps.new(props)
               query_result = LucidData::QueryResult.new(key: query_result_instance_key)
-              query_result.result_set = instance_exec(props: LucidProps.new(props), &@_query_block)
+              query_result.result_set = instance_exec(&@_query_block)
               query_result
             end
 
@@ -73,6 +72,8 @@ module LucidData
               Isomorfeus.pub_sub_client
             end
           end
+
+          attr_accessor :props
 
           def current_user
             Isomorfeus.current_user

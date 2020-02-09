@@ -59,8 +59,7 @@ module Isomorfeus
 
         def process_execute(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props_json
-          props_json = response_agent.request[type_class_name]['execute']
-          props = Oj.load(props_json, mode: :strict)
+          props = response_agent.request[type_class_name]['execute']
           props.transform_keys!(&:to_sym)
           props[:props].transform_keys!(&:to_sym)
           if Isomorfeus.current_user.authorized?(type_class, :execute, props[:props])
