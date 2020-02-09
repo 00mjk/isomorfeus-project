@@ -102,26 +102,30 @@ module Isomorfeus
             }
           end
 
-          def _get_attributes
+          def attributes
             raw_attributes = Redux.fetch_by_path(*@_store_path)
             hash = Hash.new(raw_attributes)
             hash.merge!(@_changed_attributes) if @_changed_attributes
             hash
           end
 
+          def native_attributes
+            Redux.fetch_by_path(*@_store_path)
+          end
+
           def _get_selected_attributes
-            attributes = _get_attributes.dup
+            sel_attributes = attributes.dup
             if @_selected_attributes && !@_selected_attributes.empty?
-              attributes.each_key do |attr|
+              sel_attributes.each_key do |attr|
                 unless @_selected_attributes.include?(attr) || @_selected_attributes.include?(attr)
-                  attributes.delete(attr)
+                  sel_attributes.delete(attr)
                 end
               end
             end
             if @_excluded_attributes && !@_excluded_attributes.empty?
-              @_excluded_attributes.each { |attr| attributes.delete(attr) }
+              @_excluded_attributes.each { |attr| sel_attributes.delete(attr) }
             end
-            attributes
+            sel_attributes
           end
         else
           base.instance_exec do
@@ -140,26 +144,30 @@ module Isomorfeus
             end
           end
 
-          def _get_attributes
+          def attributes
+            @_raw_attributes
+          end
+
+          def native_attributes
             @_raw_attributes
           end
 
           def _get_selected_attributes
-            attributes = _get_attributes.transform_keys(&:to_s)
+            sel_attributes = attributes.transform_keys(&:to_s)
             self.class.attribute_conditions.each do |attr, options|
-              attributes.delete(attr.to_s) if options[:server_only]
+              sel_attributes.delete(attr.to_s) if options[:server_only]
             end
             if @_selected_attributes && !@_selected_attributes.empty?
-              attributes.each_key do |attr|
+              sel_attributes.each_key do |attr|
                 unless @_selected_attributes.include?(attr.to_sym) || @_selected_attributes.include?(attr)
-                  attributes.delete(attr)
+                  sel_attributes.delete(attr)
                 end
               end
             end
             if @_excluded_attributes && !@_excluded_attributes.empty?
-              @_excluded_attributes.each { |attr| attributes.delete(attr.to_s) }
+              @_excluded_attributes.each { |attr| sel_attributes.delete(attr.to_s) }
             end
-            attributes
+            sel_attributes
           end
         end
       end

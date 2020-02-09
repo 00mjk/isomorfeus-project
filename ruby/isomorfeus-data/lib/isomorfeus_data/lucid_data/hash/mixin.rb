@@ -114,7 +114,7 @@ module LucidData
             result
           end
 
-          def _get_attributes
+          def attributes
             raw_attributes = Redux.fetch_by_path(*@_store_path)
             hash = ::Hash.new(raw_attributes)
             hash.merge!(@_changed_attributes) if @_changed_attributes
@@ -135,7 +135,7 @@ module LucidData
           end
 
           def each(&block)
-            _get_attributes.each(&block)
+            attributes.each(&block)
           end
 
           def [](name)
@@ -152,7 +152,7 @@ module LucidData
           end
 
           def compact!
-            result = _get_attributes.compact!
+            result = attributes.compact!
             return nil if result.nil?
             @_changed_attributes = result
             changed!
@@ -160,7 +160,7 @@ module LucidData
           end
 
           def delete(name)
-            hash = _get_attributes
+            hash = attributes
             result = hash.delete(name)
             @_changed_attributes = hash
             changed!
@@ -168,7 +168,7 @@ module LucidData
           end
 
           def delete_if(&block)
-            hash = _get_attributes
+            hash = attributes
             result = hash.delete_if(&block)
             @_changed_attributes = hash
             changed!
@@ -187,7 +187,7 @@ module LucidData
               return @_default unless @_default_proc
               @_default_proc.call(self, method_name)
             else
-              hash = _get_attributes
+              hash = attributes
               hash.send(name, *args, &block)
             end
           end
@@ -198,7 +198,7 @@ module LucidData
           alias has_key? key?
 
           def keep_if(&block)
-            raw_hash = _get_attributes
+            raw_hash = attributes
             raw_hash.keep_if(&block)
             @_changed_attributes = raw_hash
             changed!
@@ -206,13 +206,13 @@ module LucidData
           end
 
           def merge!(*args)
-            @_changed_attributes = _get_attributes.merge!(*args)
+            @_changed_attributes = attributes.merge!(*args)
             changed!
             self
           end
 
           def reject!(&block)
-            hash = _get_attributes
+            hash = attributes
             result = hash.reject!(&block)
             return nil if result.nil?
             @_changed_attributes = hash
@@ -221,7 +221,7 @@ module LucidData
           end
 
           def select!(&block)
-            hash = _get_attributes
+            hash = attributes
             result = hash.select!(&block)
             return nil if result.nil?
             @_changed_attributes = hash
@@ -231,7 +231,7 @@ module LucidData
           alias filter! select!
 
           def shift
-            hash = _get_attributes
+            hash = attributes
             result = hash.shift
             @_changed_attributes = hash
             changed!
@@ -246,23 +246,23 @@ module LucidData
           end
 
           def to_h
-            _get_attributes.dup
+            attributes.dup
           end
 
           def transform_keys!(&block)
-            @_changed_attributes = _get_attributes.transform_keys!(&block)
+            @_changed_attributes = attributes.transform_keys!(&block)
             changed!
             self
           end
 
           def transform_values!(&block)
-            @_changed_attributes = _get_attributes.transform_values!(&block)
+            @_changed_attributes = attributes.transform_values!(&block)
             changed!
             self
           end
 
           def update(*args)
-            @_changed_attributes = _get_attributes.update(*args)
+            @_changed_attributes = attributes.update(*args)
             changed!
             self
           end

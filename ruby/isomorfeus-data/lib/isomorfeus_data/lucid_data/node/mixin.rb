@@ -90,7 +90,7 @@ module LucidData
           end
 
           def each(&block)
-            _get_attributes.each(&block)
+            attributes.each(&block)
           end
 
           def [](name)
