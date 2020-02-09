@@ -4,16 +4,6 @@ module LucidAuthentication
       self.class == Anonymous
     end
 
-    def encrypt_password(password, password_confirmation)
-      raise "Password and confirmation don't match!" unless password == password_confirmation
-      BCrypt::Password.create(password).to_s
-    end
-
-    def passwords_match?(encrypted_password, given_password)
-      bcrypt_pass = BCrypt::Password.new(encrypted_password)
-      bcrypt_pass == given_password
-    end
-
     if RUBY_ENGINE == 'opal'
       def self.included(base)
         base.instance_exec do
@@ -91,6 +81,16 @@ module LucidAuthentication
             end
           end
         end
+      end
+
+      def encrypt_password(password, password_confirmation)
+        raise "Password and confirmation don't match!" unless password == password_confirmation
+        BCrypt::Password.create(password).to_s
+      end
+
+      def passwords_match?(encrypted_password, given_password)
+        bcrypt_pass = BCrypt::Password.new(encrypted_password)
+        bcrypt_pass == given_password
       end
 
       def promise_logout(scheme: :isomorfeus)
