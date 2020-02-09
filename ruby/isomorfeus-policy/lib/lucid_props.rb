@@ -13,8 +13,7 @@ class LucidProps
   end
 
   def to_transport
-    transport_hash = {}.merge(@props_hash)
-    transport_hash
+    {}.merge(@props_hash)
   end
 
   if RUBY_ENGINE == 'opal'
