@@ -5,8 +5,10 @@ class MyQuickOp < LucidQuickOp::Base
   prop :a_prop
 
   op do
-    props.a_prop == 'a_value'
-    # do something
+    if RUBY_ENGINE != 'opal' # keep asset size low and guard code against inclusion in client side assets
+      props.a_prop == 'a_value'
+      # do something
+    end 
   end
 end
 
