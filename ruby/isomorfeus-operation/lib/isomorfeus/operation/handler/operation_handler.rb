@@ -16,7 +16,13 @@ module Isomorfeus
                   if Isomorfeus.current_user.authorized?(operation_class, :promise_run, props)
                     operation_promise = operation_class.promise_run(**props)
                     if operation_promise.realized?
-                      response_agent.agent_result = { success: 'ok' , result: operation_promise.value }
+                      state = operation_promise.resolved? ? :resolved : :rejected
+                      result_hash = { state => operation_promise.value }
+                      if operation_promise.error
+                        e = operation_promise.error
+                        result_hash[:error] = { message: e.message, class_name: e.class.to_s, back_trace: e.backtrace }
+                      end
+                      response_agent.agent_result = { success: 'ok' , result: result_hash }
                     else
                       start = Time.now
                       timeout = false
@@ -30,7 +36,13 @@ module Isomorfeus
                       if timeout
                         response_agent.error = { error: 'Timeout' }
                       else
-                        response_agent.agent_result = { success: 'ok' , result: operation_promise.value }
+                        state = operation_promise.resolved? ? :resolved : :rejected
+                        result_hash = { state => operation_promise.value }
+                        if operation_promise.error
+                          e = operation_promise.error
+                          result_hash[:error] = { message: e.message, class_name: e.class.to_s, back_trace: e.backtrace }
+                        end
+                        response_agent.agent_result = { success: 'ok' , result: result_hash }
                       end
                     end
                   else

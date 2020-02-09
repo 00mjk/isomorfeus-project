@@ -39,15 +39,27 @@ module LucidOperation
           def promise_run(**props_hash)
             props = validated_props(props_hash)
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props).then do |agent|
-              if agent.processed
-                agent.result
-              else
+              unless agent.processed
                 agent.processed = true
                 if agent.response.key?(:error)
                   `console.error(#{agent.response[:error].to_n})`
                   Isomorfeus.raise_error(message: agent.response[:error])
                 end
                 agent.result = agent.response[:result]
+              end
+              if agent.result.key?(:rejected)
+                if agent.result.key?(:error)
+                  e = agent.result[:error]
+                  exception_class_name = e[:class_name]
+                  exception_class = exception_class_name.constantize
+                  exception = exception_class.new(e[:message])
+                  exception.set_backtrace(e[:backtrace])
+                  raise exception
+                else
+                  raise agent.result[:rejected]
+                end
+              else
+                agent.result[:resolved]
               end
             end
           end
@@ -63,7 +75,7 @@ module LucidOperation
           end
         end
 
-        attr_accessor :props
+        attr_reader :props
         attr_accessor :step_result
 
         def initialize(**props_hash)

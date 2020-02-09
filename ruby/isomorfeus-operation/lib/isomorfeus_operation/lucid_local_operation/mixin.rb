@@ -15,13 +15,12 @@ module LucidLocalOperation
 
       base.instance_exec do
         def promise_run(**props_hash)
-          validate_props(props_hash)
           self.new(**props_hash).promise_run
         end
       end
     end
 
-    attr_accessor :props
+    attr_reader :props
     attr_accessor :step_result
 
     def initialize(**props_hash)

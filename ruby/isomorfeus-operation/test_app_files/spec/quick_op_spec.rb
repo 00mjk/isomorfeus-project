@@ -74,12 +74,12 @@ RSpec.describe 'LucidQuickOp' do
     it 'executes the fail block on failure' do
       result = on_server do
         res = nil
-        SimpleQuickOp.promise_run(fail_op: true).fail do |exception|
-          res = exception.message
+        SimpleQuickOp.promise_run(fail_op: true).fail do |_|
+          res = 'fail called'
         end
         res
       end
-      expect(result).to eq('failure')
+      expect(result).to eq('fail called')
     end
   end
 
@@ -114,6 +114,24 @@ RSpec.describe 'LucidQuickOp' do
         SimpleQuickOp.promise_run({})
       end
       expect(result).to eq('a bird')
+    end
+
+    it 'executes the then block on success' do
+      result = @doc.await_ruby do
+        SimpleQuickOp.promise_run.then do |result|
+          'i see ' + result
+        end
+      end
+      expect(result).to eq('i see a bird')
+    end
+
+    it 'executes the fail block on failure' do
+      result = @doc.await_ruby do
+        SimpleQuickOp.promise_run(fail_op: true).fail do |_|
+          'fail called'
+        end
+      end
+      expect(result).to eq('fail called')
     end
   end
 end
