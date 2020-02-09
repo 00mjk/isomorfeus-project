@@ -18,9 +18,9 @@ module LucidData
               props.each_key do |prop_name|
                 Isomorfeus.raise_error(message: "#{self.to_s} No such query prop declared: '#{prop_name}'!") unless declared_props.key?(prop_name)
               end
-              validate_props(props)
-              data_props = { props: props, query_result_instance_key: query_result_instance.key }
-              Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :execute, data_props).then do |agent|
+              props = validated_props(props)
+              props[:query_result_instance_key] = query_result_instance.key
+              Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props).then do |agent|
                 if agent.processed
                   agent.result
                 else
