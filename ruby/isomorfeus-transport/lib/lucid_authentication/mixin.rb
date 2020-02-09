@@ -1,8 +1,21 @@
 module LucidAuthentication
   module Mixin
+    def anonymous?
+      self.class == Anonymous
+    end
+
+    def encrypt_password(password, password_confirmation)
+      raise "Password and confirmation don't match!" unless password == password_confirmation
+      BCrypt::Password.create(password).to_s
+    end
+
+    def passwords_match?(encrypted_password, given_password)
+      bcrypt_pass = BCrypt::Password.new(encrypted_password)
+      bcrypt_pass == given_password
+    end
+
     if RUBY_ENGINE == 'opal'
       def self.included(base)
-
         base.instance_exec do
           def authentication(&block)
           end

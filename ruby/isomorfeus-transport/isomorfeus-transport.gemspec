@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.0'
+  s.add_dependency 'bcrypt', '~> 3.1.13'
   s.add_dependency 'iodine', '~> 0.7.38'
   s.add_dependency 'oj', '>= 3.10.0'
   s.add_dependency 'opal', '>= 1.0.0'
