@@ -1,5 +1,7 @@
 ## Common API
 
+Loading data from the client must be allowed by policy, see [Data Policy](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_policy.md)
+
 ### Loading Data
 
 All LucidData *classes* support the following methods for loading data based on a key:
