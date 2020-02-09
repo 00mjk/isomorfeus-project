@@ -51,10 +51,7 @@ module LucidOperation
           if match_data
             matched = true
 
-            promise = promise.then do |result|
-              operation.step_result = result
-              operation.instance_exec(*match_data, &step[1])
-            end.fail do |result|
+            promise = promise.ensure do |result|
               operation.step_result = result
               operation.instance_exec(*match_data, &step[1])
             end
