@@ -46,6 +46,10 @@ class LucidProps
     def to_json
       JSON.dump(to_transport)
     end
+
+    def to_n
+      @props_hash.to_n
+    end
   else # RUBY_ENGINE
     def [](prop_name)
       name = prop_name.to_sym
@@ -81,6 +85,10 @@ class LucidProps
 
     def to_json
       Oj.dump(to_transport, mode: :strict)
+    end
+
+    def to_n
+      @props_hash
     end
   end # RUBY_ENGINE
 
