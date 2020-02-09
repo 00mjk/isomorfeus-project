@@ -16,12 +16,9 @@ module Isomorfeus
 
       def email_sender
         @email_sender ||= MailHandler.sender(Isomorfeus.email_sender_config[:type]) do |dispatcher|
-          dispatcher.address  = Isomorfeus.email_sender_config[:address]  if Isomorfeus.email_sender_config.key?(:address)
-          dispatcher.port     = Isomorfeus.email_sender_config[:port]     if Isomorfeus.email_sender_config.key?(:port)
-          dispatcher.domain   = Isomorfeus.email_sender_config[:domain]   if Isomorfeus.email_sender_config.key?(:domain)
-          dispatcher.username = Isomorfeus.email_sender_config[:username] if Isomorfeus.email_sender_config.key?(:username)
-          dispatcher.password = Isomorfeus.email_sender_config[:password] if Isomorfeus.email_sender_config.key?(:password)
-          dispatcher.use_ssl  = Isomorfeus.email_sender_config[:use_ssl]  if Isomorfeus.email_sender_config.key?(:use_ssl)
+          Isomorfeus.email_sender_config.each do |key,value|
+            dispatcher.send("#{key}=".to_sym, value)
+          end
         end
       end
     end
