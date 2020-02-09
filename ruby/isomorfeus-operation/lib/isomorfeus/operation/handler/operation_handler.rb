@@ -13,8 +13,9 @@ module Isomorfeus
                 props_json = response_agent.request[operation_class_name]
                 begin
                   props = Oj.load(props_json, mode: :strict)
+                  props.transform_keys!(&:to_sym)
                   if Isomorfeus.current_user.authorized?(operation_class, :promise_run, props)
-                    operation_promise = operation_class.promise_run(props)
+                    operation_promise = operation_class.promise_run(**props)
                     if operation_promise.realized?
                       response_agent.agent_result = { success: 'ok' , result: operation_promise.value }
                     else

@@ -13,8 +13,6 @@ class MyQuickOp < LucidQuickOp::Base
 end
 
 MyQuickOp.promise_run(a_prop: 'a_value')
-# or
-MyQuickOp.promise_run(props: { a_prop: 'a_value' })
 ```
 #### Policy
 

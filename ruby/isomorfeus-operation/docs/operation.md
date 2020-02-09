@@ -19,8 +19,6 @@ class MyOperation < LucidOperation::Base
 end
 
 MyOperation.promise_run(a_prop: 'a_value')
-# or
-MyOperation.promise_run(props: { a_prop: 'a_value' })
 ```
 
 LucidLocalOperation is the same as LucidOperation, except its always executed locally, wherever that may be.

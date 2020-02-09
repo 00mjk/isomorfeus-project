@@ -1,9 +1,5 @@
 module LucidOperation
   module PromiseRun
-    def initialize(validated_props_hash)
-      @props = LucidProps.new(validated_props_hash)
-    end
-
     def promise_run
       promise = Promise.new
       original_promise = promise

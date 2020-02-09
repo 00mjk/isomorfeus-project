@@ -36,9 +36,8 @@ module LucidOperation
             @finally_defined = true
           end
 
-          def promise_run(props_hash = nil)
-            props_hash = props_hash || props
-            validate_props(props_hash)
+          def promise_run(**props_hash)
+            props_hash = validated_props(props_hash)
             props_json = LucidProps.new(props_hash).to_json
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |agent|
               if agent.processed
@@ -60,15 +59,18 @@ module LucidOperation
         base.include(LucidOperation::PromiseRun)
 
         base.instance_exec do
-          def promise_run(props_hash = nil)
-            props_hash = props_hash || props
-            validate_props(props_hash)
-            self.new(props_hash).promise_run
+          def promise_run(**props_hash)
+            self.new(**props_hash).promise_run
           end
         end
 
         attr_accessor :props
         attr_accessor :step_result
+
+        def initialize(**props_hash)
+          props_hash = self.class.validated_props(props_hash)
+          @props = LucidProps.new(props_hash)
+        end
 
         def current_user
           Isomorfeus.current_user

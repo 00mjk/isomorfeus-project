@@ -14,16 +14,20 @@ module LucidLocalOperation
       base.include(LucidOperation::PromiseRun)
 
       base.instance_exec do
-        def promise_run(props_hash = nil, props: nil)
-          props_hash = props_hash || props
+        def promise_run(**props_hash)
           validate_props(props_hash)
-          self.new(props_hash).promise_run
+          self.new(**props_hash).promise_run
         end
       end
     end
 
     attr_accessor :props
     attr_accessor :step_result
+
+    def initialize(**props_hash)
+      props_hash = self.class.validated_props(props_hash)
+      @props = LucidProps.new(props_hash)
+    end
 
     def current_user
       Isomorfeus.current_user

@@ -44,27 +44,42 @@ RSpec.describe 'LucidQuickOp' do
       expect(result).to include('Proc')
     end
 
-    it 'the simple quick operation has a op block that has a bird' do
+    it 'can run the simple quick operation instance' do
       result = on_server do
-        SimpleQuickOp.instance_variable_get(:@op).call
-      end
-      expect(result).to eq('a bird')
-    end
-
-    it 'can run the simple quick operation instance on the server' do
-      result = on_server do
-        promise = SimpleQuickOp.new({}).promise_run
+        promise = SimpleQuickOp.new.promise_run
         promise.value
       end
       expect(result).to eq('a bird')
     end
 
-    it 'can run the simple quick operation on the server' do
+    it 'can run the simple quick operation' do
       result = on_server do
-        promise = SimpleQuickOp.promise_run({})
+        promise = SimpleQuickOp.promise_run
         promise.value
       end
       expect(result).to eq('a bird')
+    end
+
+    it 'executes the then block on success' do
+      result = on_server do
+        res = nil
+        SimpleQuickOp.promise_run.then do |value|
+          res = value
+        end
+        res
+      end
+      expect(result).to eq('a bird')
+    end
+
+    it 'executes the fail block on failure' do
+      result = on_server do
+        res = nil
+        SimpleQuickOp.promise_run(fail_op: true).fail do |exception|
+          res = exception.message
+        end
+        res
+      end
+      expect(result).to eq('failure')
     end
   end
 
