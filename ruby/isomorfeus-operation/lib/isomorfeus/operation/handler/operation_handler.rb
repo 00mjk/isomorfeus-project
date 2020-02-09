@@ -10,10 +10,9 @@ module Isomorfeus
             if Isomorfeus.valid_operation_class_name?(operation_class_name)
               operation_class = Isomorfeus.cached_operation_class(operation_class_name)
               if operation_class
-                props_json = response_agent.request[operation_class_name]
+                props = response_agent.request[operation_class_name]
+                props.transform_keys!(&:to_sym)
                 begin
-                  props = Oj.load(props_json, mode: :strict)
-                  props.transform_keys!(&:to_sym)
                   if Isomorfeus.current_user.authorized?(operation_class, :promise_run, props)
                     operation_promise = operation_class.promise_run(**props)
                     if operation_promise.realized?

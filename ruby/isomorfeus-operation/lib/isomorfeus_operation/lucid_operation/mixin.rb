@@ -37,9 +37,8 @@ module LucidOperation
           end
 
           def promise_run(**props_hash)
-            props_hash = validated_props(props_hash)
-            props_json = LucidProps.new(props_hash).to_json
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |agent|
+            props = validated_props(props_hash)
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props).then do |agent|
               if agent.processed
                 agent.result
               else
