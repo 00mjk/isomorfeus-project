@@ -191,12 +191,12 @@ module Isomorfeus
       data_hash = { database_gems:      database_gems.chop,
                     rack_server_gems:   rack_server_gems.chop }
       if source_dir
-        %i[isomorfeus_data isomorfeus_i18n isomorfeus_mailer isomorfeus_operation isomorfeus_policy isomorfeus_transport].each do |i_module|
+        %i[isomorfeus isomorfeus_data isomorfeus_i18n isomorfeus_mailer isomorfeus_operation isomorfeus_policy isomorfeus_transport].each do |i_module|
           data_hash[i_module] = i_module == isomorfeus_module ? "path: '..'" : "path: '../../#{i_module.to_s.tr('_', '-')}'"
         end
-        data_hash[:isomorfeus] = nil
+        data_hash[:isomorfeus_version] = nil
       else
-        data_hash[:isomorfeus] = "'~> #{Isomorfeus::VERSION}'"
+        data_hash[:isomorfeus_version] = "'~> #{Isomorfeus::VERSION}'"
       end
       create_file_from_template('Gemfile.erb', 'Gemfile', data_hash)
     end
