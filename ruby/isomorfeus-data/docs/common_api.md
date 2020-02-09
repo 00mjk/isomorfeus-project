@@ -35,7 +35,8 @@ All LucidData *classes* support the following methods for creating data:
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
   but not from within render blocks.
   
-For creating the `execute_save` block must be defined, see below.
+For creating the `execute_create` block must be defined, to execute the actual creation of data. This block is executed within the instance und must return self.
+Returning nil indicates that the create failed for some reason. Alternatively a exception may be thrown.
 
 ### Saving Data
 
@@ -49,7 +50,7 @@ All LucidData *instances* support the following methods for saving data:
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
   but not from within render blocks.
 
-A `execute_save` block must be defined, to execute the actual save of data. This block must return a instance if the class at hand.
+A `execute_save` block must be defined, to execute the actual save of data. This block is executed within the instance und must return self.
 Returning nil indicates that the save failed for some reason. Alternatively a exception may be thrown.
 
 ### Destroying Data

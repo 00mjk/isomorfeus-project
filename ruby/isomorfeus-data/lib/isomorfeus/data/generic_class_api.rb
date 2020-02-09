@@ -2,16 +2,6 @@ module Isomorfeus
   module Data
     module GenericClassApi
       if RUBY_ENGINE == 'opal'
-        def create(key:, **things)
-          instance = new(key: key, **things)
-          instance.promise_save
-          instance
-        end
-
-        def promise_create(key:, **things)
-          new(key: key, **things).promise_save
-        end
-
         def destroy(key:)
           promise_destroy(key: key)
           true
@@ -57,34 +47,12 @@ module Isomorfeus
           end
         end
 
-        def save(instance:)
-          instance.promise_save
-          instance
-        end
-
-        def promise_save(instance:)
-          instance.promise_save
-        end
-
         # execute
+        def execute_create(_); end
         def execute_destroy(_); end
         def execute_load(_); end
         def execute_save(_); end
       else
-        def promise_create(key:, **things)
-          instance = self.create(key: key, **things)
-          result_promise = Promise.new
-          result_promise.resolve(instance)
-          result_promise
-        end
-
-        def promise_destroy(key:)
-          result = self.destroy(key: key)
-          result_promise = Promise.new
-          result_promise.resolve(result)
-          result_promise
-        end
-
         def destroy(key:)
           !!instance_exec(key: key, &@_destroy_block)
         end
@@ -104,17 +72,11 @@ module Isomorfeus
           data
         end
 
-        def save(instance:)
-          previous_key = instance.key
-          data = instance_exec(instance: instance, &@_save_block)
-          return nil unless data
-          Isomorfeus.raise_error(message: "#{self.to_s}: execute_save must return a instance of #{self.to_s} or nil. Returned was: #{data.class}.") if data.class != self
-          data.instance_variable_set(:@previous_key, previous_key) if data.key != previous_key
-          data._unchange!
-          data
+        # execute
+        def execute_create(&block)
+          @_create_block = block
         end
 
-        # execute
         def execute_destroy(&block)
           @_destroy_block = block
         end
@@ -126,6 +88,22 @@ module Isomorfeus
         def execute_save(&block)
           @_save_block = block
         end
+      end
+
+      def create(key:, **things)
+        new(key: key, **things).create
+      end
+
+      def promise_create(key:, **things)
+        new(key: key, **things).promise_create
+      end
+
+      def save(instance:)
+        instance.save
+      end
+
+      def promise_save(instance:)
+        instance.promise_save
       end
 
       def current_user

@@ -1,6 +1,10 @@
 class SimpleGraph < LucidData::Graph::Base
   attribute :one
 
+  execute_create do
+    self
+  end
+
   execute_load do |key:|
     if RUBY_ENGINE != 'opal'
       new(key: key,
@@ -10,8 +14,8 @@ class SimpleGraph < LucidData::Graph::Base
     end
   end
 
-  execute_save do |instance:|
-    instance
+  execute_save do
+    self
   end
 
   execute_destroy do |key:|
