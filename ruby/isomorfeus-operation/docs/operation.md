@@ -19,9 +19,7 @@ class MyOperation < LucidOperation::Base
 end
 
 MyOperation.promise_run(a_prop: 'a_value')
-
 # or
-
 MyOperation.promise_run(props: { a_prop: 'a_value' })
 ```
 
