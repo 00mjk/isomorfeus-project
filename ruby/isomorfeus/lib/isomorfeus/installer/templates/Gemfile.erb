@@ -7,17 +7,18 @@ gem 'foreman', require: false
 gem 'roda', '~> 3.27.0'
 gem 'opal', github: 'janbiedermann/opal', branch: 'es6_modules_1_1'
 
-<% if isomorfeus %>
-gem 'isomorfeus', <%= isomorfeus %>
+<% if isomorfeus_version %>
+gem 'isomorfeus', <%= isomorfeus_version %>
 <% else %>
 gem 'isomorfeus-redux', '~> 4.0.17'
-gem 'isomorfeus-react', '>= 16.12.15'
+gem 'isomorfeus-react', '>= 16.12.16'
 gem 'isomorfeus-policy', <%= isomorfeus_policy %>
 gem 'isomorfeus-transport', <%= isomorfeus_transport %>
 gem 'isomorfeus-i18n', <%= isomorfeus_i18n %>
 gem 'isomorfeus-data', <%= isomorfeus_data %>
 gem 'isomorfeus-operation', <%= isomorfeus_operation %>
 gem 'isomorfeus-mailer', <%= isomorfeus_mailer %>
+gem 'isomorfeus', <%= isomorfeus %>
 <% end %>
 
 group :development do
