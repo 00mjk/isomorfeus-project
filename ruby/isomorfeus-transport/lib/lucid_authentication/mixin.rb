@@ -7,7 +7,7 @@ module LucidAuthentication
     if RUBY_ENGINE == 'opal'
       def self.included(base)
         base.instance_exec do
-          def authentication(&block)
+          def execute_login(&block)
           end
 
           def promise_login(user: nil, pass: nil, scheme: :isomorfeus)
