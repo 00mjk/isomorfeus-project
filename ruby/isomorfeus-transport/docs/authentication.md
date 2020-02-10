@@ -15,7 +15,8 @@ A class representing a user should be a LucidNode and include LucidAuthenticatio
 ```ruby
 class User < LucidGenericDocument::Base
   include LucidAuthentication::Mixin
-  authentication do |user:, pass:|
+
+  execute_login do |user:, pass:|
     # should return either a User instance or a Promise which resolves to a User instance
     # The returned instance must be instance of a LucidData class  
   end

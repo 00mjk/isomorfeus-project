@@ -64,8 +64,8 @@ module LucidAuthentication
         Isomorfeus.add_valid_user_class(base)
 
         base.instance_exec do
-          def authentication(&block)
-            @authentication_block = block
+          def execute_login(&block)
+            @execute_login_block = block
           end
 
           def promise_login(user: nil, pass: nil, scheme: :isomorfeus)
@@ -73,7 +73,7 @@ module LucidAuthentication
           end
 
           def promise_authentication_with_isomorfeus(user: nil, pass: nil)
-            promise_or_user = @authentication_block.call(user: user, pass: pass)
+            promise_or_user = @execute_login_block.call(user: user, pass: pass)
             if promise_or_user.class == Promise
               promise_or_user
             else
