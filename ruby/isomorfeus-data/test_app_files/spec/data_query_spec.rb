@@ -7,7 +7,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryBase < LucidData::Query::Base
           prop :test_prop
 
-          execute_query do |props:|
+          execute_query do
           end
         end
         TestQueryBase.to_s.split('::').last
@@ -21,7 +21,7 @@ RSpec.describe 'LucidData::Query' do
           include LucidData::Query::Mixin
           prop :test_prop
 
-          execute_query do |props:|
+          execute_query do
           end
         end
         TestQueryMixin.to_s.split('::').last
@@ -37,11 +37,11 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
-        query_result = TestQueryMixinC.execute(props: { test_prop: 'testing' })
+        query_result = TestQueryMixinC.execute(test_prop: 'testing')
         query_result.node.test
       end
       expect(result).to eq('testing')
@@ -52,12 +52,12 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
         begin
-          query_result = TestQueryMixinC.execute(props: { test_prop: 1 })
+          query_result = TestQueryMixinC.execute(test_prop: 1)
           query_result.node.test
         rescue
           'exception thrown'
@@ -71,12 +71,12 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
         begin
-          query_result = TestQueryMixinC.execute(props: {})
+          query_result = TestQueryMixinC.execute()
           query_result.node.test
         rescue
           'exception thrown'
@@ -93,11 +93,11 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
-        query_result = TestQueryMixinC.execute(props: { test_prop: ['test_value'] })
+        query_result = TestQueryMixinC.execute(test_prop: ['test_value'])
         query_result.node.test.class.name
       end
       expect(result).to eq('Array')
@@ -108,12 +108,12 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
         begin
-          query_result = TestQueryMixinC.execute(props: { test_prop: 10 })
+          query_result = TestQueryMixinC.execute(test_prop: 10)
           query_result.node.test.class.name
         rescue
           'exception thrown'
@@ -127,12 +127,12 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
         begin
-          query_result = TestQueryMixinC.execute(props: {})
+          query_result = TestQueryMixinC.execute()
           query_result.node.test.class.name
         rescue
           'exception thrown'
@@ -149,11 +149,11 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
-        query_result = TestQueryMixinC.execute(props: { test_prop: 123 })
+        query_result = TestQueryMixinC.execute( test_prop: 123 )
         query_result.instance_variable_set(:@key, '1')
         query_result.to_transport
       end
@@ -186,7 +186,7 @@ RSpec.describe 'LucidData::Query' do
 
     it 'can execute a simple query' do
       result = on_server do
-        query_result = SimpleQuery.execute(props: {simple_prop: 'simple_text'})
+        query_result = SimpleQuery.execute(simple_prop: 'simple_text')
         query_result.node.one
       end
       expect(result).to eq('simple_text')
@@ -203,7 +203,7 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryBase < LucidData::Query::Base
           prop :test_prop
 
-          execute_query do |props:|
+          execute_query do
           end
         end
         TestQueryBase.to_s.split('::').last
@@ -217,7 +217,7 @@ RSpec.describe 'LucidData::Query' do
           include LucidData::Query::Mixin
           prop :test_prop
 
-          execute_query do |props:|
+          execute_query do
           end
         end
         TestQueryMixin.to_s.split('::').last
@@ -233,11 +233,11 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
-        query_result = TestQueryMixinC.execute(props: { test_prop: 'testing' })
+        query_result = TestQueryMixinC.execute( test_prop: 'testing' )
         query_result.class.to_s
       end
       expect(result).to eq('LucidData::QueryResult')
@@ -248,12 +248,12 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
         begin
-          query_result = TestQueryMixinC.execute(props: { test_prop: 1 })
+          query_result = TestQueryMixinC.execute( test_prop: 1 )
           query_result.class.to_s
         rescue
           'exception thrown'
@@ -267,12 +267,12 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, class: String, required: true
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
         begin
-          query_result = TestQueryMixinC.execute(props: {})
+          query_result = TestQueryMixinC.execute()
           query_result.class.to_s
         rescue
           'exception thrown'
@@ -289,11 +289,11 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
-        query_result = TestQueryMixinC.execute(props: { test_prop: ['test_value'] })
+        query_result = TestQueryMixinC.execute( test_prop: ['test_value'] )
         query_result.class.to_s
       end
       expect(result).to eq('LucidData::QueryResult')
@@ -304,12 +304,12 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
         begin
-          query_result = TestQueryMixinC.execute(props: { test_prop: 10 })
+          query_result = TestQueryMixinC.execute( test_prop: 10 )
           query_result.class.to_s
         rescue
           'exception thrown'
@@ -323,12 +323,12 @@ RSpec.describe 'LucidData::Query' do
         class TestQueryMixinC < LucidData::Query::Base
           prop :test_prop, is_a: Enumerable, required: true
 
-          execute_query do |props:|
+          execute_query do
             { node: TestNode.new(key: 1, attributes: { test: props.test_prop }) }
           end
         end
         begin
-          query_result = TestQueryMixinC.execute(props: {})
+          query_result = TestQueryMixinC.execute()
           query_result.class.to_s
         rescue
           'exception thrown'
@@ -363,7 +363,7 @@ RSpec.describe 'LucidData::Query' do
 
     it 'can execute a simple query' do
       result = @doc.await_ruby do
-        SimpleQuery.promise_execute(props: {simple_prop: 'simple_text'}).then do |query_result|
+        SimpleQuery.promise_execute(simple_prop: 'simple_text').then do |query_result|
           query_result.node.one
         end
       end

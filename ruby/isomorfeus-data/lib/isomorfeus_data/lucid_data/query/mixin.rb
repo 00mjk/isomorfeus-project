@@ -53,27 +53,22 @@ module LucidData
 
             def execute(**props)
               query_result_instance_key = props.delete(:query_result_instance_key)
-              props = validated_props(props)
-              @props = LucidProps.new(props)
               query_result = LucidData::QueryResult.new(key: query_result_instance_key)
-              query_result.result_set = instance_exec(&@_query_block)
+              query_result.result_set = self.new(**props).instance_exec(&@_query_block)
               query_result
             end
 
             def execute_query(&block)
               @_query_block = block
             end
-
-            def current_user
-              Isomorfeus.current_user
-            end
-
-            def pub_sub_client
-              Isomorfeus.pub_sub_client
-            end
           end
 
-          attr_accessor :props
+          attr_reader :props
+
+          def initialize(**props_hash)
+            props_hash = self.class.validated_props(props_hash)
+            @props = LucidProps.new(props_hash)
+          end
 
           def current_user
             Isomorfeus.current_user

@@ -83,8 +83,7 @@ module Isomorfeus
           # 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props_json
           props = response_agent.request[type_class_name]['execute']
           props.transform_keys!(&:to_sym)
-          props[:props].transform_keys!(&:to_sym)
-          if Isomorfeus.current_user.authorized?(type_class, :execute, props[:props])
+          if Isomorfeus.current_user.authorized?(type_class, :execute, props)
             queried_type = type_class.execute(**props)
             if queried_type
               response_agent.outer_result = {} unless response_agent.outer_result
