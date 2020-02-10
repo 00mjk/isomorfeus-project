@@ -19,6 +19,7 @@ module Isomorfeus
   else
     class << self
       attr_accessor :api_websocket_path
+      attr_accessor :session_store
 
       def add_middleware(middleware)
         Isomorfeus.middlewares << middleware
@@ -130,6 +131,8 @@ module Isomorfeus
         Thread.current[:isomorfeus_pub_sub_client]
       end
     end
+
+    self.session_store = Isomorfeus::Transport::ThreadSessionStore.new # dont use this one, but we keep it here to have at least something
   end
 
   # defaults

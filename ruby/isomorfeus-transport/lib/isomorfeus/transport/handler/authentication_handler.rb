@@ -42,12 +42,13 @@ module Isomorfeus
               end
             elsif login_or_logout == 'logout'
               begin
-
+                # bogus
+                session_cookie = nil
               ensure
                 Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_user, nil)
                 Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
                 Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, nil)
-                Isomorfeus.session_store.remove(cookie: session_cookie, user: user)
+                Isomorfeus.session_store.remove(cookie: session_cookie)
                 response_agent.agent_result = { success: 'ok' }
               end
             end

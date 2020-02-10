@@ -24,6 +24,7 @@ else
   require 'active_support'
   require 'iodine'
   require 'roda'
+  require 'isomorfeus/transport/thread_session_store'
   require 'isomorfeus/config'
   require 'isomorfeus/promise'
   require 'isomorfeus/transport/version'
