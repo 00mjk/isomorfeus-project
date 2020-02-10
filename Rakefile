@@ -70,7 +70,7 @@ task :push_ruby_packages do
 end
 
 task :push_ruby_packages_to_rubygems do
-  %w[data i18n operation policy transport].each do |mod|
+  %w[data i18n mailer operation policy transport].each do |mod|
     puts "Publishing to rubygems"
     system("gem push ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
   end
@@ -79,7 +79,7 @@ end
 
 task :push_ruby_packages_to_github do
   puts "Publishing to github"
-  %w[data i18n operation policy transport].each do |mod|
+  %w[data i18n mailer operation policy transport].each do |mod|
     system("gem push --key github --host https://rubygems.pkg.github.com/isomorfeus ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
   end
   system("gem push --key github --host https://rubygems.pkg.github.com/isomorfeus ruby/isomorfeus/isomorfeus-#{VERSION}.gem")
@@ -87,7 +87,7 @@ end
 
 task :push_ruby_packages_to_isomorfeus do
   puts "Publishing to isomorfeus"
-  %w[data i18n operation policy transport].each do |mod|
+  %w[data i18n mailer operation policy transport].each do |mod|
     system("scp ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem iso:~/gems/")
     system("ssh iso \"bash -l -c 'gem inabox gems/isomorfeus-#{mod}-#{VERSION}.gem --host http://localhost:5555/'\"")
   end
