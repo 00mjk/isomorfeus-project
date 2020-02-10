@@ -17,8 +17,10 @@ class User < LucidGenericDocument::Base
   include LucidAuthentication::Mixin
 
   execute_login do |user:, pass:|
-    # should return either a User instance or a Promise which resolves to a User instance
-    # The returned instance must be instance of a LucidData class  
+    if RUBY_ENGINE != 'opal' # guard to prevent inclusion of code client side to keep asset size low
+      # should return either a User instance or a Promise which resolves to a User instance
+      # The returned instance must be instance of a LucidData class  
+    end 
   end
 end
 ```
