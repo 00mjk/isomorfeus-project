@@ -23,7 +23,6 @@ else
   require 'websocket/driver'
   require 'active_support'
   require 'iodine'
-  require 'roda'
   require 'isomorfeus/transport/thread_session_store'
   require 'isomorfeus/config'
   require 'isomorfeus/promise'
