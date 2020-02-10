@@ -18,6 +18,7 @@ All configuration options of Mailhandler can be passed in the hash. For Mailhand
 
 Within a isomorfeus project components for building emails are the app/mail_components directory.
 When using LucidComponent or LucidMaterial::Component the main component passed to the mail must be either a LucidApp or LucidMaterial::App component.
+Each mail template build of components can be considered a tiny App.
 
 One class is provided to actually build and send the mail: LucidMail. This class is only available on the server.
 
