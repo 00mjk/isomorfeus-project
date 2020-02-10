@@ -106,7 +106,7 @@ module Isomorfeus
 
         def create
           previous_key = self.key
-          instance = instance_exec(&@_create_block)
+          instance = instance_exec(&self.class.instance_variable_get(:@_create_block))
           return nil unless instance
           Isomorfeus.raise_error(message: "#{self.to_s}: execute_create must return self or nil. Returned was: #{instance.class}.") if instance != self
           instance_variable_set(:@previous_key, previous_key) if key != previous_key
@@ -121,7 +121,7 @@ module Isomorfeus
 
         def save
           previous_key = self.key
-          instance = instance_exec(&@_save_block)
+          instance = instance_exec(&self.class.instance_variable_get(:@_save_block))
           return nil unless instance
           Isomorfeus.raise_error(message: "#{self.to_s}: execute_save must return self or nil. Returned was: #{instance.class}.") if instance != self
           instance_variable_set(:@previous_key, previous_key) if key != previous_key
