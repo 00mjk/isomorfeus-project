@@ -21,7 +21,6 @@ class LucidMail
   end
 
   def render_component
-    STDERR.puts "props: #{props.to_h}"
     rendered_tree = mount_static_component(props.component, props.props, 'mail_components.js')
     @rendered_component = <<~HTML
     <!DOCTYPE html>
