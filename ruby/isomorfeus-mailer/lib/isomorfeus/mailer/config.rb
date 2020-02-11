@@ -13,8 +13,8 @@ module Isomorfeus
 
       def email_sender
         @email_sender ||= MailHandler.sender(Isomorfeus.email_sender_config[:type]) do |dispatcher|
-          Isomorfeus.email_sender_config.each do |key,value|
-            dispatcher.send("#{key}=".to_sym, value)
+          Isomorfeus.email_sender_config.each do |key, value|
+            dispatcher.__send__("#{key}=".to_sym, value) unless key == :type
           end
         end
       end
