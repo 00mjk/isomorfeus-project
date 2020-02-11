@@ -1,10 +1,7 @@
 module Isomorfeus
   # available settings
   class << self
-    if RUBY_ENGINE == 'opal'
-      # nothing
-    else
-
+    if RUBY_ENGINE != 'opal'
       def email_sender_config
         @email_sender_config ||= { type: :smtp }
       end
