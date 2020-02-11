@@ -17,6 +17,7 @@ if RUBY_ENGINE == 'opal'
 else
   require 'base64'
   require 'digest'
+  require 'bcrypt'
   require 'ostruct'
   require 'socket'
   require 'oj'
