@@ -45,6 +45,22 @@ mail = LucidMail.new(component: 'EmailComponent',
                      subject: 'Welcome')
 mail.send
 ```
+#### Inspecting the rendered component
+
+The generated HTML is accessible after building the mail using:
+```ruby
+mail.build
+html = mail.rendered_component
+```
+
+#### Accessing the mail before sending
+
+It is possible to access the actual mail object after building it for further inspection or modification:  
+```ruby
+mail.build
+mail_object = mail.mail
+```
+For documentation about the Mail Object see the [Mail Documentation](https://github.com/mikel/mail).
 
 #### Triggering mail from a client
 LucidMail is available only on the server. It can be wrapped in a operation to allow triggering the sending of mail from a client. Example:
