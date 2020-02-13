@@ -11,7 +11,7 @@ module LucidAuthentication
           end
 
           def promise_login(user: nil, pass: nil, scheme: :isomorfeus, &block)
-            send("promise_authentication_with_#{scheme}",user: user, pass: pass, &block)
+            send("promise_authentication_with_#{scheme}", user: user, pass: pass, &block)
           end
 
           def promise_authentication_with_isomorfeus(user: nil, pass: nil, &block)
