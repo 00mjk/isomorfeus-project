@@ -39,7 +39,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
   end
 
   context 'on client' do
-    before :all do
+    before :each do
       @doc = visit('/')
     end
 
@@ -54,20 +54,14 @@ RSpec.describe 'LucidAuthentication::Mixin' do
       expect(result).to include('LucidAuthentication::Mixin')
     end
 
-    it 'can authenticate successfully' do
-      result = @doc.await_ruby do
-        SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pass').then do |user|
-          user.key
-        end
-      end
-      expect(result).to eq('123')
-    end
-
     it 'can authenticate successfully and current_user is available' do
-      result = @doc.await_ruby do
-        SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pass').then do |user|
-          Isomorfeus.current_user.key
-        end
+      @doc.evaluate_ruby do
+        SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pass')
+      end
+      sleep 10 # wait for page redirect
+      @doc.visit('/') # make sure we get proper execution context, so load page again
+      result = @doc.evaluate_ruby do
+        Isomorfeus.current_user.key
       end
       expect(result).to eq('123')
     end
