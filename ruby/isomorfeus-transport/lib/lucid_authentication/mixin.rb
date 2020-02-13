@@ -10,11 +10,11 @@ module LucidAuthentication
           def execute_login(&block)
           end
 
-          def promise_login(user: nil, pass: nil, scheme: :isomorfeus)
-              send("promise_authentication_with_#{scheme}",user: user, pass: pass)
+          def promise_login(user: nil, pass: nil, scheme: :isomorfeus, &block)
+            send("promise_authentication_with_#{scheme}",user: user, pass: pass, &block)
           end
 
-          def promise_authentication_with_isomorfeus(user: nil, pass: nil)
+          def promise_authentication_with_isomorfeus(user: nil, pass: nil, &block)
             if Isomorfeus.production?
               Isomorfeus.raise_error(message: "Connection not secure, can't login") unless Isomorfeus::Transport.socket.url.start_with?('wss:')
             else
@@ -29,12 +29,19 @@ module LucidAuthentication
                   Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.response[:data])
                   class_name = agent.response[:data].keys.first
                   key = agent.response[:data][class_name].keys.first
-
-                  # TODO set session cookie
-                  # agent.response[:session_cookie]
                   logged_in_user = Isomorfeus.cached_data_class(class_name).new(key: key)
-                  Isomorfeus.set_current_user(logged_in_user)
-                  agent.result = logged_in_user
+                  cookie_accessor = agent.response[:session_cookie_accessor]
+                  begin
+                    target = if block_given?
+                               block.call(logged_in_user)
+                             else
+                               `window.location.pathname`
+                             end
+                  rescue
+                    target = `window.location.pathname`
+                  end
+                  cookie_query = "#{Isomorfeus.cookie_eater_path}?#{cookie_accessor}=#{target}"
+                  `window.location = cookie_query` # doing page load and redirect
                 else
                   error = agent.response[:error]
                   `console.err(error)` if error
@@ -52,9 +59,9 @@ module LucidAuthentication
 
       def promise_deauthentication_with_isomorfeus
         Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'logout', 'logout').then do |agent|
-          # TODO unset session cookie
-          # agent.response[:session_cookie]
+          `document.cookie = "session="`
           Isomorfeus.set_current_user(nil)
+          Isomorfeus.force_init_store!
           agent.processed = true
           agent.response.key?(:success) ? true : raise('Logout failed!')
         end

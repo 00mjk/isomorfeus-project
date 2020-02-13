@@ -45,10 +45,8 @@ module Isomorfeus
       end
 
       def user(client)
-        # TODO get session cooke and load user from session
         current_user = client.instance_variable_get(:@isomorfeus_user)
         return current_user if current_user
-        # TODO get session cooke and load user from session
         Anonymous.new
       end
     end
