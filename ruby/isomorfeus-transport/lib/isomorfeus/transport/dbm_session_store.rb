@@ -17,7 +17,7 @@ module Isomorfeus
           cookie = dbm[accessor]
           if cookie
             session_info = cookie.split('; ').first
-            session_id = session_info.split('=').strip
+            session_id = session_info.split('=').last.strip
             dbm["eaten_#{accessor}"] = session_id
             dbm.delete(accessor)
           else
