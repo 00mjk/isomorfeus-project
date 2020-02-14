@@ -41,7 +41,7 @@ module Isomorfeus
 
         def process_create(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :create, data_hash
-          data = response_agent.request[type_class_name]['save']
+          data = response_agent.request[type_class_name]['create']
           instance_data = data['instance']
           included_items_data = data.key?('included_items') ? data['included_items'] : nil
           if Isomorfeus.current_user.authorized?(type_class, :create, data)
