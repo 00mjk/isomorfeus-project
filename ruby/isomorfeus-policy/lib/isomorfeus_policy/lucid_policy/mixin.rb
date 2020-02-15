@@ -7,74 +7,75 @@ module LucidPolicy
         end
 
         def authorization_rules
-          @authorization_rules ||= { classes: {}, conditions: [], others: :deny }
+          @authorization_rules ||= { rules: {}.dup, policies: {}.dup, others: :deny }.dup
         end
 
         def all
           :others
         end
 
-        def allow(*classes_and_methods)
-          _raise_allow_deny_first if @refine_used
-          @allow_deny_used = true
-          _allow_or_deny(:allow, *classes_and_methods)
+        def allow(*classes_and_methods_and_options)
+          _allow_or_deny(:allow, *classes_and_methods_and_options)
         end
 
-        def deny(*classes_and_methods)
-          _raise_allow_deny_first if @refine_used
-          @allow_deny_used = true
-          _allow_or_deny(:deny, *classes_and_methods)
+        def deny(*classes_and_methods_and_options)
+          _allow_or_deny(:deny, *classes_and_methods_and_options)
         end
 
         def others
           :others
         end
 
-        def refine(*classes_and_methods, &block)
-          _raise_allow_deny_first unless @allow_deny_used
-          @refine_used = true
-          _allow_or_deny(nil, *classes_and_methods, &block)
+        def rule(*classes_and_methods, &block)
+          _allow_or_deny(:rule, *classes_and_methods, &block)
         end
 
-        def with_condition(&block)
-          authorization_rules[:conditions] << block
+        def combine_with(policy_class, **options)
+          authorization_rules[:policies] = { policy_class => options }
         end
 
         private
 
-        def _raise_allow_deny_first
-          Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{self}: 'allow' or 'deny' must appear before 'refine'")
-        end
+        def _allow_or_deny(thing, *classes_methods_options, &block)
+          rules = authorization_rules
 
-        def _allow_or_deny(allow_or_deny, *classes_and_methods, &block)
-          rules              = authorization_rules
-          allow_or_deny_or_block = block_given? ? block : allow_or_deny.to_sym
-
-          target_classes = []
-          target_methods = []
-
-          if classes_and_methods.first == :others
-            rules[:others] = allow_or_deny_or_block
+          if %i[allow deny].include?(thing) && classes_methods_options.first == :others
+            rules[:others] = thing
             return
           end
 
-          classes_and_methods.each do |class_or_method|
-            if (class_or_method.class == String || class_or_method.class == Symbol) && class_or_method.to_s[0].downcase == class_or_method.to_s[0]
-              target_methods << class_or_method.to_sym
+          target_classes = []
+          target_methods = []
+          target_options = {}
+
+          classes_methods_options.each do |class_method_option|
+            if class_method_option.class == Hash
+              target_options = class_method_option
             else
-              target_classes << class_or_method
+              class_or_method_s = class_method_option.to_s
+              if class_method_option.class == Symbol && class_or_method_s[0].downcase == class_or_method_s[0]
+                target_methods << class_method_option
+              else
+                class_method_option = class_method_option.to_s unless class_method_option.class == String
+                target_classes << class_method_option
+              end
             end
           end
 
+          thing_or_block = block_given? ? block : thing
+
           target_classes.each do |target_class|
-            rules[:classes][target_class] = {} unless rules[:classes].key?(target_class)
-            if allow_or_deny && target_methods.empty?
-              rules[:classes][target_class][:default] = allow_or_deny_or_block
+            rules[:rules][target_class] = {} unless rules[:rules].key?(target_class)
+
+            if target_methods.empty?
+              rules[:rules][target_class][:rule] = thing_or_block
+              rules[:rules][target_class][:options] = target_options unless target_options.empty?
             else
-              rules[:classes][target_class][:default] = :deny unless rules[:classes][target_class].key?(:default)
-              rules[:classes][target_class][:methods] = {} unless rules[:classes][target_class].key?(:methods)
+              rules[:rules][target_class][:rule] = :deny unless rules[:rules][target_class].key?(:rule)
+              rules[:rules][target_class][:methods] = {} unless rules[:rules][target_class].key?(:methods)
               target_methods.each do |target_method|
-                rules[:classes][target_class][:methods][target_method] = allow_or_deny_or_block
+                rules[:rules][target_class][:methods][target_method] = { rule: thing_or_block }
+                rules[:rules][target_class][:methods][target_method][:options] = target_options unless target_options.empty?
               end
             end
           end
@@ -87,35 +88,50 @@ module LucidPolicy
 
       def authorized?(target_class, target_method = nil, props = nil)
         Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{self}: At least the class must be given!") unless target_class
-        result = :deny
 
-        rules = self.class.authorization_rules
+        target_class = target_class.to_s unless target_class.class == String
 
-        props = LucidProps.new(props) unless props.class == LucidProps
+        rules  =  self.class.authorization_rules
 
-        condition_result = true
-        rules[:conditions].each do |condition|
-          condition_result = condition.call(@object, target_class, target_method, props, &condition)
-          break unless condition_result == true
-        end
+        result =  if rules[:rules].key?(target_class)
+                    if target_method && rules[:rules][target_class].key?(:methods) && rules[:rules][target_class][:methods].key?(target_method)
+                      options = rules[:rules][target_class][:methods][target_method][:options]
+                      rule = rules[:rules][target_class][:methods][target_method][:rule]
+                    else
+                      options = rules[:rules][target_class][:options]
+                      rule = rules[:rules][target_class][:rule]
+                    end
 
-        if condition_result == true
-          result = if rules[:classes].key?(target_class)
-                     if target_method && rules[:classes][target_class].key?(:methods) &&
-                       rules[:classes][target_class][:methods].key?(target_method)
-                       rules[:classes][target_class][:methods][target_method]
-                     else
-                       rules[:classes][target_class][:default]
-                     end
-                   else
-                     rules[:others]
-                   end
+                    if rule.class == Symbol
+                      if options
+                        condition, method_result = __get_condition_and_result(options)
+                        rule if (condition == :if && method_result == true) || (condition == :if_not && method_result == false)
+                      else
+                        rule
+                      end
+                    else
+                      props = LucidProps.new(props) unless props.class == LucidProps
+                      policy_helper = LucidPolicy::Helper.new
+                      policy_helper.instance_exec(@object, target_class, target_method, props, &rule)
+                      policy_helper.result
+                    end
+                  else
+                    rules[:others]
+                  end
 
-          if result.class == Proc
-            policy_helper = LucidPolicy::Helper.new
-            policy_helper.instance_exec(@object, target_class, target_method, props, &result)
-            result = policy_helper.result
+        return true if result == :allow
+
+        rules[:policies].each do |policy_class, options|
+          combined_policy_result = nil
+          if options.empty?
+            combined_policy_result = policy_class.new(@object).authorized?(target_class, target_method, props)
+          else
+            condition, method_result = __get_condition_and_result(options)
+            if (condition == :if && method_result == true) || (condition == :if_not && method_result == false)
+              combined_policy_result = policy_class.new(@object).authorized?(target_class, target_method, props)
+            end
           end
+          return true if combined_policy_result == true
         end
 
         result == :allow ? true : false
@@ -124,6 +140,29 @@ module LucidPolicy
       def authorized!(target_class, target_method = nil, props = nil)
         return true if authorized?(target_class, target_method, props)
         Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{@object}: not authorized to call #{target_class}.#{target_method}(#{props})!")
+      end
+
+      private
+
+      def __get_condition_and_result(options)
+        condition = nil
+        method_name_or_block = if options.key?(:if)
+                                 condition = :if
+                                 options[:if]
+                               elsif options.key?(:if_not)
+                                 condition = :if_not
+                                 options[:if_not]
+                               elsif options.key?(:unless)
+                                 condition = :if_not
+                                 options[:unless]
+                               end
+        method_result = if method_name_or_block && method_name_or_block.class == Symbol
+                          @object.__send__(method_name_or_block)
+                        else
+                          props = LucidProps.new(props) unless props.class == LucidProps
+                          method_name_or_block.call(@object, props)
+                        end
+        [condition, method_result]
       end
     end
   end
