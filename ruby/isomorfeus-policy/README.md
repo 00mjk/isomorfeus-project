@@ -60,14 +60,14 @@ class MyUserPolicy < LucidPolicy::Base
     
   # further conditions can be used
   allow BlaBlaGraph, :member_feature, only_if: :registered?
-    # this will call the method registered? on the instance. The method must return a boolean.  
+    # this will call the method registered? on the user instance. The method must return a boolean.  
     # permission is granted if the method returned true
     # method name must be given as symbol 
     # other versions: 
     allow BlaBlaGraph, :member_feature, if: :registered?
     
   allow BlaBlaGraph, :public_feature, only_if_not: :registered? 
-    # this will call the method registered? on the instance. The method must return a boolean.  
+    # this will call the method registered? on the user instance. The method must return a boolean.  
     # permission is granted if the method returned false
     # method name must be given as symbol
     # other versions: 
@@ -135,12 +135,12 @@ class MyUserPolicy < LucidPolicy::Base
 
   # conditions as for allow and deny can be used too
   combine_with AdminRolePolicy, if: :admin?
-    # this will call the method registered? on the instance. The method must return a boolean.  
+    # this will call the method admin? on the user instance. The method must return a boolean.  
     # this will execute the AdminRolePolicy rules only if the method returned true
     # method name must be given as symbol 
  
   combine_with AdminRolePolicy, if_not: :normal_guy? 
-    # this will call the method registered? on the instance. The method must return a boolean.  
+    # this will call the method normal_guy?? on the user instance. The method must return a boolean.  
     # this will execute the AdminRolePolicy rules only if the method returned false
     # method name must be given as symbol
     # other versions: 
