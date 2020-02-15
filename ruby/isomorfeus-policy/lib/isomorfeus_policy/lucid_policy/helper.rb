@@ -3,16 +3,15 @@ module LucidPolicy
     attr_reader :result
 
     def initialize
-      @result= nil
+      @result = :deny
     end
 
     def allow
-      @result = :allow if @result.nil?
+      @result = :allow
       nil
     end
 
     def deny
-      @result = :deny if @result.nil?
       nil
     end
   end
