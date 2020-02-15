@@ -22,9 +22,9 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to include("LucidPolicy::Base")
     end
 
-    it 'can use policy_for and deny authorization' do
+    it 'can use policy and by default deny authorization' do
       result = on_server do
-        class UserA
+        class ::UserA
           include LucidAuthorization::Mixin
         end
         class Resource
@@ -36,7 +36,7 @@ RSpec.describe 'LucidPolicy' do
             true
           end
         end
-        class UserAPolicy < LucidPolicy::Base
+        class ::UserAPolicy < LucidPolicy::Base
         end
         result_for_class  = UserA.new.authorized?(Resource)
         result_for_method = UserA.new.authorized?(Resource, :run_denied)
@@ -45,9 +45,9 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([false, false])
     end
 
-    it 'can use policy_for and allow for class and any method' do
+    it 'can use policy and allow for class and any method' do
       result = on_server do
-        class UserB
+        class ::UserB
           include LucidAuthorization::Mixin
         end
         class Resource
@@ -62,17 +62,17 @@ RSpec.describe 'LucidPolicy' do
         class ::UserBPolicy < LucidPolicy::Base
           allow Resource
         end
-        result_for_class    = UserB.new.authorized?(Resource)
-        result_for_a_method = UserB.new.authorized?(Resource, :run_allowed)
-        result_for_d_method = UserB.new.authorized?(Resource, :run_denied)
+        result_for_class    = UserB.new.authorized!(Resource)
+        result_for_a_method = UserB.new.authorized!(Resource, :run_allowed)
+        result_for_d_method = UserB.new.authorized!(Resource, :run_denied)
         [result_for_class, result_for_a_method, result_for_d_method]
       end
       expect(result).to eq([true, true, true])
     end
 
-    it 'can use policy_for and deny for class and a specified method' do
+    it 'can use policy and deny for class and a specified method' do
       result = on_server do
-        class UserC
+        class ::UserC
           include LucidAuthorization::Mixin
         end
         class Resource
@@ -96,9 +96,9 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([false, true, false])
     end
 
-    it 'can use policy_for and deny for class and a specified method and allow for others' do
+    it 'can use policy and deny for class and a specified method and allow for others' do
       result = on_server do
-        class UserD
+        class ::UserD
           include LucidAuthorization::Mixin
         end
         class Resource
@@ -129,11 +129,11 @@ RSpec.describe 'LucidPolicy' do
 
     it 'can use a policy with a condition that denies' do
       result = on_server do
-        class UserF
+        class ::UserF
           include LucidAuthorization::Mixin
 
           def validated?
-            false
+            true
           end
         end
         class Resource
@@ -145,11 +145,8 @@ RSpec.describe 'LucidPolicy' do
             true
           end
         end
-        class UserFPolicy < LucidPolicy::Base
-          allow Resource
-          with_condition do |user, resource_class, resource_method|
-            user.validated?
-          end
+        class ::UserFPolicy < LucidPolicy::Base
+          allow Resource, unless: proc { |user| user.validated? }
         end
         result_for_class    = UserF.new.authorized?(Resource)
         result_for_a_method = UserF.new.authorized?(Resource, :run_allowed)
@@ -159,9 +156,9 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([false, false, false])
     end
 
-    it 'can use a policy with a condition that allows' do
+    it 'can use a policy with a condition that allows as proc' do
       result = on_server do
-        class UserG
+        class ::UserG
           include LucidAuthorization::Mixin
 
           def validated?
@@ -178,10 +175,7 @@ RSpec.describe 'LucidPolicy' do
           end
         end
         class ::UserGPolicy < LucidPolicy::Base
-          allow Resource
-          with_condition do |user, resource_class, resource_method|
-            user.validated?
-          end
+          allow Resource, if: proc { |user| user.validated? }
         end
         result_for_class    = UserG.new.authorized?(Resource)
         result_for_a_method = UserG.new.authorized?(Resource, :run_allowed)
@@ -191,9 +185,38 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([true, true, true])
     end
 
-    it 'can use a policy and refine a rule and allows' do
+    it 'can use a policy with a condition that allows as symbol' do
       result = on_server do
-        class UserH
+        class ::UserG
+          include LucidAuthorization::Mixin
+
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class ::UserGPolicy < LucidPolicy::Base
+          allow Resource, if: :validated?
+        end
+        result_for_class    = UserG.new.authorized?(Resource)
+        result_for_a_method = UserG.new.authorized?(Resource, :run_allowed)
+        result_for_d_method = UserG.new.authorized?(Resource, :run_denied)
+        [result_for_class, result_for_a_method, result_for_d_method]
+      end
+      expect(result).to eq([true, true, true])
+    end
+
+    it 'can use a policy and define a custom rule that allows' do
+      result = on_server do
+        class ::UserH
           include LucidAuthorization::Mixin
 
           def validated?
@@ -210,8 +233,7 @@ RSpec.describe 'LucidPolicy' do
           end
         end
         class ::UserHPolicy < LucidPolicy::Base
-          deny Resource
-          refine Resource, :run_allowed do |user, target_class, target_method|
+          rule Resource, :run_allowed do |user, target_class, target_method|
             allow if user.validated?
             deny
           end
@@ -224,13 +246,13 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([false, true, false])
     end
 
-    it 'can use a policy and refine a rule and denies' do
+    it 'can use a policy and define a custom rule that denies' do
       result = on_server do
-        class UserI
+        class ::UserI
           include LucidAuthorization::Mixin
 
           def validated?
-            false
+            true
           end
         end
         class Resource
@@ -243,9 +265,8 @@ RSpec.describe 'LucidPolicy' do
           end
         end
         class ::UserIPolicy < LucidPolicy::Base
-          allow Resource
-          refine Resource, :run_denied do |user, target_class, target_method|
-            allow if user.validated?
+          rule Resource, :run_allowed do |user, target_class, target_method|
+            allow unless user.validated?
             deny
           end
         end
@@ -254,7 +275,73 @@ RSpec.describe 'LucidPolicy' do
         result_for_d_method = UserI.new.authorized?(Resource, :run_denied)
         [result_for_class, result_for_a_method, result_for_d_method]
       end
+      expect(result).to eq([false, false, false])
+    end
+
+    it 'can use a policy and refine a rule with a custom rule that denies' do
+      result = on_server do
+        class ::UserJ
+          include LucidAuthorization::Mixin
+
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class ::UserJPolicy < LucidPolicy::Base
+          allow Resource
+          rule Resource, :run_denied do |user, target_class, target_method|
+            allow unless user.validated?
+            deny
+          end
+        end
+        result_for_class    = UserJ.new.authorized?(Resource)
+        result_for_a_method = UserJ.new.authorized?(Resource, :run_allowed)
+        result_for_d_method = UserJ.new.authorized?(Resource, :run_denied)
+        [result_for_class, result_for_a_method, result_for_d_method]
+      end
       expect(result).to eq([true, true, false])
+    end
+
+    it 'can combine Policies that allow' do
+      result = on_server do
+        class ::UserK
+          include LucidAuthorization::Mixin
+
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class CombiAPolicy < LucidPolicy::Base
+          allow Resource
+        end
+        class ::UserKPolicy < LucidPolicy::Base
+          combine_with CombiAPolicy
+          deny others
+        end
+        result_for_class    = UserK.new.authorized?(Resource)
+        result_for_a_method = UserK.new.authorized?(Resource, :run_allowed)
+        result_for_d_method = UserK.new.authorized?(Resource, :run_denied)
+        [result_for_class, result_for_a_method, result_for_d_method]
+      end
+      expect(result).to eq([true, true, true])
     end
   end
 
@@ -283,7 +370,30 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to include("LucidPolicy::Base")
     end
 
-    it 'can use policy_for and allow for class and any method' do
+    it 'can use policy and by default deny authorization' do
+      result = @doc.evaluate_ruby do
+        class UserA
+          include LucidAuthorization::Mixin
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class UserAPolicy < LucidPolicy::Base
+        end
+        result_for_class  = UserA.new.authorized?(Resource)
+        result_for_method = UserA.new.authorized?(Resource, :run_denied)
+        [result_for_class, result_for_method]
+      end
+      expect(result).to eq([false, false])
+    end
+
+    it 'can use policy and allow for class and any method' do
       result = @doc.evaluate_ruby do
         class UserB
           include LucidAuthorization::Mixin
@@ -308,7 +418,7 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([true, true, true])
     end
 
-    it 'can use policy_for and deny for class and a specified method' do
+    it 'can use policy and deny for class and a specified method' do
       result = @doc.evaluate_ruby do
         class UserC
           include LucidAuthorization::Mixin
@@ -334,7 +444,7 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([false, true, false])
     end
 
-    it 'can use policy_for and deny for class and a specified method and allow for others' do
+    it 'can use policy and deny for class and a specified method and allow for others' do
       result = @doc.evaluate_ruby do
         class UserD
           include LucidAuthorization::Mixin
@@ -371,7 +481,7 @@ RSpec.describe 'LucidPolicy' do
           include LucidAuthorization::Mixin
 
           def validated?
-            false
+            true
           end
         end
         class Resource
@@ -384,10 +494,7 @@ RSpec.describe 'LucidPolicy' do
           end
         end
         class UserFPolicy < LucidPolicy::Base
-          allow Resource
-          with_condition do |user, resource_class, resource_method|
-            user.validated?
-          end
+          allow Resource, unless: proc { |user| user.validated? }
         end
         result_for_class    = UserF.new.authorized?(Resource)
         result_for_a_method = UserF.new.authorized?(Resource, :run_allowed)
@@ -397,7 +504,7 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([false, false, false])
     end
 
-    it 'can use a policy with a condition that allows' do
+    it 'can use a policy with a condition that allows as proc' do
       result = @doc.evaluate_ruby do
         class UserG
           include LucidAuthorization::Mixin
@@ -416,10 +523,7 @@ RSpec.describe 'LucidPolicy' do
           end
         end
         class UserGPolicy < LucidPolicy::Base
-          allow Resource
-          with_condition do |user, resource_class, resource_method|
-            user.validated?
-          end
+          allow Resource, if: proc { |user| user.validated? }
         end
         result_for_class    = UserG.new.authorized?(Resource)
         result_for_a_method = UserG.new.authorized?(Resource, :run_allowed)
@@ -429,7 +533,36 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([true, true, true])
     end
 
-    it 'can use a policy and refine a rule and allows' do
+    it 'can use a policy with a condition that allows as symbol' do
+      result = @doc.evaluate_ruby do
+        class UserG
+          include LucidAuthorization::Mixin
+
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class UserGPolicy < LucidPolicy::Base
+          allow Resource, if: :validated?
+        end
+        result_for_class    = UserG.new.authorized?(Resource)
+        result_for_a_method = UserG.new.authorized?(Resource, :run_allowed)
+        result_for_d_method = UserG.new.authorized?(Resource, :run_denied)
+        [result_for_class, result_for_a_method, result_for_d_method]
+      end
+      expect(result).to eq([true, true, true])
+    end
+
+    it 'can use a policy and define a custom rule tha allows' do
       result = @doc.evaluate_ruby do
         class UserH
           include LucidAuthorization::Mixin
@@ -448,8 +581,7 @@ RSpec.describe 'LucidPolicy' do
           end
         end
         class UserHPolicy < LucidPolicy::Base
-          deny Resource
-          refine Resource, :run_allowed do |user, target_class, target_method|
+          rule Resource, :run_allowed do |user, target_class, target_method|
             allow if user.validated?
             deny
           end
@@ -462,13 +594,13 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([false, true, false])
     end
 
-    it 'can use a policy and refine a rule and denies' do
+    it 'can use a policy and define a custom rule that denies' do
       result = @doc.evaluate_ruby do
         class UserI
           include LucidAuthorization::Mixin
 
           def validated?
-            false
+            true
           end
         end
         class Resource
@@ -481,9 +613,8 @@ RSpec.describe 'LucidPolicy' do
           end
         end
         class UserIPolicy < LucidPolicy::Base
-          allow Resource
-          refine Resource, :run_denied do |user, target_class, target_method|
-            allow if user.validated?
+          rule Resource, :run_allowed do |user, target_class, target_method|
+            allow unless user.validated?
             deny
           end
         end
@@ -492,7 +623,73 @@ RSpec.describe 'LucidPolicy' do
         result_for_d_method = UserI.new.authorized?(Resource, :run_denied)
         [result_for_class, result_for_a_method, result_for_d_method]
       end
+      expect(result).to eq([false, false, false])
+    end
+
+    it 'can use a policy and refine a rule with a custom rule that denies' do
+      result = @doc.evaluate_ruby do
+        class UserJ
+          include LucidAuthorization::Mixin
+
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class UserJPolicy < LucidPolicy::Base
+          allow Resource
+          rule Resource, :run_denied do |user, target_class, target_method|
+            allow unless user.validated?
+            deny
+          end
+        end
+        result_for_class    = UserJ.new.authorized?(Resource)
+        result_for_a_method = UserJ.new.authorized?(Resource, :run_allowed)
+        result_for_d_method = UserJ.new.authorized?(Resource, :run_denied)
+        [result_for_class, result_for_a_method, result_for_d_method]
+      end
       expect(result).to eq([true, true, false])
+    end
+
+    it 'can combine Policies that allow' do
+      result = @doc.evaluate_ruby do
+        class UserK
+          include LucidAuthorization::Mixin
+
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class CombiAPolicy < LucidPolicy::Base
+          allow Resource
+        end
+        class UserKPolicy < LucidPolicy::Base
+          combine_with CombiAPolicy
+          deny others
+        end
+        result_for_class    = UserK.new.authorized!(Resource)
+        result_for_a_method = UserK.new.authorized!(Resource, :run_allowed)
+        result_for_d_method = UserK.new.authorized!(Resource, :run_denied)
+        [result_for_class, result_for_a_method, result_for_d_method]
+      end
+      expect(result).to eq([true, true, true])
     end
   end
 end
