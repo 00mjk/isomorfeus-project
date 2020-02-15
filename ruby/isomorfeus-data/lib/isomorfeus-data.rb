@@ -12,6 +12,7 @@ if RUBY_ENGINE == 'opal'
   require_tree 'isomorfeus_data', :autoload
   Isomorfeus.zeitwerk.push_dir('data')
 else
+  require 'uri'
   require 'oj'
   require 'active_support'
   require 'active_support/core_ext/hash'

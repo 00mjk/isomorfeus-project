@@ -60,6 +60,8 @@ module Isomorfeus
           case @o[:type]
           when :boolean
             Isomorfeus.raise_error(message: "#{@c}: #{@p} is not a boolean") unless @e.class == TrueClass || @e.class == FalseClass
+          else
+            c_string_sub_types
           end
         end
       end
@@ -72,6 +74,7 @@ module Isomorfeus
             send('c_' + m, l)
           end
         end
+        @o[:validate_block].call(@e) if @o.key?(:validate_block)
       end
 
       # specific validations
@@ -120,12 +123,23 @@ module Isomorfeus
         Isomorfeus.raise_error(message: "#{@c}: #{@p} test condition check failed") unless @o[:test].call(@e)
       end
 
-      def c_sub_type(v)
-        case v
+      def c_string_sub_types
+        Isomorfeus.raise_error(message: "#{@c}: #{@p} must be a String") unless @e.class == String
+        case @o[:type]
         when :email
-          # TODO
-        when :url
-          # TODO
+          Isomorfeus.raise_error(message: "#{@c}: #{@p} is not a valid email address") unless @e.match? /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/
+        when :uri
+          if RUBY_ENGINE == 'opal'
+            %x{
+              try {
+                new URL(#@e);
+              } catch {
+                #{Isomorfeus.raise_error(message: "#{@c}: #{@p} is not a valid uri")}
+              }
+            }
+          else
+            Isomorfeus.raise_error(message: "#{@c}: #{@p} is not a valid uri") unless @e.match? /\A#{URI.regexp}\z/
+          end
         end
       end
     end
