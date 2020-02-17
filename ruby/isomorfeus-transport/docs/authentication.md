@@ -94,11 +94,11 @@ The general :isomorfeus scheme login procedure is as follows:
 - page is returned to client, with all data, including current_user
 
 Login with the :isomorfeus scheme may create 3 situations:
-1: *Login successful*: promise_login -> do engage cookie eater -> redirect -> current_user is the logged in user
-2: *Login failed*: promise_login -> .fail block
-3: *Login successful and cookie eater cookie stolen*: promise_login -> do engage cookie eater -> destroy existing session -> redirect -> current_user is Anonymous
-(Although Stealing the cookie eater cookie seems virtually impossible. It is consumed (eaten) immediately after creation and as real life cookies, 
-can only be eaten once.)
+1. *Login successful*: promise_login -> do engage cookie eater -> redirect -> current_user is the logged in user
+2. *Login failed*: promise_login -> .fail block
+3. *Login successful and cookie eater cookie stolen*: promise_login -> do engage cookie eater -> destroy existing session -> redirect -> current_user is Anonymous
+(This is theoretical. Stealing the cookie eater cookie is virtually impossible. It is consumed (eaten) immediately after creation and as cookies
+in real life, can only be eaten once.)
 
 ### Convenience methods
 
