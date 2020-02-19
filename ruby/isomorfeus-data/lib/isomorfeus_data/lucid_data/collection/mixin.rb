@@ -3,7 +3,6 @@ module LucidData
     module Mixin
       def self.included(base)
         base.include(Enumerable)
-        base.extend(LucidPropDeclaration::Mixin)
         base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
@@ -96,7 +95,9 @@ module LucidData
         def to_transport
           hash = { 'attributes' => _get_selected_attributes, 'nodes' => nodes_as_sids }
           hash.merge!('revision' => revision) if revision
-          { @class_name => { @key => hash }}
+          result = { @class_name => { @key => hash }}
+          result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+          result
         end
 
         def included_items_to_transport
@@ -113,8 +114,7 @@ module LucidData
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_graph = graph
-            @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_nodes_path = [:data_state, @class_name, @key, :nodes]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_composition = composition
             @_changed = false
@@ -156,6 +156,11 @@ module LucidData
             @_changed = false
             @_changed_attributes = {}
             @_changed_collection = nil
+          end
+
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_nodes_path = [:data_state, @class_name, @key, :nodes]
           end
 
           def nodes
@@ -450,40 +455,28 @@ module LucidData
           end
           alias prepend unshift
         else # RUBY_ENGINE
-          unless base == LucidData::Collection::Base
-            Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
-          end
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Collection::Base
 
           base.instance_exec do
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              documents = data.delete(:documents)
-              vertexes = data.delete(:vertexes)
-              vertices = data.delete(:vertices)
-              nodes = data.delete(:nodes)
-              self.new(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
-                       nodes: nodes)
-            end
-
-            def save(key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil,
-                     pub_sub_client: nil, current_user: nil)
-              val_nodes = documents || nodes || vertexes || vertices
-              _validate_attributes(attributes) if self.class.attribute_conditions.any?
-              _validate_nodes(val_nodes) if self.class.node_conditions.any?
-              data = instance_exec(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
-                                   nodes: nodes, pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              documents = data.delete(:documents)
-              vertexes = data.delete(:vertexes)
-              vertices = data.delete(:vertices)
-              nodes = data.delete(:nodes)
-              self.new(key: key, revision: revision, attributes: attributes, documents: documents, vertexes: vertexes, vertices: vertices,
-                       nodes: nodes)
+            def instance_from_transport(instance_data, included_items_data)
+              key = instance_data[self.name].keys.first
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
+              nodes_sids = instance_data[self.name][key].key?('nodes') ? instance_data[self.name][key]['nodes'] : []
+              nodes = []
+              nodes_sids.each do |sid|
+                node_class_name = sid[0]
+                node_key = sid[1]
+                Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Not a valid LucidData class!") unless Isomorfeus.valid_data_class_name?(node_class_name)
+                if included_items_data.key?(node_class_name) && included_items_data[node_class_name].key?(node_key)
+                  node_class = Isomorfeus.cached_data_class(node_class_name)
+                  Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Cannot get class!") unless node_class
+                  node = node_class.instance_from_transport({ node_class_name => { node_key => included_items_data[node_class_name][node_key] }}, included_items_data)
+                  Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name} with key #{node_key} could not be extracted from transport data!") unless node
+                  nodes << node
+                end
+              end
+              new(key: key, revision: revision, attributes: attributes, nodes: nodes)
             end
           end
 
@@ -508,6 +501,10 @@ module LucidData
             nodes.each { |n| n.collection = self }
             @_raw_collection = nodes
             @_sid_to_node_cache = {}
+          end
+
+          def _unchange!
+            @_changed = false
           end
 
           def nodes

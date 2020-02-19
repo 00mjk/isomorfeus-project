@@ -17,7 +17,6 @@ else
   require 'fast_gettext'
   require 'http_accept_language/parser'
   require 'http_accept_language/middleware'
-  require 'isomorfeus/promise'
   require 'isomorfeus-data'
   require 'isomorfeus/i18n/config'
   require 'isomorfeus/i18n/init'

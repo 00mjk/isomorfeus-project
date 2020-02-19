@@ -18,14 +18,15 @@ module LucidData
       end
 
       def loaded?
-        Redux.fetch_by_path([:data_state, @class_name, @key]) ? true : false
+        Redux.fetch_by_path(:data_state, @class_name, @key) ? true : false
       end
 
       def key?(k)
-        if @result_set.any?
+        if @result_set
           @result_set.key?(k)
         else
-          stored_results = Redux.fetch_by_path([:data_state, @class_name, @key])
+          stored_results = Redux.fetch_by_path(:data_state, @class_name, @key)
+          return false unless stored_results
           `Object.hasOwnProperty(stored_results, k)`
         end
       end
@@ -36,20 +37,21 @@ module LucidData
       end
 
       def method_missing(accessor_name, *args, &block)
-        raise "#{@class_name}: no such thing '#{accessor_name}‘in the results!" unless @result_set.key?(accessor_name)
-        sid = if @result_set.any?
+        sid = if @result_set
                 @result_set[accessor_name]
               else
-                stored_results = Redux.fetch_by_path([:data_state, @class_name, @key])
-                stored_results.JS[accessor_name]
+                stored_results = Redux.fetch_by_path(:data_state, @class_name, @key)
+                stored_results.JS[accessor_name] if stored_results
               end
+        Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}' in the results!") unless sid
         Isomorfeus.instance_from_sid(sid)
       end
     else
       def initialize(key: nil, result_set: {})
         @class_name = 'LucidData::QueryResult'
         @key = key ? key.to_s : self.object_id.to_s
-        @result_set = result_set
+        @result_set = result_set.nil? ? {} : result_set
+        @result_set.transform_keys!(&:to_sym)
       end
 
       def loaded?
@@ -66,14 +68,14 @@ module LucidData
       end
 
       def method_missing(accessor_name, *args, &block)
-        raise "#{@class_name}: no such thing '#{accessor_name}‘in the results!" unless @result_set.key?(accessor_name)
+        Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}' in the results!") unless @result_set.key?(accessor_name)
         @result_set[accessor_name]
       end
 
       def to_transport
         sids_hash = {}
         @result_set.each do |key, value|
-          sids_hash[key] = value.to_sid
+          sids_hash[key.to_s] = value.to_sid
         end
         { @class_name => { @key => sids_hash }}
       end

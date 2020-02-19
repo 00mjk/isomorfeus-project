@@ -1,9 +1,5 @@
 module LucidOperation
   module PromiseRun
-    def initialize(validated_props_hash)
-      @props = Isomorfeus::Transport::PropsProxy.new(validated_props_hash)
-    end
-
     def promise_run
       promise = Promise.new
       original_promise = promise
@@ -24,7 +20,7 @@ module LucidOperation
             end
           end
         end
-        raise "No match found for step #{gherkin_step}!" unless matched
+        Isomorfeus.raise_error(message: "No match found for step #{gherkin_step}!") unless matched
       end
 
       # fail track
@@ -42,7 +38,7 @@ module LucidOperation
             end
           end
         end
-        raise "No match found for failure step #{gherkin_step}!" unless matched
+        Isomorfeus.raise_error(message: "No match found for failure step #{gherkin_step}!") unless matched
       end
 
       # ensure
@@ -55,16 +51,13 @@ module LucidOperation
           if match_data
             matched = true
 
-            promise = promise.then do |result|
-              operation.step_result = result
-              operation.instance_exec(*match_data, &step[1])
-            end.fail do |result|
+            promise = promise.ensure do |result|
               operation.step_result = result
               operation.instance_exec(*match_data, &step[1])
             end
           end
         end
-        raise "No match found for ensure step #{gherkin_step}!" unless matched
+        Isomorfeus.raise_error(message: "No match found for ensure step #{gherkin_step}!") unless matched
       end
 
       original_promise.resolve

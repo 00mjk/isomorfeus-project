@@ -74,6 +74,14 @@ const ssr_config = {
     ]
 };
 
+const mail_components_config = {
+    target: 'node',
+    entry: { mail_components: [path.resolve(__dirname, '../app/imports/mail_components.js')] },
+    plugins: [
+        new WebpackAssetsManifest({ publicPath: true, merge: true }) // generate manifest
+    ]
+};
+
 //const web_worker_config = {
 //    target: 'webworker',
 //    entry: { web_worker: [path.resolve(__dirname, '../app/imports/application_web_worker.js')] },
@@ -86,6 +94,7 @@ const ssr_config = {
 
 const browser = Object.assign({}, common_config, browser_config);
 const ssr = Object.assign({}, common_config, ssr_config);
+const mail_components = Object.assign({}, common_config, mail_components_config);
 // const web_worker = Object.assign({}, common_config, web_worker_config);
 
-module.exports = [ browser, ssr ];
+module.exports = [ browser, ssr, mail_components ];

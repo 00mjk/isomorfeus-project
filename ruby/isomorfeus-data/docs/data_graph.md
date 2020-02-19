@@ -42,8 +42,8 @@ c = MyGraph.new(key: '1234',
 #### Loading
 ```
 class MyGraph < LucidData::Graph::Base
-  execute_load do |key:, current_user:, pub_sub_client:|
-    { key: '1234',
+  execute_load do |key:|
+    new(key: '1234',
       nodes: {
         # pass node collections as hash with keys names as declared
         important_tasks: ImportantTasks.new(key: '1'),
@@ -53,7 +53,7 @@ class MyGraph < LucidData::Graph::Base
         contractors_important_tasks_edges: ContractorITEdges.new(key: '1'),
         contractors_other_tasks_edges: ContractorOTEdges.new(key: '1')
       } 
-    }
+    )
   end
 end
 ```

@@ -12,6 +12,8 @@ GEMFILE_DIRS = %w[
   isomorfeus-data/test_app
   isomorfeus-i18n
   isomorfeus
+  isomorfeus-mailer
+  isomorfeus-mailer/test_app
   isomorfeus-operation
   isomorfeus-operation/test_app
   isomorfeus-policy
@@ -64,11 +66,11 @@ task default: %w[ruby_specs]
 task :push_ruby_packages do
   Rake::Task['push_ruby_packages_to_rubygems'].invoke
   Rake::Task['push_ruby_packages_to_github'].invoke
-  Rake::Task['push_ruby_packages_to_isomorfeus'].invoke
+  # Rake::Task['push_ruby_packages_to_isomorfeus'].invoke
 end
 
 task :push_ruby_packages_to_rubygems do
-  %w[data i18n operation policy transport].each do |mod|
+  %w[data i18n mailer operation policy transport].each do |mod|
     puts "Publishing to rubygems"
     system("gem push ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
   end
@@ -77,7 +79,7 @@ end
 
 task :push_ruby_packages_to_github do
   puts "Publishing to github"
-  %w[data i18n operation policy transport].each do |mod|
+  %w[data i18n mailer operation policy transport].each do |mod|
     system("gem push --key github --host https://rubygems.pkg.github.com/isomorfeus ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
   end
   system("gem push --key github --host https://rubygems.pkg.github.com/isomorfeus ruby/isomorfeus/isomorfeus-#{VERSION}.gem")
@@ -85,7 +87,7 @@ end
 
 task :push_ruby_packages_to_isomorfeus do
   puts "Publishing to isomorfeus"
-  %w[data i18n operation policy transport].each do |mod|
+  %w[data i18n mailer operation policy transport].each do |mod|
     system("scp ruby/isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem iso:~/gems/")
     system("ssh iso \"bash -l -c 'gem inabox gems/isomorfeus-#{mod}-#{VERSION}.gem --host http://localhost:5555/'\"")
   end
@@ -97,6 +99,7 @@ task :build_ruby_packages do
   Rake::Task['build_ruby_data_package'].invoke
   Rake::Task['build_ruby_i18n_package'].invoke
   Rake::Task['build_ruby_installer_package'].invoke
+  Rake::Task['build_ruby_mailer_package'].invoke
   Rake::Task['build_ruby_operation_package'].invoke
   Rake::Task['build_ruby_policy_package'].invoke
   Rake::Task['build_ruby_transport_package'].invoke
@@ -130,6 +133,10 @@ task :build_ruby_installer_package do
   Dir.chdir(pwd)
 end
 
+task :build_ruby_mailer_package do
+  update_version_and_build_gem_for('mailer')
+end
+
 task :build_ruby_operation_package do
   update_version_and_build_gem_for('operation')
 end
@@ -146,6 +153,7 @@ task :ruby_specs do
   Rake::Task['ruby_installer_spec'].invoke
   Rake::Task['ruby_data_spec'].invoke
   Rake::Task['ruby_i18n_spec'].invoke
+  Rake::Task['ruby_mailer_spec'].invoke
   Rake::Task['ruby_operation_spec'].invoke
   Rake::Task['ruby_policy_spec'].invoke
   Rake::Task['ruby_transport_spec'].invoke
@@ -163,6 +171,7 @@ task :ruby_installer_spec => [:build_ruby_packages] do
   pwd = Dir.pwd
   # copy gems
   system('cp ruby/iso*/*.gem ruby/gems/gems/')
+  system('ls -al ruby/gems/gems/')
   Dir.chdir(File.join('ruby','gems'))
   system('gem generate_index')
   Dir.chdir(pwd)
@@ -177,6 +186,10 @@ task :ruby_installer_spec => [:build_ruby_packages] do
   end
   Process.waitpid(pid)
   Dir.chdir(pwd)
+end
+
+task :ruby_mailer_spec do
+  run_rake_spec_for('mailer')
 end
 
 task :ruby_operation_spec do

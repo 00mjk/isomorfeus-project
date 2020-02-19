@@ -5,7 +5,6 @@ module LucidData
       # TODO include -> compose dsl
       # TODO inline store path
       def self.included(base)
-        base.extend(LucidPropDeclaration::Mixin)
         base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
@@ -39,14 +38,14 @@ module LucidData
           end
 
           def _validate_part(access_name, part)
-            raise "#{self.name}: No such part declared: '#{access_name}'!" unless parts.key?(access_name)
+            Isomorfeus.raise_error(message: "#{self.name}: No such part declared: '#{access_name}'!") unless parts.key?(access_name)
             Isomorfeus::Data::ElementValidator.new(self.name, part, parts[access_name]).validate!
           end
 
           def _validate_parts(many_parts)
             parts.each_key do |access_name|
               if parts[access_name].key?(:required) && parts[access_name][:required] && !many_parts.key?(attr)
-                raise "Required part #{access_name} not given!"
+                Isomorfeus.raise_error(message: "Required part #{access_name} not given!")
               end
             end
             many_parts.each { |access_name, part| _validate_part(access_name, part) } if parts.any?
@@ -75,7 +74,9 @@ module LucidData
           parts.each do |name, instance|
             hash['parts'][name.to_s] = instance.to_sid if instance
           end
-          { @class_name => { @key => hash }}
+          result = { @class_name => { @key => hash }}
+          result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+          result
         end
 
         def included_items_to_transport
@@ -94,8 +95,7 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_parts_path = [:data_state, @class_name, @key, :parts]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_changed = false
 
@@ -146,6 +146,11 @@ module LucidData
             nil
           end
 
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_parts_path = [:data_state, @class_name, @key, :parts]
+          end
+
           def _init_parts
             self.class.parts.each_key do |access_name|
               sid = Redux.fetch_by_path(*(@_parts_path + [access_name]))
@@ -165,31 +170,28 @@ module LucidData
             Redux.fetch_by_path(*@_composition_path)
           end
         else # RUBY_ENGINE
-          unless base == LucidData::Composition::Base
-            Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
-          end
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Composition::Base
 
           base.instance_exec do
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              parts = data.delete(:parts)
-              self.new(key: key, revision: revision, parts: parts, attributes: attributes)
-            end
-
-            def save(key:, revision: nil, parts: nil, attributes: nil, pub_sub_client: nil, current_user: nil)
-              attributes = {} unless attributes
-              _validate_attributes(attributes)
-              _validate_parts(parts)
-              data = instance_exec(key: key, revision: revision, parts: parts, attributes: attributes,
-                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              parts = data.delete(:parts)
-              self.new(key: key, revision: revision, parts: parts, attributes: attributes)
+            def instance_from_transport(instance_data, included_items_data)
+              key = instance_data[self.name].keys.first
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
+              source_parts = instance_data[self.name][key].key?('parts') ? instance_data[self.name][key]['parts'] : {}
+              parts = {}
+              source_parts.each do |part_name, sid|
+                part_class_name = sid[0]
+                part_key = sid[1]
+                Isomorfeus.raise_error(message: "#{self.name}: #{part_class_name}: Not a valid LucidData class!") unless Isomorfeus.valid_data_class_name?(part_class_name)
+                if included_items_data.key?(part_class_name) && included_items_data[part_class_name].key?(part_key)
+                  part_class = Isomorfeus.cached_data_class(part_class_name)
+                  Isomorfeus.raise_error(message: "#{self.name}: #{part_class_name}: Cannot get class!") unless part_class
+                  part = part_class.instance_from_transport({ part_class_name => { part_key => included_items_data[part_class_name][part_key] }}, included_items_data)
+                  Isomorfeus.raise_error(message: "#{self.name}: #{part_class_name} with key #{part_key} could not be extracted from transport data!") unless part
+                  parts[part_name.to_sym] = part
+                end
+              end
+              new(key: key, revision: revision, attributes: attributes, parts: parts)
             end
           end
 
@@ -212,6 +214,10 @@ module LucidData
                 @_parts[access_name].composition = self
               end
             end
+          end
+
+          def _unchange!
+            @_changed = false
           end
 
           def parts

@@ -6,53 +6,11 @@ Operations for Isomorfeus.
 At the [Isomorfeus Framework Project](http://isomorfeus.com) 
 
 ### Usage
-there are 3 kinds of Operations:
-- LucidQuickOp
-- LucidOperation
-- LucidLocalOperation
+Operations use Props like other parts of the system.
+See [the isomorfeus-react props documentation](https://github.com/isomorfeus/isomorfeus-react/blob/master/ruby/docs/props.md#prop-declaration).
 
-```ruby
-class MyQuickOp < LucidQuickOp::Base
-  prop :a_prop
+There are 3 kinds of Operations:
+- [LucidQuickOp](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-operation/docs/quick_op.md) - Quick simple operation, always executed on the server.
+- [LucidOperation](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-operation/docs/operation.md) - For complex multi-stepped operations, always executed on the server.
+- [LucidLocalOperation](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-operation/docs/operation.md) - For complex multi-stepped operations, always executed locally.
 
-  op do
-    props.a_prop == 'a_value'
-    # do something
-  end
-end
-
-MyQuickOp.promise_run(a_prop: 'a_value')
-
-# or
-
-MyQuickOp.promise_run(props: { a_prop: 'a_value' })
-```
-
-Quick remote procedure call, always executed on the server.
-LucidOperation too is always executed on the Server. It allows to define Operations in gherkin human language style:
-```ruby
-class MyOperation < LucidOperation::Base
-  prop :a_prop
-
-  procedure <<~TEXT
-     Given a bird
-     When it flies
-     Then be happy
-  TEXT
-
-  Given /a bird/ do
-     props.a_prop == 'a_value'
-  end
-
-  # etc ...
-end
-
-MyOperation.promise_run(a_prop: 'a_value')
-
-# or
-
-MyOperation.promise_run(props: { a_prop: 'a_value' })
-```
-
-LucidLocalOperation is the same as LucidOperation, except its always executed locally, wherever that may be.
-Its barely tested so far and no other docs.

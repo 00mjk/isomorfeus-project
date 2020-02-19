@@ -28,30 +28,30 @@ module LucidOperation
       lines.each do |line|
         case line
         when STAR, GIVEN, WHEN, THEN, AND
-          raise FINALLY_EXCEPTION if has_finally
+          Isomorfeus.raise_error(message: FINALLY_EXCEPTION) if has_finally
           operation[:steps] << $1.strip
         when ENSURE
           operation[:ensure] << $1.strip
         when IW_FAILING, IF_ITT_FAILED, FAILED
           operation[:failure] << $1.strip
         when FIRST
-          raise FIRST_EXCEPTION if operation[:steps].size > 0
+          Isomorfeus.raise_error(message: FIRST_EXCEPTION) if operation[:steps].size > 0
           operation[:steps] << $1.strip
         when FINALLY
-          raise FINALLY_EXCEPTION if has_finally
+          Isomorfeus.raise_error(message: FINALLY_EXCEPTION) if has_finally
           operation[:steps] << $1.strip
           has_finally = true
         when PROCEDURE
-          raise 'No Operation defined!' if operation[:operation].empty?
-          raise 'Procedure already defined!' unless operation[:procedure].empty?
+          Isomorfeus.raise_error(message: 'No Operation defined!') if operation[:operation].empty?
+          Isomorfeus.raise_error(message: 'Procedure already defined!') unless operation[:procedure].empty?
           operation[:procedure] = $1.strip
         when OPERATION
-          raise 'Operation already defined!' unless operation[:operation].empty?
+          Isomorfeus.raise_error(message: 'Operation already defined!') unless operation[:operation].empty?
           operation[:operation] = $1.strip
         when WHITE_SPACE, COMMENT
           # nothing, just skip
         else
-          raise "Unknown key word(s) at the beginning of the line: #{line}" unless operation[:procedure].empty?
+          Isomorfeus.raise_error(message: "Unknown key word(s) at the beginning of the line: #{line}") unless operation[:procedure].empty?
           operation[:description] = [] unless operation.key?(:description)
           operation[:description] << line.strip
         end

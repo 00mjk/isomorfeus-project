@@ -37,12 +37,30 @@ RSpec.describe 'LucidData::Collection' do
       expect(result).to be true
     end
 
-    it 'can load a simple collection on the server' do
+    it 'can load a simple collection' do
       result = on_server do
         collection = SimpleCollection.load(key: 1)
         collection.size
       end
       expect(result).to eq(5)
+    end
+
+    it 'can destroy a simple collection' do
+      result = on_server do
+        SimpleCollection.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
+
+    it 'can save a simple collection' do
+      result = on_server do
+        collection = SimpleCollection.load(key: '123')
+        collection.push(SimpleNode.new(key: '4', attributes: { one: 1}))
+        before_changed = collection.changed?
+        collection.save
+        [collection.size, before_changed, collection.changed?]
+      end
+      expect(result).to eq([6, true, false])
     end
 
     it 'can convert a simple collection on the server to transport' do
@@ -62,11 +80,11 @@ RSpec.describe 'LucidData::Collection' do
         collection = SimpleCollection.load(key: 3)
         collection.included_items_to_transport
       end
-      expect(result).to eq({"SimpleNode"=>{"1"=>{"one"=>1},
-                                           "2"=>{"one"=>2},
-                                           "3"=>{"one"=>3},
-                                           "4"=>{"one"=>4},
-                                           "5"=>{"one"=>5}}})
+      expect(result).to eq({"SimpleNode"=>{"1"=>{"attributes"=>{"one"=>1}},
+                                           "2"=>{"attributes"=>{"one"=>2}},
+                                           "3"=>{"attributes"=>{"one"=>3}},
+                                           "4"=>{"attributes"=>{"one"=>4}},
+                                           "5"=>{"attributes"=>{"one"=>5}}}})
     end
   end
 
@@ -96,13 +114,33 @@ RSpec.describe 'LucidData::Collection' do
       expect(result).to eq('TestCollectionM')
     end
 
-    it 'can load a simple collection on the client' do
+    it 'can load a simple collection' do
       result = @doc.await_ruby do
         SimpleCollection.promise_load(key: 6).then do |collection|
           collection.size
         end
       end
       expect(result).to eq(5)
+    end
+
+    it 'can destroy a simple collection' do
+      result = @doc.await_ruby do
+        SimpleCollection.promise_destroy(key: '123').then { |result| result }
+      end
+      expect(result).to eq(true)
+    end
+
+    it 'can save a simple collection' do
+      result = @doc.await_ruby do
+        SimpleCollection.promise_load(key: '123').then do |collection|
+          collection.push(SimpleNode.new(key: 4, attributes: {one: 1}))
+          before_changed = collection.changed?
+          collection.promise_save.then do |collection|
+            [collection.size, before_changed, collection.changed?]
+          end
+        end
+      end
+      expect(result).to eq([6, true, false])
     end
   end
 

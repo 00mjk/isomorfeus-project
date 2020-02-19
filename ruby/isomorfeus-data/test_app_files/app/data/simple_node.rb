@@ -1,19 +1,19 @@
 class SimpleNode < LucidData::Document::Base
   attribute :one
 
-  execute_load do |key:, current_user:, pub_sub_client:|
-    { key: key, attributes: { one: key }}
+  execute_create do
+    self
   end
 
-  execute_query do |props:, current_user:, pub_sub_client:|
-    { node: self.new(key: key, attributes: { one: key }) }
+  execute_load do |key:|
+    new(key: key, attributes: { one: key })
   end
 
-  execute_save do |key:, revision: nil, attributes: nil, current_user:, pub_sub_client:|
-    { key: key, attributes: attributes }
+  execute_save do
+    self
   end
 
-  execute_destroy do |key:, current_user:, pub_sub_client:|
-    { key: key }
+  execute_destroy do |key:|
+    true
   end
 end

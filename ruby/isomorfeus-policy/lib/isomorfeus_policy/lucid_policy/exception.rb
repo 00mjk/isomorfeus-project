@@ -1,4 +1,4 @@
 module LucidPolicy
-  class Exception < Exception
+  class Exception < ::Exception
   end
 end

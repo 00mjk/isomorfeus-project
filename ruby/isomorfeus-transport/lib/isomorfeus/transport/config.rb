@@ -3,14 +3,39 @@ module Isomorfeus
 
   if RUBY_ENGINE == 'opal'
     add_client_option(:api_websocket_path)
+    add_client_option(:cookie_eater_path)
     add_client_option(:transport_init_class_names, [])
 
     def self.add_transport_init_class_name(init_class_name)
       transport_init_class_names << init_class_name
     end
+
+    def self.current_user
+      @current_user ||= init_current_user
+    end
+
+    def self.init_current_user
+      if Isomorfeus.current_user_sid
+        Isomorfeus.instance_from_sid(Isomorfeus.current_user_sid)
+      else
+        Anonymous.new
+      end
+    end
+
+    def self.set_current_user(user)
+      if user
+        @current_user = user
+        Isomorfeus.current_user_sid = user.to_sid
+      else
+        @current_user = Anonymous.new
+      end
+    end
   else
     class << self
       attr_accessor :api_websocket_path
+      attr_accessor :cookie_eater_path
+      attr_accessor :session_store
+      attr_accessor :cookie_dbm_path
 
       def add_middleware(middleware)
         Isomorfeus.middlewares << middleware
@@ -113,9 +138,21 @@ module Isomorfeus
         class_name = class_name.split('>::').last if class_name.start_with?('#<')
         class_name
       end
+
+      def current_user
+        Thread.current[:isomorfeus_user]
+      end
+
+      def pub_sub_client
+        Thread.current[:isomorfeus_pub_sub_client]
+      end
     end
+
+    self.cookie_dbm_path = 'cookie'
+    self.session_store = Isomorfeus::Transport::DbmSessionStore.new # dont use this one, but we keep it here to have at least something
   end
 
   # defaults
   self.api_websocket_path = '/isomorfeus/api/websocket'
+  self.cookie_eater_path = '/isomorfeus/cookie/eat'
 end

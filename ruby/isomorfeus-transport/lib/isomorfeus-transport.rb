@@ -1,6 +1,5 @@
 require 'isomorfeus-policy'
 require 'lucid_authentication/mixin'
-require 'isomorfeus/transport/props_proxy'
 if RUBY_ENGINE == 'opal'
   require 'json'
   require 'isomorfeus/config'
@@ -11,21 +10,28 @@ if RUBY_ENGINE == 'opal'
   require 'isomorfeus/transport/client_processor'
   require 'isomorfeus/transport/websocket'
   require 'isomorfeus/transport'
+  require 'isomorfeus/transport/ssr_login'
   require 'lucid_channel/mixin'
   require 'lucid_channel/base'
   Isomorfeus.zeitwerk.push_dir('channels')
   Isomorfeus.add_client_init_class_name('Isomorfeus::Transport')
+  Isomorfeus.add_transport_init_class_name('Isomorfeus::Transport::SsrLogin') if Isomorfeus.on_ssr?
 else
   require 'base64'
   require 'digest'
+  require 'bcrypt'
   require 'ostruct'
   require 'socket'
   require 'oj'
   require 'websocket/driver'
   require 'active_support'
   require 'iodine'
+  require 'dbm'
+  require 'isomorfeus/transport/dbm_session_store'
   require 'isomorfeus/config'
-  require 'isomorfeus/promise'
+  opal_path = Gem::Specification.find_by_name('opal').full_gem_path
+  promise_path = File.join(opal_path, 'stdlib', 'promise.rb')
+  require promise_path
   require 'isomorfeus/transport/version'
   require 'isomorfeus/transport/response_agent'
   require 'isomorfeus/transport/config'

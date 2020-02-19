@@ -3,7 +3,6 @@ module LucidData
     module Mixin
       def self.included(base)
         base.include(Enumerable)
-        base.extend(LucidPropDeclaration::Mixin)
         base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
@@ -55,7 +54,7 @@ module LucidData
 
           def _validate_node_collection(access_name, collection)
             unless node_collections.key?(access_name) || access_name == :nodes
-              raise "#{self.name}: No such node collection declared: '#{access_name}'!"
+              Isomorfeus.raise_error(message: "#{self.name}: No such node collection declared: '#{access_name}'!")
             end
             Isomorfeus::Data::ElementValidator.new(self.name, collection, node_collections[access_name]).validate! if node_collections[access_name]
           end
@@ -95,7 +94,7 @@ module LucidData
 
           def _validate_edge_collection(access_name, collection)
             unless edge_collections.key?(access_name) || access_name == :edges
-              raise "#{self.name}: No such edge collection declared: '#{access_name}'!"
+              Isomorfeus.raise_error(message: "#{self.name}: No such edge collection declared: '#{access_name}'!")
             end
             Isomorfeus::Data::ElementValidator.new(self.name, collection, edge_collections[access_name]).validate! if edge_collections[access_name]
           end
@@ -223,7 +222,9 @@ module LucidData
             hash['edges'][name.to_s] = collection.to_sid if collection
           end
           hash.merge!('revision' => revision) if revision
-          { @class_name => { @key => hash }}
+          result = { @class_name => { @key => hash }}
+          result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+          result
         end
 
         def included_items_to_transport
@@ -248,9 +249,7 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_edges_path = [:data_state, @class_name, @key, :edges]
-            @_nodes_path = [:data_state, @class_name, @key, :nodes]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_composition = composition
             @_changed = false
@@ -368,6 +367,12 @@ module LucidData
             nil
           end
 
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_edges_path = [:data_state, @class_name, @key, :edges]
+            @_nodes_path = [:data_state, @class_name, @key, :nodes]
+          end
+
           def edge_collections
             _init_edge_collections if @_edge_collections.empty?
             @_edge_collections
@@ -381,42 +386,38 @@ module LucidData
           alias document_collections node_collections
           alias vertex_collections node_collections
         else # RUBY_ENGINE
-          unless base == LucidData::Graph::Base
-            Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
-          end
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Graph::Base
 
           base.instance_exec do
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
-              revision = data.delete(:revision)
-              nodes = data.delete(:nodes)
-              edges = data.delete(:edges)
-              attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, edges: edges, nodes: nodes, attributes: attributes)
-            end
+            def instance_from_transport(instance_data, included_items_data)
+              key = instance_data[self.name].keys.first
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
 
-            def save(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil,
-                     pub_sub_client: nil, current_user: nil)
-              attributes = {} unless attributes
-              val_edges = edges || links
-              val_nodes = documents || nodes || vertexes || vertices
-              _validate_attributes(attributes) if attributes.any?
-              _validate_edges(val_edges)
-              _validate_nodes(val_nodes)
-              data = instance_exec(key: key, revision: revision, parts: parts, attributes: attributes,
-                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              documents = data.delete(:documents)
-              vertexes = data.delete(:vertexes)
-              vertices = data.delete(:vertices)
-              nodes = data.delete(:nodes)
-              edges = data.delete(:edges)
-              links = data.delete(:links)
-              self.new(key: key, revision: revision, attributes: attributes, edges: edges, links: links, nodes: nodes, documents: documents,
-                       vertices: vertices, vertexes: vertexes, pub_sub_client: nil, current_user: nil)
+              nodes_hash = instance_data[self.name][key].key?('nodes') ? instance_data[self.name][key]['nodes'] : {}
+              edges_hash = instance_data[self.name][key].key?('edges') ? instance_data[self.name][key]['edges'] : {}
+
+              nodes_edges = [{},{}]
+              [nodes_hash, edges_hash].each_with_index do |hash, hash_index|
+                hash.each do |name, value|
+                  namsy = name.to_sym
+                  nodes_edges[namsy] = []
+                  value.each do |sid|
+                    node_class_name = sid[0]
+                    node_key = sid[1]
+                    Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Not a valid LucidData class!") unless Isomorfeus.valid_data_class_name?(node_class_name)
+                    if included_items_data.key?(node_class_name) && included_items_data[node_class_name].key?(node_key)
+                      node_class = Isomorfeus.cached_data_class(node_class_name)
+                      Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Cannot get class!") unless node_class
+                      node = node_class.instance_from_transport({ node_class_name => { node_key => included_items_data[node_class_name][node_key] }}, included_items_data)
+                      Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name} with key #{node_key} could not be extracted from transport data!") unless node
+                      nodes_edges[hash_index][namsy] << node
+                    end
+                  end
+                end
+              end
+
+              new(key: key, revision: revision, attributes: attributes, nodes: nodes_edges[0], edges: nodes_edges[1])
             end
           end
 
@@ -465,6 +466,10 @@ module LucidData
               @_edge_collections[:edges] = edges
               @_edge_collections[:edges].graph = self if @_edge_collections[:edges].respond_to?(:graph=)
             end
+          end
+
+          def _unchange!
+            @_changed = false
           end
 
           def edge_collections

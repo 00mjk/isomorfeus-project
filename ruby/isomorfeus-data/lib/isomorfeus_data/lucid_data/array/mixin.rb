@@ -3,7 +3,6 @@ module LucidData
     module Mixin
       def self.included(base)
         base.include(Enumerable)
-        base.extend(LucidPropDeclaration::Mixin)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
 
@@ -59,7 +58,7 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key, :elements]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_changed_array = nil
             @_composition = composition
@@ -82,6 +81,10 @@ module LucidData
           def _get_array
             return @_changed_array if @_changed_array
             Redux.fetch_by_path(*@_store_path)
+          end
+
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :elements]
           end
 
           def changed?
@@ -344,27 +347,14 @@ module LucidData
           end
           alias prepend unshift
         else # RUBY_ENGINE
-          unless base == LucidData::Array::Base
-            Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
-          end
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Array::Base
 
           base.instance_exec do
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
-              revision = data.delete(:revision)
-              elements = data.delete(:elements)
-              self.new(key: key, revision: revision, elements: elements)
-            end
-
-            def save(key:, revision: nil, elements: nil, pub_sub_client: nil, current_user: nil)
-              _validate_elements(elements)
-              data = instance_exec(key: key, revision: revision, elements: elements,
-                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
-              revision = data.delete(:revision)
-              elements = data.delete(:elements)
-              self.new(key: key, revision: revision, elements: elements)
+            def instance_from_transport(instance_data, _included_items_data)
+              key = instance_data[self.name].keys.first
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              elements = instance_data[self.name][key].key?('elements') ? instance_data[self.name][key]['elements'] : nil
+              new(key: key, revision: revision, elements: elements)
             end
           end
 
@@ -381,6 +371,10 @@ module LucidData
             @_raw_array = elements
           end
 
+          def _unchange!
+            @_changed = false
+          end
+
           def changed?
             @_changed
           end
@@ -392,7 +386,9 @@ module LucidData
           def to_transport
             hash = { 'elements' => @_raw_array }
             hash.merge!('revision' => revision) if revision
-            { @class_name => { @key => hash }}
+            result = { @class_name => { @key => hash }}
+            result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+            result
           end
 
           # Array methods

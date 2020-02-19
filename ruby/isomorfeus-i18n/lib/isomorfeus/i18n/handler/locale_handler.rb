@@ -7,7 +7,7 @@ module Isomorfeus
         include FastGettext::Translation
         include FastGettext::TranslationMultidomain
 
-        on_request do |pub_sub_client, current_user, response_agent|
+        on_request do |response_agent|
           Isomorfeus::I18n::Init.init unless Thread.current[:isomorfeus_i18n_initialized] == true
           response_agent.agent_result = {}
           # promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, method, [args])
@@ -27,7 +27,7 @@ module Isomorfeus
                 FastGettext.with_domain(domain) do
                   response_agent.request[domain].each_key do |locale|
                     response_agent.agent_result[domain][locale] = {}
-                    raise "Locale #{locale} not available!" unless Isomorfeus.available_locales.include?(locale)
+                    Isomorfeus.raise_error(message: "Locale #{locale} not available!") unless Isomorfeus.available_locales.include?(locale)
                     FastGettext.with_locale(locale) do
                       response_agent.request[domain][locale].each_key do |locale_method|
                         method_args = response_agent.request[domain][locale][locale_method]
@@ -53,7 +53,7 @@ module Isomorfeus
                                         when 'Dp_' then Dp_(*method_args)
                                         when 'Ds_' then Ds_(*method_args)
                                         else
-                                          raise "No such locale method #{locale_method}"
+                                          Isomorfeus.raise_error(message: "No such locale method #{locale_method}")
                                         end
                         response_agent.agent_result[domain][locale].deep_merge!(locale_method => { Oj.dump(method_args, mode: :strict) => method_result })
                       end

@@ -71,8 +71,6 @@ module LucidArango
         else # RUBY_ENGINE
           unless base == LucidArango::Document::Base
             Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
           end
         end
       end

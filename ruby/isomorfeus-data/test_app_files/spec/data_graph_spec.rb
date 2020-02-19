@@ -47,6 +47,13 @@ RSpec.describe 'LucidGraph' do
       expect(result).to eq([5,5])
     end
 
+    it 'can destroy a simple graph' do
+      result = on_server do
+        SimpleGraph.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
+
     it 'can converts a simple graph on the server to transport' do
       result = on_server do
         graph = SimpleGraph.load(key: 4)
@@ -77,11 +84,11 @@ RSpec.describe 'LucidGraph' do
                                                                                          ["SimpleEdge", "3"],
                                                                                          ["SimpleEdge", "4"],
                                                                                          ["SimpleEdge", "5"]]}},
-                           "SimpleNode" => {"1"=>{"one"=>1},
-                                             "2"=>{"one"=>2},
-                                             "3"=>{"one"=>3},
-                                             "4"=>{"one"=>4},
-                                             "5"=>{"one"=>5}})
+                           "SimpleNode" => {"1"=>{"attributes"=>{"one"=>1}},
+                                             "2"=>{"attributes"=>{"one"=>2}},
+                                             "3"=>{"attributes"=>{"one"=>3}},
+                                             "4"=>{"attributes"=>{"one"=>4}},
+                                             "5"=>{"attributes"=>{"one"=>5}}})
     end
 
     it 'converts a partial graph to transport' do
@@ -93,12 +100,12 @@ RSpec.describe 'LucidGraph' do
           edges :given_edges
           edges :empty_edges
 
-          execute_load do |key:, current_user:, pub_sub_client:|
+          execute_load do |key:|
             node = LucidData::GenericNode.new(key: "#{key}_node")
             edge = LucidData::GenericEdge.new(key: "#{key}_edge", from: node, to: node)
-            { key: key,
-              nodes: { given_nodes: LucidData::GenericCollection.new(key: "#{key}_gc", nodes: [node]) },
-              edges: { given_edges: LucidData::GenericEdgeCollection.new(key: "#{key}_gec", edges: [edge])}}
+            new(key: key,
+                nodes: { given_nodes: LucidData::GenericCollection.new(key: "#{key}_gc", nodes: [node]) },
+                edges: { given_edges: LucidData::GenericEdgeCollection.new(key: "#{key}_gec", edges: [edge])})
           end
         end
 
@@ -114,7 +121,7 @@ RSpec.describe 'LucidGraph' do
                                                                           "to" => ["LucidData::GenericNode", "1_node"] }},
                               "LucidData::GenericEdgeCollection" => {"1_gec"=> { "attributes" => {},
                                                                                  "edges" => [["LucidData::GenericEdge", "1_edge"]] }},
-                              "LucidData::GenericNode" => { "1_node" => {}}}])
+                              "LucidData::GenericNode" => { "1_node" => {"attributes"=>{}}}}])
     end
   end
 
@@ -144,7 +151,7 @@ RSpec.describe 'LucidGraph' do
       expect(result).to eq('TestGraphM')
     end
 
-    it 'can load a simple graph on the client' do
+    it 'can load a simple graph' do
       result = @doc.await_ruby do
         SimpleGraph.promise_load(key: 8).then do |graph|
           n_nodes = graph.nodes.size
@@ -153,6 +160,13 @@ RSpec.describe 'LucidGraph' do
         end
       end
       expect(result).to eq([5,5])
+    end
+
+    it 'can destroy a simple graph' do
+      result = @doc.await_ruby do
+        SimpleGraph.promise_destroy(key: '123').then { |result| result }
+      end
+      expect(result).to eq(true)
     end
   end
 

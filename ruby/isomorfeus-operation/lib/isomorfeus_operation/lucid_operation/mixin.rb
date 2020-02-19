@@ -27,29 +27,39 @@ module LucidOperation
           alias :If_that_failed :steps
 
           def First(regular_expression, &block)
-            raise "#{self}: First already defined, can only be defined once!" if @first_defined
+            Isomorfeus.raise_error(message: "#{self}: First already defined, can only be defined once!") if @first_defined
             @first_defined = true
           end
 
           def Finally(regular_expression, &block)
-            raise "#{self}: Finally already defined, can only be defined once!" if @finally_defined
+            Isomorfeus.raise_error(message: "#{self}: Finally already defined, can only be defined once!") if @finally_defined
             @finally_defined = true
           end
 
-          def promise_run(props_hash = nil)
-            props_hash = props_hash || props
-            validate_props(props_hash)
-            props_json = Isomorfeus::Transport::PropsProxy.new(props_hash).to_json
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props_json).then do |agent|
-              if agent.processed
-                agent.result
-              else
+          def promise_run(**props_hash)
+            props = validated_props(props_hash)
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props).then do |agent|
+              unless agent.processed
                 agent.processed = true
                 if agent.response.key?(:error)
                   `console.error(#{agent.response[:error].to_n})`
-                  raise agent.response[:error]
+                  Isomorfeus.raise_error(message: agent.response[:error])
                 end
                 agent.result = agent.response[:result]
+              end
+              if agent.result.key?(:rejected)
+                if agent.result.key?(:error)
+                  e = agent.result[:error]
+                  exception_class_name = e[:class_name]
+                  exception_class = exception_class_name.constantize
+                  exception = exception_class.new(e[:message])
+                  exception.set_backtrace(e[:backtrace])
+                  raise exception
+                else
+                  raise agent.result[:rejected]
+                end
+              else
+                agent.result[:resolved]
               end
             end
           end
@@ -59,21 +69,27 @@ module LucidOperation
         base.extend(LucidOperation::Steps)
         base.include(LucidOperation::PromiseRun)
 
-        unless base == LucidOperation::Base
-          base.prop :pub_sub_client, default: nil
-          base.prop :current_user, default: Anonymous.new
-        end
-
         base.instance_exec do
-          def promise_run(props_hash = nil)
-            props_hash = props_hash || props
-            validate_props(props_hash)
-            self.new(props_hash).promise_run
+          def promise_run(**props_hash)
+            self.new(**props_hash).promise_run
           end
         end
 
-        attr_accessor :props
+        attr_reader :props
         attr_accessor :step_result
+
+        def initialize(**props_hash)
+          props_hash = self.class.validated_props(props_hash)
+          @props = LucidProps.new(props_hash)
+        end
+
+        def current_user
+          Isomorfeus.current_user
+        end
+
+        def pub_sub_client
+          Isomorfeus.pub_sub_client
+        end
       end
     end
   end

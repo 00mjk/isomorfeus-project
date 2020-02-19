@@ -51,13 +51,6 @@ RSpec.describe 'LucidLocalOperation' do
       expect(result).to include('Proc')
     end
 
-    it 'the simple operation has one step which returns a bird' do
-      result = on_server do
-        SimpleLocalOperation.steps[0][1].call
-      end
-      expect(result).to eq('a bird')
-    end
-
     it 'the simple operation has the procedure parsed' do
       result = on_server do
         SimpleLocalOperation.gherkin
@@ -85,6 +78,28 @@ RSpec.describe 'LucidLocalOperation' do
         promise.value
       end
       expect(result).to eq('a bird')
+    end
+
+    it 'executes the then block on success' do
+      result = on_server do
+        res = nil
+        SimpleLocalOperation.promise_run.then do |value|
+          res = value
+        end
+        res
+      end
+      expect(result).to eq('a bird')
+    end
+
+    it 'executes the fail block on failure' do
+      result = on_server do
+        res = nil
+        SimpleLocalOperation.promise_run(fail_op: true).fail do |_|
+          res = 'fail called'
+        end
+        res
+      end
+      expect(result).to eq('fail called')
     end
   end
 
@@ -119,6 +134,27 @@ RSpec.describe 'LucidLocalOperation' do
         SimpleLocalOperation.promise_run({})
       end
       expect(result).to eq('a bird')
+    end
+
+    it 'executes the then block on success' do
+      result = @doc.await_ruby do
+        SimpleLocalOperation.promise_run.then do |result|
+          'i see ' + result
+        end
+      end
+      expect(result).to eq('i see a bird')
+    end
+
+    it 'executes the fail block on failure' do
+      # the global vars are a workaround
+      result = @doc.await_ruby do
+        SimpleLocalOperation.promise_run(fail_op: true).fail do |_|
+          $promise_resolved = true
+          $promise_result = 'fail called'
+          'fail called'
+        end
+      end
+      expect(result).to eq('fail called')
     end
   end
 end

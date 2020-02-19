@@ -14,7 +14,7 @@ module Isomorfeus
         # LucidData::Graph
         # LucidData::Composition
 
-        def process_request(pub_sub_client, current_user, response_agent)
+        def process_request(response_agent)
           # promise_send_path('Isomorfeus::Data::Handler::Generic', self.to_s, action, props_hash)
           response_agent.request.each_key do |type_class_name|
             if Isomorfeus.valid_data_class_name?(type_class_name)
@@ -22,10 +22,11 @@ module Isomorfeus
               if type_class
                 response_agent.request[type_class_name].each_key do |action|
                   case action
-                  when 'load' then process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-                  when 'query' then process_query(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-                  when 'save' then process_save(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-                  when 'destroy' then process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+                  when 'load' then process_load(response_agent, type_class, type_class_name)
+                  when 'execute' then process_execute(response_agent, type_class, type_class_name)
+                  when 'create' then process_create(response_agent, type_class, type_class_name)
+                  when 'save' then process_save(response_agent, type_class, type_class_name)
+                  when 'destroy' then process_destroy(response_agent, type_class, type_class_name)
                   else response_agent.error = { error: { action => 'No such thing!' }}
                   end
                 end
@@ -38,15 +39,35 @@ module Isomorfeus
           response_agent.error = { error: "Isomorfeus::Data::Handler::Generic: #{e.message}\n#{e.backtrace.join("\n")}" }
         end
 
-        def process_load(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+        def process_create(response_agent, type_class, type_class_name)
+          # 'Isomorfeus::Data::Handler::Generic', self.name, :create, data_hash
+          data = response_agent.request[type_class_name]['create']
+          instance_data = data['instance']
+          included_items_data = data.key?('included_items') ? data['included_items'] : nil
+          if Isomorfeus.current_user.authorized?(type_class, :create, data)
+            instance = type_class.instance_from_transport(instance_data, included_items_data)
+            created_type = instance.create
+            if created_type
+              response_agent.outer_result = {} unless response_agent.outer_result
+              response_agent.outer_result.deep_merge!(data: created_type.to_transport)
+              if created_type.respond_to?(:included_items_to_transport)
+                response_agent.outer_result.deep_merge!(data: created_type.included_items_to_transport)
+              end
+              response_agent.agent_result = { success: 'ok' }
+            else response_agent.error = { error: { type_class_name => 'Create returned nothing!' }}
+            end
+          else response_agent.error = { error: 'Access denied!' }
+          end
+        end
+
+        def process_load(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key
           props = response_agent.request[type_class_name]['load']
           props.transform_keys!(&:to_sym)
-          props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
-          if current_user.authorized?(type_class, :load, props)
+          if Isomorfeus.current_user.authorized?(type_class, :load, props)
             loaded_type = type_class.load(**props)
             if loaded_type
-              response_agent.outer_result = {} if response_agent.outer_result.nil?
+              response_agent.outer_result = {} unless response_agent.outer_result
               response_agent.outer_result.deep_merge!(data: loaded_type.to_transport)
               if loaded_type.respond_to?(:included_items_to_transport)
                 response_agent.outer_result.deep_merge!(data: loaded_type.included_items_to_transport)
@@ -58,18 +79,15 @@ module Isomorfeus
           end
         end
 
-        def process_query(pub_sub_client, current_user, response_agent, type_class, type_class_name)
-          # 'Isomorfeus::Data::Handler::Generic', self.name, :query, props_json
-          props_json = response_agent.request[type_class_name]['query']
-          props = Oj.load(props_json, mode: :strict)
+        def process_execute(response_agent, type_class, type_class_name)
+          # 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props_json
+          props = response_agent.request[type_class_name]['execute']
           props.transform_keys!(&:to_sym)
-          props[:props].transform_keys!(&:to_sym)
-          props.deep_merge!({ pub_sub_client: pub_sub_client, current_user: current_user })
-          if current_user.authorized?(type_class, :query, props[:props])
-            queried_type = type_class.query(**props)
+          if Isomorfeus.current_user.authorized?(type_class, :execute, props)
+            queried_type = type_class.execute(**props)
             if queried_type
-              response_agent.outer_result = {} if response_agent.outer_result.nil?
-              response_agent.outer_result = { data: queried_type.to_transport }
+              response_agent.outer_result = {} unless response_agent.outer_result
+              response_agent.outer_result.deep_merge!(data: queried_type.to_transport)
               if queried_type.respond_to?(:included_items_to_transport)
                 response_agent.outer_result.deep_merge!(data: queried_type.included_items_to_transport)
               end
@@ -80,15 +98,16 @@ module Isomorfeus
           end
         end
 
-        def process_save(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+        def process_save(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :save, data_hash
-          props = response_agent.request[type_class_name]['save']
-          props.transform_keys!(&:to_sym)
-          props.deep_merge!({ pub_sub_client: pub_sub_client, current_user: current_user })
-          if current_user.authorized?(type_class, :save, props)
-            saved_type = type_class.save(**props)
+          data = response_agent.request[type_class_name]['save']
+          instance_data = data['instance']
+          included_items_data = data.key?('included_items') ? data['included_items'] : nil
+          if Isomorfeus.current_user.authorized?(type_class, :save, data)
+            instance = type_class.instance_from_transport(instance_data, included_items_data)
+            saved_type = instance.save
             if saved_type
-              response_agent.outer_result = {} if response_agent.outer_result.nil?
+              response_agent.outer_result = {} unless response_agent.outer_result
               response_agent.outer_result.deep_merge!(data: saved_type.to_transport)
               if saved_type.respond_to?(:included_items_to_transport)
                 response_agent.outer_result.deep_merge!(data: saved_type.included_items_to_transport)
@@ -100,17 +119,15 @@ module Isomorfeus
           end
         end
 
-        def process_destroy(pub_sub_client, current_user, response_agent, type_class, type_class_name)
+        def process_destroy(response_agent, type_class, type_class_name)
           props = response_agent.request[type_class_name]['destroy']
           props.transform_keys!(&:to_sym)
-          props.merge!(pub_sub_client: pub_sub_client, current_user: current_user)
-          if current_user.authorized?(type_class, :destroy, props)
-            destroyed_type = type_class.destroy(**props)
-            if destroyed_type
-              response_agent.outer_result = {} if response_agent.outer_result.nil?
-              response_agent.outer_result.deep_merge(data: destroyed_type)
+          if Isomorfeus.current_user.authorized?(type_class, :destroy, props)
+            result = type_class.destroy(**props)
+            if result
               response_agent.agent_result = { success: 'ok' }
-            else response_agent.error = { error: { type_class_name => 'Destroy failed!' }}
+            else
+              response_agent.error = { error: { type_class_name => 'Destroy failed!' }}
             end
           else response_agent.error = { error: 'Access denied!' }
           end

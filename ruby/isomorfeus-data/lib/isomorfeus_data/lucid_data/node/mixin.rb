@@ -2,7 +2,6 @@ module LucidData
   module Node
     module Mixin
       def self.included(base)
-        base.extend(LucidPropDeclaration::Mixin)
         base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
@@ -46,9 +45,11 @@ module LucidData
         end
 
         def to_transport
-          hash = _get_selected_attributes
-          hash.merge!("revision" => revision) if revision
-          { @class_name => { @key => hash }}
+          hash = { 'attributes' => _get_selected_attributes }
+          hash.merge!('revision' => revision) if revision
+          result = { @class_name => { @key => hash }}
+          result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+          result
         end
 
         if RUBY_ENGINE == 'opal'
@@ -56,7 +57,7 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
             @_collection = collection
             @_composition = composition
@@ -84,8 +85,12 @@ module LucidData
             @_changed = false
           end
 
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+          end
+
           def each(&block)
-            _get_attributes.each(&block)
+            attributes.each(&block)
           end
 
           def [](name)
@@ -138,28 +143,14 @@ module LucidData
             end
           end
         else # RUBY_ENGINE
-          unless base == LucidData::Node::Base || base == LucidData::Document::Base || base == LucidData::Vertex::Base
-            Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
-          end
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Node::Base || base == LucidData::Document::Base || base == LucidData::Vertex::Base
 
           base.instance_exec do
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, attributes: attributes)
-            end
-
-            def save(key:, revision: nil, attributes: nil, pub_sub_client: nil, current_user: nil)
-              attributes = {} unless attributes
-              _validate_attributes(attributes)
-              data = instance_exec(key: key, revision: revision, attributes: attributes,
-                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
-              revision = data.delete(:revision)
-              attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, attributes: attributes)
+            def instance_from_transport(instance_data, _included_items_data)
+              key = instance_data[self.name].keys.first
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
+              new(key: key, revision: revision, attributes: attributes)
             end
           end
 
@@ -174,6 +165,10 @@ module LucidData
             attributes = {} unless attributes
             _validate_attributes(attributes) if attributes
             @_raw_attributes = attributes
+          end
+
+          def _unchange!
+            @_changed = false
           end
 
           def each(&block)

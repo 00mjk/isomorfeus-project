@@ -1,0 +1,5 @@
+require 'html2text'
+require 'mailhandler'
+require 'isomorfeus-react'
+require 'isomorfeus/mailer/config'
+require 'lucid_mail'

@@ -80,7 +80,7 @@ module LucidStorableObject
                 agent.processed = true
                 if agent.response.key?(:error)
                   `console.error(#{agent.response[:error].to_n})`
-                  raise agent.response[:error]
+                  Isomorfeus.raise_error(message: agent.response[:error])
                 end
                 Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
                 agent.result = instance
@@ -93,8 +93,6 @@ module LucidStorableObject
       else # RUBY_ENGINE
         unless base == LucidStorableObject::Base
           Isomorfeus.add_valid_data_class(base)
-          base.prop :pub_sub_client, default: nil
-          base.prop :current_user, default: Anonymous.new
         end
 
         def initialize(store_path: nil, validated_props: nil)

@@ -12,9 +12,11 @@ if RUBY_ENGINE == 'opal'
   require_tree 'isomorfeus_data', :autoload
   Isomorfeus.zeitwerk.push_dir('data')
 else
+  require 'uri'
   require 'oj'
   require 'active_support'
   require 'active_support/core_ext/hash'
+  require 'arango-driver'
 
   require 'isomorfeus_data/lucid_data/query_result'
   require 'isomorfeus_data/lucid_data/array/mixin'
@@ -44,6 +46,8 @@ else
   require 'isomorfeus_data/lucid_data/graph/base'
   require 'isomorfeus_data/lucid_data/composition/mixin'
   require 'isomorfeus_data/lucid_data/composition/base'
+  require 'isomorfeus_data/lucid_data/query/mixin'
+  require 'isomorfeus_data/lucid_data/query/base'
 
   require 'isomorfeus_data/lucid_data/generic_collection'
   require 'isomorfeus_data/lucid_data/generic_edge'

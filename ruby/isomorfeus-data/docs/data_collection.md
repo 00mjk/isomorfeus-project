@@ -31,10 +31,10 @@ c[0].key # -> '1' - access key of first node
 #### Loading
 ```
 class MyCollection < LucidData::Collection::Base
-  execute_load do |key:, current_user:, pub_sub_client:|
+  execute_load do |key:|
     a = MyNode.new(key: '1')
     b = MyNode.new(key: '2')
-    { key: key, nodes: [a, b] } # also here the other terms work instead of nodes: documents, vertices, vertexes
+    new(key: key, nodes: [a, b]) # also here the other terms work instead of nodes: documents, vertices, vertexes
   end
 end
 

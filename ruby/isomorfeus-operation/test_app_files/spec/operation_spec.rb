@@ -58,13 +58,6 @@ RSpec.describe 'LucidOperation' do
       expect(result).to include('Proc')
     end
 
-    it 'the simple operation has one step which returns a bird' do
-      result = on_server do
-        SimpleOperation.steps[0][1].call
-      end
-      expect(result).to eq('a bird')
-    end
-
     it 'the simple operation has the procedure parsed' do
       result = on_server do
         SimpleOperation.gherkin
@@ -92,6 +85,28 @@ RSpec.describe 'LucidOperation' do
         promise.value
       end
       expect(result).to eq('a bird')
+    end
+
+    it 'executes the then block on success' do
+      result = on_server do
+        res = nil
+        SimpleOperation.promise_run.then do |value|
+          res = value
+        end
+        res
+      end
+      expect(result).to eq('a bird')
+    end
+
+    it 'executes the fail block on failure' do
+      result = on_server do
+        res = nil
+        SimpleOperation.promise_run(fail_op: true).fail do |_|
+          res = 'fail called'
+        end
+        res
+      end
+      expect(result).to eq('fail called')
     end
   end
 
@@ -126,6 +141,24 @@ RSpec.describe 'LucidOperation' do
         SimpleOperation.promise_run({})
       end
       expect(result).to eq('a bird')
+    end
+
+    it 'executes the then block on success' do
+      result = @doc.await_ruby do
+        SimpleOperation.promise_run.then do |result|
+          'i see ' + result
+        end
+      end
+      expect(result).to eq('i see a bird')
+    end
+
+    it 'executes the fail block on failure' do
+      result = @doc.await_ruby do
+        SimpleOperation.promise_run(fail_op: true).fail do |_|
+          'fail called'
+        end
+      end
+      expect(result).to eq('fail called')
     end
   end
 end

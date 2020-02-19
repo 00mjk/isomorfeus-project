@@ -113,6 +113,32 @@ RSpec.describe 'LucidData::Document' do
       expect(result).to be(true)
     end
 
+    it 'can load a simple node' do
+      result = on_server do
+        node = SimpleNode.load(key: '123')
+        node.one
+      end
+      expect(result).to eq('123')
+    end
+
+    it 'can destroy a simple node' do
+      result = on_server do
+        SimpleNode.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
+
+    it 'can save a simple node' do
+      result = on_server do
+        node = SimpleNode.load(key: '123')
+        node.one = 'changed'
+        before_changed = node.changed?
+        node.save
+        [node.one, before_changed, node.changed?]
+      end
+      expect(result).to eq(['changed', true, false])
+    end
+
     it 'converts to sid' do
       result = on_server do
         class TestDocumentMixinC < LucidData::Document::Base
@@ -156,7 +182,7 @@ RSpec.describe 'LucidData::Document' do
         document = TestDocumentMixinC.new(key: 12, attributes: { test_attribute: 'test'})
         document.to_transport
       end
-      expect(result).to eq("TestDocumentMixinC"=>{"12"=>{"test_attribute" => "test"}})
+      expect(result).to eq("TestDocumentMixinC"=>{"12"=>{"attributes" => { "test_attribute" => "test"}}})
     end
 
     it 'keeps server_only attribute on server' do
@@ -167,7 +193,7 @@ RSpec.describe 'LucidData::Document' do
         document = TestDocumentMixinC.new(key: 13, attributes: { test_attribute: 'test' })
         document.to_transport
       end
-      expect(result).to eq("TestDocumentMixinC"=>{"13"=>{}})
+      expect(result).to eq("TestDocumentMixinC"=>{"13"=>{"attributes" =>{}}})
     end
   end
 
@@ -287,6 +313,35 @@ RSpec.describe 'LucidData::Document' do
       expect(result).to be(true)
     end
 
+    it 'can load a simple node' do
+      result = @doc.await_ruby do
+        SimpleNode.promise_load(key: '123').then do |node|
+          node.one
+        end
+      end
+      expect(result).to eq('123')
+    end
+
+    it 'can destroy a simple node' do
+      result = @doc.await_ruby do
+        SimpleNode.promise_destroy(key: '123').then { |result| result }
+      end
+      expect(result).to eq(true)
+    end
+
+    it 'can save a simple node' do
+      result = @doc.await_ruby do
+        SimpleNode.promise_load(key: '123').then do |node|
+          node.one = 'changed'
+          before_changed = node.changed?
+          node.promise_save.then do |node|
+            [node.one, before_changed, node.changed?]
+          end
+        end
+      end
+      expect(result).to eq(['changed', true, false])
+    end
+
     it 'converts to sid' do
       result = @doc.evaluate_ruby do
         class TestDocumentMixinC < LucidData::Document::Base
@@ -330,7 +385,7 @@ RSpec.describe 'LucidData::Document' do
         document = TestDocumentMixinC.new(key: 28, attributes: { test_attribute: 'test' })
         document.to_transport.to_n
       end
-      expect(result).to eq("TestDocumentMixinC" => {"28"=>{"test_attribute" => "test"}})
+      expect(result).to eq("TestDocumentMixinC" => {"28"=>{"attributes" => {"test_attribute" => "test"}}})
     end
 
     it 'can load' do

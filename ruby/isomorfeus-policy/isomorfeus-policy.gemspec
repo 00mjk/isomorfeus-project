@@ -10,13 +10,13 @@ Gem::Specification.new do |s|
   s.summary      = 'Policies for Isomorfeus.'
   s.description  = 'Policies for Isomorfeus.'
   s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
-  s.files        = `git ls-files -- {lib,LICENSE,README.md}`.split("\n")
+  s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
 
   s.add_dependency 'opal', '>= 1.0.0'
-  s.add_dependency 'isomorfeus-react', '>= 16.12.9'
-  s.add_dependency 'isomorfeus-redux', '~> 4.0.17'
+  s.add_dependency 'isomorfeus-react', '>= 16.12.20'
+  s.add_dependency 'isomorfeus-redux', '~> 4.0.18'
   s.add_development_dependency 'isomorfeus', Isomorfeus::Policy::VERSION
   s.add_development_dependency 'opal-webpack-loader', '>= 0.9.10'
   s.add_development_dependency 'rake'

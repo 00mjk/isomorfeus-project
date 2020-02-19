@@ -3,9 +3,7 @@
 module Isomorfeus
   module Transport
     module ServerProcessor
-      def process_request(client, current_user, request, handler_instance_cache, response_agent_array)
-        Thread.current[:isomorfeus_pub_sub_client] = client
-
+      def process_request(request, handler_instance_cache, response_agent_array)
         if request.key?('request') && request['request'].key?('agent_ids')
           request['request']['agent_ids'].each_key do |agent_id|
             request['request']['agent_ids'][agent_id].each_key do |handler_class_name|
@@ -19,7 +17,7 @@ module Isomorfeus
                             handler_instance_cache[handler_class_name] = handler_class.new if handler_class
                           end
                 if handler
-                  handler.process_request(client, current_user, response_agent)
+                  handler.process_request(response_agent)
                 else
                   response_agent.error = { error: { handler_class_name => 'No such handler!'}}
                 end
@@ -35,8 +33,8 @@ module Isomorfeus
 
             if Isomorfeus.valid_channel_class_name?(class_name) && channel
               channel_class = Isomorfeus.cached_channel_class(class_name)
-              if channel_class && current_user.authorized?(channel_class, :send_message, channel)
-                client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
+              if channel_class && Isomorfeus.current_user.authorized?(channel_class, :send_message, channel)
+                Isomorfeus.pub_sub_client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
               else
                 response_agent = OpenStruct.new
                 response_agent_array << response_agent
@@ -61,8 +59,8 @@ module Isomorfeus
             class_name = response_agent.request['class']
             if Isomorfeus.valid_channel_class_name?(class_name) && channel
               channel_class = Isomorfeus.cached_channel_class(class_name)
-              if channel_class && current_user.authorized?(channel_class, :subscribe, channel)
-                client.subscribe(channel)
+              if channel_class && Isomorfeus.current_user.authorized?(channel_class, :subscribe, channel)
+                Isomorfeus.pub_sub_client.subscribe(channel)
                 response_agent.agent_result = { success: channel }
               else
                 response_agent.error = { error: "Not authorized!"}
@@ -82,8 +80,8 @@ module Isomorfeus
             class_name = response_agent.request['class']
             if Isomorfeus.valid_channel_class_name?(class_name) && channel
               channel_class = Isomorfeus.cached_channel_class(class_name)
-              if channel_class && current_user.authorized?(channel_class, :unsubscribe, channel)
-                client.unsubscribe(channel)
+              if channel_class && Isomorfeus.current_user.authorized?(channel_class, :unsubscribe, channel)
+                Isomorfeus.pub_sub_client.unsubscribe(channel)
                 response_agent.agent_result = { success: channel }
               else
                 response_agent.error = { error: "Not authorized!"}

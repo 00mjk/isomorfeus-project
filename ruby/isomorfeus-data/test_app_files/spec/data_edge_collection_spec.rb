@@ -45,6 +45,13 @@ RSpec.describe 'LucidData::EdgeCollection' do
       expect(result).to eq(5)
     end
 
+    it 'can destroy a simple edge collection' do
+      result = on_server do
+        SimpleEdgeCollection.destroy(key: '123')
+      end
+      expect(result).to eq(true)
+    end
+
     it 'can convert a simple collection on the server to transport' do
       result = on_server do
         collection = SimpleEdgeCollection.load(key: 2)
@@ -53,7 +60,7 @@ RSpec.describe 'LucidData::EdgeCollection' do
       expect(result).to eq({"SimpleEdgeCollection"=>{"2"=>{"attributes"=>{}, "edges"=>[["SimpleEdge", "1"],
                                                                                    ["SimpleEdge", "2"],
                                                                                    ["SimpleEdge", "3"],
-                                                                                   ["SimpleEdge", "4"], 
+                                                                                   ["SimpleEdge", "4"],
                                                                                    ["SimpleEdge", "5"]]}}})
     end
 
@@ -96,13 +103,20 @@ RSpec.describe 'LucidData::EdgeCollection' do
       expect(result).to eq('TestEdgeCollectionM')
     end
 
-    it 'can load a simple collection on the client' do
+    it 'can load a simple edge collection' do
       result = @doc.await_ruby do
         SimpleEdgeCollection.promise_load(key: 6).then do |collection|
           collection.size
         end
       end
       expect(result).to eq(5)
+    end
+
+    it 'can destroy a simple edge collection' do
+      result = @doc.await_ruby do
+        SimpleEdgeCollection.promise_destroy(key: '123').then { |result| result }
+      end
+      expect(result).to eq(true)
     end
   end
 

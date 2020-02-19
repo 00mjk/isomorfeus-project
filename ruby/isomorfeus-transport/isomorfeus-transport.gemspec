@@ -10,16 +10,17 @@ Gem::Specification.new do |s|
   s.summary      = 'Various transport options for Isomorfeus.'
   s.description  = 'Various transport options for Isomorfeus.'
   s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
-  s.files        = `git ls-files -- {lib,LICENSE,README.md}`.split("\n")
+  s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.0'
+  s.add_dependency 'bcrypt', '~> 3.1.13'
   s.add_dependency 'iodine', '~> 0.7.38'
   s.add_dependency 'oj', '>= 3.10.0'
   s.add_dependency 'opal', '>= 1.0.0'
-  s.add_dependency 'isomorfeus-redux', '~> 4.0.17'
-  s.add_dependency 'isomorfeus-react', '>= 16.12.9'
+  s.add_dependency 'isomorfeus-redux', '~> 4.0.18'
+  s.add_dependency 'isomorfeus-react', '>= 16.12.20'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
   s.add_dependency 'websocket-driver', '~> 0.7.0'
   s.add_development_dependency 'isomorfeus', Isomorfeus::Transport::VERSION

@@ -7,13 +7,13 @@ Gem::Specification.new do |s|
   s.email        = 'jan@kursator.de'
   s.license      = 'MIT'
   s.homepage     = 'http://isomorfeus.com'
-  s.summary      = 'Create new isomorfeus-project applications with ease.'
-  s.description  = 'Create new isomorfeus-project applications with ease.'
+  s.summary      = 'Command line utilities and installer for isomorfeus projects.'
+  s.description  = 'Command line utilities (console, yandle) and installer for isomorfeus projects.'
   s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
   s.bindir       = 'bin'
   s.executables  << 'isomorfeus'
   s.executables  << 'yandle'
-  s.files        = `git ls-files -- {lib,LICENSE,readme.md}`.split("\n")
+  s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
 
@@ -23,13 +23,14 @@ Gem::Specification.new do |s|
   s.add_dependency 'pry', '~> 0.12.2'
   s.add_dependency 'opal-webpack-loader', '>= 0.9.10'
   s.add_dependency 'thor', '>= 0.19.4'
-  s.add_dependency 'isomorfeus-react', '>= 16.12.9'
-  s.add_dependency 'isomorfeus-redux', '~> 4.0.17'
+  s.add_dependency 'isomorfeus-react', '>= 16.12.20'
+  s.add_dependency 'isomorfeus-redux', '~> 4.0.18'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-transport', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-data', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-i18n', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-operation', Isomorfeus::VERSION
+  s.add_dependency 'isomorfeus-mailer', Isomorfeus::VERSION
 
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'rake'

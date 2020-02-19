@@ -22,6 +22,7 @@ Data must then be shaped (usually in to a Hash or Array) to fit the Isomorfeus D
 
 - [Core Concepts](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/concepts.md)
 - [Common API](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/common_api.md)
+- [Data Policy](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_policy.md)
 
 ### Available Classes
 

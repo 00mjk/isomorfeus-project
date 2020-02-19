@@ -40,6 +40,10 @@ module LucidChannel
           channel = channel ? channel : self.name
           Isomorfeus::Transport.unsubscribe(self, channel)
         end
+
+        def current_user
+          Isomorfeus.current_user
+        end
       end
     end
   end

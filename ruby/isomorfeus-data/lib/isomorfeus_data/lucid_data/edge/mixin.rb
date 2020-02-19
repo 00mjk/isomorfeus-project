@@ -2,7 +2,6 @@ module LucidData
   module Edge
     module Mixin
       def self.included(base)
-        base.extend(LucidPropDeclaration::Mixin)
         base.include(Isomorfeus::Data::AttributeSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
@@ -57,7 +56,9 @@ module LucidData
                    "from" => from_as_sid,
                    "to" => to_as_sid }
           hash.merge!("revision" => revision) if revision
-          { @class_name => { @key => hash }}
+          result = { @class_name => { @key => hash }}
+          result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
+          result
         end
 
         if RUBY_ENGINE == 'opal'
@@ -65,9 +66,7 @@ module LucidData
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
-            @_store_path = [:data_state, @class_name, @key, :attributes]
-            @_from_path = [:data_state, @class_name, @key, :from]
-            @_to_path = [:data_state, @class_name, @key, :to]
+            _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, @class_name, @key, :revision)
             @_collection = collection
             @_composition = composition
@@ -113,8 +112,14 @@ module LucidData
             @_changed = false
           end
 
+          def _update_paths
+            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_from_path = [:data_state, @class_name, @key, :from]
+            @_to_path = [:data_state, @class_name, @key, :to]
+          end
+
           def each(&block)
-            _get_attributes.each(&block)
+            attributes.each(&block)
           end
 
           def [](name)
@@ -162,32 +167,31 @@ module LucidData
             node
           end
         else # RUBY_ENGINE
-          unless base == LucidData::Edge::Base || base == LucidData::Link::Base
-            Isomorfeus.add_valid_data_class(base)
-            base.prop :pub_sub_client, default: nil
-            base.prop :current_user, default: Anonymous.new
-          end
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Edge::Base || base == LucidData::Link::Base
 
           base.instance_exec do
-            def load(key:, pub_sub_client: nil, current_user: nil)
-              data = instance_exec(key: key, pub_sub_client: pub_sub_client, current_user: current_user, &@_load_block)
-              revision = data.delete(:revision)
-              from = data.delete(:from)
-              to = data.delete(:to)
-              attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, from: from, to: to, attributes: attributes)
-            end
-
-            def save(key:, revision: nil, from:, to:, attributes: nil, pub_sub_client: nil, current_user: nil)
-              attributes = {} unless attributes
-              _validate_attributes(attributes)
-              data = instance_exec(key: key, revision: revision, from: from, to: to, attributes: attributes,
-                                   pub_sub_client: pub_sub_client, current_user: current_user, &@_save_block)
-              revision = data.delete(:revision)
-              from = data.delete(:from)
-              to = data.delete(:to)
-              attributes = data.delete(:attributes)
-              self.new(key: key, revision: revision, from: from, to: to, attributes: attributes)
+            def instance_from_transport(instance_data, included_items_data)
+              key = instance_data[self.name].keys.first
+              revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
+              from_node_sid = instance_data[self.name][key].key?('from') ? instance_data[self.name][key]['from'] : nil
+              to_node_sid = instance_data[self.name][key].key?('to') ? instance_data[self.name][key]['to'] : nil
+              from_to = []
+              if from_node_sid && to_node_sid
+                [from_node_sid, to_node_sid].each do |sid|
+                  node_class_name = sid[0]
+                  node_key = sid[1]
+                  Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Not a valid LucidData class!") unless Isomorfeus.valid_data_class_name?(node_class_name)
+                  if included_items_data.key?(node_class_name) && included_items_data[node_class_name].key?(node_key)
+                    node_class = Isomorfeus.cached_data_class(node_class_name)
+                    Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name}: Cannot get class!") unless node_class
+                    node = node_class.instance_from_transport({ node_class_name => { node_key => included_items_data[node_class_name][node_key] }}, included_items_data)
+                    Isomorfeus.raise_error(message: "#{self.name}: #{node_class_name} with key #{node_key} could not be extracted from transport data!") unless node
+                    from_to << node
+                  end
+                end
+              end
+              new(key: key, revision: revision, attributes: attributes, from: from_to[0], to: from_to[1])
             end
           end
 
@@ -218,6 +222,10 @@ module LucidData
                        end
           end
 
+          def _unchange!
+            @_changed =false
+          end
+
           def each(&block)
             @_raw_attributes.each(&block)
           end
@@ -237,7 +245,7 @@ module LucidData
           end
 
           def from=(node)
-            raise "A invalid 'from' was given" unless node
+            Isomorfeus.raise_error(message: "A invalid 'from' was given") unless node
             changed!
             old_from = from
             if node.respond_to?(:to_sid)
@@ -257,7 +265,7 @@ module LucidData
           end
 
           def to=(node)
-            raise "A invalid 'to' was given" unless node
+            Isomorfeus.raise_error(message: "A invalid 'to' was given") unless node
             old_to = to
             changed!
             if node.respond_to?(:to_sid)
