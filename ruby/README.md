@@ -21,6 +21,7 @@ At the [Isomorfeus Framework Project](http://isomorfeus.com)
 - [Isomorfeus Operation - Isomorphic business operations](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-operation/README.md)
 - [Isomorfeus Policy - Isomorphic Policy](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-policy/README.md)
 - [Isomorfeus Transport - Cahnnels, PubSub and Authentication](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-transport/README.md)
+- [Isomorfeus Server Roda Application](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/docs/roda_app.md)
 
 ### For very advanced usage
 - [Isomorfeus Redux](https://github.com/isomorfeus/isomorfeus-redux/blob/master/ruby/README.md)
