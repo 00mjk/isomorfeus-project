@@ -47,7 +47,7 @@ If you want to work without using containers on macOS again, you must delete the
 ### Editing your first component
 Then open browser at [http://localhost:5000](http://localhost:5000).
 By default you will see a simple WelcomeComponent.
-The component is located in the file my_project/app/components/welcome_component.rb
+The component is located in the file `my_project/app/components/welcome_component.rb`.
 Open the File your favorite ruby editor or IDE and change the text. After saving, the changed text should appear instantly in the Browser.
 
 To learn more about components may have a look at the
