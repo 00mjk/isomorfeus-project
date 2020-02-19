@@ -5,39 +5,24 @@ Create new isomorfeus applications with ease.
 ### Community and Support
 At the [Isomorfeus Framework Project](http://isomorfeus.com) 
 
-#### Supported Isomorfeus modules
-- isomorfeus-react
-- isomorfeus-redux
-
-#### Supported asset bundlers
-- webpack with opal-webpack-loader
-
 ## Installation
-```bash
+```shell script
 gem install isomorfeus
 ```
 
 ## Creating new applications
 To create a new application execute:
-```bash
+```shell script
 isomorfeus new my_application
 ```
 
-### Options
-```bash
-isomorfeus help
-```
-
-```
+### Commands
+```shell script
+$ isomorfeus help
 Commands:
-  isomorfeus help [COMMAND]    # Describe available commands or one specific command
-  isomorfeus new project_name  # create a new isomorfeus project with project_name
-```
-
-```
-Available options for the command 'new':
-  -y, [--yarn-and-bundle], [--no-yarn-and-bundle]  # Execute yarn install and bundle install. (optional)
-                                                   # Default: true
+    isomorfeus console                       # Open console for current project.
+    isomorfeus help [COMMAND]                # Describe available commands or one specific command
+    isomorfeus new project_name              # Create a new isomorfeus project with project_name.
 ```
 
 ### Yandle
