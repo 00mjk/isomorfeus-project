@@ -10,7 +10,7 @@ At the [Isomorfeus Framework Project](http://isomorfeus.com)
 ## Documentation
 
 ### Getting started
-- [Get started](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/docs/get_started.md)
+- [Get started](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/docs/get_started_web.md)
 
 ### Isomorfeus modules
 - [Isomorfeus installer and command execution](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus/README.md)
