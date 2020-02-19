@@ -10,7 +10,7 @@ before_script:
   - echo arangodb3 arangodb3/password_again password root | sudo debconf-set-selections
   - sudo dpkg -i arangodb3_3.6.0-1_amd64.deb
   - sudo apt-get install libdb-dev
-  - gem install bundler
+  - gem install builder
   - gem install dbm
 env:
   - LC_ALL=en_US.UTF-8 ARANGO_USER=root ARANGO_PASSWORD=root
