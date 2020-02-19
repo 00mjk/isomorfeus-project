@@ -11,7 +11,7 @@ At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ### Getting started
 - [Get started](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/docs/get_started_web.md)
-
+- [Project Structure](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/docs/project_structure.md)
 ### Isomorfeus modules
 - [Isomorfeus installer and command execution](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus/README.md)
 - [Isomorfeus React - Develop Rect Components in Ruby](https://github.com/isomorfeus/isomorfeus-react/blob/master/ruby/README.md)

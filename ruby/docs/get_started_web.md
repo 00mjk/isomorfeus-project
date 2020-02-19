@@ -50,5 +50,6 @@ By default you will see a simple WelcomeComponent.
 The component is located in the file `my_project/app/components/welcome_component.rb`.
 Open the File your favorite ruby editor or IDE and change the text. After saving, the changed text should appear instantly in the Browser.
 
-To learn more about components may have a look at the
+Understand the generic project structure [here](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/docs/project_structure.md)
+and to learn more about components may have a look at the
 [isomorfeus-react documentation](https://github.com/isomorfeus/isomorfeus-react/blob/master/ruby/README.md).
