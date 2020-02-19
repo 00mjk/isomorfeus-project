@@ -31,6 +31,10 @@ User.promise_login(user: user_identifier, pass: user_password_or_token) do |user
   # return a path for redirection
 end
 ```
+
+> *ATTENTION:* The standard isomorfeus authentication scheme accepts a *block* -> `promise_login() do` and *NOT* a `promise_login().then do`. 
+Other authentication though schemes may accept a `promise_login().then` (see the facebook scheme example below).
+
 or later on:
 ```ruby
 user.promise_logout
