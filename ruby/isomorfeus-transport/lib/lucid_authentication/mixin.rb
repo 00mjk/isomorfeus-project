@@ -75,15 +75,23 @@ module LucidAuthentication
             @execute_login_block = block
           end
 
-          def promise_login(user: nil, pass: nil, scheme: :isomorfeus)
-            send("promise_authentication_with_#{scheme}", user: user, pass: pass)
+          def promise_login(user: nil, pass: nil, scheme: :isomorfeus, &block)
+            send("promise_authentication_with_#{scheme}", user: user, pass: pass, &block)
           end
 
-          def promise_authentication_with_isomorfeus(user: nil, pass: nil)
+          def promise_authentication_with_isomorfeus(user: nil, pass: nil, &block)
             promise_or_user = @execute_login_block.call(user: user, pass: pass)
             if promise_or_user.class == Promise
-              promise_or_user
+              if block_given?
+                promise_or_user.then do |user|
+                  block.call(user)
+                  user
+                end
+              else
+                promise_or_user
+              end
             else
+              block.call(user) if block_given?
               Promise.new.resolve(promise_or_user)
             end
           end
