@@ -43,6 +43,7 @@ class LucidMail
       body text_body
     end
     @mail.html_part do
+      content_transfer_encoding 'binary'
       content_type 'text/html; charset=UTF-8'
       body html_body
     end
