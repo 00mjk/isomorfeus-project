@@ -1,5 +1,5 @@
 module Isomorfeus
   module Data
-    VERSION = '1.0.0.zeta19'
+    VERSION = '1.0.0.zeta20'
   end
 end
