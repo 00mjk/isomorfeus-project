@@ -102,7 +102,7 @@ which will raise a LucidPolicy::Exception unless authorized
 Besides calling methods or executing blocks from allow or deny, custom rules can be defined. Example:
 ```ruby
 class MyUserPolicy < LucidPolicy::Base
-  rule BlaGraph, :load, :count do |user, target_class, target_method, props|
+  rule BlaGraph, :load, :count do |user, target_class_name, target_method, props|
     allow if user.verified?
     allow if user.admin?
     deny
@@ -122,7 +122,7 @@ The recommended default rule for combined policies is `deny others`.
 Given a:
 ```ruby
   class AdminRolePolicy < LucidPolicy::Base
-    rule BlaGraph, :load, :count do |user, target_class, target_method, props|
+    rule BlaGraph, :load, :count do |user, target_class_name, target_method, props|
       allow if user.verified?
       deny
     end
