@@ -27,8 +27,15 @@ end
 ```
 With that its possible to do on the client (or server):
 ```ruby
+User.promise_login(user: user_identifier, pass: user_password_or_token)
+# or
 User.promise_login(user: user_identifier, pass: user_password_or_token) do |user|
   # return a path for redirection
+  # user is the instance of the logged in user, but current_user has not been set 
+  # current_user will be set and globally available after the redirect.
+  # If this block is used it must return a path starting with '/', it will be the path the system redirects the
+  # user to, the path the user will land on after successful login 
+  '/dashboard'
 end
 ```
 
