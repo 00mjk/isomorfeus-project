@@ -162,7 +162,7 @@ When then authorizing:
 ```ruby
 my_user.authorized?(BlaGraph, :load)
 ```
-the reason for access aor denied access, the winning rule, cen be inspected: 
+the reason for access or denied access, the winning rule, can be inspected: 
 ```ruby
 my_user.authozation_reason
 ```
