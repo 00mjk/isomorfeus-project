@@ -346,7 +346,7 @@ RSpec.describe 'LucidPolicy' do
 
     it 'can record the winning rule' do
       result = on_server do
-        class ::UserK
+        class ::UserL
           include LucidAuthorization::Mixin
 
           def validated?
@@ -365,11 +365,11 @@ RSpec.describe 'LucidPolicy' do
         class CombiAPolicy < LucidPolicy::Base
           allow Resource
         end
-        class ::UserKPolicy < LucidPolicy::Base
+        class ::UserLPolicy < LucidPolicy::Base
           combine_with CombiAPolicy
           deny others
         end
-        user = UserK.new
+        user = UserL.new
         user.record_authorization_reason
         user.authorized?(Resource)
         result_for_class = user.authorization_reason
@@ -385,15 +385,15 @@ RSpec.describe 'LucidPolicy' do
       expect(result).to eq([{ combined: { class_name: "Resource",
                                           others: :deny,
                                           policy_class: "CombiAPolicy" },
-                              policy_class: "UserKPolicy" },
+                              policy_class: "UserLPolicy" },
                             { combined: { class_name: "Resource",
                                           others: :deny,
                                           policy_class: "CombiAPolicy" },
-                              policy_class: "UserKPolicy" },
+                              policy_class: "UserLPolicy" },
                             { combined: { class_name: "Test",
                                           others: :deny,
                                           policy_class: "CombiAPolicy" },
-                              policy_class: "UserKPolicy" },
+                              policy_class: "UserLPolicy" },
                             nil])
     end
   end
@@ -743,6 +743,59 @@ RSpec.describe 'LucidPolicy' do
         [result_for_class, result_for_a_method, result_for_d_method]
       end
       expect(result).to eq([true, true, true])
+    end
+
+    it 'can record the winning rule' do
+      result = @doc.evaluate_ruby do
+        class UserL
+          include LucidAuthorization::Mixin
+
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class CombiAPolicy < LucidPolicy::Base
+          allow Resource
+        end
+        class UserLPolicy < LucidPolicy::Base
+          combine_with CombiAPolicy
+          deny others
+        end
+        user = UserL.new
+        user.record_authorization_reason
+        user.authorized?(Resource)
+        result_for_class = user.authorization_reason.to_n
+        user.authorized?(Resource, :load)
+        result_for_a_method = user.authorization_reason.to_n
+        user.authorized?('Test', :load)
+        result_for_d_method = user.authorization_reason.to_n
+        user.stop_to_record_authorization_reason
+        user.authorized?('Test', :load)
+        result_for_c_method = user.authorization_reason.to_n
+        [result_for_class, result_for_a_method, result_for_d_method, result_for_c_method]
+      end
+      expect(result).to eq([{ 'combined' =>{ 'class_name' => "Resource",
+                                             'others' => 'deny',
+                                             'policy_class' => "CombiAPolicy" },
+                              'policy_class' => "UserLPolicy" },
+                            { 'combined' => { 'class_name' => "Resource",
+                                              'others' => 'deny',
+                                              'policy_class' => "CombiAPolicy" },
+                              'policy_class' => "UserLPolicy" },
+                            { 'combined' => { 'class_name' => "Test",
+                                              'others' => 'deny',
+                                              'policy_class' => "CombiAPolicy" },
+                              'policy_class' => "UserLPolicy" },
+                            nil])
     end
   end
 end

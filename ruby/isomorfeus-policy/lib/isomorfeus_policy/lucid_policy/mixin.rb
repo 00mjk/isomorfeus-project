@@ -65,6 +65,7 @@ module LucidPolicy
           thing_or_block = block_given? ? block : thing
 
           target_classes.each do |target_class|
+            target_class = target_class.split('>::').last if target_class.start_with?('#<')
             rules[:rules][target_class] = {} unless rules[:rules].key?(target_class)
 
             if target_methods.empty?
@@ -161,9 +162,10 @@ module LucidPolicy
       end
 
       def authorized!(target_class, target_method = nil, props = nil)
-        return true if authorized?(target_class, target_method, props)
+        result = authorized?(target_class, target_method, props)
         reason_message = reason ? ", reason: #{reason}" : ''
-        Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{@object}: not authorized to call #{target_class}.#{target_method}(#{props})#{reason_message}!")
+        return true if result
+        Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{@object}: not authorized to call #{target_class}#{}#{target_method} #{props} #{reason_message}!")
       end
 
       private
