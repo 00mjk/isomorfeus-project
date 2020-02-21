@@ -383,11 +383,11 @@ RSpec.describe 'LucidPolicy' do
         [result_for_class, result_for_a_method, result_for_d_method, result_for_c_method]
       end
       [{ combined: { class_name: "Resource",
-                     others: :deny,
+                     rule: :allow,
                      policy_class: "CombiAPolicy" },
          policy_class: "UserLPolicy" },
        { combined: { class_name: "Resource",
-                     others: :deny,
+                     rule: :allow,
                      policy_class: "CombiAPolicy" },
          policy_class: "UserLPolicy" },
        { combined: { class_name: "Test",
@@ -786,11 +786,11 @@ RSpec.describe 'LucidPolicy' do
         [result_for_class, result_for_a_method, result_for_d_method, result_for_c_method]
       end
       [{ 'combined' =>{ 'class_name' => "Resource",
-                         'others' => 'deny',
-                         'policy_class' => "CombiAPolicy" },
+                        'rule' => 'allow',
+                        'policy_class' => "CombiAPolicy" },
           'policy_class' => "UserLPolicy" },
         { 'combined' => { 'class_name' => "Resource",
-                          'others' => 'deny',
+                          'rule' => 'allow',
                           'policy_class' => "CombiAPolicy" },
           'policy_class' => "UserLPolicy" },
         { 'combined' => { 'class_name' => "Test",
