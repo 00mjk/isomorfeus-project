@@ -153,3 +153,25 @@ class MyUserPolicy < LucidPolicy::Base
   deny others
 end
 ```
+### Debugging Policies or finding out the winning rule
+Its possible to start recording the reason for a authorization result:
+```ruby
+my_user.record_authorization_reason
+```
+When then authorizing:
+```ruby
+my_user.authorized?(BlaGraph, :load)
+```
+the reason for access aor denied access, the winning rule, cen be inspected: 
+```ruby
+my_user.authozation_reason
+```
+
+It will be a Hash and show the responsible policy class, condition, condition result, etc. Example:
+```ruby
+{ combined:
+  { class_name: "Resource",
+    others: :deny,
+    policy_class: "CombinedPolicy" },
+  policy_class: "UserPolicy" }
+```

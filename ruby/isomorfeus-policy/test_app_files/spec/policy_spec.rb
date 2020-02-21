@@ -343,6 +343,59 @@ RSpec.describe 'LucidPolicy' do
       end
       expect(result).to eq([true, true, true])
     end
+
+    it 'can record the winning rule' do
+      result = on_server do
+        class ::UserK
+          include LucidAuthorization::Mixin
+
+          def validated?
+            true
+          end
+        end
+        class Resource
+          def run_denied
+            raise "it was run though it shouldn't have"
+          end
+
+          def run_allowed
+            true
+          end
+        end
+        class CombiAPolicy < LucidPolicy::Base
+          allow Resource
+        end
+        class ::UserKPolicy < LucidPolicy::Base
+          combine_with CombiAPolicy
+          deny others
+        end
+        user = UserK.new
+        user.record_authorization_reason
+        user.authorized?(Resource)
+        result_for_class = user.authorization_reason
+        user.authorized?(Resource, :load)
+        result_for_a_method = user.authorization_reason
+        user.authorized?('Test', :load)
+        result_for_d_method = user.authorization_reason
+        user.stop_to_record_authorization_reason
+        user.authorized?('Test', :load)
+        result_for_c_method = user.authorization_reason
+        [result_for_class, result_for_a_method, result_for_d_method, result_for_c_method]
+      end
+      expect(result).to eq([{ combined: { class_name: "Resource",
+                                          others: :deny,
+                                          policy_class: "CombiAPolicy" },
+                              policy_class: "UserKPolicy" },
+                            { combined: { class_name: "Resource",
+                                          others: :deny,
+                                          policy_class: "CombiAPolicy" },
+                              policy_class: "UserKPolicy" },
+                            { combined: { class_name: "Test",
+                                          others: :deny,
+                                          policy_class: "CombiAPolicy" },
+                              policy_class: "UserKPolicy" },
+                            nil])
+    end
   end
 
   context 'on client' do

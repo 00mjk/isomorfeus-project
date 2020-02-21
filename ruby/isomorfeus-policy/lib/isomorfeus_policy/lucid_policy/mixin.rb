@@ -56,7 +56,7 @@ module LucidPolicy
               if class_method_option.class == Symbol && class_or_method_s[0].downcase == class_or_method_s[0]
                 target_methods << class_method_option
               else
-                class_method_option = class_method_option.to_s unless class_method_option.class == String
+                class_method_option = class_or_method_s unless class_method_option.class == String
                 target_classes << class_method_option
               end
             end
@@ -82,14 +82,23 @@ module LucidPolicy
         end
       end
 
-      def initialize(object)
+      attr_reader :reason
+
+      def initialize(object, record_reason = nil)
         @object = object
+        @reason = nil
+        @record_reason = record_reason
+        if @record_reason
+          @class_name = self.class.name
+          @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
+        end
       end
 
       def authorized?(target_class, target_method = nil, props = nil)
-        Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{self}: At least the class must be given!") unless target_class
+        Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{self}: At least the class or class name must be given!") unless target_class
 
         target_class = target_class.to_s unless target_class.class == String
+        target_class = target_class.split('>::').last if target_class.start_with?('#<')
 
         rules  =  self.class.authorization_rules
 
@@ -97,14 +106,20 @@ module LucidPolicy
                     if target_method && rules[:rules][target_class].key?(:methods) && rules[:rules][target_class][:methods].key?(target_method)
                       options = rules[:rules][target_class][:methods][target_method][:options]
                       rule = rules[:rules][target_class][:methods][target_method][:rule]
+                      @reason = { policy_class: @class_name, class_name: target_class, method: target_method, rule: rule } if @record_reason
                     else
                       options = rules[:rules][target_class][:options]
                       rule = rules[:rules][target_class][:rule]
+                      @reason = { policy_class: @class_name, class_name: target_class, rule: rule } if @record_reason
                     end
 
-                    if rule.class == Symbol
+                    if rule.class == Symbol || rule.class == String
                       if options
                         condition, method_result = __get_condition_and_result(options)
+                        if @record_reason
+                          @reason[:condition] = condition
+                          @reason[:condition_result] = method_result
+                        end
                         rule if (condition == :if && method_result == true) || (condition == :if_not && method_result == false)
                       else
                         rule
@@ -113,10 +128,14 @@ module LucidPolicy
                       props = LucidProps.new(props) unless props.class == LucidProps
                       policy_helper = LucidPolicy::Helper.new
                       policy_helper.instance_exec(@object, target_class, target_method, props, &rule)
-                      policy_helper.result
+                      r = policy_helper.result
+                      @reason[:rule_result] = r if @record_reason
+                      r
                     end
                   else
-                    rules[:others]
+                    r = rules[:others]
+                    @reason = { policy_class: @class_name, class_name: target_class, others: r } if @record_reason
+                    r
                   end
 
         return true if result == :allow
@@ -124,11 +143,15 @@ module LucidPolicy
         rules[:policies].each do |policy_class, options|
           combined_policy_result = nil
           if options.empty?
-            combined_policy_result = policy_class.new(@object).authorized?(target_class, target_method, props)
+            policy_instance = policy_class.new(@object, @record_reason)
+            combined_policy_result = policy_instance.authorized?(target_class, target_method, props)
+            @reason = @reason = { policy_class: @class_name, combined: policy_instance.reason } if @record_reason
           else
             condition, method_result = __get_condition_and_result(options)
             if (condition == :if && method_result == true) || (condition == :if_not && method_result == false)
-              combined_policy_result = policy_class.new(@object).authorized?(target_class, target_method, props)
+              policy_instance = policy_class.new(@object, @record_reason)
+              combined_policy_result = policy_instance.authorized?(target_class, target_method, props)
+              @reason = { policy_class: @class_name, combined: policy_instance.reason, condition: condition, condition_result: method_result } if @record_reason
             end
           end
           return true if combined_policy_result == true
@@ -139,7 +162,8 @@ module LucidPolicy
 
       def authorized!(target_class, target_method = nil, props = nil)
         return true if authorized?(target_class, target_method, props)
-        Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{@object}: not authorized to call #{target_class}.#{target_method}(#{props})!")
+        reason_message = reason ? ", reason: #{reason}" : ''
+        Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{@object}: not authorized to call #{target_class}.#{target_method}(#{props})#{reason_message}!")
       end
 
       private
