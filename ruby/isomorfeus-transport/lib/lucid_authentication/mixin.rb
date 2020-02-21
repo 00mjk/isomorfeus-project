@@ -37,6 +37,9 @@ module LucidAuthentication
                              else
                                `window.location.pathname`
                              end
+                    unless target.class == String && target.start_with?('/')
+                      Isomorfeus.raise_error(message: "A path must be returned as string starting with '/', returned was #{target}!")
+                    end
                   rescue
                     target = `window.location.pathname`
                   end
