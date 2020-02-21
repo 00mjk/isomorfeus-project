@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
   s.bindir       = 'bin'
   s.executables  << 'isomorfeus'
+  s.executables  << 'ismos'
   s.executables  << 'yandle'
   s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
