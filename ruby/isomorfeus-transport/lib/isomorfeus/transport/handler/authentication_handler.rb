@@ -42,14 +42,13 @@ module Isomorfeus
               end
             elsif login_or_logout == 'ssr_login'
               response_agent.agent_result = { error: 'Authentication failed' }
-              response_agent.request['ssr_login'].each_key do |session_id|
-                user = Isomorfeus.session_store.get_user(session_id: session_id)
-                if user
-                  Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_user, user)
-                  Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
-                  Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, nil)
-                  response_agent.agent_result = { success: 'ok', data: user.to_transport }
-                end
+              session_id = response_agent.request['ssr_login']
+              user = Isomorfeus.session_store.get_user(session_id: session_id)
+              if user
+                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_user, user)
+                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
+                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, nil)
+                response_agent.agent_result = { success: 'ok', data: user.to_transport }
               end
             elsif login_or_logout == 'logout'
               begin
