@@ -1,5 +1,6 @@
+os: linux
 dist: bionic
-lanugage: ruby
+language: ruby
 rvm: 2.6.5
 script: rake
 before_install: nvm install 12.15.0
