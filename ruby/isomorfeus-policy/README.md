@@ -175,3 +175,8 @@ It will be a Hash and show the responsible policy class, condition, condition re
     policy_class: "CombinedPolicy" },
   policy_class: "UserPolicy" }
 ```
+
+Recording can be stopped again, for better performance:
+```ruby
+my_user.stop_to_record_authorization_reason
+```
