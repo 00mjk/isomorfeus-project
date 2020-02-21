@@ -42,6 +42,7 @@ module LucidAuthentication
                   end
                   cookie_query = "#{Isomorfeus.cookie_eater_path}?#{cookie_accessor}=#{target}"
                   `window.location = cookie_query` # doing page load and redirect
+                  nil
                 else
                   error = agent.response[:error]
                   `console.err(error)` if error
