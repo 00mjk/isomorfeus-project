@@ -2,7 +2,6 @@ require 'isomorfeus-policy'
 require 'lucid_authentication/mixin'
 if RUBY_ENGINE == 'opal'
   require 'json'
-  require 'isomorfeus/config'
   require 'isomorfeus/execution_environment'
   require 'isomorfeus/transport/version'
   require 'isomorfeus/transport/config'
@@ -28,7 +27,6 @@ else
   require 'iodine'
   require 'dbm'
   require 'isomorfeus/transport/dbm_session_store'
-  require 'isomorfeus/config'
   opal_path = Gem::Specification.find_by_name('opal').full_gem_path
   promise_path = File.join(opal_path, 'stdlib', 'promise.rb')
   require promise_path
