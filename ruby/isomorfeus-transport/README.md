@@ -32,5 +32,5 @@ Server only:
 
 ## Usage
 
-- [Authentication and Current User](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-policy/docs/authentication.md)
-- [Channels (PubSub)](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-policy/docs/channels.md)
+- [Authentication and Current User](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-transport/docs/authentication.md)
+- [Channels (PubSub)](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-transport/docs/channels.md)
