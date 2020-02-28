@@ -1,5 +1,5 @@
 module Isomorfeus
   module Mailer
-    VERSION = '1.0.0.zeta23'
+    VERSION = '1.0.0.zeta24'
   end
 end
