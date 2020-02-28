@@ -13,8 +13,15 @@ module Isomorfeus
                 prev_state
               end
             when 'I18N_LOAD'
-              result = prev_state.deep_merge(action[:data])
-              result == prev_state ? prev_state : result
+              new_state = {}.merge!(prev_state)
+              if action.key?(:collected)
+                action[:collected].each do |act|
+                  new_state.deep_merge!(act[:data])
+                end
+              else
+                new_state.deep_merge!(action[:data])
+              end
+              new_state
             else
               prev_state
             end

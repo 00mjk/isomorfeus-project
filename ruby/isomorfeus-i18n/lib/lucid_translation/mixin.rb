@@ -29,7 +29,7 @@ module LucidTranslation
                 `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
-              Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
+              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
           end
         end
@@ -52,7 +52,7 @@ module LucidTranslation
                 `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
-              Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
+              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
           end
         end
@@ -83,7 +83,7 @@ module LucidTranslation
                 `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
-              Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
+              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
           end
         end
@@ -106,7 +106,7 @@ module LucidTranslation
                 `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
-              Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
+              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
           end
         end
@@ -129,7 +129,7 @@ module LucidTranslation
                 `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
-              Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
+              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
             end
           end
         end
@@ -171,7 +171,7 @@ module LucidTranslation
                   `console.error(#{agent.response[:error].to_n})`
                   Isomorfeus.raise_error(message: agent.response[:error])
                 end
-                Isomorfeus.store.merge_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
+                Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
               end
             end
           end
