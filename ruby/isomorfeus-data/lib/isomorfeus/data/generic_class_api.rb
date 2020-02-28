@@ -14,7 +14,6 @@ module Isomorfeus
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.dispatch(type: 'DATA_DESTROY', data: [self.name, key])
@@ -37,7 +36,6 @@ module Isomorfeus
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               instance._load_from_store!

@@ -37,7 +37,6 @@ module Isomorfeus
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               data = agent.full_response[:data]
@@ -81,7 +80,6 @@ module Isomorfeus
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               data = agent.full_response[:data]

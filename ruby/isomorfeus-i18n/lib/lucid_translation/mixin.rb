@@ -26,7 +26,6 @@ module LucidTranslation
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
@@ -49,7 +48,6 @@ module LucidTranslation
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
@@ -80,7 +78,6 @@ module LucidTranslation
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
@@ -103,7 +100,6 @@ module LucidTranslation
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
@@ -126,7 +122,6 @@ module LucidTranslation
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
@@ -168,7 +163,6 @@ module LucidTranslation
               else
                 agent.processed = true
                 if agent.response.key?(:error)
-                  `console.error(#{agent.response[:error].to_n})`
                   Isomorfeus.raise_error(message: agent.response[:error])
                 end
                 Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })

@@ -79,7 +79,6 @@ module LucidStorableObject
               else
                 agent.processed = true
                 if agent.response.key?(:error)
-                  `console.error(#{agent.response[:error].to_n})`
                   Isomorfeus.raise_error(message: agent.response[:error])
                 end
                 Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])

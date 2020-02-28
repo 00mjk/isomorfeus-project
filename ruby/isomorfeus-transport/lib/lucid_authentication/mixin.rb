@@ -16,7 +16,7 @@ module LucidAuthentication
 
           def promise_authentication_with_isomorfeus(user: nil, pass: nil, &block)
             if Isomorfeus.production?
-              Isomorfeus.raise_error(message: "Connection not secure, can't login") unless Isomorfeus::Transport.socket.url.start_with?('wss:')
+              Isomorfeus.raise_error(message: "Connection not secure, can't login!") unless Isomorfeus::Transport.socket.url.start_with?('wss:')
             else
               `console.warn("Connection not secure, ensure a secure connection in production, otherwise login will fail!")` unless Isomorfeus::Transport.socket.url.start_with?('wss:')
             end
@@ -47,9 +47,7 @@ module LucidAuthentication
                   `window.location = cookie_query` # doing page load and redirect
                   nil
                 else
-                  error = agent.response[:error]
-                  `console.err(error)` if error
-                  Isomorfeus.raise_error(message: 'Login failed!') # triggers .fail
+                  Isomorfeus.raise_error(message: "Login failed with '#{agent.response[:error]}'!") # triggers .fail
                 end
               end
             end

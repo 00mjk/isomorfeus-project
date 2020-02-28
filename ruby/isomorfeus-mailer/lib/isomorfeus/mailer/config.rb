@@ -7,7 +7,7 @@ module Isomorfeus
       end
 
       def email_sender_config=(new_config)
-        Isomorfeus.raise_error "email_sender_config must at least include a :type!" unless new_config.key?(:type)
+        Isomorfeus.raise_error(message: "email_sender_config must at least include a :type!") unless new_config.key?(:type)
         @email_sender_config = new_config
       end
 

@@ -42,7 +42,6 @@ module LucidOperation
               unless agent.processed
                 agent.processed = true
                 if agent.response.key?(:error)
-                  `console.error(#{agent.response[:error].to_n})`
                   Isomorfeus.raise_error(message: agent.response[:error])
                 end
                 agent.result = agent.response[:result]

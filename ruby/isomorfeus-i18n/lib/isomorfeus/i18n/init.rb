@@ -21,7 +21,6 @@ module Isomorfeus
             else
               agent.processed = true
               if agent.response.key?(:error)
-                `console.error(#{agent.response[:error].to_n})`
                 Isomorfeus.raise_error(message: agent.response[:error])
               end
               @initializing = false

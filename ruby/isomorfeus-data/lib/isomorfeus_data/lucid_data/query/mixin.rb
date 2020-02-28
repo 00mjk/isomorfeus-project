@@ -26,7 +26,6 @@ module LucidData
                 else
                   agent.processed = true
                   if agent.response.key?(:error)
-                    `console.error(#{agent.response[:error].to_n})`
                     Isomorfeus.raise_error(message: agent.response[:error])
                   end
                   query_result_instance._load_from_store!
