@@ -2,7 +2,6 @@ require 'isomorfeus-policy'
 require 'lucid_authentication/mixin'
 if RUBY_ENGINE == 'opal'
   require 'json'
-  require 'isomorfeus/execution_environment'
   require 'isomorfeus/transport/version'
   require 'isomorfeus/transport/config'
   require 'isomorfeus/transport/request_agent'
@@ -38,7 +37,7 @@ else
   require 'isomorfeus/transport/server_processor'
   require 'isomorfeus/transport/server_socket_processor'
   require 'isomorfeus/transport/websocket'
-
+  require 'isomorfeus/transport'
   require 'isomorfeus/transport/rack_middleware'
   require 'isomorfeus/transport/middlewares'
 
