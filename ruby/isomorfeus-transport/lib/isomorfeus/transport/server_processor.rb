@@ -29,26 +29,42 @@ module Isomorfeus
         elsif request.key?('notification')
           begin
             channel = request['notification']['channel']
-            class_name = request['notification']['class']
-
-            if Isomorfeus.valid_channel_class_name?(class_name) && channel
-              channel_class = Isomorfeus.cached_channel_class(class_name)
-              if channel_class && Isomorfeus.current_user.authorized?(channel_class, :send_message, channel)
-                Isomorfeus.pub_sub_client.publish(request['notification']['channel'], Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
+            channel_class_name = request['notification']['class']
+            if Isomorfeus.valid_channel_class_name?(channel_class_name) && channel
+              channel_class = Isomorfeus.cached_channel_class(channel_class_name)
+              if channel_class && channel_class.valid_channel?(channel)
+                if Isomorfeus.current_user.authorized?(channel_class_name, :send_message, channel)
+                  allow_publish = if channel_class.server_is_processing_messages?(channel)
+                                    channel_class.server_process_message(request['notification']['message'], channel)
+                                  else
+                                    true
+                                  end
+                  if allow_publish == true
+                    Isomorfeus.pub_sub_client.publish("#{channel_class_name}_#{channel}", Oj.dump({ 'notification' => request['notification'] }, mode: :strict))
+                  else
+                    response_agent = OpenStruct.new
+                    response_agent.result = { notification: request['notification'].merge(error: 'Message cancelled!') }
+                    response_agent_array << response_agent
+                  end
+                else
+                  response_agent = OpenStruct.new
+                  response_agent.result = { notification: request['notification'].merge(error: 'Not authorized!') }
+                  response_agent_array << response_agent
+                end
               else
                 response_agent = OpenStruct.new
+                response_agent.result = { notification: request['notification'].merge(error: "Not a valid channel #{channel} for #{channel_class_name}!") }
                 response_agent_array << response_agent
-                response_agent.result = { response: { error: 'Not authorized!' }}
               end
             else
               response_agent = OpenStruct.new
+              response_agent.result = { notification: request['notification'].merge(error: "Not a valid Channel class #{channel_class_name}!") }
               response_agent_array << response_agent
-              response_agent.result = { response: { error: 'No such thing!' }}
             end
           rescue Exception => e
             response_agent = OpenStruct.new
+            response_agent.result = { notification: request['notification'].merge(error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}") }
             response_agent_array << response_agent
-            response_agent.result = { response: { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }}
           end
         elsif request.key?('subscribe') && request['subscribe'].key?('agent_ids')
           begin
@@ -56,17 +72,23 @@ module Isomorfeus
             response_agent = Isomorfeus::Transport::ResponseAgent.new(agent_id, request['subscribe']['agent_ids'][agent_id])
             response_agent_array << response_agent
             channel = response_agent.request['channel']
-            class_name = response_agent.request['class']
-            if Isomorfeus.valid_channel_class_name?(class_name) && channel
-              channel_class = Isomorfeus.cached_channel_class(class_name)
-              if channel_class && Isomorfeus.current_user.authorized?(channel_class, :subscribe, channel)
-                Isomorfeus.pub_sub_client.subscribe(channel)
-                response_agent.agent_result = { success: channel }
+            channel_class_name = response_agent.request['class']
+            if Isomorfeus.valid_channel_class_name?(channel_class_name) && channel
+              channel_class = Isomorfeus.cached_channel_class(channel_class_name)
+              if channel_class && channel_class.valid_channel?(channel)
+                if Isomorfeus.current_user.authorized?(channel_class, :subscribe, channel)
+                  Isomorfeus.pub_sub_client.subscribe("#{channel_class_name}_#{channel}")
+                  response_agent.agent_result = { success: channel }
+                else
+                  response_agent.error = { error: "Not authorized!"}
+                end
               else
-                response_agent.error = { error: "Not authorized!"}
+                response_agent = OpenStruct.new
+                response_agent.result = { response: { error: "Not a valid channel #{channel} for #{channel_class_name}!" }}
+                response_agent_array << response_agent
               end
             else
-              response_agent.error = { error: "No such thing!"}
+              response_agent.error = { error: "Not a valid Channel class #{channel_class_name}!" }
             end
           rescue Exception => e
             response_agent.error = { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }
@@ -77,17 +99,23 @@ module Isomorfeus
             response_agent = Isomorfeus::Transport::ResponseAgent.new(agent_id, request['unsubscribe']['agent_ids'][agent_id])
             response_agent_array << response_agent
             channel = response_agent.request['channel']
-            class_name = response_agent.request['class']
-            if Isomorfeus.valid_channel_class_name?(class_name) && channel
-              channel_class = Isomorfeus.cached_channel_class(class_name)
-              if channel_class && Isomorfeus.current_user.authorized?(channel_class, :unsubscribe, channel)
-                Isomorfeus.pub_sub_client.unsubscribe(channel)
-                response_agent.agent_result = { success: channel }
+            channel_class_name = response_agent.request['class']
+            if Isomorfeus.valid_channel_class_name?(channel_class_name) && channel
+              channel_class = Isomorfeus.cached_channel_class(channel_class_name)
+              if channel_class && channel_class.valid_channel?(channel)
+                if Isomorfeus.current_user.authorized?(channel_class, :unsubscribe, channel)
+                  Isomorfeus.pub_sub_client.unsubscribe("#{channel_class_name}_#{channel}")
+                  response_agent.agent_result = { success: channel }
+                else
+                  response_agent.error = { error: "Not authorized!"}
+                end
               else
-                response_agent.error = { error: "Not authorized!"}
+                response_agent = OpenStruct.new
+                response_agent.result = { response: { error: "Not a valid channel #{channel} for #{channel_class_name}!" }}
+                response_agent_array << response_agent
               end
             else
-              response_agent.error = { error: 'No such thing!'}
+              response_agent.error = { error: "Not a valid Channel class #{channel_class_name}!" }
             end
           rescue Exception => e
             response_agent.error = { error: "Isomorfeus::Transport::ServerProcessor: #{e.message}\n#{e.backtrace.join("\n")}" }

@@ -5,13 +5,18 @@ module Isomorfeus
         if json_hash.key?(:response)
           process_response(json_hash)
         elsif json_hash.key?(:notification)
-          process_notification(json_hash)
+          process_message(json_hash)
         end
       end
 
-      def self.process_notification(notification_hash)
-        processor_class = "::#{notification_hash[:notification][:class]}".constantize
-        processor_class.process_message(notification_hash[:notification][:channel], notification_hash[:notification][:message])
+      def self.process_message(message_hash)
+        processor_class_name = message_hash[:notification][:class]
+        Isomorfeus.raise_error(message: "Not a valid channel class #{processor_class_name}!") unless Isomorfeus.valid_channel_class_name?(processor_class_name)
+        processor_class = Isomorfeus.cached_channel_class(processor_class_name)
+        unless processor_class.respond_to?(:process_message)
+          Isomorfeus.raise_error(message: "Cannot process message, #{processor_class} must be a Channel and must have the on_message block defined!")
+        end
+        processor_class.process_message(message_hash[:notification][:message], message_hash[:notification][:error], message_hash[:notification][:channel])
       end
 
       def self.process_response(response_hash)

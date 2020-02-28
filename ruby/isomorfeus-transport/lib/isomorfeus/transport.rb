@@ -110,50 +110,40 @@ module Isomorfeus
           agent.promise
         end
 
-        def send_notification(channel_class, channel, message)
+        def send_message(channel_class, channel, message)
           Isomorfeus.raise_error(message: 'No socket!') unless @socket
-          @socket.send(`JSON.stringify(#{{notification: { class: channel_class.name, channel: channel, message: message}}.to_n})`)
+          @socket.send(`JSON.stringify(#{{ notification: { class: channel_class.name, channel: channel, message: message }}.to_n})`)
           true
         end
 
-        def subscribe(channel_class, channel, &block)
-          request = { subscribe: true, class: channel_class.name, channel: channel }
+        def promise_subscribe(channel_class_name, channel)
+          request = { subscribe: true, class: channel_class_name, channel: channel }
           if request_in_progress?(request)
             agent = get_agent_for_request_in_progress(request)
           else
             agent = Isomorfeus::Transport::RequestAgent.new(request)
             register_request_in_progress(request, agent.id)
             Isomorfeus.raise_error(message: 'No socket!') unless @socket
-            @socket.send(`JSON.stringify(#{{subscribe: { agent_ids: { agent.id => request }}}.to_n})`)
+            @socket.send(`JSON.stringify(#{{ subscribe: { agent_ids: { agent.id => request }}}.to_n})`)
           end
           result_promise = agent.promise.then do |agent|
             agent.response
-          end
-          if block_given?
-            result_promise = result_promise.then do |response|
-              block.call(response)
-            end
           end
           result_promise
         end
 
-        def unsubscribe(channel_class, channel, &block)
-          request = { unsubscribe: true, class: channel_class.name, channel: channel }
+        def promise_unsubscribe(channel_class_name, channel)
+          request = { unsubscribe: true, class: channel_class_name, channel: channel }
           if request_in_progress?(request)
             agent = get_agent_for_request_in_progress(request)
           else
             agent = Isomorfeus::Transport::RequestAgent.new(request)
             register_request_in_progress(request, agent.id)
             Isomorfeus.raise_error(message: 'No socket!') unless @socket
-            @socket.send(`JSON.stringify(#{{unsubscribe: { agent_ids: { agent.id => request }}}.to_n})`)
+            @socket.send(`JSON.stringify(#{{ unsubscribe: { agent_ids: { agent.id => request }}}.to_n})`)
           end
           result_promise = agent.promise.then do |agent|
             agent.response
-          end
-          if block_given?
-            result_promise = result_promise.then do |response|
-              block.call(response)
-            end
           end
           result_promise
         end
@@ -185,23 +175,20 @@ module Isomorfeus
           @requests_in_progress[:requests].delete(request)
         end
       else # RUBY_ENGINE
-        def send_notification(channel_class, channel, message)
-          Isomorfeus.pub_sub_client.publish(channel, Oj.dump({notification: { class: channel_class.name, channel: channel, message: message}}, mode: :strict))
+        def send_message(channel_class, channel, message)
+          channel_class_name = channel_class.name
+          Isomorfeus.pub_sub_client.publish("#{channel_class_name}_#{channel}", Oj.dump({notification: { class: channel_class_name, channel: channel, message: message}}, mode: :strict))
           true
         end
 
-        def subscribe(channel_class, channel, &block)
+        def promise_subscribe(channel_class, channel, &block)
           Isomorfeus.pub_sub_client.subscribe(channel)
-          result_promise = Promise.new
-          result_promise.resolve({ success: channel })
-          result_promise
+          Promise.new.resolve({ success: channel })
         end
 
-        def unsubscribe(channel_class, channel, &block)
+        def promise_unsubscribe(channel_class, channel, &block)
           Isomorfeus.pub_sub_client.unsubscribe(channel)
-          result_promise = Promise.new
-          result_promise.resolve({ success: channel })
-          result_promise
+          Promise.new.resolve({ success: channel })
         end
       end # RUBY_ENGINE
     end

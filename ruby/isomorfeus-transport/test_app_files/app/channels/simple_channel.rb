@@ -1,10 +1,5 @@
 class SimpleChannel < LucidChannel::Base
-  on_message do |channel, message|
-    if channel && message
-      $channel = channel
-      $message = message
-    else
-      $message = channel
-    end
+  on_message do |message, error|
+    $simple_message = message
   end
 end

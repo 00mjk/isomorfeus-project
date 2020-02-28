@@ -25,7 +25,7 @@ module Isomorfeus
         response_agent_array.each do |response_agent|
           result.deep_merge!(response_agent.result)
         end
-        client.write Oj.dump(result, mode: :strict)
+        client.write Oj.dump(result, mode: :strict) unless result.empty?
       ensure
         Thread.current[:isomorfeus_user] = nil
         Thread.current[:isomorfeus_pub_sub_client] = nil

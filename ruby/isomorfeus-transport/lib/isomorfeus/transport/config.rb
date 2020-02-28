@@ -1,33 +1,65 @@
 module Isomorfeus
   # available settings
+  class << self
+    def cached_channel_classes
+      @cached_channel_classes ||= {}
+    end
+
+    def cached_channel_class(class_name)
+      return "::#{class_name}".constantize if Isomorfeus.development?
+      return cached_channel_classes[class_name] if cached_channel_classes.key?(class_name)
+      cached_channel_classes[class_name] = "::#{class_name}".constantize
+    end
+
+    def valid_channel_class_names
+      @valid_channel_class_names ||= Set.new
+    end
+
+    def add_valid_channel_class(klass)
+      valid_channel_class_names << raw_class_name(klass)
+    end
+
+    def raw_class_name(klass)
+      class_name = klass.name
+      class_name = class_name.split('>::').last if class_name.start_with?('#<')
+      class_name
+    end
+  end
 
   if RUBY_ENGINE == 'opal'
     add_client_option(:api_websocket_path)
     add_client_option(:cookie_eater_path)
     add_client_option(:transport_init_class_names, [])
 
-    def self.add_transport_init_class_name(init_class_name)
-      transport_init_class_names << init_class_name
-    end
-
-    def self.current_user
-      @current_user ||= init_current_user
-    end
-
-    def self.init_current_user
-      if Isomorfeus.current_user_sid
-        Isomorfeus.instance_from_sid(Isomorfeus.current_user_sid)
-      else
-        Anonymous.new
+    class << self
+      def valid_channel_class_name?(class_name)
+        cached_channel_class(class_name) # because of autoloader
+        valid_channel_class_names.include?(class_name)
       end
-    end
 
-    def self.set_current_user(user)
-      if user
-        @current_user = user
-        Isomorfeus.current_user_sid = user.to_sid
-      else
-        @current_user = Anonymous.new
+      def add_transport_init_class_name(init_class_name)
+        transport_init_class_names << init_class_name
+      end
+
+      def current_user
+        @current_user ||= init_current_user
+      end
+
+      def init_current_user
+        if Isomorfeus.current_user_sid
+          Isomorfeus.instance_from_sid(Isomorfeus.current_user_sid)
+        else
+          Anonymous.new
+        end
+      end
+
+      def set_current_user(user)
+        if user
+          @current_user = user
+          Isomorfeus.current_user_sid = user.to_sid
+        else
+          @current_user = Anonymous.new
+        end
       end
     end
   else
@@ -36,6 +68,10 @@ module Isomorfeus
       attr_accessor :cookie_eater_path
       attr_accessor :session_store
       attr_accessor :cookie_dbm_path
+
+      def valid_channel_class_name?(class_name)
+        valid_channel_class_names.include?(class_name)
+      end
 
       def add_middleware(middleware)
         Isomorfeus.middlewares << middleware
@@ -65,28 +101,6 @@ module Isomorfeus
 
       def middlewares
         @middlewares ||= Set.new
-      end
-
-      def cached_channel_classes
-        @cached_channel_classes ||= {}
-      end
-
-      def cached_channel_class(class_name)
-        return "::#{class_name}".constantize if Isomorfeus.development?
-        return cached_channel_classes[class_name] if cached_channel_classes.key?(class_name)
-        cached_channel_classes[class_name] = "::#{class_name}".constantize
-      end
-
-      def valid_channel_class_names
-        @valid_channel_class_names ||= Set.new
-      end
-
-      def valid_channel_class_name?(class_name)
-        valid_channel_class_names.include?(class_name)
-      end
-
-      def add_valid_channel_class(klass)
-        valid_channel_class_names << raw_class_name(klass)
       end
 
       def valid_handler_class_names
@@ -131,12 +145,6 @@ module Isomorfeus
         return "::#{class_name}".constantize if Isomorfeus.development?
         return cached_user_classes[class_name] if cached_user_classes.key?(class_name)
         cached_user_classes[class_name] = "::#{class_name}".constantize
-      end
-
-      def raw_class_name(klass)
-        class_name = klass.name
-        class_name = class_name.split('>::').last if class_name.start_with?('#<')
-        class_name
       end
 
       def current_user
