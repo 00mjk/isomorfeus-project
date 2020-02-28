@@ -16,7 +16,7 @@ else
   require 'oj'
   require 'active_support'
   require 'active_support/core_ext/hash'
-  require 'arango-driver'
+  # require 'arango-driver'
 
   require 'isomorfeus_data/lucid_data/query_result'
   require 'isomorfeus_data/lucid_data/array/mixin'
