@@ -4,10 +4,6 @@ module Isomorfeus
       if RUBY_ENGINE == 'opal'
         attr_accessor :socket
 
-        def delay(ms = 1000, &block)
-          `setTimeout(#{block.to_n}, #{ms})`
-        end
-
         def init
           @requests_in_progress = { requests: {}, agent_ids: {} }
           @socket = nil
@@ -32,7 +28,7 @@ module Isomorfeus
           @socket = Isomorfeus::Transport::Websocket.new(ws_url)
           @socket.on_error do
             @socket.close
-            delay 1000 do
+            after 1000 do
               Isomorfeus::Transport.promise_connect
             end
           end
@@ -99,14 +95,14 @@ module Isomorfeus
             begin
               @socket.send(`JSON.stringify(#{{request: { agent_ids: { agent.id => request }}}.to_n})`)
               agent.sent = true
-              delay(Isomorfeus.on_ssr? ? 8000 : 20000) do
+              after(Isomorfeus.on_ssr? ? 8000 : 20000) do
                 unless agent.promise.realized?
                   agent.promise.reject({agent_response: { error: 'Request timeout!' }, full_response: {}})
                 end
               end
             rescue
               @socket.close
-              delay 5000 do
+              after 5000 do
                 Isomorfeus::Transport.promise_connect
               end
             end
@@ -190,19 +186,19 @@ module Isomorfeus
         end
       else # RUBY_ENGINE
         def send_notification(channel_class, channel, message)
-          Thread.current[:isomorfeus_pub_sub_client].publish(Oj.dump({notification: { class: channel_class.name, channel: channel, message: message}}, mode: :strict))
+          Isomorfeus.pub_sub_client.publish(channel, Oj.dump({notification: { class: channel_class.name, channel: channel, message: message}}, mode: :strict))
           true
         end
 
         def subscribe(channel_class, channel, &block)
-          Thread.current[:isomorfeus_pub_sub_client].subscribe(channel)
+          Isomorfeus.pub_sub_client.subscribe(channel)
           result_promise = Promise.new
           result_promise.resolve({ success: channel })
           result_promise
         end
 
         def unsubscribe(channel_class, channel, &block)
-          Thread.current[:isomorfeus_pub_sub_client].unsubscribe(channel)
+          Isomorfeus.pub_sub_client.unsubscribe(channel)
           result_promise = Promise.new
           result_promise.resolve({ success: channel })
           result_promise
