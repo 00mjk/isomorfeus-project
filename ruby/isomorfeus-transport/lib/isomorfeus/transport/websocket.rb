@@ -48,7 +48,7 @@ module Isomorfeus
         def send(data)
           case ready_state
           when OPEN then @native_websocket.JS.send(data)
-          when CONNECTING then Isomorfeus::Transport.delay(50) { send(data) }
+          when CONNECTING then after(50) { send(data) }
           when CLOSING then Isomorfeus.raise_error(error_class: SendError, message: 'Cant send, connection is closing!')
           when CLOSED then Isomorfeus.raise_error(error_class: SendError.new, message: 'Cant send, connection is closed!')
           end
