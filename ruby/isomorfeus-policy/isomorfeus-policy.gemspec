@@ -15,10 +15,10 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'opal', '>= 1.0.0'
-  s.add_dependency 'isomorfeus-react', '>= 16.13.0'
+  s.add_dependency 'isomorfeus-react', '>= 16.13.1'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.22'
   s.add_development_dependency 'isomorfeus', Isomorfeus::Policy::VERSION
-  s.add_development_dependency 'opal-webpack-loader', '>= 0.9.10'
+  s.add_development_dependency 'opal-webpack-loader', '>= 0.9.11'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.8.0'
 end
