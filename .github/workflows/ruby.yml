@@ -1,4 +1,4 @@
-name: Ruby
+name: Isomorfeus Project
 
 on:
   push:
@@ -24,6 +24,7 @@ jobs:
         echo arangodb3 arangodb3/password password root | sudo debconf-set-selections
         echo arangodb3 arangodb3/password_again password root | sudo debconf-set-selections
         sudo dpkg -i arangodb3_3.6.0-1_amd64.deb
+        sudo systemctl start arangodb3
         sudo apt-get install libdb-dev
         gem install bundler
         gem install builder
