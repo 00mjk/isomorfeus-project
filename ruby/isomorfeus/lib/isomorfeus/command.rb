@@ -34,6 +34,7 @@ else
   require_relative '../isomorfeus/installer/gemfile'
   require_relative '../isomorfeus/installer/install_targets'
   require_relative '../isomorfeus/installer/new_project'
+  require_relative '../isomorfeus/installer/test_app_files'
   require_relative '../isomorfeus/installer/upgrade'
   require_relative '../isomorfeus/installer/target/web'
   require_relative '../isomorfeus/installer/yarn_and_bundle'

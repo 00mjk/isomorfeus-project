@@ -6,17 +6,6 @@ module Isomorfeus
         FileUtils.copy(from, to)
       end
 
-      def copy_test_app_files
-        Dir.glob("#{Isomorfeus::Installer.source_dir}/**/*").each do |file|
-          if File.file?(file)
-            target_file = file[(Isomorfeus::Installer.source_dir.size+1)..-1]
-            target_dir = File.dirname(target_file)
-            Dir.mkdir(target_dir) unless Dir.exist?(target_dir)
-            copy_file(file, target_file)
-          end
-        end
-      end
-
       def create_directory(directory)
         unless Dir.exist?(directory)
           puts "Creating directory #{directory}."
