@@ -29,3 +29,23 @@ jobs:
         gem install builder
         gem install dbm
         rake
+    - name: Success
+      if: success()
+      uses: voxmedia/github-action-slack-notify-build@v1.1.1
+      with:
+        channel: ci
+        status: SUCCESS
+        color: good
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    - name: Failure
+      if: failure()
+      uses: voxmedia/github-action-slack-notify-build@v1.1.1
+      with:
+        channel: ci
+        status: FAILED
+        color: danger
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+
