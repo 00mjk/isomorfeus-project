@@ -66,8 +66,8 @@ module Isomorfeus
     class << self
       attr_accessor :api_websocket_path
       attr_accessor :cookie_eater_path
-      attr_accessor :session_store
       attr_accessor :cookie_dbm_path
+      attr_reader :session_store
 
       def valid_channel_class_name?(class_name)
         valid_channel_class_names.include?(class_name)
@@ -154,10 +154,15 @@ module Isomorfeus
       def pub_sub_client
         Thread.current[:isomorfeus_pub_sub_client]
       end
+
+      def session_store(&block)
+        @session_store = block
+      end
     end
 
-    self.cookie_dbm_path = 'cookie'
-    self.session_store = Isomorfeus::Transport::DbmSessionStore.new # dont use this one, but we keep it here to have at least something
+    self.session_store do
+      Isomorfeus::Transport::DbmSessionStore.new('cookie') # dont use this one, but we keep it here to have at least something
+    end
   end
 
   # defaults

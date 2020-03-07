@@ -1,19 +1,20 @@
 module Isomorfeus
   module Transport
     class DbmSessionStore
-      def initialize
-        DBM.open(Isomorfeus.cookie_dbm_path, 0640, DBM::NEWDB).close
+      def initialize(cookie_dbm_path)
+        @cookie_dbm_path = cookie_dbm_path
+        DBM.open(@cookie_dbm_path, 0640, DBM::NEWDB).close
       end
 
       def add(session_id:, cookie:, user:, accessor:)
-        DBM.open(Isomorfeus.cookie_dbm_path, 0640, DBM::WRITER) do |dbm|
+        DBM.open(@cookie_dbm_path, 0640, DBM::WRITER) do |dbm|
           dbm[session_id] = Oj.dump([user.class.to_s, user.key], mode: :strict)
           dbm[accessor] = cookie
         end
       end
 
       def take_cookie(accessor:)
-        DBM.open(Isomorfeus.cookie_dbm_path, 0640, DBM::WRITER) do |dbm|
+        DBM.open(@cookie_dbm_path, 0640, DBM::WRITER) do |dbm|
           cookie = dbm[accessor]
           if cookie
             session_info = cookie.split('; ').first
@@ -32,7 +33,7 @@ module Isomorfeus
       end
 
       def get_user(session_id:)
-        json = DBM.open(Isomorfeus.cookie_dbm_path, 0640, DBM::READER) do |dbm|
+        json = DBM.open(@cookie_dbm_path, 0640, DBM::READER) do |dbm|
           dbm[session_id]
         end
         if json
@@ -42,7 +43,7 @@ module Isomorfeus
       end
 
       def remove(session_id:)
-        DBM.open(Isomorfeus.cookie_dbm_path, 0640, DBM::WRITER) do |dbm|
+        DBM.open(@cookie_dbm_path, 0640, DBM::WRITER) do |dbm|
           dbm.delete(session_id)
         end
       end

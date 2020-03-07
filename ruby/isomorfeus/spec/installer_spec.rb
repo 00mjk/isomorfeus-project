@@ -17,28 +17,36 @@ RSpec.describe 'isomorfeus installer' do
     end
 
     it 'it can' do
-      Isomorfeus::CLI.start(%w[new morphing --no-yarn-and-bundle])
+      Isomorfeus::CLI.start(%w[new morphing -y no])
       Dir.chdir('morphing')
-      expect(Dir.exist?(File.join('app', 'imports')))
-      expect(Dir.exist?(File.join('app', 'channels')))
-      expect(Dir.exist?(File.join('app', 'components')))
-      expect(Dir.exist?(File.join('app', 'data')))
-      expect(Dir.exist?(File.join('app', 'handlers')))
-      expect(Dir.exist?(File.join('app', 'locales')))
-      expect(Dir.exist?(File.join('app', 'operations')))
-      expect(Dir.exist?(File.join('app', 'policies')))
-      expect(Dir.exist?(File.join('app', 'styles')))
-      expect(File.exist?(File.join('app','styles', 'application.css'))).to be true
-      expect(File.exist?(File.join('app', 'imports', 'application.js'))).to be true
-      expect(File.exist?(File.join('app', 'imports', 'application_common.js'))).to be true
-      expect(File.exist?(File.join('app', 'imports', 'application_ssr.js'))).to be true
+      expect(Dir.exist?('config')).to be true
+      expect(Dir.exist?(File.join('app', 'imports'))).to be true
+      expect(Dir.exist?(File.join('app', 'channels'))).to be true
+      expect(Dir.exist?(File.join('app', 'components'))).to be true
+      expect(Dir.exist?(File.join('app', 'data'))).to be true
+      # expect(Dir.exist?(File.join('app', 'handlers'))).to be true
+      expect(Dir.exist?(File.join('app', 'layouts'))).to be true
+      expect(Dir.exist?(File.join('app', 'locales'))).to be true
+      expect(Dir.exist?(File.join('app', 'mail_components'))).to be true
+      expect(Dir.exist?(File.join('app', 'operations'))).to be true
+      expect(Dir.exist?(File.join('app', 'policies'))).to be true
+      expect(Dir.exist?(File.join('app', 'styles'))).to be true
+      expect(File.exist?(File.join('app','styles', 'web.css'))).to be true
+      expect(File.exist?(File.join('app', 'imports', 'web.js'))).to be true
+      expect(File.exist?(File.join('app', 'imports', 'web_common.js'))).to be true
+      expect(File.exist?(File.join('app', 'imports', 'web_ssr.js'))).to be true
       expect(File.exist?(File.join('app', 'components', 'welcome_component.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'hello_component.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'morphing_app.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'navigation_links.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'not_found_404_component.rb'))).to be true
+      expect(File.exist?(File.join('app', 'layouts', 'web.erb'))).to be true
+      expect(File.exist?(File.join('app', 'layouts', 'mail_preview.erb'))).to be true
       expect(File.exist?(File.join('app', 'policies', 'anonymous_policy.rb'))).to be true
-      expect(File.exist?(File.join('app', 'isomorfeus_loader.rb'))).to be true
+      expect(File.exist?(File.join('app', 'web_loader.rb'))).to be true
+      expect(File.exist?(File.join('app', 'mail_components_loader.rb'))).to be true
+      expect(File.exist?(File.join('config', 'arango.rb'))).to be true
+      expect(File.exist?(File.join('config', 'iodine.rb'))).to be true
       expect(File.exist?(File.join('owl_init.rb'))).to be true
       expect(File.exist?(File.join('app_loader.rb'))).to be true
       expect(File.exist?(File.join('webpack', 'debug.js'))).to be true
@@ -47,36 +55,45 @@ RSpec.describe 'isomorfeus installer' do
       expect(Dir.exist?(File.join('public', 'assets'))).to be true
       expect(File.exist?('package.json')).to be true
       expect(File.exist?('Procfile')).to be true
+      expect(File.exist?('ProcfileDev')).to be true
       expect(File.exist?('ProcfileDebug')).to be true
       expect(File.exist?('config.ru')).to be true
-      expect(File.exist?('morphing_app.rb')).to be true
+      expect(File.exist?('morphing_roda_app.rb')).to be true
       expect(File.exist?('Gemfile')).to be true
       expect(File.exist?('.gitignore')).to be true
     end
 
     it 'with the cmd it can' do
-      system('bundle exec isomorfeus new morphing --no-yarn-and-bundle')
+      system('bundle exec isomorfeus new morphing -y no')
       Dir.chdir('morphing')
-      expect(Dir.exist?(File.join('app', 'imports')))
-      expect(Dir.exist?(File.join('app', 'channels')))
-      expect(Dir.exist?(File.join('app', 'components')))
-      expect(Dir.exist?(File.join('app', 'data')))
-      expect(Dir.exist?(File.join('app', 'handlers')))
-      expect(Dir.exist?(File.join('app', 'locales')))
-      expect(Dir.exist?(File.join('app', 'operations')))
-      expect(Dir.exist?(File.join('app', 'policies')))
-      expect(Dir.exist?(File.join('app', 'styles')))
-      expect(File.exist?(File.join('app','styles', 'application.css'))).to be true
-      expect(File.exist?(File.join('app', 'imports', 'application.js'))).to be true
-      expect(File.exist?(File.join('app', 'imports', 'application_common.js'))).to be true
-      expect(File.exist?(File.join('app', 'imports', 'application_ssr.js'))).to be true
+      expect(Dir.exist?('config')).to be true
+      expect(Dir.exist?(File.join('app', 'imports'))).to be true
+      expect(Dir.exist?(File.join('app', 'channels'))).to be true
+      expect(Dir.exist?(File.join('app', 'components'))).to be true
+      expect(Dir.exist?(File.join('app', 'data'))).to be true
+      # expect(Dir.exist?(File.join('app', 'handlers'))).to be true
+      expect(Dir.exist?(File.join('app', 'layouts'))).to be true
+      expect(Dir.exist?(File.join('app', 'locales'))).to be true
+      expect(Dir.exist?(File.join('app', 'mail_components'))).to be true
+      expect(Dir.exist?(File.join('app', 'operations'))).to be true
+      expect(Dir.exist?(File.join('app', 'policies'))).to be true
+      expect(Dir.exist?(File.join('app', 'styles'))).to be true
+      expect(File.exist?(File.join('app','styles', 'web.css'))).to be true
+      expect(File.exist?(File.join('app', 'imports', 'web.js'))).to be true
+      expect(File.exist?(File.join('app', 'imports', 'web_common.js'))).to be true
+      expect(File.exist?(File.join('app', 'imports', 'web_ssr.js'))).to be true
       expect(File.exist?(File.join('app', 'components', 'welcome_component.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'hello_component.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'morphing_app.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'navigation_links.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'not_found_404_component.rb'))).to be true
+      expect(File.exist?(File.join('app', 'layouts', 'web.erb'))).to be true
+      expect(File.exist?(File.join('app', 'layouts', 'mail_preview.erb'))).to be true
       expect(File.exist?(File.join('app', 'policies', 'anonymous_policy.rb'))).to be true
-      expect(File.exist?(File.join('app', 'isomorfeus_loader.rb'))).to be true
+      expect(File.exist?(File.join('app', 'web_loader.rb'))).to be true
+      expect(File.exist?(File.join('app', 'mail_components_loader.rb'))).to be true
+      expect(File.exist?(File.join('config', 'arango.rb'))).to be true
+      expect(File.exist?(File.join('config', 'iodine.rb'))).to be true
       expect(File.exist?(File.join('owl_init.rb'))).to be true
       expect(File.exist?(File.join('app_loader.rb'))).to be true
       expect(File.exist?(File.join('webpack', 'debug.js'))).to be true
@@ -87,7 +104,7 @@ RSpec.describe 'isomorfeus installer' do
       expect(File.exist?('Procfile')).to be true
       expect(File.exist?('ProcfileDebug')).to be true
       expect(File.exist?('config.ru')).to be true
-      expect(File.exist?('morphing_app.rb')).to be true
+      expect(File.exist?('morphing_roda_app.rb')).to be true
       expect(File.exist?('Gemfile')).to be true
       expect(File.exist?('.gitignore')).to be true
     end
@@ -99,7 +116,7 @@ RSpec.describe 'isomorfeus installer' do
       Dir.mkdir('test_apps') unless Dir.exist?('test_apps')
       Dir.chdir('test_apps')
       FileUtils.rm_rf('morphing') if Dir.exist?('morphing')
-      Isomorfeus::CLI.start(%w[new morphing --no-yarn-and-bundle])
+      Isomorfeus::CLI.start(%w[new morphing -y no])
       Dir.chdir('morphing')
       gemfile = File.read('Gemfile')
       new_gemfile_lines = ["source 'file://#{File.expand_path('../../../../gems')}'\n"]
@@ -134,11 +151,11 @@ RSpec.describe 'isomorfeus installer' do
 
     it 'can build the assets' do
       Bundler.with_original_env do
-        system('yarn run production_build')
+        system('yarn run build')
       end
       manifest = Oj.load(File.read(File.join('public', 'assets', 'manifest.json')), mode: :strict)
-      application_js = manifest['application.js']
-      expect(File.exist?(File.join('public', application_js))).to be true
+      web_js = manifest['web.js']
+      expect(File.exist?(File.join('public', web_js))).to be true
     end
 
     it 'can execute tests' do
@@ -174,9 +191,9 @@ RSpec.describe 'isomorfeus installer' do
     # end
 
     it 'iodine' do
-      Isomorfeus::CLI.start(%w[new morphing -r iodine --no-yarn-and-bundle])
+      Isomorfeus::CLI.start(%w[new morphing -r iodine -y no])
       Dir.chdir('morphing')
-      expect(File.exist?('iodine_config.rb')).to be true
+      expect(File.exist?(File.join('config', 'iodine.rb'))).to be true
       gemfile = File.read('Gemfile')
       new_gemfile_lines = ["source 'file://#{File.expand_path('../../../../gems')}'\n"]
       gemfile.lines.each do |line|

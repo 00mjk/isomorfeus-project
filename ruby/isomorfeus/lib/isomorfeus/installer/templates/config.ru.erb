@@ -1,10 +1,10 @@
-require_relative '<%= app_require %>'
+require_relative '<%= roda_app_path %>'
 
 if !Isomorfeus.development?
   Isomorfeus.zeitwerk.setup
   Isomorfeus.zeitwerk.eager_load
 
-  run <%= app_class %>.freeze.app
+  run <%= roda_app_class %>.freeze.app
 else
   Isomorfeus.zeitwerk.enable_reloading
   Isomorfeus.zeitwerk.setup
@@ -17,7 +17,7 @@ else
       Isomorfeus.zeitwerk_lock.release_write_lock
     end
     Isomorfeus.zeitwerk_lock.with_read_lock do
-      <%= app_class %>.call env
+      <%= roda_app_class %>.call env
     end
   end
 end

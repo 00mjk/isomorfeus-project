@@ -10,20 +10,33 @@ else
   require 'erb'
   require 'active_support/core_ext/string'
   require 'opal-webpack-loader/installer_cli'
+  require_relative '../isomorfeus/version'
   require_relative '../isomorfeus/installer'
   require_relative '../isomorfeus/installer/rack_servers'
-  require_relative '../isomorfeus/version'
-  require_relative '../isomorfeus/installer/options_mangler'
-  require_relative '../isomorfeus/installer/new_project'
-  require_relative '../isomorfeus/cli'
 
-  Isomorfeus::Installer.module_directories.each do |mod_dir|
-    mod_path = File.realpath(File.join(Isomorfeus::Installer.base_path, mod_dir))
-    modules = Dir.glob('*.rb', base: mod_path)
-    modules.each do |mod|
-      require_relative File.join(mod_path, mod)
+  begin
+    require 'isomorfeus/professional/version'
+    if Isomorfeus::VERSION == Isomorfeus::Professional::VERSION
+      require 'isomorfeus-professional-installer'
+      Isomorfeus::Installer.is_professional = true
+      puts "Thanks for purchasing Isomorfeus Professional."
+    else
+      Isomorfeus::Installer.is_professional = false
+      STDERR.puts "Isomorfeus Professional not loaded, version mismatch Isomorfeus: #{Isomorfeus::VERSION} != Professional: #{Isomorfeus::Professional::VERSION}"
     end
+  rescue LoadError
+    Isomorfeus::Installer.is_professional = false
+    puts "Isomorfeus Professional not available."
   end
+
+  require_relative '../isomorfeus/installer/options_mangler'
+  require_relative '../isomorfeus/installer/dsl'
+  require_relative '../isomorfeus/installer/gemfile'
+  require_relative '../isomorfeus/installer/install_targets'
+  require_relative '../isomorfeus/installer/new_project'
+  require_relative '../isomorfeus/installer/upgrade'
+  require_relative '../isomorfeus/installer/target/web'
+  require_relative '../isomorfeus/installer/yarn_and_bundle'
 
   require_relative '../isomorfeus/cli'
 
