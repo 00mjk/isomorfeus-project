@@ -33,8 +33,9 @@ end
 def run_rake_spec_for(isomorfeus_module)
   pwd = Dir.pwd
   Dir.chdir(path_for(isomorfeus_module))
-  system('rake')
+  system('rake | tee spec_output')
   Dir.chdir(pwd)
+  exit 1 if File.read('spec_output').include?('Failed examples:')
 end
 
 def update_version_and_build_gem_for(isomorfeus_module)

@@ -155,12 +155,16 @@ module Isomorfeus
         Thread.current[:isomorfeus_pub_sub_client]
       end
 
-      def session_store(&block)
-        @session_store = block
+      def session_store
+        @session_store ||= @session_store_init.call
+      end
+
+      def session_store_init(&block)
+        @session_store_init = block
       end
     end
 
-    self.session_store do
+    self.session_store_init do
       Isomorfeus::Transport::DbmSessionStore.new('cookie') # dont use this one, but we keep it here to have at least something
     end
   end
