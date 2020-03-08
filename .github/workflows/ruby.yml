@@ -32,7 +32,7 @@ jobs:
         rake
     - name: Success
       if: success()
-      uses: janbiedermann/github-action-slack-notify-build
+      uses: janbiedermann/github-action-slack-notify-build@5de6099
       with:
         channel: ci
         status: SUCCESS
@@ -41,7 +41,7 @@ jobs:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     - name: Failure
       if: failure()
-      uses: janbiedermann/github-action-slack-notify-build
+      uses: janbiedermann/github-action-slack-notify-build@5de6099
       with:
         channel: ci
         status: FAILED
