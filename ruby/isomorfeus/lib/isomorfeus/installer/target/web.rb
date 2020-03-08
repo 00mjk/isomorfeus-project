@@ -10,6 +10,8 @@ module Isomorfeus
             install_configuration
 
             OpalWebpackLoader::Installer::CLI.start(['iso'])
+            move_owl_config
+
             install_webpack_config
 
             install_web_styles
@@ -26,7 +28,7 @@ module Isomorfeus
 
           def install_roda_app
             data_hash = { roda_app_class: Isomorfeus::Installer.roda_app_class, app_class: Isomorfeus::Installer.app_class }
-            create_file_from_template(templates_path, 'roda_app.rb.erb', Isomorfeus::Installer.roda_app_path + '.rb', data_hash)
+            create_file_from_template(templates_path, 'roda_app.rb.erb', File.join('app', 'server', Isomorfeus::Installer.roda_app_path + '.rb'), data_hash)
             data_hash = { roda_app_class: Isomorfeus::Installer.roda_app_class, roda_app_path: Isomorfeus::Installer.roda_app_path }
             create_file_from_template(templates_path, 'config.ru.erb', 'config.ru', data_hash)
             create_file_from_template(templates_path, File.join('app_loader.rb.erb'), 'app_loader.rb', {})
@@ -80,6 +82,10 @@ module Isomorfeus
             create_file_from_template(templates_path, 'development.js.erb', webpack_config_path('development.js'), {})
             create_file_from_template(templates_path, 'development_ssr.js.erb', webpack_config_path('development_ssr.js'), {})
             create_file_from_template(templates_path, 'debug.js.erb', webpack_config_path('debug.js'), {})
+          end
+
+          def move_owl_config
+            FileUtils.move('owl_init.rb', File.join('config', 'opal_webpack_loader.rb'))
           end
 
           def templates_path
