@@ -1,9 +1,6 @@
-require_relative 'app_loader'
-require_relative 'owl_init'
-# require_relative 'arango_config'
-require_relative 'iodine_config'
+Isomorfeus.load_configuration
 
-class TestAppApp < Roda
+class TestAppRodaApp < Roda
   extend Isomorfeus::Transport::Middlewares
   include OpalWebpackLoader::ViewHelper
   include Isomorfeus::ReactViewHelper

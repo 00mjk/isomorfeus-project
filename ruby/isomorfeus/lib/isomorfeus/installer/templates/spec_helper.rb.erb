@@ -1,10 +1,10 @@
 ENV['NODE_PATH'] = File.join(File.expand_path('..', __dir__), 'node_modules')
 ENV['RACK_ENV'] = 'test'
-require 'bundler/setup'
+require_relative '../app_loader'
 require 'rspec'
 require 'rspec/expectations'
 require 'isomorfeus-puppetmaster'
-require_relative '../<%= roda_app_path %>'
+require_relative '../app/server/<%= roda_app_path %>'
 
 Isomorfeus.zeitwerk.setup
 Isomorfeus.zeitwerk.eager_load
