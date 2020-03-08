@@ -7,7 +7,7 @@ task :run_test_app_specs => 'create_test_app' do
   pwd = Dir.pwd
   Dir.chdir('test_app')
   Bundler.with_original_env do
-    system('bundle exec rspec')
+    system('WORKERS=1 bundle exec rspec')
   end
   Dir.chdir(pwd)
   system('rm -rf test_app')
