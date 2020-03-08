@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'pry', '~> 0.12.2'
   s.add_dependency 'opal-webpack-loader', '>= 0.9.11'
   s.add_dependency 'thor', '>= 0.19.4'
-  s.add_dependency 'isomorfeus-react', '>= 16.13.2'
+  s.add_dependency 'isomorfeus-react', '>= 16.13.6'
   s.add_dependency 'isomorfeus-redux', '~> 4.0.22'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-transport', Isomorfeus::VERSION
