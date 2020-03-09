@@ -22,6 +22,9 @@ gem 'isomorfeus-data', <%= isomorfeus_data %>
 gem 'isomorfeus-operation', <%= isomorfeus_operation %>
 gem 'isomorfeus-mailer', <%= isomorfeus_mailer %>
 gem 'isomorfeus', <%= isomorfeus %>
+<% if isomorfeus_professional %>
+gem 'isomorfeus-professional', <%= isomorfeus_professional %>
+<% end %>
 <% end %>
 
 group :development do

@@ -24,6 +24,11 @@ module Isomorfeus
             %i[isomorfeus isomorfeus_data isomorfeus_i18n isomorfeus_mailer isomorfeus_operation isomorfeus_policy isomorfeus_transport].each do |i_module|
               data_hash[i_module] = i_module == Isomorfeus::Installer.isomorfeus_module ? "path: '..'" : "path: '../../#{i_module.to_s.tr('_', '-')}'"
             end
+            if File.exist?("gems/gems/isomorfeus-professional-#{Isomorfeus::VERSION}.gem")
+              data_hash[:isomorfeus_professional] = "path: '../../../../'"
+            else
+              data_hash[:isomorfeus_professional] = false
+            end
             data_hash[:isomorfeus_edition] = :test
           else
             data_hash[:isomorfeus_edition] = Isomorfeus::Installer.is_professional ? :professional : :community
