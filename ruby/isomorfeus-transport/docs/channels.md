@@ -94,13 +94,15 @@ class MyChannel < LucidChannel::Base
 
   # provide server side processing block
   server_on_message :cats do |message|
-    # server can now relay messages or anything else
-    if message.include?('dog') 
-      MyChannel.send_message(message, :dogs)
-      false  # if false is returned or anything else than true, the message is NOT published at all, instead returned to the sender with the error 'Message cancelled!'
-    else
-      true   # only if true is returned, the message is published to the channel.
-    end
+    if RUBY_ENGINE != 'opal'
+      # server can now relay messages or anything else
+      if message.include?('dog') 
+        MyChannel.send_message(message, :dogs)
+        false # if false is returned or anything else than true, the message is NOT published at all, instead returned to the sender with the error 'Message cancelled!'
+      else
+        true  # only if true is returned, the message is published to the channel.
+      end
+    end 
   end
 end
 
