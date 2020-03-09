@@ -9,6 +9,7 @@ else
   require 'fileutils'
   require 'erb'
   require 'active_support/core_ext/string'
+  require 'oj'
   require 'opal-webpack-loader/installer_cli'
   require_relative '../isomorfeus/version'
   require_relative '../isomorfeus/installer'
