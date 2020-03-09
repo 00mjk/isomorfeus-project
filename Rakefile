@@ -167,7 +167,7 @@ task :ruby_i18n_spec do
   run_rake_spec_for('i18n')
 end
 
-task :ruby_installer_spec => [:build_ruby_packages] do
+task :create_gem_repo do
   pwd = Dir.pwd
   # copy gems
   system('cp ruby/iso*/*.gem ruby/gems/gems/')
@@ -175,6 +175,10 @@ task :ruby_installer_spec => [:build_ruby_packages] do
   Dir.chdir(File.join('ruby','gems'))
   system('gem generate_index')
   Dir.chdir(pwd)
+end
+
+task :ruby_installer_spec => [:build_ruby_packages, :create_gem_repo] do
+  pwd = Dir.pwd
   Dir.chdir(File.join('ruby', "isomorfeus"))
   system('bundle install')
   options = { keep_file_descriptors: false }
