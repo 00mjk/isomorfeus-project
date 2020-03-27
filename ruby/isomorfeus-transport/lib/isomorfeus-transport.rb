@@ -25,7 +25,8 @@ else
   require 'active_support'
   require 'iodine'
   require 'dbm'
-  require 'isomorfeus/transport/dbm_session_store'
+  require 'isomorfeus/transport/memcached_session_store'
+  require 'isomorfeus/transport/redis_session_store'
   opal_path = Gem::Specification.find_by_name('opal').full_gem_path
   promise_path = File.join(opal_path, 'stdlib', 'promise.rb')
   require promise_path

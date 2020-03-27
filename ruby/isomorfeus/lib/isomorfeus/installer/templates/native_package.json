@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "react":"^16.13.0",
+    "@react-native-community/datetimepicker": "^2.2.3",
+    "@react-native-community/slider": "^2.0.8",
+    "@react-native-community/viewpager": "^3.3.0",
+    "metro": "https://github.com/isomorfeus/metro-package.git",
+    "metro-resolver": "https://github.com/isomorfeus/metro-resolver-package.git",
+    "react-native": "https://github.com/isomorfeus/react-native-package.git",
+    "react-native-svg": "^12.0.3",
+    "react-native-web": "^0.12.2",
+    "react-router-native": "^5.1.2"
+  }
+}

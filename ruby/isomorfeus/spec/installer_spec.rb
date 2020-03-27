@@ -109,6 +109,12 @@ RSpec.describe 'isomorfeus installer' do
       expect(File.exist?('Gemfile')).to be true
       expect(File.exist?('.gitignore')).to be true
     end
+
+    it 'can for web and mobile' do
+      Bundler.with_original_env do
+        system('bundle exec isomorfeus new test_app -t "web native" -y no')
+      end
+    end
   end
 
   context 'in a new app' do
