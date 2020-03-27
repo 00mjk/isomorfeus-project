@@ -5,10 +5,9 @@ module Isomorfeus
         attr_accessor :socket
 
         def init
-          @requests_in_progress = { requests: {}, agent_ids: {} }
           @socket = nil
           @initialized = false
-          promise_connect if Isomorfeus.on_browser?
+          promise_connect if Isomorfeus.on_browser? || Isomorfeus.on_mobile?
           true
         end
 
@@ -23,10 +22,12 @@ module Isomorfeus
             ws_protocol = window_protocol == 'https:' ? 'wss:' : 'ws:'
             ws_url = "#{ws_protocol}//#{`window.location.host`}#{Isomorfeus.api_websocket_path}"
           else
-            ws_url = Isomorfeus::TopLevel.transport_ws_url
+            ws_protocol = Isomorfeus.production? ? 'wss:' : 'ws:'
+            ws_url = "#{ws_protocol}//#{Isomorfeus.api_websocket_host}:#{Isomorfeus.api_websocket_port}#{Isomorfeus.api_websocket_path}"
           end
           @socket = Isomorfeus::Transport::Websocket.new(ws_url)
-          @socket.on_error do
+          @socket.on_error do |error|
+            `console.log('Isomorfeus::Transport: Error connecting:', error)`
             @socket.close
             after 1000 do
               Isomorfeus::Transport.promise_connect
@@ -149,30 +150,30 @@ module Isomorfeus
         end
 
         def busy?
-          @requests_in_progress[:requests].size != 0
+          requests_in_progress[:requests].size != 0
         end
 
         def requests_in_progress
-          @requests_in_progress
+          @requests_in_progress ||= { requests: {}, agent_ids: {} }
         end
 
         def request_in_progress?(request)
-          @requests_in_progress[:requests].key?(request)
+          requests_in_progress[:requests].key?(request)
         end
 
         def get_agent_for_request_in_progress(request)
-          agent_id = @requests_in_progress[:requests][request]
+          agent_id = requests_in_progress[:requests][request]
           Isomorfeus::Transport::RequestAgent.get(agent_id)
         end
 
         def register_request_in_progress(request, agent_id)
-          @requests_in_progress[:requests][request] = agent_id
-          @requests_in_progress[:agent_ids][agent_id] = request
+          requests_in_progress[:requests][request] = agent_id
+          requests_in_progress[:agent_ids][agent_id] = request
         end
 
         def unregister_request_in_progress(agent_id)
-          request = @requests_in_progress[:agent_ids].delete(agent_id)
-          @requests_in_progress[:requests].delete(request)
+          request = requests_in_progress[:agent_ids].delete(agent_id)
+          requests_in_progress[:requests].delete(request)
         end
       else # RUBY_ENGINE
         def send_message(channel_class, channel, message)

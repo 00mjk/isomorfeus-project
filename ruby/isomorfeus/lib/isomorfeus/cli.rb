@@ -8,11 +8,12 @@ module Isomorfeus
 Select targets to install.
 Available targets:
   web: Create web applications
-  mobile: Create mobile applications with React Native #{'(Requires Isomorfeus Professional)' unless Isomorfeus::Installer.is_professional}
-  desktop: Create desktop applications with Electron #{'(Requires Isomorfeus Professional)' unless Isomorfeus::Installer.is_professional}
+  native: Create applications with React Native (Requires #{'Isomorfeus Professional and the' unless Isomorfeus::Installer.is_professional} web target)'
+  all: web + native
 Example:
-  -t "web mobile desktop" - Setup project for all targets
-  -t mobile               - Setup project for mobile applications only
+  -t all          - Setup project for all targets
+  -t "web native" - Setup project for all targets
+  -t web          - Setup project for web applications only
 DESC
     option :yarn_and_bundle, default: 'yes', required: false, type: :string, aliases: '-y',
            desc: "Execute yarn install and bundle install: -y or -y yes, do not execute: -y no"
@@ -38,13 +39,10 @@ DESC
 Add a target to a existing Isomorfeus Project.
 \x5
 \x5Available targets:
-\x5  web: Create web applications
-\x5  mobile: Create mobile applications with React Native #{'(Requires Isomorfeus Professional)' unless Isomorfeus::Installer.is_professional}
-\x5  desktop: Create desktop applications with Electron #{'(Requires Isomorfeus Professional)' unless Isomorfeus::Installer.is_professional}
+\x5  native: Create applications with React Native (Requires #{'Isomorfeus Professional and the' unless Isomorfeus::Installer.is_professional} web target)'
 \x5
 \x5  Example:
-\x5  isomorfeus add_target mobile - Add mobile as target to a existing project
-\x5  isomorfeus add_target web    - Add web as target to a existing project
+\x5  isomorfeus add_target native - Add mobile as target to a existing project
 DESC
     option :yarn_and_bundle, default: 'yes', required: false, type: :string, aliases: '-y',
            desc: "Execute yarn install and bundle install: -y or -y yes, do not execute: -y no"
@@ -87,16 +85,8 @@ DESC
            desc: "Isomorfeus module name for which to generate the test app, eg: 'i18n'. (required)"
     option :source_dir, required: true, type: :string, aliases: '-s',
            desc: "Recursively copy files from source dir into app. (optional)"
-    option :targets, default: 'web', required: false, type: :string, aliases: '-t', desc: <<~DESC
-Select targets to install.
-Available targets:
-  web: Create web applications (default)
-  mobile: Create mobile applications with React Native #{'(Requires Isomorfeus Professional)' unless Isomorfeus::Installer.is_professional}
-  desktop: Create desktop applications with Electron #{'(Requires Isomorfeus Professional)' unless Isomorfeus::Installer.is_professional}
-Example:
-  ismos new my_project -t "web mobile desktop" - Setup project for all targets
-  ismos new my_project -t mobile               - Setup project for mobile applications only
-DESC
+    option :targets, default: 'web', required: false, type: :string, aliases: '-t',
+           desc: 'Select targets to install.'
     option :rack_server, default: 'iodine', aliases: '-r',
            desc: "Select rack server, one of: #{Isomorfeus::Installer.sorted_rack_servers.join(', ')}. (optional, default: iodine)"
     option :yarn_and_bundle, default: 'yes', required: false, type: :string, aliases: '-y',

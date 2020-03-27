@@ -27,6 +27,8 @@ module Isomorfeus
   end
 
   if RUBY_ENGINE == 'opal'
+    add_client_option(:api_websocket_host)
+    add_client_option(:api_websocket_port)
     add_client_option(:api_websocket_path)
     add_client_option(:cookie_eater_path)
     add_client_option(:transport_init_class_names, [])
@@ -64,6 +66,8 @@ module Isomorfeus
     end
   else
     class << self
+      attr_accessor :api_websocket_host
+      attr_accessor :api_websocket_port
       attr_accessor :api_websocket_path
       attr_accessor :cookie_eater_path
       attr_accessor :cookie_dbm_path
@@ -170,6 +174,9 @@ module Isomorfeus
   end
 
   # defaults
+  self.api_websocket_host = 'localhost'
+  self.api_websocket_port = '5000'
   self.api_websocket_path = '/isomorfeus/api/websocket'
+
   self.cookie_eater_path = '/isomorfeus/cookie/eat'
 end
