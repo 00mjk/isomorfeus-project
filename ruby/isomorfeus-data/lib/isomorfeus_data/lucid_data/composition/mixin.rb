@@ -136,7 +136,7 @@ module LucidData
                 @_parts[access_name] = Isomorfeus.instance_from_sid(sid) if sid
               end
             end
-            @_parts.each_value { |part| part.composition = self }
+            @_parts.each_value { |part| part.composition = self if part }
           end
 
           def _load_from_store!
@@ -211,7 +211,7 @@ module LucidData
             self.class.parts.each_key do |access_name|
               if parts.key?(access_name)
                 @_parts[access_name] = parts[access_name]
-                @_parts[access_name].composition = self
+                @_parts[access_name].composition = self if @_parts[access_name]
               end
             end
           end
