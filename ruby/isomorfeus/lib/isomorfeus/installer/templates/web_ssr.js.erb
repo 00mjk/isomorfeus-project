@@ -3,11 +3,12 @@
 // for example modules which depend on objects provided by node js
 import ReactDOMServer from 'react-dom/server';
 global.ReactDOMServer = ReactDOMServer;
-import { StaticRouter, Link, NavLink, Route, Switch } from 'react-router-dom';
+import { StaticRouter, Link, NavLink, Redirect, Route, Switch } from 'react-router-dom';
 // global.History = History;
 global.Router = StaticRouter;
 global.Link = Link;
 global.NavLink = NavLink;
+global.Redirect = Redirect;
 global.Route = Route;
 global.Switch = Switch;
 import WebSocket from 'ws';

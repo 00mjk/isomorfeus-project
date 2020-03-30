@@ -65,11 +65,12 @@ import deepForceUpdate from 'react-deep-force-update';
 global.deepForceUpdate = deepForceUpdate;
 
 // import npm modules that are valid to use only in the browser
-import { NativeRouter, Link, NavLink, Route, Switch } from 'react-router-native';
+import { NativeRouter, Link, NavLink, Redirect, Route, Switch } from 'react-router-native';
 // global.History = History;
 global.Router = NativeRouter;
 global.Link = Link;
 global.NavLink = NavLink;
+global.Redirect = Redirect;
 global.Route = Route;
 global.Switch = Switch;
 
