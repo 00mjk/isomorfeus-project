@@ -9,7 +9,8 @@ All LucidData *classes* support the following methods for loading data based on 
   Convenience method useful for loading in a component render block. It returns at first a empty object with the key set. After data has been loaded
   the object will have its data available and a render is triggered. Transport request bundling applies.
   This method is optimistic and assumes success. Failure cannot be handled.
-  Triggers a load only when data is not availalbe.
+  On the client: Triggers a load only when data is not available.
+  On the server: The same as load!, always loads data.
 
 - `load!(key:)` -> instance
   The same as load but always triggers a load.
@@ -21,7 +22,8 @@ All LucidData *classes* support the following methods for loading data based on 
   but not from within render blocks.
 
 - `promise_load(key:)` -> promise with instance when resolved
-  This method is the same as promise_load! but triggers load only when data is not available.
+  On the client: This method is the same as promise_load! but triggers load only when data is not available.
+  On the server: The same as promise_load!, always loads data.
 
 A `execute_load` block must be defined, to execute the actual load of data. This blocks must return a instance if the class.
 Returning nil indicates that the requested item does not exist. Alternatively a exception may be thrown.
