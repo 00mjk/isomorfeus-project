@@ -9,12 +9,19 @@ All LucidData *classes* support the following methods for loading data based on 
   Convenience method useful for loading in a component render block. It returns at first a empty object with the key set. After data has been loaded
   the object will have its data available and a render is triggered. Transport request bundling applies.
   This method is optimistic and assumes success. Failure cannot be handled.
-  
-- `promise_load(key:)` -> promise with instance when resolved
+  Triggers a load only when data is not availalbe.
+
+- `load!(key:)` -> instance
+  The same as load but always triggers a load.
+
+- `promise_load!(key:)` -> promise with instance when resolved
   This method returns a promise. This method always triggers a load when called, but subject to transport request bundling, the actual request may be
   delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
+
+- `promise_load(key:)` -> promise with instance when resolved
+  This method is the same as promise_load! but triggers load only when data is not available.
 
 A `execute_load` block must be defined, to execute the actual load of data. This blocks must return a instance if the class.
 Returning nil indicates that the requested item does not exist. Alternatively a exception may be thrown.
@@ -22,7 +29,7 @@ Returning nil indicates that the requested item does not exist. Alternatively a 
 ### Creating Data
 
 Creating is the same as instantiating with new and then saving the object.
- 
+
 All LucidData *classes* support the following methods for creating data:
 - `create(key:, **args)` -> instance
   Identical to calling `.new.save`
@@ -32,9 +39,9 @@ All LucidData *classes* support the following methods for creating data:
   Identical to calling `.new.promise_save`
   This method returns a promise. This method always triggers a create when called, but subject to transport request bundling,
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
-  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
+  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
-  
+
 For creating the `execute_create` block must be defined, to execute the actual creation of data. This block is executed within the instance und must return self.
 Returning nil indicates that the create failed for some reason. Alternatively a exception may be thrown.
 
@@ -47,7 +54,7 @@ All LucidData *instances* support the following methods for saving data:
 - `promise_save` -> promise with self when successful
   This method returns a promise. This method always triggers a save when called, but subject to transport request bundling, the actual request may be
   delayed, bundled together with other request or fulfilled by another identical request.
-  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
+  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
 
 A `execute_save` block must be defined, to execute the actual save of data. This block is executed within the instance und must return self.
@@ -62,7 +69,7 @@ All LucidData *classes* support the following methods for destroying data:
 - `promise_destroy(key:)` -> promise with true when successful
   This method returns a promise. This method always triggers a destroy when called, but subject to transport request bundling,
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
-  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
+  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
 
 A `execute_destroy` block must be defined, to execute the actual load of data. These blocks must return `true` if the destroy succeeded or `false`
@@ -75,9 +82,9 @@ All LucidData *instances* support the following methods for destroying data:
 - `promise_destroy` -> promise with true when successful
   This method returns a promise. This method always triggers a destroy when called, but subject to transport request bundling,
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
-  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
+  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
-  
+
 ### Reloading Data
 
 All LucidData *instances* support the following methods for reloading data from the server:
@@ -87,7 +94,7 @@ All LucidData *instances* support the following methods for reloading data from 
 - `promise_reload` -> promise with self when resolved
   This method returns a promise. This method always triggers a reload when called, but subject to transport request bundling,
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
-  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components, 
+  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
 
 ### Attributes
