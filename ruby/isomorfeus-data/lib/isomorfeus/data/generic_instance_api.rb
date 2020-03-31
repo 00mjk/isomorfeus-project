@@ -62,12 +62,12 @@ module Isomorfeus
         end
 
         def reload
-          self.class.promise_load(@key, self)
+          self.class.promise_load!(@key, self)
           self
         end
 
         def promise_reload
-          self.class.promise_load(@key, self)
+          self.class.promise_load!(@key, self)
         end
 
         def promise_save

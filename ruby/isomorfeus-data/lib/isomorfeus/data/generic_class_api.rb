@@ -30,6 +30,21 @@ module Isomorfeus
 
         def promise_load(key:, instance: nil)
           instance = self.new(key: key) unless instance
+          if instance.loaded?
+            Promise.new.resolve(instance)
+          else
+            promise_load!(key: key, instance: instance)
+          end
+        end
+
+        def load!(key:)
+          instance = self.new(key: key)
+          promise_load!(key: key, instance: instance) unless instance.loaded?
+          instance
+        end
+
+        def promise_load!(key:, instance: nil)
+          instance = self.new(key: key) unless instance
           Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key).then do |agent|
             if agent.processed
               agent.result
@@ -61,6 +76,7 @@ module Isomorfeus
           result_promise.resolve(instance)
           result_promise
         end
+        alias promise_load! promise_load
 
         def load(key:)
           data = instance_exec(key: key, &@_load_block)
@@ -69,6 +85,7 @@ module Isomorfeus
           Isomorfeus.raise_error(message: "#{self.to_s}: execute_load must return a instance of #{self.to_s} or nil. Returned was: #{data.class}.") if data.class != self
           data
         end
+        alias load! load
 
         # execute
         def execute_create(&block)
