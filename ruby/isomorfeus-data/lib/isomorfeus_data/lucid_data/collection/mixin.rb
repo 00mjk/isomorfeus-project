@@ -94,7 +94,7 @@ module LucidData
 
         def to_transport
           hash = { 'attributes' => _get_selected_attributes, 'nodes' => nodes_as_sids }
-          hash.merge!('revision' => revision) if revision
+          hash['revision'] = revision if revision
           result = { @class_name => { @key => hash }}
           result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
           result

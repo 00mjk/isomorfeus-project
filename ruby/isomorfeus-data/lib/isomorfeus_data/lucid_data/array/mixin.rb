@@ -97,7 +97,7 @@ module LucidData
 
           def to_transport
             hash = { 'elements' => _get_array }
-            hash.merge!('revision' => revision) if revision
+            hash['revision'] = revision if revision
             { @class_name => { @key =>  hash }}
           end
 
@@ -385,7 +385,7 @@ module LucidData
 
           def to_transport
             hash = { 'elements' => @_raw_array }
-            hash.merge!('revision' => revision) if revision
+            hash['revision'] = revision if revision
             result = { @class_name => { @key => hash }}
             result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
             result

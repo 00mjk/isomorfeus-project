@@ -221,7 +221,7 @@ module LucidData
           edge_collections.each do |name, collection|
             hash['edges'][name.to_s] = collection.to_sid if collection
           end
-          hash.merge!('revision' => revision) if revision
+          hash['revision'] = revision if revision
           result = { @class_name => { @key => hash }}
           result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
           result

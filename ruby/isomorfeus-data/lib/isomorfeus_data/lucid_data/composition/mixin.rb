@@ -70,7 +70,7 @@ module LucidData
 
         def to_transport
           hash = { 'attributes' => _get_selected_attributes, 'parts' => {} }
-          hash.merge!('revision' => revision) if revision
+          hash['revision'] = revision if revision
           parts.each do |name, instance|
             hash['parts'][name.to_s] = instance.to_sid if instance
           end
