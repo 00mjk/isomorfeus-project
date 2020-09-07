@@ -4,6 +4,7 @@ require 'isomorfeus/data/attribute_support'
 require 'isomorfeus/data/generic_class_api'
 require 'isomorfeus/data/generic_instance_api'
 require 'isomorfeus/data/element_validator'
+require 'base64'
 
 if RUBY_ENGINE == 'opal'
   require 'isomorfeus/data/reducer'
@@ -16,6 +17,9 @@ else
   require 'oj'
   require 'active_support'
   require 'active_support/core_ext/hash'
+  require 'shrine'
+  require 'shrine/storage/memory'
+  require 'shrine/storage/file_system'
   # require 'arango-driver'
 
   require 'isomorfeus_data/lucid_data/query_result'
@@ -54,7 +58,16 @@ else
   require 'isomorfeus_data/lucid_data/generic_edge_collection'
   require 'isomorfeus_data/lucid_data/generic_node'
 
+  require 'isomorfeus_data/lucid_data/file/class_api'
+  require 'isomorfeus_data/lucid_data/file/instance_api'
+  require 'isomorfeus_data/lucid_data/file/mixin'
+  require 'isomorfeus_data/lucid_data/file/base'
+
   require 'isomorfeus/data/handler/generic'
+  require 'isomorfeus/data/handler/file'
+  require 'isomorfeus/data/file_rack_middleware'
+
+  Isomorfeus.add_middleware(Isomorfeus::Transport::FileRackMiddleware)
 
   Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
 

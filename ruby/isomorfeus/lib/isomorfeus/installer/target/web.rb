@@ -39,6 +39,7 @@ module Isomorfeus
             create_file_from_template(templates_path, Isomorfeus::Installer.rack_server[:config_template], config_path(Isomorfeus::Installer.rack_server[:config_template][0..-5]), {})
             data_hash = { app_class: Isomorfeus::Installer.app_class }
             create_file_from_template(templates_path, 'arango_config.rb.erb', config_path('arango.rb'), data_hash)
+            create_file_from_template(templates_path, 'shrine_config.rb.erb', config_path('shrine.rb'), data_hash)
           end
 
           def install_procfiles
@@ -96,4 +97,3 @@ module Isomorfeus
     end
   end
 end
-

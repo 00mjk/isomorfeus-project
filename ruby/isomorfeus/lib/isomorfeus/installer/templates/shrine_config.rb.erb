@@ -1,0 +1,10 @@
+# Shrine config
+
+# require additional plugins:
+# require 'shrine/storage/cloudinary'
+
+# storage settings
+Shrine.storages = {
+  cache: Shrine::Storage::Memory.new,
+  store: Shrine::Storage::FileSystem.new("data/files")
+}

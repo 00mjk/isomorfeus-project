@@ -39,6 +39,18 @@ module Isomorfeus
         valid_data_classes[raw_class_name(klass)] = true
       end
 
+      def valid_file_classes
+        @valid_file_classes ||= {}
+      end
+
+      def valid_file_class_name?(class_name)
+        valid_file_classes.key?(class_name)
+      end
+
+      def add_valid_file_class(klass)
+        valid_file_classes[raw_class_name(klass)] = true
+      end
+
       def connect_to_arango
         arango_options = if Isomorfeus.production? then Isomorfeus.arango_production
                          elsif Isomorfeus.development? then Isomorfeus.arango_development
@@ -105,6 +117,8 @@ module Isomorfeus
       attr_accessor :arango_production
       attr_accessor :arango_development
       attr_accessor :arango_test
+      attr_accessor :file_request_path
     end
+    self.file_request_path = '/isomorfeus/files'
   end
 end
