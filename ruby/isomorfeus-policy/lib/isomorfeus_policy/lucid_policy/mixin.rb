@@ -34,8 +34,6 @@ module LucidPolicy
           authorization_rules[:policies] = { policy_class => options }
         end
 
-        private
-
         def _allow_or_deny(thing, *classes_methods_options, &block)
           rules = authorization_rules
 
@@ -116,7 +114,7 @@ module LucidPolicy
 
                     if rule.class == Symbol || rule.class == String
                       if options
-                        condition, method_result = __get_condition_and_result(options)
+                        condition, method_result = _get_condition_and_result(options)
                         if @record_reason
                           @reason[:condition] = condition
                           @reason[:condition_result] = method_result
@@ -148,7 +146,7 @@ module LucidPolicy
             combined_policy_result = policy_instance.authorized?(target_class, target_method, props)
             @reason = @reason = { policy_class: @class_name, combined: policy_instance.reason } if @record_reason
           else
-            condition, method_result = __get_condition_and_result(options)
+            condition, method_result = _get_condition_and_result(options)
             if (condition == :if && method_result == true) || (condition == :if_not && method_result == false)
               policy_instance = policy_class.new(@object, @record_reason)
               combined_policy_result = policy_instance.authorized?(target_class, target_method, props)
@@ -168,9 +166,7 @@ module LucidPolicy
         Isomorfeus.raise_error(error_class: LucidPolicy::Exception, message: "#{@object}: not authorized to call #{target_class}#{}#{target_method} #{props} #{reason_message}!")
       end
 
-      private
-
-      def __get_condition_and_result(options)
+      def _get_condition_and_result(options)
         condition = nil
         method_name_or_block = if options.key?(:if)
                                  condition = :if
