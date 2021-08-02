@@ -1,6 +1,6 @@
 module Isomorfeus
   module Transport
-    class Websocket
+    class WebsocketClient
       attr_reader :url
 
       if RUBY_ENGINE == 'opal'
