@@ -70,7 +70,7 @@ module Isomorfeus
       attr_accessor :api_websocket_port
       attr_accessor :api_websocket_path
       attr_accessor :cookie_eater_path
-      attr_accessor :cookie_dbm_path
+      attr_accessor :cookie_sdbm_path
       attr_reader :session_store
 
       def valid_channel_class_name?(class_name)
@@ -169,7 +169,7 @@ module Isomorfeus
     end
 
     self.session_store_init do
-      Isomorfeus::Transport::DbmSessionStore.new('cookie') # dont use this one, but we keep it here to have at least something
+      Isomorfeus::Transport::SdbmSessionStore.new('cookie') # dont use this one, but we keep it here to have at least something
     end
   end
 
