@@ -109,21 +109,21 @@ module LucidData
             `Object.keys(derivatives)`
           end
 
-          def url(derivative: null)
+          def url(derivative: nil)
             derivative = :default unless derivative
             return @changed_url[derivative] if @changed_url.key?(derivative)
             path = @_derivatives_path + [derivative, :url]
             result = Redux.fetch_by_path(*path)
           end
 
-          def data_url(derivative: null)
+          def data_url(derivative: nil)
             derivative = :default unless derivative
             return @changed_data_url[derivative] if @changed_data_url.key?(derivative)
             path = @_derivatives_path + [derivative, :data_url]
             result = Redux.fetch_by_path(*path)
           end
 
-          def data(derivative: null)
+          def data(derivative: nil)
             derivative = :default unless derivative
             return @changed_data[derivative] if @changed_data.key?(derivative)
             return @decoded_data[derivative] if @decoded_data.key?(derivative)
@@ -132,8 +132,10 @@ module LucidData
             @decoded_data[derivative] = Base64.decode64(encoded_data)
           end
 
-          def set(derivative: null, data: nil, data_url: nil, url: nil)
-            raise "Either data, data_url or url must be given as keyword argument!" unless data || data_url || url
+          def set(derivative: nil, data: nil, data_url: nil, url: nil)
+            unless data || data_url || url
+              raise "Either data, data_url or url must be given as keyword argument!"
+            end
             changed!
             derivative = :default unless derivative
             @changed_data[derivative][:data] = data if data
@@ -279,29 +281,37 @@ module LucidData
             @_derivatives.keys
           end
 
-          def url(derivative: null)
+          def url(derivative: nil)
             derivative = :default unless derivative
-            return @_changed_derivatives[derivative][:url] if @_changed_derivatives.key?(derivative) && @_changed_derivatives[derivative].key?(:url)
+            if @_changed_derivatives.key?(derivative) && @_changed_derivatives[derivative].key?(:url)
+              return @_changed_derivatives[derivative][:url]
+            end
             return @_derivatives[derivative][:url] if @derivatives.key(derivative)
             nil
           end
 
-          def data_url(derivative: null)
+          def data_url(derivative: nil)
             derivative = :default unless derivative
-            return @_changed_derivatives[derivative][:data_url] if @_changed_derivatives.key?(derivative) && @_changed_derivatives[derivative].key?(:data_url)
+            if @_changed_derivatives.key?(derivative) && @_changed_derivatives[derivative].key?(:data_url)
+              return @_changed_derivatives[derivative][:data_url]
+            end
             return @_derivatives[derivative][:data_url] if @derivatives.key(derivative)
             nil
           end
 
-          def data(derivative: null)
+          def data(derivative: nil)
             derivative = :default unless derivative
-            return @_changed_derivatives[derivative][:data] if @_changed_derivatives.key?(derivative) && @_changed_derivatives[derivative].key?(:data)
+            if @_changed_derivatives.key?(derivative) && @_changed_derivatives[derivative].key?(:data)
+              return @_changed_derivatives[derivative][:data]
+            end
             return @_derivatives[derivative][:data] if @derivatives.key(derivative)
             nil
           end
 
-          def set(derivative: null, data: nil, data_url: nil, url: nil)
-            raise "Either data, data_url or url must be given as keyword argument!" unless data || data_url || url
+          def set(derivative: nil, data: nil, data_url: nil, url: nil)
+            unless data || data_url || url
+              raise "Either data, data_url or url must be given as keyword argument!"
+            end
             changed!
             derivative = :default unless derivative
             @_changed_derivatives[derivative][:data] = data if data
