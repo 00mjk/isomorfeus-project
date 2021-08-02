@@ -13,8 +13,8 @@ gem 'isomorfeus-professional', <%= isomorfeus_version %>
 <% elsif isomorfeus_edition == :community %>
 gem 'isomorfeus', <%= isomorfeus_version %>
 <% else %>
-gem 'isomorfeus-redux', '~> 4.0.22'
-gem 'isomorfeus-react', '>= 16.13.6'
+gem 'isomorfeus-redux', '~> 4.1.1'
+gem 'isomorfeus-react', '>= 16.13.11'
 gem 'isomorfeus-policy', <%= isomorfeus_policy %>
 gem 'isomorfeus-transport', <%= isomorfeus_transport %>
 gem 'isomorfeus-i18n', <%= isomorfeus_i18n %>
@@ -28,8 +28,6 @@ gem 'isomorfeus-professional', <%= isomorfeus_professional %>
 <% end %>
 
 group :development do
-  gem 'debase'
-  gem 'ruby-debug-ide'
   gem 'pry', '~> 0.12.2'
   gem 'pry-nav'
   gem 'pry-rescue'
@@ -38,5 +36,5 @@ end
 
 group :test do
   gem 'rspec', '~> 3.8.0'
-  gem 'isomorfeus-puppetmaster', '~> 0.3.5'
+  gem 'isomorfeus-puppetmaster', '~> 0.4.0'
 end
