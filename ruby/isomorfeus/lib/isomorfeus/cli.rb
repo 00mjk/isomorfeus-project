@@ -22,11 +22,17 @@ DESC
       Isomorfeus::Installer.options = options
       begin
         Dir.mkdir(Isomorfeus::Installer.project_dir)
-        Dir.chdir(Isomorfeus::Installer.project_dir)
       rescue
-        puts "Directory #{installer.project_dir} could not be created!"
+        if Dir.exist?(Isomorfeus::Installer.project_dir) && Gem.win_platform?
+          # this is a workaround for Windows being unable to delete existing app directories of test_apps
+          # because of some node_modules
+          puts "Using existing directory #{Isomorfeus::Installer.project_dir}!"
+        else
+          puts "Directory #{Isomorfeus::Installer.project_dir} could not be created!"
         exit 1
       end
+      end
+      Dir.chdir(Isomorfeus::Installer.project_dir)
       Isomorfeus::Installer::NewProject.execute
       Isomorfeus::Installer::InstallTargets.execute
       Isomorfeus::Installer::Gemfile.execute
