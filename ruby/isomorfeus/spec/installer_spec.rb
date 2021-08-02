@@ -167,7 +167,7 @@ RSpec.describe 'isomorfeus installer' do
 
     it 'can execute tests' do
       test_result = Bundler.with_original_env do
-        `THREADS=4 WORKERS=1 bundle exec rspec`
+        `bundle exec rspec`
       end
       expect(test_result).to include('1 example, 0 failures')
     end
@@ -187,15 +187,6 @@ RSpec.describe 'isomorfeus installer' do
       Dir.chdir('..')
       Dir.chdir('..')
     end
-
-    # it 'agoo' do
-    #   Isomorfeus::CLI.start(%w[new morphing -r agoo --no-yarn-and-bundle])
-    #   Dir.chdir('morphing')
-    #   system('env -i PATH=$PATH yarn install')
-    #   system('env -i PATH=$PATH bundle install')
-    #   test_result = `env -i PATH=$PATH ARANGO_USER=$ARANGO_USER ARANGO_PASSWORD=$ARANGO_PASSWORD bundle exec rspec`
-    #   expect(test_result).to include('1 example, 0 failures')
-    # end
 
     it 'iodine' do
       Isomorfeus::CLI.start(%w[new morphing -r iodine -y no])
@@ -223,7 +214,7 @@ RSpec.describe 'isomorfeus installer' do
       test_result = Bundler.with_original_env do
         system('yarn install')
         system('bundle install')
-        `THREADS=4 WORKERS=1 bundle exec rspec`
+        `bundle exec rspec`
       end
       expect(test_result).to include('1 example, 0 failures')
     end
