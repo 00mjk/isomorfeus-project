@@ -25,7 +25,7 @@ module Isomorfeus
             ws_protocol = Isomorfeus.production? ? 'wss:' : 'ws:'
             ws_url = "#{ws_protocol}//#{Isomorfeus.api_websocket_host}:#{Isomorfeus.api_websocket_port}#{Isomorfeus.api_websocket_path}"
           end
-          @socket = Isomorfeus::Transport::Websocket.new(ws_url)
+          @socket = Isomorfeus::Transport::WebsocketClient.new(ws_url)
           @socket.on_error do |error|
             `console.log('Isomorfeus::Transport: Error connecting:', error)`
             @socket.close
