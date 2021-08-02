@@ -119,6 +119,10 @@ module Isomorfeus
       attr_accessor :arango_test
       attr_accessor :file_request_path
     end
+  end
+
+  if RUBY_ENGINE == 'opal'
+  else
     self.file_request_path = '/isomorfeus/files'
   end
 end
