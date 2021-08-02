@@ -7,7 +7,11 @@ module Isomorfeus
           if yandle == 'yes'
             puts 'Executing yarn install:'
             Bundler.with_original_env do
-              system('env -i PATH=$PATH yarn install')
+              if Gem.win_platform?
+                system('yarn install')
+              else
+                system('env -i PATH="$PATH" yarn install')
+              end
             end
             puts 'Executing bundle install:'
             bundle_command =  Gem.bin_path("bundler", "bundle")
