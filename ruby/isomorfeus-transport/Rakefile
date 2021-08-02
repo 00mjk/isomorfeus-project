@@ -1,5 +1,6 @@
 require 'bundler'
 require 'cowsay'
+require 'fileutils'
 task default: %w[run_test_app_specs]
 
 task :run_test_app_specs => 'create_test_app' do
@@ -7,15 +8,19 @@ task :run_test_app_specs => 'create_test_app' do
   pwd = Dir.pwd
   Dir.chdir('test_app')
   Bundler.with_original_env do
-    system('WORKERS=1 bundle exec rspec')
+    if Gem.win_platform?
+      system('bundle exec rspec')
+    else
+      system('WORKERS=1 bundle exec rspec')
+    end
   end
   Dir.chdir(pwd)
-  system('rm -rf test_app')
+  FileUtils.rm_rf('test_app')
 end
 
 task :create_test_app do
-  system('rm -rf test_app')
-  system('../isomorfeus/bin/isomorfeus test_app -m operation -s test_app_files')
+  FileUtils.rm_rf('test_app')
+  system('ruby -- ../isomorfeus/bin/isomorfeus test_app -m operation -s test_app_files')
 end
 
 task :start_test_app => 'create_test_app' do
