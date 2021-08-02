@@ -15,17 +15,16 @@ Gem::Specification.new do |s|
   s.executables  << 'ismos'
   s.executables  << 'yandle'
   s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
-  # s.test_files     = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.0'
   s.add_dependency 'bundler'
-  s.add_dependency 'oj', '>= 3.10.0'
+  s.add_dependency 'oj', '>= 3.11.5'
   s.add_dependency 'pry', '~> 0.12.2'
-  s.add_dependency 'opal-webpack-loader', '>= 0.9.11'
+  s.add_dependency 'opal-webpack-loader', '>= 0.11.1'
   s.add_dependency 'thor', '>= 0.19.4'
-  s.add_dependency 'isomorfeus-react', '>= 16.13.6'
-  s.add_dependency 'isomorfeus-redux', '~> 4.0.22'
+  s.add_dependency 'isomorfeus-react', '>= 16.13.11'
+  s.add_dependency 'isomorfeus-redux', '~> 4.1.1'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-transport', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-data', Isomorfeus::VERSION
