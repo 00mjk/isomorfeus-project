@@ -1,6 +1,7 @@
 require 'bundler'
 require 'bundler/cli'
 require 'bundler/cli/exec'
+require 'fileutils'
 
 VERSION = File.read('../ISOMORFEUS_VERSION').strip
 puts "VERSION #{VERSION}"
@@ -66,7 +67,6 @@ task default: %w[ruby_specs]
 task :push_ruby_packages do
   Rake::Task['push_ruby_packages_to_rubygems'].invoke
   Rake::Task['push_ruby_packages_to_github'].invoke
-  # Rake::Task['push_ruby_packages_to_isomorfeus'].invoke
 end
 
 task :push_ruby_packages_to_rubygems do
@@ -83,16 +83,6 @@ task :push_ruby_packages_to_github do
     system("gem push --key github --host https://rubygems.pkg.github.com/isomorfeus isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem")
   end
   system("gem push --key github --host https://rubygems.pkg.github.com/isomorfeus isomorfeus/isomorfeus-#{VERSION}.gem")
-end
-
-task :push_ruby_packages_to_isomorfeus do
-  puts "Publishing to isomorfeus"
-  %w[data i18n mailer operation policy transport].each do |mod|
-    system("scp isomorfeus-#{mod}/isomorfeus-#{mod}-#{VERSION}.gem iso:~/gems/")
-    system("ssh iso \"bash -l -c 'gem inabox gems/isomorfeus-#{mod}-#{VERSION}.gem --host http://localhost:5555/'\"")
-  end
-  system("scp isomorfeus/isomorfeus-#{VERSION}.gem iso:~/gems/")
-  system("ssh iso \"bash -l -c 'gem inabox gems/isomorfeus-#{VERSION}.gem --host http://localhost:5555/'\"")
 end
 
 task :build_ruby_packages do
@@ -170,8 +160,14 @@ end
 task :create_gem_repo do
   pwd = Dir.pwd
   # copy gems
-  system('cp iso*/*.gem gems/gems/')
-  system('ls -al gems/gems/')
+  FileUtils.cp("isomorfeus-data/isomorfeus-data-#{VERSION}.gem",'gems/gems/')
+  FileUtils.cp("isomorfeus-i18n/isomorfeus-i18n-#{VERSION}.gem",'gems/gems/')
+  FileUtils.cp("isomorfeus/isomorfeus-#{VERSION}.gem",'gems/gems/')
+  FileUtils.cp("isomorfeus-mailer/isomorfeus-mailer-#{VERSION}.gem",'gems/gems/')
+  FileUtils.cp("isomorfeus-operation/isomorfeus-operation-#{VERSION}.gem",'gems/gems/')
+  FileUtils.cp("isomorfeus-policy/isomorfeus-policy-#{VERSION}.gem",'gems/gems/')
+  FileUtils.cp("isomorfeus-transport/isomorfeus-transport-#{VERSION}.gem",'gems/gems/')
+  puts Dir.entries('gems/gems').join("\n")
   Dir.chdir('gems')
   system('gem generate_index')
   Dir.chdir(pwd)
@@ -185,10 +181,14 @@ task :ruby_installer_spec => [:build_ruby_packages, :create_gem_repo] do
   options.define_singleton_method(:keep_file_descriptors?) do
     false
   end
-  pid = fork do
-    Bundler::CLI::Exec.new(options, ['rspec']).run
+  if Gem.win_platform?
+    system('bundle exec rspec')
+  else
+    pid = fork do
+      Bundler::CLI::Exec.new(options, ['rspec']).run
+    end
+    Process.waitpid(pid)
   end
-  Process.waitpid(pid)
   Dir.chdir(pwd)
 end
 
