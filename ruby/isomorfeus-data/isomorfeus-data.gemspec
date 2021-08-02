@@ -16,15 +16,15 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'activesupport', '~> 6.0'
   s.add_dependency 'arango-driver', '~> 3.5.0.alpha1'
-  s.add_dependency 'oj', '>= 3.10.0'
+  s.add_dependency 'oj', '>= 3.11.5'
   s.add_dependency 'opal', '>= 1.0.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'shrine', '~> 3.2.1'
-  s.add_dependency 'isomorfeus-react', '>= 16.13.6'
-  s.add_dependency 'isomorfeus-redux', '~> 4.0.22'
+  s.add_dependency 'isomorfeus-react', '>= 16.13.11'
+  s.add_dependency 'isomorfeus-redux', '~> 4.1.1'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Data::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Data::VERSION
-  s.add_development_dependency 'opal-webpack-loader', '>= 0.9.11'
+  s.add_development_dependency 'opal-webpack-loader', '>= 0.11.1'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.8.0'
 end
