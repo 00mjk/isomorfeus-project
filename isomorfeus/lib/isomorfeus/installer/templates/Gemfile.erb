@@ -2,33 +2,15 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 <%= rack_server_gems %>
-gem 'foreman', require: false
 
 gem 'tilt', '~> 2.0.10'
-gem 'roda', '~> 3.29.0'
-gem 'opal', github: 'janbiedermann/opal', branch: 'es6_modules_1_1'
+gem 'roda', '~> 3.47.0'
+gem 'opal', github: 'janbiedermann/opal', branch: 'es6_modules_1_2'
 
-<% if isomorfeus_edition == :professional %>
-gem 'isomorfeus-professional', <%= isomorfeus_version %>
-<% elsif isomorfeus_edition == :community %>
 gem 'isomorfeus', <%= isomorfeus_version %>
-<% else %>
-gem 'isomorfeus-redux', '~> 4.1.1'
-gem 'isomorfeus-react', '>= 16.13.11'
-gem 'isomorfeus-policy', <%= isomorfeus_policy %>
-gem 'isomorfeus-transport', <%= isomorfeus_transport %>
-gem 'isomorfeus-i18n', <%= isomorfeus_i18n %>
-gem 'isomorfeus-data', <%= isomorfeus_data %>
-gem 'isomorfeus-operation', <%= isomorfeus_operation %>
-gem 'isomorfeus-mailer', <%= isomorfeus_mailer %>
-gem 'isomorfeus', <%= isomorfeus %>
-<% if isomorfeus_professional %>
-gem 'isomorfeus-professional', <%= isomorfeus_professional %>
-<% end %>
-<% end %>
 
 group :development do
-  gem 'pry', '~> 0.12.2'
+  gem 'pry', '~> 0.14.1'
   gem 'pry-nav'
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
@@ -36,5 +18,5 @@ end
 
 group :test do
   gem 'rspec', '~> 3.8.0'
-  gem 'isomorfeus-puppetmaster', '~> 0.4.0'
+  gem 'isomorfeus-puppetmaster', '>= 0.5.0'
 end
