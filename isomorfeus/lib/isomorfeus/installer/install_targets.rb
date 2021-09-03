@@ -4,7 +4,7 @@ module Isomorfeus
       class << self
         def execute
           targets_string = Isomorfeus::Installer.options[:targets]
-          targets_string = 'web native' if targets_string == 'all'
+          targets_string = 'web' if targets_string == 'all'
           targets = targets_string.split(' ')
           targets = targets_string.split(',') if targets.empty?
           targets = targets_string.split(', ') if targets.empty?
