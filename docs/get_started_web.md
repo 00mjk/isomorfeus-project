@@ -7,8 +7,7 @@ Isomorfeus works on any of the following operating systems:
 
 Further are required:
 - ruby >= 2.6.5 with bundler
-- node >= 12 with yarn
-
+- node with at least current LTS version
 ### Installation
 ```shell script
 $ gem install isomorfeus -v 1.0.0.zeta19
@@ -39,10 +38,7 @@ $ cd my_project
 $ docker-compose up
 ```
 and start the build of the containers (takes a while) and after that the containers themselves.
-Once the container are started continue below.
-
-If your are on macOS, be aware that the container generated node_modules directory in the project root works for the containers only.
-If you want to work without using containers on macOS again, you must delete the node_modules directory and execute `yarn install` again.  
+Once the container are started continue below. 
 
 ### Editing your first component
 Then open browser at [http://localhost:5000](http://localhost:5000).
