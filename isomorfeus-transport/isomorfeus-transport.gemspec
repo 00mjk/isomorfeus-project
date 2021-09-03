@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.summary      = 'Various transport options for Isomorfeus.'
   s.description  = 'Various transport options for Isomorfeus.'
   s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
-  s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
+  s.files        = `git ls-files -- lib LICENSE README.md node_modules package.json`.split("\n")
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.0'

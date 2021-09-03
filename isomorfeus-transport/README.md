@@ -13,15 +13,6 @@ gem 'isomorfeus-transport'
 ```
 and bundle install/update
 
-## Server Side Rendering
-`yarn add ws`
-
-The 'ws' module then needs to be imported in application_ssr.js:
-```
-import WebSocket from 'ws';
-global.WebSocket = WebSocket;
-```
-
 ## Configuration options
 
 Client and Server:

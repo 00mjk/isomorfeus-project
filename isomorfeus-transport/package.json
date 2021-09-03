@@ -1,0 +1,6 @@
+{
+  "name": "isomorfeus-transport",
+  "dependencies": {
+    "ws": "8.2.1"
+  }
+}
