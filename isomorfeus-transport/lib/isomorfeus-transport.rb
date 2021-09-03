@@ -62,4 +62,10 @@ else
       Isomorfeus.zeitwerk.push_dir(path)
     end
   end
+
+  require 'isomorfeus-speednode'
+  Isomorfeus.node_paths << File.expand_path(File.join(File.dirname(__FILE__), '..', 'node_modules'))
+  
+  require 'isomorfeus/transport/imports'
+  Isomorfeus::Transport::Imports.add
 end
