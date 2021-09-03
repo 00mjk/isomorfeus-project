@@ -1,6 +1,3 @@
-require 'opal-webpack-loader/installer_cli'
-require 'opal-webpack-loader/version'
-
 module Isomorfeus
   module Installer
     class NewProject
