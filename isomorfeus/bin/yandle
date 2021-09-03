@@ -1,9 +1,0 @@
-#!/usr/bin/env ruby
-
-if %w[update upgrade].include?(ARGV[0])
-  system('yarn upgrade')
-  system('bundle update')
-else
-  system('yarn install')
-  system('bundle install')
-end
