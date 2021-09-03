@@ -1,5 +1,7 @@
+require 'isomorfeus-speednode'
+require 'isomorfeus-asset-manager'
 require 'isomorfeus-redux'
-require 'isomorfeus-react'
+require 'isomorfeus-preact'
 require 'isomorfeus-policy'
 require 'isomorfeus-transport'
 require 'isomorfeus-i18n'

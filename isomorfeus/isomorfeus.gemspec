@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'oj', '>= 3.13.3'
   s.add_dependency 'pry', '~> 0.14.4'
   s.add_dependency 'thor', '>= 0.19.4'
+  s.add_dependency 'isomorfeus-speednode', '>= 0.4.0'
   s.add_dependency 'isomorfeus-asset-manager', '>= 0.12.0'
   s.add_dependency 'isomorfeus-preact', '>= 10.5.2'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.4'
