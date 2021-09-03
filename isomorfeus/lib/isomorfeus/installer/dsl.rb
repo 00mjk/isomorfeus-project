@@ -24,7 +24,7 @@ module Isomorfeus
 
       def create_common_framework_directories
         # no created: handlers
-        %w[channels components data imports layouts locales mail_components operations policies server styles].each do |isomorfeus_dir|
+        %w[channels components data layouts locales mail_components operations policies server].each do |isomorfeus_dir|
           create_directory(File.join('app', isomorfeus_dir))
         end
         create_directory('data')
@@ -58,21 +58,8 @@ module Isomorfeus
         create_file_from_template(Isomorfeus::Installer.templates_path, 'spec_helper.rb.erb', File.join('spec', 'spec_helper.rb'), data_hash)
       end
 
-      def install_package_json
-        data_hash = { application_name: Isomorfeus::Installer.app_class }
-        create_file_from_template(Isomorfeus::Installer.templates_path, 'package.json.erb', 'package.json', data_hash)
-      end
-
       def config_path(config_file)
         File.join( 'config', config_file)
-      end
-
-      def js_import_path(entrypoint)
-        File.join('app', 'imports', entrypoint)
-      end
-
-      def webpack_config_path(config_file)
-        File.join( 'webpack', config_file)
       end
     end
   end
