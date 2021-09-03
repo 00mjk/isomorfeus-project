@@ -18,7 +18,7 @@ require_relative '../lib/isomorfeus/installer/new_project'
 require_relative '../lib/isomorfeus/installer/test_app_files'
 require_relative '../lib/isomorfeus/installer/upgrade'
 require_relative '../lib/isomorfeus/installer/target/web'
-require_relative '../lib/isomorfeus/installer/yarn_and_bundle'
+require_relative '../lib/isomorfeus/installer/bundle'
 
 require_relative '../lib/isomorfeus/cli'
 
