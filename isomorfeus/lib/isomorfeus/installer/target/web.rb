@@ -8,20 +8,9 @@ module Isomorfeus
           def execute
             install_roda_app
             install_configuration
-
-            OpalWebpackLoader::Installer::CLI.start(['iso'])
-            move_owl_config
-
-            install_webpack_config
-
-            install_web_styles
-            install_web_imports
             install_web_loaders
             install_web_layouts
-
             install_web_specs
-
-            install_procfiles
           end
 
           # DSL
@@ -38,23 +27,7 @@ module Isomorfeus
           def install_configuration
             create_file_from_template(templates_path, Isomorfeus::Installer.rack_server[:config_template], config_path(Isomorfeus::Installer.rack_server[:config_template][0..-5]), {})
             data_hash = { app_class: Isomorfeus::Installer.app_class }
-            create_file_from_template(templates_path, 'arango_config.rb.erb', config_path('arango.rb'), data_hash)
             create_file_from_template(templates_path, 'shrine_config.rb.erb', config_path('shrine.rb'), data_hash)
-          end
-
-          def install_procfiles
-            data_hash = { rack_server_start_command: Isomorfeus::Installer.rack_server[:start_command] }
-            create_file_from_template(templates_path, 'Procfile.erb', 'Procfile', data_hash)
-            create_file_from_template(templates_path, 'ProcfileDev.erb', 'ProcfileDev', data_hash)
-            create_file_from_template(templates_path, 'ProcfileDebug.erb', 'ProcfileDebug', data_hash)
-          end
-
-          def install_web_imports
-            create_file_from_template(templates_path, 'web.js.erb', js_import_path('web.js'), {})
-            create_file_from_template(templates_path, 'web_common.js.erb', js_import_path('web_common.js'), {})
-            create_file_from_template(templates_path, 'web_ssr.js.erb', js_import_path('web_ssr.js'), {})
-            # create_file_from_template(templates_path, 'web_worker.js.erb', js_import_path('web_worker.js'), data_hash)
-            create_file_from_template(templates_path, 'mail_components.js.erb', js_import_path('mail_components.js'), {})
           end
 
           def install_web_layouts
@@ -70,23 +43,6 @@ module Isomorfeus
 
           def install_web_specs
             create_file_from_template(templates_path, 'web_spec.rb.erb', File.join('spec', 'web_spec.rb'), {})
-          end
-
-          def install_web_styles
-            create_file_from_template(templates_path, 'web.css.erb', File.join('app', 'styles', 'web.css'), {})
-          end
-
-          def install_webpack_config
-            File.unlink(webpack_config_path('production.js'), webpack_config_path('development.js'),
-                        webpack_config_path('debug.js'))
-            create_file_from_template(templates_path, 'production.js.erb', webpack_config_path('production.js'), {})
-            create_file_from_template(templates_path, 'development.js.erb', webpack_config_path('development.js'), {})
-            create_file_from_template(templates_path, 'development_ssr.js.erb', webpack_config_path('development_ssr.js'), {})
-            create_file_from_template(templates_path, 'debug.js.erb', webpack_config_path('debug.js'), {})
-          end
-
-          def move_owl_config
-            FileUtils.move('owl_init.rb', File.join('config', 'opal_webpack_loader.rb'))
           end
 
           def templates_path
