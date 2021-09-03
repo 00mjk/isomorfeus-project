@@ -24,6 +24,7 @@ else
   require 'oj'
   require 'active_support'
   require 'sdbm'
+  require 'isomorfeus-asset-manager'
   require 'isomorfeus/transport/sdbm_session_store'
   require 'isomorfeus/transport/memcached_session_store'
   require 'isomorfeus/transport/redis_session_store'
@@ -43,6 +44,7 @@ else
   require 'isomorfeus/transport/middlewares'
 
   Isomorfeus.add_middleware(Isomorfeus::Transport::RackMiddleware)
+  Isomorfeus.add_middleware(Isomorfeus::AssetManager::RackMiddleware)
 
   require 'lucid_handler/mixin'
   require 'lucid_handler/base'
@@ -50,8 +52,9 @@ else
   require 'lucid_channel/base'
 
   require 'isomorfeus/transport/handler/authentication_handler'
-
-  Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
+  
+  require 'iso_opal'
+  Opal.append_path(__dir__.untaint) unless IsoOpal.paths_include?(__dir__.untaint)
 
   %w[channels handlers server].each do |dir|
     path =  File.expand_path(File.join('app', dir))
