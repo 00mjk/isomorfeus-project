@@ -24,8 +24,3 @@ Commands:
     isomorfeus help [COMMAND]                # Describe available commands or one specific command
     isomorfeus new project_name              # Create a new isomorfeus project with project_name.
 ```
-
-### Yandle
-There is a convenience command to execute yarn and bundle: `yandle`:
-- `yandle` - will execute `yarn install` followed by `bundle install`
-- `yandle update` or `yandle upgrade` - will execute `yarn upgrade` followed by `bundle update`
