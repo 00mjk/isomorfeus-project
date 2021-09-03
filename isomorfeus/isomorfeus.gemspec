@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   s.bindir       = 'bin'
   s.executables  << 'isomorfeus'
   s.executables  << 'ismos'
-  s.executables  << 'yandle'
   s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   s.require_paths = ['lib']
 
