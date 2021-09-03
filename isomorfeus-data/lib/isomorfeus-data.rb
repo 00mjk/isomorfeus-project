@@ -69,7 +69,8 @@ else
 
   Isomorfeus.add_middleware(Isomorfeus::Transport::FileRackMiddleware)
 
-  Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
+  require 'iso_opal'
+  Opal.append_path(__dir__.untaint) unless IsoOpal.paths.include?(__dir__.untaint)
 
   path = File.expand_path(File.join('app', 'data'))
 

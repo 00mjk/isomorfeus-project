@@ -17,7 +17,9 @@ else
   require 'isomorfeus_operation/lucid_quick_op/base'
   require 'isomorfeus_operation/lucid_operation/mixin'
   require 'isomorfeus_operation/lucid_operation/base'
-  Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
+  
+  require 'iso_opal'
+  Opal.append_path(__dir__.untaint) unless IsoOpal.paths.include?(__dir__.untaint)
 
   # require 'active_support/dependencies'
 

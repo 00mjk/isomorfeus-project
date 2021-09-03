@@ -1,4 +1,4 @@
-require 'isomorfeus-react'
+require 'isomorfeus-preact'
 require 'isomorfeus/policy/config'
 require 'lucid_props'
 
@@ -14,8 +14,9 @@ else
   require 'isomorfeus_policy/lucid_authorization/mixin'
   require 'isomorfeus_policy/lucid_authorization/base'
   require 'isomorfeus_policy/anonymous'
+  require 'iso_opal'
 
-  Opal.append_path(__dir__.untaint) unless Opal.paths.include?(__dir__.untaint)
+  Opal.append_path(__dir__.untaint) unless IsoOpal.paths_include?(__dir__.untaint)
   path = File.expand_path(File.join('app', 'policies'))
   Isomorfeus.zeitwerk.push_dir(path)
 end
