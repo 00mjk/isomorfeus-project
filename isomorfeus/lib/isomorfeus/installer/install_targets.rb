@@ -19,7 +19,7 @@ module Isomorfeus
               target_class = Isomorfeus::Installer::Target.const_get(target)
               target_class.execute
             else
-              raise "No such target #{target} available. Is Isomorfeus Professional installed?"
+              raise "No such target #{target} available."
             end
           end
         end
