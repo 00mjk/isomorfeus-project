@@ -10,7 +10,6 @@ else
   require 'erb'
   require 'active_support/core_ext/string'
   require 'oj'
-  require 'opal-webpack-loader/installer_cli'
   require_relative '../isomorfeus/version'
   require_relative '../isomorfeus/installer'
   require_relative '../isomorfeus/installer/rack_servers'
@@ -22,7 +21,7 @@ else
   require_relative '../isomorfeus/installer/test_app_files'
   require_relative '../isomorfeus/installer/upgrade'
   require_relative '../isomorfeus/installer/target/web'
-  require_relative '../isomorfeus/installer/yarn_and_bundle'
+  require_relative '../isomorfeus/installer/bundle'
 
   begin
     require 'isomorfeus/professional/version'
