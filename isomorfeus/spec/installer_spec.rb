@@ -84,6 +84,7 @@ RSpec.describe 'isomorfeus installer' do
     end
 
     it 'can for web and mobile' do
+      skip "no mobile yupport yet"
       Bundler.with_original_env do
         system('bundle exec isomorfeus new test_app -t "web native" -y no')
       end
@@ -126,15 +127,6 @@ RSpec.describe 'isomorfeus installer' do
       FileUtils.rm_rf('morphing') if Dir.exist?('morphing')
       Dir.chdir('..')
       Dir.chdir('..')
-    end
-
-    it 'can build the assets' do
-      skip "TODO adapt to new asset-manager"
-      Bundler.with_original_env do
-      end
-      manifest = Oj.load(File.read(File.join('public', 'assets', 'manifest.json')), mode: :strict)
-      web_js = manifest['web.js']
-      expect(File.exist?(File.join('public', web_js))).to be true
     end
 
     it 'can execute tests' do
