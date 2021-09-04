@@ -6,7 +6,6 @@ module Isomorfeus
       def self.execute
         begin
           create_common_framework_directories
-          install_package_json
           install_basic_components
           install_basic_policy
           install_spec_helper
