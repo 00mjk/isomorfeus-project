@@ -3,16 +3,14 @@ require 'bundler/cli'
 require 'bundler/cli/exec'
 require 'fileutils'
 
-VERSION = File.read('../ISOMORFEUS_VERSION').strip
+VERSION = File.read('ISOMORFEUS_VERSION').strip
 puts "VERSION #{VERSION}"
 
 GEMFILE_DIRS = %w[
-  example-apps/all_component_types
-  example-apps/basic
+  isomorfeus
   isomorfeus-data
   isomorfeus-data/test_app
   isomorfeus-i18n
-  isomorfeus
   isomorfeus-mailer
   isomorfeus-mailer/test_app
   isomorfeus-operation
@@ -160,9 +158,9 @@ end
 task :create_gem_repo do
   pwd = Dir.pwd
   # copy gems
+  FileUtils.cp("isomorfeus/isomorfeus-#{VERSION}.gem",'gems/gems/')
   FileUtils.cp("isomorfeus-data/isomorfeus-data-#{VERSION}.gem",'gems/gems/')
   FileUtils.cp("isomorfeus-i18n/isomorfeus-i18n-#{VERSION}.gem",'gems/gems/')
-  FileUtils.cp("isomorfeus/isomorfeus-#{VERSION}.gem",'gems/gems/')
   FileUtils.cp("isomorfeus-mailer/isomorfeus-mailer-#{VERSION}.gem",'gems/gems/')
   FileUtils.cp("isomorfeus-operation/isomorfeus-operation-#{VERSION}.gem",'gems/gems/')
   FileUtils.cp("isomorfeus-policy/isomorfeus-policy-#{VERSION}.gem",'gems/gems/')
