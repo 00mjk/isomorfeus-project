@@ -21,7 +21,7 @@ Within a isomorfeus project components for building emails are the app/mail_comp
 When using LucidComponent or LucidMaterial::Component the main component passed to the mail must be either a LucidApp or LucidMaterial::App component.
 Each mail template build of components can be considered a tiny App.
 
-Mail components are rendered using the React static renderer, so the React rules for static rendering apply.
+Mail components are rendered using the Preact static renderer, so the Preact rules for static rendering apply.
 
 Inline styles work in Mail Components too.
 

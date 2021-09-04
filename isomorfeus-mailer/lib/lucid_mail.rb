@@ -1,5 +1,5 @@
 class LucidMail
-  include Isomorfeus::ReactViewHelper
+  include Isomorfeus::PreactViewHelper
   extend LucidPropDeclaration::Mixin
 
   prop :from, class: String, required: true
