@@ -8,7 +8,7 @@ It has 3 major parts and task:
 2. Extend the default Roda App with isomorfeus functionality
 3. the actual Roda app, route requests, assemble pages.
 
-Routing for pages in Isomorfeus is completely done in the React Router, no need to modify the Roda App.
+Routing for pages in Isomorfeus is completely done in the Preact Wouter, no need to modify the Roda App.
 The catch all route at 4. (see below) takes care of it.
 
 Of course, you may add routes for other things. If you do, you must restart the server in development for routes to take effect.
@@ -24,8 +24,7 @@ require_relative 'iodine_config'
 class TestAppApp < Roda
   # 2. Extend the default Roda App with isomorfeus functionality
   extend Isomorfeus::Transport::Middlewares
-  include OpalWebpackLoader::ViewHelper
-  include Isomorfeus::ReactViewHelper
+  include Isomorfeus::PreactViewHelper
 
   use_isomorfeus_middlewares
   plugin :public, root: 'public', gzip: true

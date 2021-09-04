@@ -43,7 +43,7 @@ optional:
 ### Project app/components
 my_project/app/components contains all application components and by default has:
 - hello_component.rb - a very simple component
-- navigation_links.rb - a component showing the use React Router Link
+- navigation_links.rb - a component showing the use Preact Wouter Link
 - not_found_404_component.rb - a component thats rendered when no route matches
 - test_project_app.rb - the main application component which contains all routes
 - welcome_component.rb - another simple component
