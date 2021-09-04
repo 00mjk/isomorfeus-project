@@ -1,4 +1,4 @@
-class NavigationLinks < React::FunctionComponent::Base
+class NavigationLinks < Preact::FunctionComponent::Base
   render do
     P do
       Link(to: '/') { 'Hello World!' }

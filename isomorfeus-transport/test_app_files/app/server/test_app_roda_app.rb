@@ -4,7 +4,7 @@ Isomorfeus.load_configuration(File.expand_path(File.join(__dir__, '..', '..', 'c
 class TestAppRodaApp < Roda
   extend Isomorfeus::Transport::Middlewares
   include OpalWebpackLoader::ViewHelper
-  include Isomorfeus::ReactViewHelper
+  include Isomorfeus::PreactViewHelper
 
   use_isomorfeus_middlewares
   plugin :public, root: 'public'
