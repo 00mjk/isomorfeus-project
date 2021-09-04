@@ -1,4 +1,4 @@
-class WelcomeComponent < React::FunctionComponent::Base
+class WelcomeComponent < Preact::FunctionComponent::Base
   render do
     DIV "Welcome!"
     NavigationLinks()
