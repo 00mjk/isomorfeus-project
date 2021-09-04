@@ -11,7 +11,6 @@ Available targets:
   all: web
 Example:
   -t all          - Setup project for all targets
-  -t "web native" - Setup project for all targets
   -t web          - Setup project for web applications only
 DESC
     option :yarn_and_bundle, default: 'yes', required: false, type: :string, aliases: '-y',
@@ -35,7 +34,7 @@ DESC
       Isomorfeus::Installer::NewProject.execute
       Isomorfeus::Installer::InstallTargets.execute
       Isomorfeus::Installer::Gemfile.execute
-      Isomorfeus::Installer::YarnAndBundle.execute
+      Isomorfeus::Installer::Bundle.execute
       Dir.chdir('..')
     end
 
@@ -44,7 +43,7 @@ DESC
 # Add a target to a existing Isomorfeus Project.
 # \x5
 # \x5Available targets:
-# \x5  native: Create applications with React Native (Requires #{'Isomorfeus Professional and the' unless Isomorfeus::Installer.is_professional} web target)'
+# \x5  native: Create mobile applications with Preact'
 # \x5
 # \x5  Example:
 # \x5  isomorfeus add_target native - Add mobile as target to a existing project
@@ -56,7 +55,7 @@ DESC
 #       Isomorfeus::Installer.options = options
 #       Isomorfeus::Installer::InstallTargets.execute
 #       Isomorfeus::Installer::Gemfile.execute
-#       Isomorfeus::Installer::YarnAndBundle.execute
+#       Isomorfeus::Installer::Bundle.execute
 #     end
 
     desc "console", "Open console for current project."
@@ -69,7 +68,7 @@ DESC
            desc: "Execute bundle install: -y or -y yes, do not execute: -y no"
     def upgrade
       Isomorfeus::Installer::Upgrade.execute
-      Isomorfeus::Installer::YarnAndBundle.execute
+      Isomorfeus::Installer::Bundle.execute
     end
 
     desc "versions", "Show versions of important Isomorfeus gems"
@@ -110,7 +109,7 @@ DESC
       Isomorfeus::Installer::InstallTargets.execute
       Isomorfeus::Installer::Gemfile.execute
       Isomorfeus::Installer::TestAppFiles.execute
-      Isomorfeus::Installer::YarnAndBundle.execute
+      Isomorfeus::Installer::Bundle.execute
       Dir.chdir('..')
     end
   end
