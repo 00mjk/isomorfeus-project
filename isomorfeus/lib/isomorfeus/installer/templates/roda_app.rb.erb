@@ -16,14 +16,14 @@ class <%= roda_app_class %> < Roda
   end
 
   def page_content(env, location)
-    mount_component('<%= app_class %>',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'web_ssr.js')
+    mount_component('<%= app_class %>',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js')
   end
 
   route do |r|
     r.root do
       content = page_content(env, '/')
       response.status = ssr_response_status
-      render('web', locals: { content: content, script_tag: owl_script_tag('web.js'), title: 'Welcome to <%= app_class %>' })
+      render('web', locals: { content: content, script_tag: script_tag('web.js'), title: 'Welcome to <%= app_class %>' })
     end
 
     r.public
@@ -49,7 +49,7 @@ class <%= roda_app_class %> < Roda
     r.get do
       content = page_content(env, env['PATH_INFO'])
       response.status = ssr_response_status
-      render('web', locals: { content: content, script_tag: owl_script_tag('web.js'), title: 'Welcome to <%= app_class %>' })
+      render('web', locals: { content: content, script_tag: script_tag('web.js'), title: 'Welcome to <%= app_class %>' })
     end
   end
 end
