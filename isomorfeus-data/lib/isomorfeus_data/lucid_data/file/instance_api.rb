@@ -133,7 +133,7 @@ module LucidData
           end
 
           def set(derivative: nil, data: nil, data_url: nil, url: nil)
-            unless data || data_url || url
+            unless data || data_url || url
               raise "Either data, data_url or url must be given as keyword argument!"
             end
             changed!
