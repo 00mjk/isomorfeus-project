@@ -84,9 +84,9 @@ task :push_packages_to_github do
 end
 
 task :build_packages do
+  Rake::Task['build_installer_package'].invoke
   Rake::Task['build_data_package'].invoke
   Rake::Task['build_i18n_package'].invoke
-  Rake::Task['build_installer_package'].invoke
   Rake::Task['build_mailer_package'].invoke
   Rake::Task['build_operation_package'].invoke
   Rake::Task['build_policy_package'].invoke
