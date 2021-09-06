@@ -36,7 +36,7 @@ module Isomorfeus
           end
 
           def install_web_loaders
-            create_file_from_template(templates_path, 'web_loader.rb.erb', File.join('app', 'web_loader.rb'), {})
+            create_file_from_template(templates_path, 'isomorfeus_loader.rb.erb', File.join('app', 'isomorfeus_loader.rb'), {})
             # create_file_from_template(templates_path, 'web_worker_loader.rb.erb', File.join('app', 'web_worker_loader.rb'), {})
             create_file_from_template(templates_path, 'mail_components_loader.rb.erb', File.join('app', 'mail_components_loader.rb'), {})
           end
