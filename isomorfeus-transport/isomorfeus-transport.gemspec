@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'bcrypt', '~> 3.1.16'
   s.add_dependency 'dbm'
   s.add_dependency 'iodine', '~> 0.7.44'
-  s.add_dependency 'oj', '>= 3.13.3'
+  s.add_dependency 'oj', '>= 3.13.4'
   s.add_dependency 'opal', '>= 1.2.0'
   s.add_dependency 'isomorfeus-asset-manager', '>= 0.12.1'
   s.add_dependency 'isomorfeus-preact', '>= 10.5.3'

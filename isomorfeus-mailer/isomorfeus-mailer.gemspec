@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'activesupport', '~> 6.0'
   s.add_dependency 'html2text', '~> 0.3.1'
   s.add_dependency 'mailhandler', '~> 1.0.59'
-  s.add_dependency 'oj', '>= 3.13.3'
+  s.add_dependency 'oj', '>= 3.13.4'
   s.add_dependency 'opal', '>= 1.2.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'isomorfeus-asset-manager', '>= 0.12.1'
