@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-asset-manager', '>= 0.12.1'
   s.add_dependency 'isomorfeus-preact', '>= 10.5.3'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
-  s.add_dependency 'isomorfeus-redux', '~> 4.1.5'
+  s.add_dependency 'isomorfeus-redux', '~> 4.1.6'
   s.add_dependency 'sdbm', '~> 1.0.0'
   s.add_dependency 'sorted_set', '~> 1.0.3'
   s.add_development_dependency 'isomorfeus', Isomorfeus::Transport::VERSION
