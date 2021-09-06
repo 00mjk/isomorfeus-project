@@ -75,7 +75,7 @@ DESC
     def versions
       output = ''
       %w[isomorfeus-asset-manager isomorfeus-redux isomorfeus-preact isomorfeus-data isomorfeus-i18n isomorfeus-mailer isomorfeus-operation
-         isomorfeus-policy isomorfeus-transport isomorfeus isomorfeus-professional].each do |gem|
+         isomorfeus-policy isomorfeus-transport isomorfeus].each do |gem|
         o = `bundle info #{gem} 2>&1`
         o.each_line do |line|
           output << line if line.include?('*') && line.include?(gem)

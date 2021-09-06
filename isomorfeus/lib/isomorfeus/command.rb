@@ -23,21 +23,6 @@ else
   require_relative '../isomorfeus/installer/target/web'
   require_relative '../isomorfeus/installer/bundle'
 
-  begin
-    require 'isomorfeus/professional/version'
-    if Isomorfeus::VERSION == Isomorfeus::Professional::VERSION
-      require 'isomorfeus-professional-installer'
-      Isomorfeus::Installer.is_professional = true
-      puts "Thanks for purchasing Isomorfeus Professional."
-    else
-      Isomorfeus::Installer.is_professional = false
-      STDERR.puts "Isomorfeus Professional not loaded, version mismatch Isomorfeus: #{Isomorfeus::VERSION} != Professional: #{Isomorfeus::Professional::VERSION}"
-    end
-  rescue LoadError
-    Isomorfeus::Installer.is_professional = false
-    puts "Isomorfeus Professional not available."
-  end
-
   require_relative '../isomorfeus/cli'
 
   Isomorfeus::CLI.start(ARGV)

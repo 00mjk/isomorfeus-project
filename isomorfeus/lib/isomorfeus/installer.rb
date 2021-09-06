@@ -17,8 +17,7 @@ module Isomorfeus
 
       # installer options
       attr_reader :options
-      attr_accessor :is_professional
-
+      
       def set_project_names(pro_dir)
         @project_dir    = pro_dir
         @project_name   = pro_dir.underscore
