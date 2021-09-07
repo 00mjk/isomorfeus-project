@@ -60,8 +60,6 @@ def update_version_for(isomorfeus_module)
   end
 end
 
-task default: %w[specs]
-
 task :push_packages do
   Rake::Task['push_packages_to_rubygems'].invoke
   Rake::Task['push_packages_to_github'].invoke
@@ -214,3 +212,11 @@ task :update_gems do
     Dir.chdir(pwd)
   end
 end
+
+task :push do
+  system("git push github")
+  system("git push gitlab")
+  system("git push bitbucket")
+end
+
+task default: :specs
