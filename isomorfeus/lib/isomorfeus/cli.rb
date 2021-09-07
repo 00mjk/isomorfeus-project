@@ -13,7 +13,7 @@ Example:
   -t all          - Setup project for all targets
   -t web          - Setup project for web applications only
 DESC
-    option :yarn_and_bundle, default: 'yes', required: false, type: :string, aliases: '-y',
+    option :bundle, default: 'yes', required: false, type: :string, aliases: '-y',
            desc: "Execute bundle install: -y or -y yes, do not execute: -y no"
     def new(project_name)
       Isomorfeus::Installer.set_project_names(project_name)
