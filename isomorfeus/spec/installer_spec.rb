@@ -78,13 +78,6 @@ RSpec.describe 'isomorfeus installer' do
       expect(File.exist?('Gemfile')).to be true
       expect(File.exist?('.gitignore')).to be true
     end
-
-    it 'can for web and mobile' do
-      skip "no mobile yupport yet"
-      Bundler.with_original_env do
-        system('bundle exec isomorfeus new test_app -t "web native" -y no')
-      end
-    end
   end
 
   context 'in a new app' do
@@ -113,7 +106,7 @@ RSpec.describe 'isomorfeus installer' do
         end
       end
       File.write('Gemfile', new_gemfile_lines.join(""))
-      Bundler.with_original_env do
+      Bundler.with_unbundled_env do
         system('bundle install')
       end
     end
@@ -126,7 +119,7 @@ RSpec.describe 'isomorfeus installer' do
     end
 
     it 'can execute tests' do
-      test_result = Bundler.with_original_env do
+      test_result = Bundler.with_unbundled_env do
         `bundle exec rspec`
       end
       expect(test_result).to include('1 example, 0 failures')
@@ -171,7 +164,7 @@ RSpec.describe 'isomorfeus installer' do
       end
       File.write('Gemfile', new_gemfile_lines.join(""))
 
-      test_result = Bundler.with_original_env do
+      test_result = Bundler.with_unbundled_env do
         system('bundle install')
         `bundle exec rspec`
       end
