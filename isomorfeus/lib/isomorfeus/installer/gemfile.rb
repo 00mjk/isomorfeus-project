@@ -19,12 +19,16 @@ module Isomorfeus
           Isomorfeus::Installer.rack_servers[Isomorfeus::Installer.options[:rack_server]]&.fetch(:gems)&.each do |gem|
             rack_server_gems << generate_gem_line(gem)
           end
-          data_hash = { rack_server_gems: rack_server_gems.chop, isomorfeus_version: "'~> #{Isomorfeus::VERSION}'" }
+          data_hash = { rack_server_gems: rack_server_gems.chop }
 
-          if Isomorfeus::Installer.source_dir
-            %i[isomorfeus isomorfeus_data isomorfeus_i18n isomorfeus_mailer isomorfeus_operation isomorfeus_policy isomorfeus_transport].each do |i_module|
-              data_hash[i_module] = i_module == Isomorfeus::Installer.isomorfeus_module ? "path: '..'" : "path: '../../#{i_module.to_s.tr('_', '-')}'"
+          if Isomorfeus::Installer.project_name == 'test_app'
+            gem_lines = ''
+            %i[isomorfeus isomorfeus-data isomorfeus-i18n isomorfeus-mailer isomorfeus-operation isomorfeus-policy isomorfeus-transport].each do |i_module|
+              gem_lines << "gem '#{i_module}', path: #{Isomorfeus::Installer.isomorfeus_module == i_module ? "'..'" : "'../../#{i_module}'"}\n"
             end
+            data_hash[:isomorfeus_gems] = gem_lines.chop
+          else
+            data_hash[:isomorfeus_gems] = "gem 'isomorfeus', '~> #{Isomorfeus::VERSION}'" 
           end
 
           create_file_from_template(Isomorfeus::Installer.templates_path, 'Gemfile.erb', 'Gemfile', data_hash)
