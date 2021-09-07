@@ -9,16 +9,11 @@ puts "VERSION #{VERSION}"
 GEMFILE_DIRS = %w[
   isomorfeus
   isomorfeus-data
-  isomorfeus-data/test_app
   isomorfeus-i18n
   isomorfeus-mailer
-  isomorfeus-mailer/test_app
   isomorfeus-operation
-  isomorfeus-operation/test_app
   isomorfeus-policy
-  isomorfeus-policy/test_app
   isomorfeus-transport
-  isomorfeus-transport/test_app
 ]
 
 def build_gem_for(isomorfeus_module)
