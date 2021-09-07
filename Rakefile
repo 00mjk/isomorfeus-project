@@ -148,23 +148,7 @@ task :i18n_spec do
   run_rake_spec_for('i18n')
 end
 
-task :create_gem_repo do
-  pwd = Dir.pwd
-  # copy gems
-  FileUtils.cp("isomorfeus/isomorfeus-#{VERSION}.gem",'gems/gems/')
-  FileUtils.cp("isomorfeus-data/isomorfeus-data-#{VERSION}.gem",'gems/gems/')
-  FileUtils.cp("isomorfeus-i18n/isomorfeus-i18n-#{VERSION}.gem",'gems/gems/')
-  FileUtils.cp("isomorfeus-mailer/isomorfeus-mailer-#{VERSION}.gem",'gems/gems/')
-  FileUtils.cp("isomorfeus-operation/isomorfeus-operation-#{VERSION}.gem",'gems/gems/')
-  FileUtils.cp("isomorfeus-policy/isomorfeus-policy-#{VERSION}.gem",'gems/gems/')
-  FileUtils.cp("isomorfeus-transport/isomorfeus-transport-#{VERSION}.gem",'gems/gems/')
-  puts Dir.entries('gems/gems').join("\n")
-  Dir.chdir('gems')
-  system('gem generate_index')
-  Dir.chdir(pwd)
-end
-
-task :installer_spec => [:build_packages, :create_gem_repo] do
+task :installer_spec => do
   pwd = Dir.pwd
   Dir.chdir(File.join( "isomorfeus"))
   system('bundle install')
