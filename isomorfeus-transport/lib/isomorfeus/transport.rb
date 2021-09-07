@@ -22,15 +22,18 @@ module Isomorfeus
             ws_protocol = window_protocol == 'https:' ? 'wss:' : 'ws:'
             ws_url = "#{ws_protocol}//#{`window.location.host`}#{Isomorfeus.api_websocket_path}"
           else
-            ws_protocol = Isomorfeus.production? ? 'wss:' : 'ws:'
-            ws_url = "#{ws_protocol}//#{Isomorfeus.api_websocket_host}:#{Isomorfeus.api_websocket_port}#{Isomorfeus.api_websocket_path}"
+            ws_url = "#{Isomorfeus::TopLevel.transport_ws_url}"
           end
           @socket = Isomorfeus::Transport::WebsocketClient.new(ws_url)
           @socket.on_error do |error|
-            `console.log('Isomorfeus::Transport: Error connecting:', error)`
-            @socket.close
-            after 1000 do
-              Isomorfeus::Transport.promise_connect
+            if Isomorfeus.on_browser?
+              `console.warn('Isomorfeus::Transport: Will try again, but so far error connecting:', error)`
+              @socket.close
+              after 1000 do
+                Isomorfeus::Transport.promise_connect
+              end
+            else
+              Isomorfeus.raise_error(message: error.JS[:message], stack: error.JS[:stack])
             end
           end
           @socket.on_message do |event|
