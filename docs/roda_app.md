@@ -42,7 +42,7 @@ class TestAppApp < Roda
           <meta charset="utf-8"/>
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <style id="jss-server-side" type="text/css">#{ssr_styles}</style>
-          #{owl_script_tag 'application.js'}
+          #{script_tag 'application.js'}
         </head>
         <body>
           #{rendered_tree}
