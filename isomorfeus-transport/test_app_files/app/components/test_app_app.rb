@@ -2,10 +2,10 @@ class TestAppApp < LucidApp::Base
   render do
     Router(hook: Preact.location_hook(props.location)) do
       Switch do
-        Route(path: '/', exact: true, component: HelloComponent.JS[:react_component])
-        Route(path: '/snc', exact: true, component: HelloComponent.JS[:react_component])
-        Route(path: '/ssr', exact: true, component: HelloComponent.JS[:react_component])
-        Route(path: '/welcome', exact: true, component: WelcomeComponent.JS[:react_component])
+        Route(path: '/', component: HelloComponent.JS[:preact_component])
+        Route(path: '/snc', component: HelloComponent.JS[:preact_component])
+        Route(path: '/ssr', component: HelloComponent.JS[:preact_component])
+        Route(path: '/welcome', component: WelcomeComponent.JS[:preact_component])
       end
     end
   end
