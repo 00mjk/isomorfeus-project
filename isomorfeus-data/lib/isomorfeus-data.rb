@@ -66,7 +66,7 @@ else
   require 'isomorfeus/data/handler/file'
   require 'isomorfeus/data/file_rack_middleware'
 
-  Isomorfeus.add_middleware(Isomorfeus::Transport::FileRackMiddleware)
+  Isomorfeus.add_middleware(Isomorfeus::Data::FileRackMiddleware)
 
   require 'iso_opal'
   Opal.append_path(__dir__.untaint) unless IsoOpal.paths.include?(__dir__.untaint)

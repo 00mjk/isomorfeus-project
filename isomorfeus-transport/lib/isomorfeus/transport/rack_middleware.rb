@@ -49,6 +49,10 @@ module Isomorfeus
           end
           result
         end
+      rescue Exception => e
+        # TODO
+        Isomorfeus.raise_error(error: e)
+        return [500, {}, '']
       end
     end
   end
