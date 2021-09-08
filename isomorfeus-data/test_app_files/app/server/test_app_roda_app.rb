@@ -1,4 +1,3 @@
-STDERR.puts "config", File.expand_path(File.join(__dir__, '..', '..', 'config'))
 Isomorfeus.load_configuration(File.expand_path(File.join(__dir__, '..', '..', 'config')))
 
 class TestAppRodaApp < Roda
@@ -15,7 +14,9 @@ class TestAppRodaApp < Roda
   end
 
   def page_content(env, location)
-    mount_component('TestAppApp',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js')
+    req = Rack::Request.new(env)
+    skip_ssr = req.params.has_key?("skip_ssr") ? true : false
+    mount_component('TestAppApp',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js', skip_ssr: skip_ssr)
   end
 
   route do |r|
