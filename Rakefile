@@ -148,7 +148,7 @@ task :i18n_spec do
   run_rake_spec_for('i18n')
 end
 
-task :installer_spec => do
+task :installer_spec do
   pwd = Dir.pwd
   Dir.chdir(File.join( "isomorfeus"))
   system('bundle install')
