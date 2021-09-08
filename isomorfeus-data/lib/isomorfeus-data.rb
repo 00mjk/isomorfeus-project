@@ -1,10 +1,10 @@
+require 'base64'
 require 'isomorfeus-transport'
 require 'isomorfeus/data/config'
 require 'isomorfeus/data/attribute_support'
 require 'isomorfeus/data/generic_class_api'
 require 'isomorfeus/data/generic_instance_api'
 require 'isomorfeus/data/element_validator'
-require 'base64'
 
 if RUBY_ENGINE == 'opal'
   require 'isomorfeus/data/reducer'
@@ -20,7 +20,6 @@ else
   require 'shrine'
   require 'shrine/storage/memory'
   require 'shrine/storage/file_system'
-  # require 'arango-driver'
 
   require 'isomorfeus_data/lucid_data/query_result'
   require 'isomorfeus_data/lucid_data/array/mixin'
