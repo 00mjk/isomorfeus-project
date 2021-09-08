@@ -6,7 +6,7 @@ RSpec.describe 'LucidQuickOp' do
       result = on_server do
         class TestQuickOp < LucidQuickOp::Base
         end
-        o = TestQuickOp.new({})
+        o = TestQuickOp.new()
         o.class.to_s
       end
       expect(result).to include('::TestQuickOp')
@@ -17,7 +17,7 @@ RSpec.describe 'LucidQuickOp' do
         class TestQuickOp
           include LucidQuickOp::Mixin
         end
-        o = TestQuickOp.new({})
+        o = TestQuickOp.new()
         o.class.to_s
       end
       expect(result).to include('::TestQuickOp')
@@ -92,7 +92,7 @@ RSpec.describe 'LucidQuickOp' do
       result = @doc.evaluate_ruby do
         class TestQuickOp < LucidQuickOp::Base
         end
-        o = TestQuickOp.new({})
+        o = TestQuickOp.new()
         o.class.to_s
       end
       expect(result).to include('TestQuickOp')
@@ -103,7 +103,7 @@ RSpec.describe 'LucidQuickOp' do
         class TestQuickOp
           include LucidQuickOp::Mixin
         end
-        o = TestQuickOp.new({})
+        o = TestQuickOp.new()
         o.class.to_s
       end
       expect(result).to include('TestQuickOp')
@@ -111,7 +111,7 @@ RSpec.describe 'LucidQuickOp' do
 
     it 'can run the simple quick operation' do
       result = @doc.await_ruby do
-        SimpleQuickOp.promise_run({})
+        SimpleQuickOp.promise_run()
       end
       expect(result).to eq('a bird')
     end

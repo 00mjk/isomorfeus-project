@@ -6,7 +6,7 @@ RSpec.describe 'LucidOperation' do
       result = on_server do
         class TestOperation < LucidOperation::Base
         end
-        o = TestOperation.new({})
+        o = TestOperation.new()
         o.class.to_s
       end
       expect(result).to include('::TestOperation')
@@ -17,7 +17,7 @@ RSpec.describe 'LucidOperation' do
         class TestOperation
           include LucidOperation::Mixin
         end
-        o = TestOperation.new({})
+        o = TestOperation.new()
         o.class.to_s
       end
       expect(result).to include('::TestOperation')
@@ -81,7 +81,7 @@ RSpec.describe 'LucidOperation' do
 
     it 'can run the simple operation on the server' do
       result = on_server do
-        promise = SimpleOperation.promise_run({})
+        promise = SimpleOperation.promise_run()
         promise.value
       end
       expect(result).to eq('a bird')
@@ -119,7 +119,7 @@ RSpec.describe 'LucidOperation' do
       result = @doc.evaluate_ruby do
         class TestOperation < LucidOperation::Base
         end
-        o = TestOperation.new({})
+        o = TestOperation.new()
         o.class.to_s
       end
       expect(result).to include('TestOperation')
@@ -130,7 +130,7 @@ RSpec.describe 'LucidOperation' do
         class TestOperation
           include LucidOperation::Mixin
         end
-        o = TestOperation.new({})
+        o = TestOperation.new()
         o.class.to_s
       end
       expect(result).to include('TestOperation')
@@ -138,7 +138,7 @@ RSpec.describe 'LucidOperation' do
 
     it 'can run the simple operation' do
       result = @doc.await_ruby do
-        SimpleOperation.promise_run({})
+        SimpleOperation.promise_run()
       end
       expect(result).to eq('a bird')
     end

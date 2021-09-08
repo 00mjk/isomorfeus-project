@@ -6,7 +6,7 @@ RSpec.describe 'LucidLocalOperation' do
       result = on_server do
         class TestLocalOperation < LucidLocalOperation::Base
         end
-        o = TestLocalOperation.new({})
+        o = TestLocalOperation.new()
         o.class.to_s
       end
       expect(result).to include('::TestLocalOperation')
@@ -17,7 +17,7 @@ RSpec.describe 'LucidLocalOperation' do
         class TestLocalOperation
           include LucidLocalOperation::Mixin
         end
-        o = TestLocalOperation.new({})
+        o = TestLocalOperation.new()
         o.class.to_s
       end
       expect(result).to include('::TestLocalOperation')
@@ -74,7 +74,7 @@ RSpec.describe 'LucidLocalOperation' do
 
     it 'can run the simple operation on the server' do
       result = on_server do
-        promise = SimpleLocalOperation.promise_run({})
+        promise = SimpleLocalOperation.promise_run()
         promise.value
       end
       expect(result).to eq('a bird')
@@ -112,7 +112,7 @@ RSpec.describe 'LucidLocalOperation' do
       result = @doc.evaluate_ruby do
         class TestLocalOperation < LucidLocalOperation::Base
         end
-        o = TestLocalOperation.new({})
+        o = TestLocalOperation.new()
         o.class.to_s
       end
       expect(result).to include('TestLocalOperation')
@@ -123,7 +123,7 @@ RSpec.describe 'LucidLocalOperation' do
         class TestLocalOperation
           include LucidLocalOperation::Mixin
         end
-        o = TestLocalOperation.new({})
+        o = TestLocalOperation.new()
         o.class.to_s
       end
       expect(result).to include('TestLocalOperation')
@@ -131,7 +131,7 @@ RSpec.describe 'LucidLocalOperation' do
 
     it 'can run the simple operation' do
       result = @doc.await_ruby do
-        SimpleLocalOperation.promise_run({})
+        SimpleLocalOperation.promise_run()
       end
       expect(result).to eq('a bird')
     end
