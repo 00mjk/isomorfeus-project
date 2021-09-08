@@ -3,9 +3,7 @@ Isomorfeus.load_configuration(File.expand_path(File.join(__dir__, '..', '..', 'c
 
 class TestAppRodaApp < Roda
   extend Isomorfeus::Transport::Middlewares
-  include OpalWebpackLoader::ViewHelper
   include Isomorfeus::PreactViewHelper
-
   use_isomorfeus_middlewares
   plugin :public, root: 'public'
   plugin :render, views: File.join(__dir__, '..', 'layouts'), cache: Isomorfeus.production?
@@ -17,7 +15,7 @@ class TestAppRodaApp < Roda
   end
 
   def page_content(env, location)
-    mount_component('TestAppApp',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'web_ssr.js')
+    mount_component('TestAppApp',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js')
   end
 
   route do |r|
