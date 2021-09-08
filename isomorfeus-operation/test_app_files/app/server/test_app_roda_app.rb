@@ -15,14 +15,16 @@ class TestAppRodaApp < Roda
   end
 
   def page_content(env, location)
-    mount_component('TestAppApp',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js')
+    req = Rack::Request.new(env)
+    skip_ssr = req.params.has_key?("skip_ssr") ? true : false
+    mount_component('TestAppApp',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js', skip_ssr: skip_ssr)
   end
 
   route do |r|
     r.root do
       content = page_content(env, '/')
       response.status = ssr_response_status
-      render('web', locals: { content: content, title: 'TestAppApp', script_tag: owl_script_tag('web.js') })
+      render('web', locals: { content: content, title: 'TestAppApp', script_tag: script_tag('web.js') })
     end
 
     r.public
@@ -54,7 +56,7 @@ class TestAppRodaApp < Roda
     r.get do
       content = page_content(env, env['PATH_INFO'])
       response.status = ssr_response_status
-      render('web', locals: { content: content, title: 'TestAppApp', script_tag: owl_script_tag('web.js') })
+      render('web', locals: { content: content, title: 'TestAppApp', script_tag: script_tag('web.js') })
     end
   end
 end
