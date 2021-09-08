@@ -89,7 +89,7 @@ RSpec.describe 'isomorfeus installer' do
       Isomorfeus::CLI.start(%w[new morphing -y no])
       Dir.chdir('morphing')
       gemfile = File.read('Gemfile')
-      new_gemfile_lines = ["source 'file://#{File.expand_path('../../../../gems')}'\n"]
+      new_gemfile_lines = []
       gemfile.lines.each do |line|
         if (line.start_with?("gem 'isomorfeus-") || line.start_with?("  gem 'isomorfeus-")) && line.include?(Isomorfeus::VERSION)
           new_line_items = line.split(',')
@@ -146,7 +146,7 @@ RSpec.describe 'isomorfeus installer' do
       Dir.chdir('morphing')
       expect(File.exist?(File.join('config', 'iodine.rb'))).to be true
       gemfile = File.read('Gemfile')
-      new_gemfile_lines = ["source 'file://#{File.expand_path('../../../../gems')}'\n"]
+      new_gemfile_lines = []
       gemfile.lines.each do |line|
         if (line.start_with?("gem 'isomorfeus-") || line.start_with?("  gem 'isomorfeus-")) && line.include?(Isomorfeus::VERSION)
           new_line_items = line.split(',')
