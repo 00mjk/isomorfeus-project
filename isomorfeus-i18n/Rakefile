@@ -1,28 +1,30 @@
+require 'fileutils'
 require 'bundler'
 require 'cowsay'
-task default: %w[run_test_app_specs]
 
-task :run_test_app_specs => 'create_test_app' do
+task :create_test_app do
+  FileUtils.rm_rf('test_app') if Dir.exist?('test_app')
+  system('ruby -- ../isomorfeus/bin/isomorfeus test_app -m i18n -s test_app_files')
+end
+
+task :specs => :create_test_app do
   puts Cowsay.say "Testing #{File.dirname(__FILE__).split('/').last.upcase}. NO chance for bugs!", "Ghostbusters"
   pwd = Dir.pwd
   Dir.chdir('test_app')
   Bundler.with_original_env do
-    system('WORKER=1 bundle exec rspec')
+    system('bundle exec rspec')
   end
   Dir.chdir(pwd)
   system('rm -rf test_app')
 end
 
-task :create_test_app do
-  system('rm -rf test_app')
-  system('../isomorfeus/bin/isomorfeus test_app -m operation -s test_app_files')
-end
-
-task :start_test_app => 'create_test_app' do
+task :start_test_app => :create_test_app do
   pwd = Dir.pwd
   Dir.chdir('test_app')
   Bundler.with_original_env do
-    system('foreman start')
+    system('bundle exec iodine')
   end
   Dir.chdir(pwd)
 end
+
+task default: :specs
