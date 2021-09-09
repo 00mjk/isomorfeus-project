@@ -3,10 +3,11 @@ class LucidMail
   extend LucidPropDeclaration::Mixin
 
   prop :from, class: String, required: true
-  prop :reply_to, class: String, required: false
+  prop :reply_to, class: String, required: false, allow_nil: true
   prop :to, class: String, required: true
   prop :subject, class: String, required: true
   prop :component, class: String, required: true
+  prop :asset, class: String, default: 'mail.js'
   prop :props
 
   attr_reader :mail
@@ -14,14 +15,21 @@ class LucidMail
   attr_reader :rendered_component
 
   def initialize(**props)
-    self.class.validate_props(props)
-    @props = LucidProps.new(props)
+    @props = LucidProps.new(self.class.validated_props(props))
     @mail = nil
     @rendered_component = nil
+    @loc_h = if self.class.const_defined?('::Isomorfeus::Puppetmaster')
+      "#{::Isomorfeus::Puppetmaster.served_app.host}:#{::Isomorfeus::Puppetmaster.served_app.port}"
+    elsif self.class.const_defined?('::Iodine')
+      "#{::Iodine::DEFAULT_SETTINGS[:address]}:#{::Iodine::DEFAULT_SETTINGS[:port]}"
+    else
+      'localhost:3000'
+    end
   end
 
   def render_component
-    rendered_tree = mount_static_component(props.component, props.props, 'mail_components.js')
+    component_props = { location_host: @loc_h }.merge(props.props)
+    rendered_tree = mount_component(props.component, component_props, props.asset, use_ssr: true)
     @rendered_component = <<~HTML
     <!DOCTYPE html>
     <html><head><style type="text/css">#{ssr_styles}</style></head><body>#{rendered_tree}</body></html>

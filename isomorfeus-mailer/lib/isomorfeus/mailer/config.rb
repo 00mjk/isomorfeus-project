@@ -20,4 +20,6 @@ module Isomorfeus
       end
     end
   end
+
+  self.assets['mail.js'] = Isomorfeus::AssetManager::Asset.new(:node)
 end
