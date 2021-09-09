@@ -35,7 +35,7 @@ my_project/app:
 - styles - for CSS styles
 
 - isomorfeus_loader.rb - client side ruby entry point, loading starting the application 
-- mail_components_loader.rb - loader for mail Components
+- mail_loader.rb - loader for mail Components
 
 optional:
 - imports - javascript entry files, importing additional javascripts modules and styles

@@ -10,7 +10,7 @@ module Isomorfeus
             install_configuration
             install_web_loaders
             install_web_layouts
-            install_web_specs
+            install_web_specs unless Isomorfeus::Installer.project_name == 'test_app'
           end
 
           # DSL
@@ -38,7 +38,7 @@ module Isomorfeus
           def install_web_loaders
             create_file_from_template(templates_path, 'isomorfeus_loader.rb.erb', File.join('app', 'isomorfeus_loader.rb'), {})
             # create_file_from_template(templates_path, 'web_worker_loader.rb.erb', File.join('app', 'web_worker_loader.rb'), {})
-            create_file_from_template(templates_path, 'mail_components_loader.rb.erb', File.join('app', 'mail_components_loader.rb'), {})
+            create_file_from_template(templates_path, 'mail_loader.rb.erb', File.join('app', 'mail_loader.rb'), {})
           end
 
           def install_web_specs

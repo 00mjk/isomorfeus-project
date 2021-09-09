@@ -39,7 +39,7 @@ RSpec.describe 'isomorfeus installer' do
       expect(File.exist?(File.join('app', 'policies', 'anonymous_policy.rb'))).to be true
       expect(File.exist?(File.join('app', 'server', 'morphing_roda_app.rb'))).to be true
       expect(File.exist?(File.join('app', 'isomorfeus_loader.rb'))).to be true
-      expect(File.exist?(File.join('app', 'mail_components_loader.rb'))).to be true
+      expect(File.exist?(File.join('app', 'mail_loader.rb'))).to be true
       expect(File.exist?(File.join('config', 'iodine.rb'))).to be true
       expect(Dir.exist?(File.join('public'))).to be true
       expect(File.exist?('app_loader.rb')).to be true
@@ -71,7 +71,7 @@ RSpec.describe 'isomorfeus installer' do
       expect(File.exist?(File.join('app', 'policies', 'anonymous_policy.rb'))).to be true
       expect(File.exist?(File.join('app', 'server', 'morphing_roda_app.rb'))).to be true
       expect(File.exist?(File.join('app', 'isomorfeus_loader.rb'))).to be true
-      expect(File.exist?(File.join('app', 'mail_components_loader.rb'))).to be true
+      expect(File.exist?(File.join('app', 'mail_loader.rb'))).to be true
       expect(File.exist?(File.join('config', 'iodine.rb'))).to be true
       expect(File.exist?('app_loader.rb')).to be true
       expect(File.exist?('config.ru')).to be true
