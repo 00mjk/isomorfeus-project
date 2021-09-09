@@ -15,7 +15,7 @@ class TestAppRodaApp < Roda
 
   def page_content(env, location)
     req = Rack::Request.new(env)
-    skip_ssr = req.params.has_key?("skip_ssr") ? true : false
+    skip_ssr = req.params.key?("skip_ssr") ? true : false
     mount_component('TestAppApp', { location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js', skip_ssr: skip_ssr)
   end
 
