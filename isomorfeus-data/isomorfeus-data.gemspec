@@ -15,12 +15,12 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.0'
-  s.add_dependency 'oj', '>= 3.13.4'
+  s.add_dependency 'oj', '~> 3.13.5'
   s.add_dependency 'opal', '>= 1.2.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'shrine', '~> 3.4.0'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.12.3'
-  s.add_dependency 'isomorfeus-preact', '~> 10.5.4'
+  s.add_dependency 'isomorfeus-preact', '~> 10.5.5'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.6'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Data::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Data::VERSION

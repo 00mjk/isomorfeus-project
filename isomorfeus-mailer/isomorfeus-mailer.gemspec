@@ -16,12 +16,13 @@ Gem::Specification.new do |s|
   s.add_dependency 'activesupport', '~> 6.0'
   s.add_dependency 'html2text', '~> 0.3.1'
   s.add_dependency 'mailhandler', '~> 1.0.59'
-  s.add_dependency 'oj', '>= 3.13.4'
+  s.add_dependency 'oj', '~> 3.13.5'
   s.add_dependency 'opal', '>= 1.2.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.12.3'
-  s.add_dependency 'isomorfeus-preact', '~> 10.5.4'
+  s.add_dependency 'isomorfeus-preact', '~> 10.5.5'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.6'
+  s.add_dependency 'isomorfeus-transport', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.8.0'
