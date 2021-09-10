@@ -87,7 +87,6 @@ module Isomorfeus
         end
         alias load! load
 
-        # execute
         def execute_create(&block)
           @_create_block = block
         end
