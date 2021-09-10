@@ -6,5 +6,5 @@
 # storage settings
 Shrine.storages = {
   cache: Shrine::Storage::Memory.new,
-  store: Shrine::Storage::FileSystem.new("data/files")
+  store: Shrine::Storage::FileSystem.new(File.expand_path(File.join(Isomorfeus.root, 'data', 'files')
 }
