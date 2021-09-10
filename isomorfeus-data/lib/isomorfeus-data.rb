@@ -1,4 +1,5 @@
 require 'base64'
+require 'data_uri'
 require 'isomorfeus-transport'
 require 'isomorfeus/data/config'
 require 'isomorfeus/data/attribute_support'
@@ -13,13 +14,11 @@ if RUBY_ENGINE == 'opal'
   require_tree 'isomorfeus_data', :autoload
   Isomorfeus.zeitwerk.push_dir('data')
 else
+  require 'fileutils'
   require 'uri'
   require 'oj'
   require 'active_support'
   require 'active_support/core_ext/hash'
-  require 'shrine'
-  require 'shrine/storage/memory'
-  require 'shrine/storage/file_system'
 
   require 'isomorfeus_data/lucid_data/query_result'
   require 'isomorfeus_data/lucid_data/array/mixin'
@@ -51,25 +50,19 @@ else
   require 'isomorfeus_data/lucid_data/composition/base'
   require 'isomorfeus_data/lucid_data/query/mixin'
   require 'isomorfeus_data/lucid_data/query/base'
-
-  require 'isomorfeus_data/lucid_data/generic_collection'
-  require 'isomorfeus_data/lucid_data/generic_edge'
-  require 'isomorfeus_data/lucid_data/generic_edge_collection'
-  require 'isomorfeus_data/lucid_data/generic_node'
-
-  require 'isomorfeus_data/lucid_data/file/class_api'
-  require 'isomorfeus_data/lucid_data/file/instance_api'
   require 'isomorfeus_data/lucid_data/file/mixin'
   require 'isomorfeus_data/lucid_data/file/base'
 
   require 'isomorfeus/data/handler/generic'
-  require 'isomorfeus/data/handler/file'
   require 'isomorfeus/data/file_rack_middleware'
 
   Isomorfeus.add_middleware(Isomorfeus::Data::FileRackMiddleware)
 
   require 'iso_opal'
   Opal.append_path(__dir__.untaint) unless IsoOpal.paths.include?(__dir__.untaint)
+
+  data_uri_path = File.join(Gem::Specification.find_by_name('data_uri').gem_dir, 'lib')
+  Opal.append_path(data_uri_path) unless IsoOpal.paths.include?(data_uri_path)
 
   path = File.expand_path(File.join('app', 'data'))
 

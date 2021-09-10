@@ -375,10 +375,6 @@ module LucidData
             @_changed = false
           end
 
-          def changed?
-            @_changed
-          end
-
           def each(&block)
             @_raw_array.each(&block)
           end

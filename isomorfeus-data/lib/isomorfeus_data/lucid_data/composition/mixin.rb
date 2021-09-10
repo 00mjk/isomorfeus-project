@@ -60,10 +60,6 @@ module LucidData
           self.class._validate_parts(many_parts)
         end
 
-        def changed?
-          @_changed
-        end
-
         def changed!
           @_changed = true
         end

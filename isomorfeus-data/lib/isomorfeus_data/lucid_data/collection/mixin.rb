@@ -82,10 +82,6 @@ module LucidData
           @_composition = c
         end
 
-        def changed?
-          @_changed
-        end
-
         def changed!
           @_graph.changed! if @_graph
           @_composition.changed! if @_composition

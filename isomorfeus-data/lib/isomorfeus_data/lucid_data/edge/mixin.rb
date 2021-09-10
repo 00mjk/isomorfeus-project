@@ -6,10 +6,6 @@ module LucidData
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
 
-        def changed?
-          @_changed
-        end
-
         def changed!
           @_collection.changed! if @_collection
           @_composition.changed! if @_composition

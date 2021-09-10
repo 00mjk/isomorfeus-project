@@ -196,10 +196,6 @@ module LucidData
         end
         alias links edges
 
-        def changed?
-          @_changed
-        end
-
         def changed!
           @_composition.changed! if @_composition
           @_changed = true

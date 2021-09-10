@@ -51,12 +51,11 @@ module Isomorfeus
         valid_file_classes[raw_class_name(klass)] = true
       end
       
-      attr_accessor :file_request_path
+      attr_accessor :files_path
     end
   end
 
-  if RUBY_ENGINE == 'opal'
-  else
-    self.file_request_path = '/isomorfeus/files'
+  if RUBY_ENGINE != 'opal'
+    self.files_path = File.expand_path(File.join(Isomorfeus.root, 'data', 'files'))
   end
 end

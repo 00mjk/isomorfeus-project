@@ -9,6 +9,10 @@ module Isomorfeus
         @key = k.to_s
       end
 
+      def changed?
+        @_changed
+      end
+      
       def revision
         @_revision
       end

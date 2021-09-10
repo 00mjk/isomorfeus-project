@@ -3,20 +3,10 @@ module LucidData
     class Base
       include LucidData::File::Mixin
 
-      def self.inherited(base)
-        if RUBY_ENGINE != 'opal'
-          Isomorfeus.add_valid_file_class(base)
-
-          uploader = base.const_set("Uploader", Class.new(::Shrine))
-
-          uploader.plugin :add_metadata
-          uploader.plugin :data_uri
-
-          base.default_cache :cache
-          base.default_store :store
+      if RUBY_ENGINE != 'opal'
+        def self.inherited(base)
+          Isomorfeus.add_valid_data_class(base)
         end
-
-        base.attribute :meta
       end
     end
   end
