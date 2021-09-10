@@ -18,10 +18,9 @@ Symbols will become Strings during serialization, within data they should be avo
 
 ### Key
 
-#### Key as system wide Identifier
+#### Key as identifier
 
-To identify a data object uniquely throughout the distributed isomorphic system, each Isomorfeus LucidData Object requires a key.
-Objects of same class and key are expected to be the same throughout the system.
+To identify a data object uniquely each Isomorfeus LucidData Object requires a key. Objects of same class and key are expected to be the same throughout the system.
 
 #### Example: Instantiating Data by key:
 ```
@@ -72,30 +71,9 @@ a.a_attribute == b.a_attribute # -> true
 a.object_id == b.object_id # -> false
 ``` 
 
-### Revision
-
-To detect parallel data changes and to be able to handle them, the LucidData classes support *revisions*.
-
- (more to come on this topic later)
-
-### Classes and Mixins
-
-To inherit from a LucidData class use the Base class, example:
-```
-class MyNode < LucidData::Node::Base
-end
-```
-
-To include LucidData functionality as module use the Mixin module, example:
-```
-class MyNode
-  include LucidData::Node::Mixin
-end
-```
-
 ### SID - System wide IDentifier
-
-A SID identifies a instance of the LucidData classes in the system.
+To identify a data object uniquely throughout the distributed isomorphic system the SID is used.
+A SID identifies a instances of the LucidData classes in the system.
 A SID is for example used by the system within serialized data and on the client to identify data for instances or instantiate new instances.
 A SID is just a small array consisting of class name and key:
 
@@ -116,3 +94,23 @@ n.to_sid # -> ['MyNode', '231']
  class name     key
 ```
 
+### Revision
+
+To detect parallel data changes and to be able to handle them, the LucidData classes support *revisions*.
+
+ (more to come on this topic later)
+
+### Classes and Mixins
+
+To inherit from a LucidData class use the Base class, example:
+```
+class MyNode < LucidData::Node::Base
+end
+```
+
+To include LucidData functionality as module use the Mixin module, example:
+```
+class MyNode
+  include LucidData::Node::Mixin
+end
+```
