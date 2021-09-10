@@ -10,7 +10,7 @@ module Isomorfeus
 
         def generate_gem_line(gem_hash)
           line = "gem '#{gem_hash[:name]}', '#{gem_hash[:version]}'"
-          line << ", require: false" if gem_hash.has_key?(:require) && !gem_hash[:require]
+          line << ", require: false" if gem_hash.key?(:require) && !gem_hash[:require]
           line << "\n"
         end
 
