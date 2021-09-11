@@ -1,4 +1,5 @@
 require 'base64'
+require 'stringio'
 require 'data_uri'
 require 'isomorfeus-transport'
 require 'isomorfeus/data/config'
@@ -54,12 +55,11 @@ else
   require 'isomorfeus_data/lucid_data/file/base'
 
   require 'isomorfeus/data/handler/generic'
-  require 'isomorfeus/data/file_rack_middleware'
-
-  Isomorfeus.add_middleware(Isomorfeus::Data::FileRackMiddleware)
 
   require 'iso_opal'
   Opal.append_path(__dir__.untaint) unless IsoOpal.paths.include?(__dir__.untaint)
+  uri_path = File.expand_path(File.join(__dir__.untaint, '..', 'opal'))
+  Opal.append_path(uri_path) unless IsoOpal.paths.include?(uri_path)
 
   data_uri_path = File.join(Gem::Specification.find_by_name('data_uri').gem_dir, 'lib')
   Opal.append_path(data_uri_path) unless IsoOpal.paths.include?(data_uri_path)
