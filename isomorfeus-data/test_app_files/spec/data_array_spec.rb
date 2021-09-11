@@ -274,7 +274,7 @@ RSpec.describe 'LucidData::Array' do
         array = TestArrayE.new(key: 8)
         array.changed?
       end
-      expect(result).to be(true)
+      expect(result).to be(false)
       result = @doc.evaluate_ruby do
         class TestArrayE < LucidData::Array::Base
         end
