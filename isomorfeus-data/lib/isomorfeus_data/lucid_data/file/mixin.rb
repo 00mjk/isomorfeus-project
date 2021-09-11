@@ -6,6 +6,7 @@ module LucidData
         base.include(Isomorfeus::Data::GenericInstanceApi)
         
         def changed!
+          @_composition.changed! if @_composition
           @_changed = true
         end
 
@@ -18,41 +19,78 @@ module LucidData
           result
         end
 
+        def composition
+          @_composition
+        end
+
+        def composition=(c)
+          @_composition = c
+        end
+
         def content_type
-          URI::Data.new(datra_uri).content_type if data_uri
+          _reload
+          return @_data_uri_object.content_type if @_data_uri_object
           nil
         end
 
         def content_type=(c)
-          if data_uri
-            # TODO: just do some string manipulation instead
-            data_uri = URI::Data.build(content_type: c, data: data)
-          else
-            @_content_type = c
-          end
+          changed!
+          _content_type(c)
         end
 
-        def data_uri
-          return @_changed_data_uri if @_changed_data_uri
-          @_data_uri
-        end
-
-        def data_uri=(d)
-          @_changed = true
-          @_changed_data_uri=d
+        def _content_type(c)
+          _reload
+          @_data_uri_string = _format_data_uri(c, @_data_uri_object.data)
+          @_data_uri_object = URI::Data.new(@_data_uri_string)
+          c
         end
 
         def data
-          URI::Data.new(data_uri).data if data_uri
-          nil
+          _reload
+          @_data_uri_object.data
         end
 
-        def data=(d, content_type: nil)
-          if @_content_type || content_type
-            data_uri = URI::Data.build(content_type: (content_type ? content_type : @_content_type), data: d)
+        def data=(d)
+          changed!
+          _data(d)
+        end
+
+        def _data(d)
+          _reload
+          @_data_uri_string = _format_data_uri(self.content_type, d)
+          @_data_uri_object = URI::Data.new(@_data_uri_string)
+          d
+        end
+
+        def data_uri
+          _reload
+          @_data_uri_string
+        end
+
+        def data_uri=(d)
+          changed!
+          _data_uri(d)
+        end
+
+        def _data_uri(d)
+          _reload
+          if d.class == URI::Data
+            @_data_uri_string = _format_data_uri(d.content_type, d.data)
+            @_data_uri_object = d
           else
-            data_uri = URI::Data.build(data: d)
+            @_data_uri_string = d
+            @_data_uri_object = URI::Data.new(d)
           end
+          @_data_uri_string
+        end
+
+        def data_uri_object
+          _reload
+          @_data_uri_object
+        end
+
+        def _format_data_uri(c, d)
+          "data:#{c};base64,#{Base64.encode64(d).chop}"
         end
 
         if RUBY_ENGINE == 'opal'
@@ -64,35 +102,43 @@ module LucidData
             end
           end
 
-          def initialize(key:, data: nil, data_uri: nil, revision: nil, composition: nil)
+          def initialize(key:, content_type: nil, data: nil, data_uri: nil, revision: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             _update_paths
             @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
             @_composition = composition
-            if data
-              self.data = data
-            else
-              @_data_uri = data_uri
-            end
             @_changed = false
+            @_reload = false
             loaded = loaded?
-            @_changed_data_uri = nil
+            @_data_uri_object = nil
+            @_data_uri_string = nil
+            if data_uri
+              self.data_uri = data_uri
+            elsif data
+              self.data = data
+              self.content_type = content_type if content_type
+            else
+              self._data('')
+              self._content_type(content_type) if content_type
+            end
           end
     
           def _load_from_store!
-            @_changed_data_uri = nil
             @_changed = false
+            @_reload = true
           end
-    
+         
+          def _reload
+            return unless @_reload
+            @_reload = false
+            d = Redux.fetch_by_path(*@_store_path)
+            self._data_uri(d) if d
+          end
+
           def _update_paths
             @_store_path = [:data_state, @class_name, @key, :data_uri]
-          end
-    
-          def data_uri
-            return @changed_data_uri if @changed_data_uri
-            Redux.fetch_by_path(*@_store_path)
           end
         else # RUBY_ENGINE
           Isomorfeus.add_valid_file_class(base) unless base == LucidData::File::Base
@@ -101,7 +147,7 @@ module LucidData
             def instance_from_transport(instance_data, _included_items_data)
               key = instance_data[self.name].keys.first
               revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
-              data_uri = instance_data[self.name][key].key?('data_uri') ? instance_data[self.name][key]['data_uri'].transform_keys!(&:to_sym) : nil
+              data_uri = instance_data[self.name][key].key?('data_uri') ? instance_data[self.name][key]['data_uri'] : nil
               new(key: key, revision: revision, data_uri: data_uri)
             end
 
@@ -112,44 +158,68 @@ module LucidData
             def files_path=(f)
               @files_path = f
             end
+
+            def check_and_prepare_path(key:)
+              Isomorfeus.raise_error(message: 'Invalid key (contains ".." or "\\")') if key.include?('..') || key.include?('\\')
+              elements = key.split('/')
+              Isomorfeus.raise_error(message: 'Invalid key (contains more than 2 x "/")') if elements.size > 3
+              file = elements.pop
+              if elements.size > 0
+                dir_path = ::File.expand_path(::File.join(files_path, *elements))
+                FileUtils.mkdir_p(path) unless Dir.exist?(dir_path)
+                ::File.join(dir_path, file)
+              else
+                ::File.join(files_path, file)
+              end
+            end
           end
 
-          def initialize(key:, data: nil, data_uri: nil, revision: nil, composition: nil)
+          def initialize(key:, content_type: nil, data: nil, data_uri: nil, revision: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
             @_revision = revision
             @_composition = composition
-            @_changed = false
-            @_changed_data_uri = nil
-            if data
-              self.data = data
+            @_data_uri_object = nil
+            @_data_uri_string = nil
+            if data_uri
+              self._data_uri(data_uri)
             else
-              @_data_uri = data_uri
+              self._data(data ? data : '')
+              self._content_type(content_type) if content_type
             end
+            @_changed = false
           end
   
-          def _unchange!
-            @_changed = false
+          def _reload
           end
 
+          def _unchange!
+            @_data_uri = @_changed_data_uri if @_changed
+            @_changed = false
+          end
+          
           base.execute_create do
             self.save
           end
 
           base.execute_destroy do |key:|
-            FileUtils.rm_f(File.join(files_path, key))
+            file = check_and_prepare_path(key: key)
+            ::FileUtils.rm_f(file)
+            true
           end
 
           base.execute_load do |key:|
-            data = File.read(File.join(files_path, key))
+            file = check_and_prepare_path(key: key)
+            d = ::File.read(file)
             instance = self.new(key: key)
-            instance.data = data
+            instance.data = d
             instance
           end
 
           base.execute_save do
-            File.write(File.join(files_path, key), data)
+            file = self.class.check_and_prepare_path(key: self.key)
+            ::File.write(file, self.data)
             self
           end
         end # RUBY_ENGINE

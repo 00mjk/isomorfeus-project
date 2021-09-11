@@ -1,15 +1,19 @@
 require 'spec_helper'
 
 RSpec.describe 'LucidData::File' do
+  after do
+    SimpleFile.destroy(key: '123')
+  end
+  
   context 'on the server' do
     it 'can instantiate a file by inheritance' do
       result = on_server do
         class TestFileBase < LucidData::File::Base
         end
-        file = TestFileBase.new(key: 1)
-        file.key
+        file = TestFileBase.new(key: 1, data: 'a')
+        [file.key, file.data]
       end
-      expect(result).to eq('1')
+      expect(result).to eq(['1', 'a'])
     end
 
     it 'can instantiate a file by mixin' do
@@ -17,10 +21,10 @@ RSpec.describe 'LucidData::File' do
         class TestFileMixin
           include LucidData::File::Mixin
         end
-        file = TestFileMixin.new(key: 2)
-        file.key
+        file = TestFileBase.new(key: 2, data: 'b')
+        [file.key, file.data]
       end
-      expect(result).to eq('2')
+      expect(result).to eq(['2', 'b'])
     end
 
     it 'can create a simple file' do
@@ -33,6 +37,7 @@ RSpec.describe 'LucidData::File' do
 
     it 'can load a simple file' do
       result = on_server do
+        SimpleFile.create(key: '123', data: 'a')
         file = SimpleFile.load(key: '123')
         file.data
       end
@@ -48,11 +53,14 @@ RSpec.describe 'LucidData::File' do
 
     it 'can save a simple file' do
       result = on_server do
+        SimpleFile.create(key: '123', data: 'a')
         file = SimpleFile.load(key: '123')
         file.data = 'changed'
         before_changed = file.changed?
         file.save
-        [file.data, before_changed, file.changed?]
+        after_save = file.changed?
+        file = SimpleFile.load(key: '123')
+        [file.data, before_changed, after_save]
       end
       expect(result).to eq(['changed', true, false])
     end
@@ -71,10 +79,10 @@ RSpec.describe 'LucidData::File' do
       result = on_server do
         class TestFileMixinC < LucidData::File::Base
         end
-        file = TestFileMixinC.new(key: 12)
+        file = TestFileMixinC.new(key: 12, data: 'a')
         file.to_transport
       end
-      expect(result).to eq("TestFileMixinC"=>{"12"=>{data_url: nil}})
+      expect(result).to eq("TestFileMixinC" => {"12"=>{"data_uri"=>"data:;base64,YQ=="}})
     end
   end
 
@@ -122,13 +130,51 @@ RSpec.describe 'LucidData::File' do
       expect(result).to be(true)
     end
 
+    it 'converts to sid' do
+      result = @doc.evaluate_ruby do
+        class TestFileMixinC < LucidData::File::Base
+        end
+        file = TestFileMixinC.new(key: 24)
+        file.to_sid
+      end
+      expect(result).to eq(['TestFileMixinC', '24'])
+    end
+
+    it 'converts to transport' do
+      result = @doc.evaluate_ruby do
+        class TestFileMixinC < LucidData::File::Base
+        end
+        file = TestFileMixinC.new(key: 28, data: 'a')
+        file.to_transport.to_n
+      end
+      expect(result).to eq("TestFileMixinC" => {"28"=>{"data_uri"=>"data:;base64,YQ=="}})
+    end
+
+    it 'can save' do
+      result = @doc.await_ruby do
+        file = SimpleFile.new(key: '123')
+        file.data = 654321
+        file.promise_save.then do |file|
+          file.data
+        end
+      end
+      expect(result).to eq('654321')
+    end
+  end
+
+  context 'on the client with existing file' do
+    before :each do
+      SimpleFile.create(key: '123', data: 'a')
+      @doc = visit('/')
+    end
+
     it 'can load a simple file' do
       result = @doc.await_ruby do
         SimpleFile.promise_load(key: '123').then do |file|
           file.data
         end
       end
-      expect(result).to eq('123')
+      expect(result).to eq('a')
     end
 
     it 'can destroy a simple file' do
@@ -144,51 +190,11 @@ RSpec.describe 'LucidData::File' do
           file.data = 'changed'
           before_changed = file.changed?
           file.promise_save.then do |file|
-            [file.one, before_changed, file.changed?]
+            [file.data, before_changed, file.changed?]
           end
         end
       end
       expect(result).to eq(['changed', true, false])
-    end
-
-    it 'converts to sid' do
-      result = @doc.evaluate_ruby do
-        class TestFileMixinC < LucidData::File::Base
-        end
-        file = TestFileMixinC.new(key: 24)
-        file.to_sid
-      end
-      expect(result).to eq(['TestFileMixinC', '24'])
-    end
-
-    it 'converts to transport' do
-      result = @doc.evaluate_ruby do
-        class TestFileMixinC < LucidData::File::Base
-        end
-        file = TestFileMixinC.new(key: 28)
-        file.to_transport.to_n
-      end
-      expect(result).to eq("TestFileMixinC" => {"28"=>{}})
-    end
-
-    it 'can load' do
-      result = @doc.await_ruby do
-        SimpleFile.promise_load(key: '123456').then do |file|
-          file.data
-        end
-      end
-      expect(result).to eq('123456')
-    end
-
-    it 'can save' do
-      result = @doc.await_ruby do
-        file = SimpleFile.new(key: '123456')
-        file.data = 654321
-        file.promise_save.then do |file|
-          file.data
-        end
-      end
-      expect(result).to eq(654321)
     end
   end
 end
