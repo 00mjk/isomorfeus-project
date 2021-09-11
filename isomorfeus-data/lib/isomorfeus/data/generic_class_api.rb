@@ -65,7 +65,7 @@ module Isomorfeus
         def execute_destroy(_); end
         def execute_load(_); end
         def execute_save(_); end
-      else
+      else # RUBY_ENGINE
         def destroy(key:)
           !!instance_exec(key: key, &@_destroy_block)
         end
@@ -102,7 +102,7 @@ module Isomorfeus
         def execute_save(&block)
           @_save_block = block
         end
-      end
+      end  # RUBY_ENGINE
 
       def create(key:, **things)
         new(key: key, **things).create
