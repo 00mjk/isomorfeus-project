@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.summary      = 'Compose Graphs and Collections of data just as needed for a isomorfeus app.'
   s.description  = "Write Browser Apps that transparently access server side data with Graphs and Collections with ease."
   s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
-  s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
+  s.files        = `git ls-files -- lib opal LICENSE README.md`.split("\n")
   # s.test_files   = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
 
