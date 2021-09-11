@@ -22,19 +22,16 @@
 !/storage/.keep
 
 test_app
-node_modules
 yarn-error.log
 .owl_cache
 yarn.lock
 
 /public/assets
-/ruby/example-apps/*/public/assets
-/ruby/*/test_app/public/assets
+*/test_app/public/assets
 .byebug_history
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
-/node_modules
 yarn-debug.log*
 .yarn-integrity
 .DS_Store
@@ -43,7 +40,9 @@ yarn-debug.log*
 
 .idea
 Gemfile.lock
-ruby/*/spec/test_apps/*
-ruby/*/test_app
+package-lock.json
+*/spec/test_apps/*
+*/test_app
 .rakeTasks
-ruby/gems/*
+gems/*
+*.gem

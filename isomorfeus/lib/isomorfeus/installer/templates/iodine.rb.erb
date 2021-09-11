@@ -1,0 +1,5 @@
+require 'etc'
+Iodine.threads = ENV['THREADS'] ? ENV['THREADS'].to_i : 4
+Iodine.workers = ENV['WORKERS'] ? ENV['WORKERS'].to_i : Etc.nprocessors
+Iodine::DEFAULT_SETTINGS[:address] = '127.0.0.1' if Gem.win_platform?
+Iodine.patch_rack

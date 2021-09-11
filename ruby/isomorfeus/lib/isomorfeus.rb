@@ -1,8 +1,0 @@
-require 'isomorfeus-redux'
-require 'isomorfeus-react'
-require 'isomorfeus-policy'
-require 'isomorfeus-transport'
-require 'isomorfeus-i18n'
-require 'isomorfeus-data'
-require 'isomorfeus-operation'
-require 'isomorfeus-mailer'
