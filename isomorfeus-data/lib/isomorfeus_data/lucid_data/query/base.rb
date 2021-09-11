@@ -1,10 +1,9 @@
 module LucidData
   module Query
     class Base
-      include LucidData::Query::Mixin
-
-      if RUBY_ENGINE != 'opal'
-        def self.inherited(base)
+      def self.inherited(base)
+        base.include LucidData::Query::Mixin
+        if RUBY_ENGINE != 'opal'
           Isomorfeus.add_valid_data_class(base)
         end
       end

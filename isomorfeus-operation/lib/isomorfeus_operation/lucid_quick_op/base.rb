@@ -1,9 +1,8 @@
 module LucidQuickOp
   class Base
-    include LucidQuickOp::Mixin
-
-    if RUBY_ENGINE != 'opal'
-      def self.inherited(base)
+    def self.inherited(base)
+      base.include LucidQuickOp::Mixin
+      if RUBY_ENGINE != 'opal'
         Isomorfeus.add_valid_operation_class(base)
       end
     end

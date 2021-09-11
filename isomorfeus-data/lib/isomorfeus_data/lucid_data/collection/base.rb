@@ -1,10 +1,9 @@
 module LucidData
   module Collection
     class Base
-      include LucidData::Collection::Mixin
-
-      if RUBY_ENGINE != 'opal'
-        def self.inherited(base)
+      def self.inherited(base)
+        base.include LucidData::Collection::Mixin
+        if RUBY_ENGINE != 'opal'
           Isomorfeus.add_valid_data_class(base)
         end
       end

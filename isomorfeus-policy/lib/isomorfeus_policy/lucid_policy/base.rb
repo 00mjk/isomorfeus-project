@@ -1,9 +1,8 @@
 module LucidPolicy
   class Base
-    include LucidPolicy::Mixin
-
-    if RUBY_ENGINE != 'opal'
-      def self.inherited(base)
+    def self.inherited(base)
+      base.include LucidPolicy::Mixin
+      if RUBY_ENGINE != 'opal'
         Isomorfeus.add_valid_policy_class(base)
       end
     end

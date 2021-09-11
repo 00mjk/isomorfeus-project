@@ -1,10 +1,9 @@
 module LucidData
   module Graph
     class Base
-      include LucidData::Graph::Mixin
-
-      if RUBY_ENGINE != 'opal'
-        def self.inherited(base)
+      def self.inherited(base)
+        base.include LucidData::Graph::Mixin
+        if RUBY_ENGINE != 'opal'
           Isomorfeus.add_valid_data_class(base)
         end
       end
