@@ -92,6 +92,7 @@ RSpec.describe 'LucidGraph' do
     end
 
     it 'converts a partial graph to transport' do
+      skip 'todo'
       result = on_server do
         class TestGraphPGT < LucidData::Graph::Base
           nodes :given_nodes
