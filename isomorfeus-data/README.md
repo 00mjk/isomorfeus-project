@@ -37,10 +37,4 @@ All classes follow the common principles and the common API above.
 - [LucidData::Graph](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_graph.md) - A graph, which can be build from several LucidData::Collection objects and LucidData::EdgeCollection objects
 - [LucidData::Hash](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_hash.md) - A hash, easily accessible on client and server
 
-For convenience the following generic classes are provided. They can be used when creating a separate class wouldn't be useful:
-- LucidData::GenericCollection
-- LucidData::GenericEdgeCollection 
-- LucidData::GenericNode
-- LucidData::GenericEdge
-
 (more to come soon)
