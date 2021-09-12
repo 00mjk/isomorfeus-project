@@ -18,5 +18,5 @@ else
 
   Opal.append_path(__dir__.untaint) unless IsoOpal.paths_include?(__dir__.untaint)
   path = File.expand_path(File.join('app', 'policies'))
-  Isomorfeus.zeitwerk.push_dir(path)
+  Isomorfeus.zeitwerk.push_dir(path) if Dir.exist?(path)
 end
