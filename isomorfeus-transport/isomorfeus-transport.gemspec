@@ -19,8 +19,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'iodine', '~> 0.7.44'
   s.add_dependency 'oj', '~> 3.13.5'
   s.add_dependency 'opal', '>= 1.2.0'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.12.4'
-  s.add_dependency 'isomorfeus-preact', '~> 10.5.5'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.12.5'
+  s.add_dependency 'isomorfeus-preact', '~> 10.5.6'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
   s.add_dependency 'isomorfeus-redux', '~> 4.1.6'
   s.add_dependency 'sdbm', '~> 1.0.0'
