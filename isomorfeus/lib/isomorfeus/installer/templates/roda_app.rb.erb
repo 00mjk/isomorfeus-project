@@ -16,7 +16,13 @@ class <%= roda_app_class %> < Roda
   end
 
   def page_content(env, location)
-    mount_component('<%= app_class %>',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js')
+    if Isomorfeus.development?
+      req = Rack::Request.new(env)
+      skip_ssr = req.params.key?("skip_ssr") ? true : false
+    else
+      skip_ssr = false
+    end
+    mount_component('<%= app_class %>',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js', skip_ssr: skip_ssr)
   end
 
   route do |r|
