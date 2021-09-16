@@ -3,7 +3,7 @@ require 'isomorfeus/operation/config'
 
 if RUBY_ENGINE == 'opal'
   Isomorfeus.zeitwerk.push_dir('isomorfeus_operation')
-  require_tree 'isomorfeus_operation', :autoload
+  require_tree 'isomorfeus_operation', autoload: true
   Isomorfeus.zeitwerk.push_dir('operations')
 else
   require 'oj'

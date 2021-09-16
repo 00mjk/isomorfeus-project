@@ -7,11 +7,11 @@ require 'isomorfeus-data'
 require 'isomorfeus-i18n'
 require 'isomorfeus-operation'
 
-require_tree 'policies', :autoload
-require_tree 'channels', :autoload
-require_tree 'data', :autoload
-require_tree 'operations', :autoload
-require_tree 'mail_components', :autoload
+require_tree 'policies', autoload: true
+require_tree 'channels', autoload: true
+require_tree 'data', autoload: true
+require_tree 'operations', autoload: true
+require_tree 'mail_components', autoload: true
 
 Isomorfeus.zeitwerk.push_dir('mail_components')
 

@@ -12,7 +12,7 @@ if RUBY_ENGINE == 'opal'
   require 'isomorfeus/data/reducer'
   Isomorfeus::Data::Reducer.add_reducer_to_store
   Isomorfeus.zeitwerk.push_dir('isomorfeus_data')
-  require_tree 'isomorfeus_data', :autoload
+  require_tree 'isomorfeus_data', autoload: true
   Isomorfeus.zeitwerk.push_dir('data')
 else
   require 'fileutils'

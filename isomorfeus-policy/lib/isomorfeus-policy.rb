@@ -4,7 +4,7 @@ require 'lucid_props'
 
 if RUBY_ENGINE == 'opal'
   Isomorfeus.zeitwerk.push_dir('isomorfeus_policy')
-  require_tree 'isomorfeus_policy', :autoload
+  require_tree 'isomorfeus_policy', autoload: true
   Isomorfeus.zeitwerk.push_dir('policies')
 else
   require 'isomorfeus_policy/lucid_policy/exception'
