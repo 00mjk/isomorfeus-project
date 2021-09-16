@@ -1,5 +1,5 @@
 module Isomorfeus
   module Transport
-    VERSION = '1.9.0.pre.9'
+    VERSION = '1.99.99.pre.99'
   end
 end
