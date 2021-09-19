@@ -3,9 +3,13 @@ Isomorfeus.load_configuration(File.expand_path(File.join(__dir__, '..', '..', 'c
 class TestAppRodaApp < Roda
   extend Isomorfeus::Transport::Middlewares
   include Isomorfeus::PreactViewHelper
+
   use_isomorfeus_middlewares
+
   plugin :public, root: 'public'
-  plugin :render, views: File.join(__dir__, '..', 'layouts'), cache: Isomorfeus.production?
+
+  @@templates = {}
+  @@templates_path = File.expand_path(File.join(__dir__, '..', 'layouts'))
 
   def locale
     env.http_accept_language.preferred_language_from(Isomorfeus.available_locales) ||
@@ -14,9 +18,22 @@ class TestAppRodaApp < Roda
   end
 
   def page_content(env, location)
-    req = Rack::Request.new(env)
-    skip_ssr = req.params.key?("skip_ssr") ? true : false
+    if Isomorfeus.development?
+      req = Rack::Request.new(env)
+      skip_ssr = req.params.key?("skip_ssr") ? true : false
+    else
+      skip_ssr = false
+    end
     mount_component('TestAppApp', { location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js', skip_ssr: skip_ssr)
+  end
+
+  def render(template_name, locals: {})
+    @@templates[template_name] = nil if Isomorfeus.development? # cause reloading of template in development environment
+    unless @@templates.key?(template_name)
+      mustache_template = File.read(File.join(@@templates_path, "#{template_name}.mustache"))
+      @@templates[template_name] = Iodine::Mustache.new(template: mustache_template)
+    end
+    @@templates[template_name].render(locals)
   end
 
   route do |r|
