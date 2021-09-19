@@ -34,8 +34,8 @@ RSpec.describe 'isomorfeus installer' do
       expect(File.exist?(File.join('app', 'components', 'morphing_app.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'navigation_links.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'not_found_404_component.rb'))).to be true
-      expect(File.exist?(File.join('app', 'layouts', 'web.erb'))).to be true
-      expect(File.exist?(File.join('app', 'layouts', 'mail_preview.erb'))).to be true
+      expect(File.exist?(File.join('app', 'layouts', 'web.mustache'))).to be true
+      expect(File.exist?(File.join('app', 'layouts', 'mail_preview.mustache'))).to be true
       expect(File.exist?(File.join('app', 'policies', 'anonymous_policy.rb'))).to be true
       expect(File.exist?(File.join('app', 'server', 'morphing_roda_app.rb'))).to be true
       expect(File.exist?(File.join('app', 'isomorfeus_loader.rb'))).to be true
@@ -66,8 +66,8 @@ RSpec.describe 'isomorfeus installer' do
       expect(File.exist?(File.join('app', 'components', 'morphing_app.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'navigation_links.rb'))).to be true
       expect(File.exist?(File.join('app', 'components', 'not_found_404_component.rb'))).to be true
-      expect(File.exist?(File.join('app', 'layouts', 'web.erb'))).to be true
-      expect(File.exist?(File.join('app', 'layouts', 'mail_preview.erb'))).to be true
+      expect(File.exist?(File.join('app', 'layouts', 'web.mustache'))).to be true
+      expect(File.exist?(File.join('app', 'layouts', 'mail_preview.mustache'))).to be true
       expect(File.exist?(File.join('app', 'policies', 'anonymous_policy.rb'))).to be true
       expect(File.exist?(File.join('app', 'server', 'morphing_roda_app.rb'))).to be true
       expect(File.exist?(File.join('app', 'isomorfeus_loader.rb'))).to be true

@@ -30,8 +30,8 @@ module Isomorfeus
           end
 
           def install_web_layouts
-            copy_file(File.join(templates_path, 'web.html.erb'), File.join('app', 'layouts', 'web.erb'))
-            copy_file(File.join(templates_path, 'mail_preview.html.erb'), File.join('app', 'layouts', 'mail_preview.erb'))
+            copy_file(File.join(templates_path, 'web.mustache.erb'), File.join('app', 'layouts', 'web.mustache'))
+            copy_file(File.join(templates_path, 'mail_preview.mustache.erb'), File.join('app', 'layouts', 'mail_preview.mustache'))
           end
 
           def install_web_loaders
