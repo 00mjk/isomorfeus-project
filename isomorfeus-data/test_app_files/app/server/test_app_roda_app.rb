@@ -28,7 +28,7 @@ class TestAppRodaApp < Roda
   end
 
   def render(template_name, locals: {})
-    @@templates[template_name] = nil if Isomorfeus.development? # cause reloading of template in development environment
+    @@templates.delete(template_name) if Isomorfeus.development? # cause reloading of template in development environment
     unless @@templates.key?(template_name)
       mustache_template = File.read(File.join(@@templates_path, "#{template_name}.mustache"))
       @@templates[template_name] = Iodine::Mustache.new(template: mustache_template)
