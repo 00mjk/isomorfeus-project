@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title>Mail preview of {{ component_class }}</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style id="jss-server-side" type="text/css">
-      <%= ssr_styles %>
+      {{ ssr_styles }}
     </style>
-    <%= script_tag %>
   </head>
   <body>
-    <%= content %>
+    {{ content }}
   </body>
 </html>

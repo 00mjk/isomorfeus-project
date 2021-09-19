@@ -7,7 +7,9 @@ class <%= roda_app_class %> < Roda
   use_isomorfeus_middlewares
 
   plugin :public, root: 'public', gzip: true
-  plugin :render, views: File.expand_path(File.join(__dir__, '..', 'layouts')), cache: Isomorfeus.production?
+
+  @@templates = {}
+  @@templates_path = File.expand_path(File.join(__dir__, '..', 'layouts'))
 
   def locale
     env.http_accept_language.preferred_language_from(Isomorfeus.available_locales) ||
@@ -25,11 +27,20 @@ class <%= roda_app_class %> < Roda
     mount_component('<%= app_class %>',{ location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js', skip_ssr: skip_ssr)
   end
 
+  def render(template_name, locals: {})
+    @@templates[template_name] = nil if Isomorfeus.development? # cause reloading of template in development environment
+    unless @@templates.key?(template_name)
+      mustache_template = File.read(File.join(@@templates_path, "#{template_name}.mustache"))
+      @@templates[template_name] = Idione::Mustache.new(template: mustache_template)
+    end
+    @@templates[template_name].render(locals)
+  end
+
   route do |r|
     r.root do
       content = page_content(env, '/')
       response.status = ssr_response_status
-      render('web', locals: { content: content, script_tag: script_tag('web.js'), title: 'Welcome to <%= app_class %>' })
+      render('web', locals: { content: content, script_tag: script_tag('web.js'), ssr_styles: ssr_styles, title: 'Welcome to <%= app_class %>' })
     end
 
     r.public
@@ -48,14 +59,14 @@ class <%= roda_app_class %> < Roda
         props = { location_host: env['HTTP_HOST'], location: '/mail_preview', locale: locale }.merge(r.params)
         content = mount_component(component_class, props, 'mail_components.js')
         response.status = ssr_response_status
-        render('web', locals: { content: content, component_class: component_class })
+        render('mail_preview', locals: { content: content, component_class: component_class, ssr_styles: ssr_styles })
       end
     end
 
     r.get do
       content = page_content(env, env['PATH_INFO'])
       response.status = ssr_response_status
-      render('web', locals: { content: content, script_tag: script_tag('web.js'), title: 'Welcome to <%= app_class %>' })
+      render('web', locals: { content: content, script_tag: script_tag('web.js'), ssr_styles: ssr_styles, title: 'Welcome to <%= app_class %>' })
     end
   end
 end
