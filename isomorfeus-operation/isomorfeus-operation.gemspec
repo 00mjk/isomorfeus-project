@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.0'
-  s.add_dependency 'oj', '~> 3.13.5'
+  s.add_dependency 'oj', '~> 3.13.7'
   s.add_dependency 'opal', '>= 1.2.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.12.8'

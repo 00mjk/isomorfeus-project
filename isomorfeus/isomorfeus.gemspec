@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'activesupport', '~> 6.0'
   s.add_dependency 'bundler'
-  s.add_dependency 'oj', '~> 3.13.5'
+  s.add_dependency 'oj', '~> 3.13.7'
   s.add_dependency 'pry', '~> 0.14.1'
   s.add_dependency 'thor', '>= 0.19.4'
   s.add_dependency 'isomorfeus-speednode', '~> 0.4.2'
