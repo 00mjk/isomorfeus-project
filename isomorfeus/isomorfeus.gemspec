@@ -18,11 +18,11 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'activesupport', '~> 6.0'
   s.add_dependency 'bundler'
-  s.add_dependency 'oj', '~> 3.13.7'
+  s.add_dependency 'oj', '~> 3.13.9'
   s.add_dependency 'pry', '~> 0.14.1'
   s.add_dependency 'thor', '>= 0.19.4'
   s.add_dependency 'isomorfeus-speednode', '~> 0.4.2'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.12.8'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.0'
   s.add_dependency 'isomorfeus-preact', '~> 10.5.7'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.6'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::VERSION
