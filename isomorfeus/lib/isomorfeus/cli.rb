@@ -19,6 +19,7 @@ DESC
       Isomorfeus::Installer.set_project_names(project_name)
       Isomorfeus::Installer.options = options
       begin
+        puts "Creating project directory #{Isomorfeus::Installer.project_dir}"
         Dir.mkdir(Isomorfeus::Installer.project_dir)
       rescue
         if Dir.exist?(Isomorfeus::Installer.project_dir) && Gem.win_platform?
@@ -31,6 +32,7 @@ DESC
       end
       end
       Dir.chdir(Isomorfeus::Installer.project_dir)
+      puts "within the project directory:"
       Isomorfeus::Installer::NewProject.execute
       Isomorfeus::Installer::InstallTargets.execute
       Isomorfeus::Installer::Gemfile.execute

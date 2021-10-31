@@ -53,10 +53,11 @@ module Isomorfeus
                                   File.join('app', 'policies', 'anonymous_policy.rb'), {})
       end
 
-      def install_spec_helper
+      def install_spec_files
         data_hash = { roda_app_class: Isomorfeus::Installer.roda_app_class, roda_app_path: Isomorfeus::Installer.roda_app_path,
                       rack_server: Isomorfeus::Installer.rack_server_name }
         create_file_from_template(Isomorfeus::Installer.templates_path, 'spec_helper.rb.erb', File.join('spec', 'spec_helper.rb'), data_hash)
+        create_file_from_template(Isomorfeus::Installer.templates_path, 'web_spec.rb.erb', File.join('spec', 'web_spec.rb'), {})
       end
 
       def config_path(config_file)

@@ -1,0 +1,24 @@
+require 'fileutils'
+require 'bundler'
+require 'cowsay'
+
+task :specs do
+  puts Cowsay.say "Testing #{File.dirname(__FILE__).split('/').last.upcase}. NO chance for bugs!", "Ghostbusters"
+  pwd = Dir.pwd
+  system('bundle update')
+  options = { keep_file_descriptors: false }
+  options.define_singleton_method(:keep_file_descriptors?) do
+    false
+  end
+  if Gem.win_platform?
+    system('bundle exec rspec')
+  else
+    pid = fork do
+      Bundler::CLI::Exec.new(options, ['rspec']).run
+    end
+    Process.waitpid(pid)
+  end
+  Dir.chdir(pwd)
+end
+
+task default: :specs

@@ -24,11 +24,11 @@ module Isomorfeus
           if Isomorfeus::Installer.project_name == 'test_app'
             gem_lines = ''
             %i[isomorfeus isomorfeus-data isomorfeus-i18n isomorfeus-mailer isomorfeus-operation isomorfeus-policy isomorfeus-transport].each do |i_module|
-              gem_lines << "gem '#{i_module}', path: #{Isomorfeus::Installer.isomorfeus_module == i_module ? "'..'" : "'../../#{i_module}'"}\n"
+              gem_lines << "gem '#{i_module}', path: #{Isomorfeus::Installer.isomorfeus_module == i_module ? "'..'\n" : "'../../#{i_module}'"}\n"
             end
             data_hash[:isomorfeus_gems] = gem_lines.chop
           else
-            data_hash[:isomorfeus_gems] = "gem 'isomorfeus', '~> #{Isomorfeus::VERSION}'" 
+            data_hash[:isomorfeus_gems] = "gem 'isomorfeus', '~> #{Isomorfeus::VERSION}'"
           end
 
           create_file_from_template(Isomorfeus::Installer.templates_path, 'Gemfile.erb', 'Gemfile', data_hash)

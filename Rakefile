@@ -21,7 +21,8 @@ def build_gem_for(isomorfeus_module)
 end
 
 def path_for(isomorfeus_module)
-  File.join( "isomorfeus-#{isomorfeus_module}")
+  return "isomorfeus" if isomorfeus_module == "isomorfeus"
+  "isomorfeus-#{isomorfeus_module}"
 end
 
 def run_rake_spec_for(isomorfeus_module)
@@ -149,22 +150,7 @@ task :i18n_spec do
 end
 
 task :installer_spec do
-  pwd = Dir.pwd
-  Dir.chdir(File.join( "isomorfeus"))
-  system('bundle install')
-  options = { keep_file_descriptors: false }
-  options.define_singleton_method(:keep_file_descriptors?) do
-    false
-  end
-  if Gem.win_platform?
-    system('bundle exec rspec')
-  else
-    pid = fork do
-      Bundler::CLI::Exec.new(options, ['rspec']).run
-    end
-    Process.waitpid(pid)
-  end
-  Dir.chdir(pwd)
+  run_rake_spec_for('isomorfeus')
 end
 
 task :mailer_spec do

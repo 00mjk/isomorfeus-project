@@ -8,7 +8,7 @@ module Isomorfeus
           create_common_framework_directories
           install_basic_components
           install_basic_policy
-          install_spec_helper
+          install_spec_files
         rescue Exception => e
           puts e.backtrace.join("\n")
           puts "Installation failed: #{e.message}"
