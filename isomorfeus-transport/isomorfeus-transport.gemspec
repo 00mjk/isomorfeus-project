@@ -13,12 +13,12 @@ Gem::Specification.new do |s|
   s.files        = `git ls-files -- lib LICENSE README.md node_modules package.json`.split("\n")
   s.require_paths = ['lib']
 
-  s.add_dependency 'activesupport', '~> 6.0'
+  s.add_dependency 'activesupport', '~> 6.1'
   s.add_dependency 'bcrypt', '~> 3.1.16'
   s.add_dependency 'dbm'
   s.add_dependency 'iodine', '~> 0.7.44'
   s.add_dependency 'oj', '~> 3.13.9'
-  s.add_dependency 'opal', '>= 1.2.0'
+  s.add_dependency 'opal', '~> 1.3.0'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.2'
   s.add_dependency 'isomorfeus-preact', '~> 10.5.10'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
