@@ -15,7 +15,7 @@ task :specs => :create_test_app do
     system('bundle exec rspec')
   end
   Dir.chdir(pwd)
-  system('rm -rf test_app')
+  FileUtils.rm_rf('test_app')
 end
 
 task :start_test_app => :create_test_app do
