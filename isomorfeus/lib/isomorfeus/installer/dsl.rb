@@ -28,7 +28,6 @@ module Isomorfeus
           create_directory(File.join('app', isomorfeus_dir))
         end
         create_directory('data')
-        create_directory('data/files')
         create_directory('public')
         create_directory('spec')
         create_directory('config')
