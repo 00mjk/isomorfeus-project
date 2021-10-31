@@ -39,8 +39,6 @@ module LucidData
             end
           end
           alias documents nodes
-          alias vertices nodes
-          alias vertexes nodes
 
           def _validate_nodes(nodes_hash_or_array)
             if nodes_hash_or_array.class == ::Hash
@@ -80,7 +78,6 @@ module LucidData
               false
             end
           end
-          alias links edges
 
           def _validate_edges(edges_hash_or_array)
             if edges_hash_or_array.class == ::Hash
@@ -118,19 +115,17 @@ module LucidData
 
         def method_missing(method_name, *args, &block)
           method_name_s = method_name.to_s
-          if method_name_s.start_with?('find_edge_by_') || method_name_s.start_with?('find_link_by_')
+          if method_name_s.start_with?('find_edge_by_')
             attribute = method_name_s[13..-1] # remove 'find_by_'
             value = args[0]
             attribute_hash = { attribute => value }
             attribute_hash.merge!(args[1]) if args[1]
             find_edge(attribute_hash)
-          elsif method_name_s.start_with?('find_node_by_') || method_name_s.start_with?('find_document_by_') || method_name_s.start_with?('find_vertex_by_')
+          elsif method_name_s.start_with?('find_node_by_') || method_name_s.start_with?('find_document_by_')
             attribute = if method_name_s.start_with?('find_node_by_')
                           method_name_s[13..-1]
                         elsif method_name_s.start_with?('find_document_by_')
                           method_name_s[17..-1]
-                        elsif method_name_s.start_with?('find_vertex_by_')
-                          method_name_s[15..-1]
                         end
             value = args[0]
             attribute_hash = { attribute => value }
@@ -174,7 +169,6 @@ module LucidData
           node
         end
         alias document_from_sid node_from_sid
-        alias vertex_from_sid node_from_sid
 
         def nodes
           all_nodes = []
@@ -184,8 +178,6 @@ module LucidData
           all_nodes
         end
         alias documents nodes
-        alias vertices nodes
-        alias vertexes nodes
 
         def edges
           all_edges = []
@@ -194,7 +186,6 @@ module LucidData
           end
           all_edges
         end
-        alias links edges
 
         def changed!
           @_composition.changed! if @_composition
@@ -241,7 +232,7 @@ module LucidData
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, nodes: nil, documents: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -270,7 +261,7 @@ module LucidData
 
             # nodes
             @_node_collections = {}
-            nodes = nodes || documents || vertices || vertexes
+            nodes = nodes || documents
             if nodes && loaded
               _validate_nodes(nodes)
               if nodes.class == ::Hash
@@ -301,7 +292,7 @@ module LucidData
 
             # edges
             @_edge_collections = {}
-            edges = edges || links
+            edges = edges
             if edges && loaded
               _validate_edges(edges)
               if edges.class == ::Hash
@@ -373,14 +364,12 @@ module LucidData
             _init_edge_collections if @_edge_collections.empty?
             @_edge_collections
           end
-          alias link_collections edge_collections
 
           def node_collections
             _init_node_collections if @_node_collections.empty?
             @_node_collections
           end
           alias document_collections node_collections
-          alias vertex_collections node_collections
         else # RUBY_ENGINE
           Isomorfeus.add_valid_data_class(base) unless base == LucidData::Graph::Base
 
@@ -417,8 +406,7 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, nodes: nil, documents: nil, vertices: nil, vertexes: nil,
-                         composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, nodes: nil, documents: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -431,7 +419,7 @@ module LucidData
 
             # nodes
             @_node_collections = {}
-            nodes = nodes || documents || vertices || vertexes
+            nodes = nodes || documents
             if nodes.class == ::Hash
               _validate_nodes(nodes)
               self.class.node_collections.each_key do |access_name|
@@ -448,7 +436,7 @@ module LucidData
 
             # edges
             @_edge_collections = {}
-            edges = edges || links
+            edges = edges
             if edges.class == ::Hash
               _validate_edges(edges)
               self.class.edge_collections.each_key do |access_name|
@@ -471,13 +459,11 @@ module LucidData
           def edge_collections
             @_edge_collections
           end
-          alias link_collections edge_collections
 
           def node_collections
             @_node_collections
           end
           alias document_collections node_collections
-          alias vertex_collections node_collections
         end  # RUBY_ENGINE
       end
     end

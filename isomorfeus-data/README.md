@@ -5,7 +5,7 @@ Data access for Isomorfeus.
 *Use Ruby for Graphs! ... and more!*
 
 ### Community and Support
-At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ### Overview
 
@@ -16,7 +16,6 @@ Isomorfeus Data supports arrays, hashes, collections, graphs, nodes, edges and c
 
 All LucidData classes are database agnostic. Any ORM or data source supported by ruby can be used.
 Data must then be shaped (usually in to a Hash or Array) to fit the Isomorfeus Data classes.
- 
 
 ### Core Concepts and Common API
 
@@ -29,11 +28,11 @@ Data must then be shaped (usually in to a Hash or Array) to fit the Isomorfeus D
 All classes follow the common principles and the common API above.
 
 - [LucidData::Array](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_array.md) - A array, easily accessible on client and server
-- [LucidData::Collections](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_collection.md) - A collection of LucidData::Node or LucidData::Vertex or LucidData::Document objects
+- [LucidData::Collections](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_collection.md) - A collection of LucidData::Node or LucidData::Document objects
 - [LucidData::Composition](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_composition.md) - A composition of any of those other classes, even graphs, for easy, one request access to arbitrary data
-- [LucidData::Document, LucidData::Node, LucidData::Vertex](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_node.md) - A node/document/vertex, can be used stand alone, in a collection or in a graph
-- [LucidData::Edge, LucidData::Link](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_edge.md) - A edge/link, can be used standalone, in a collection or in a graph
-- [LucidData::EdgeCollection, LucidData::LinkCollection](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_edge_collection.md)  - A collection of LucidData::Edge or LucidData::Link objects
+- [LucidData::Document, LucidData::Node](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_node.md) - A node/document, can be used stand alone, in a collection or in a graph
+- [LucidData::Edge](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_edge.md) - A edge can be used standalone, in a collection or in a graph
+- [LucidData::EdgeCollection](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_edge_collection.md)  - A collection of LucidData::Edge objects
 - [LucidData::Graph](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_graph.md) - A graph, which can be build from several LucidData::Collection objects and LucidData::EdgeCollection objects
 - [LucidData::Hash](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_hash.md) - A hash, easily accessible on client and server
 

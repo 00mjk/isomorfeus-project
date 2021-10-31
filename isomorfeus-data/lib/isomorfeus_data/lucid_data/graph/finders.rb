@@ -9,7 +9,6 @@ module LucidData
         nil
       end
       alias find_document find_node
-      alias find_vertex find_node
 
       def find_nodes(attribute_hash = nil, &block)
         found_nodes = []
@@ -20,8 +19,6 @@ module LucidData
         found_nodes
       end
       alias find_documents find_nodes
-      alias find_vertexes find_nodes
-      alias find_vertices find_nodes
 
       def find_node_by_key(node_key)
         node_collections.each_value do |collection|
@@ -31,7 +28,6 @@ module LucidData
         nil
       end
       alias find_document_by_key find_node_by_key
-      alias find_vertex_by_key find_node_by_key
 
       def find_node_by_sid(node)
         node_collections.each_value do |collection|
@@ -41,7 +37,6 @@ module LucidData
         nil
       end
       alias find_document_by_sid find_node_by_sid
-      alias find_vertex_by_sid find_node_by_sid
 
       def find_edge(attribute_hash = nil, &block)
         edge_collections.each_value do |collection|
@@ -50,7 +45,6 @@ module LucidData
         end
         nil
       end
-      alias find_link find_edge
 
       def find_edges(attribute_hash = nil, &block)
         found_edges = []
@@ -60,7 +54,6 @@ module LucidData
         end
         found_edges
       end
-      alias find_links find_edges
 
       def find_edge_by_key(edge_key)
         edge_collections.each_value do |collection|
@@ -69,7 +62,6 @@ module LucidData
         end
         nil
       end
-      alias find_link_by_key find_edge_by_key
 
       def find_edge_by_sid(edge)
         edge_collections.each_value do |collection|
@@ -78,7 +70,6 @@ module LucidData
         end
         nil
       end
-      alias find_link_by_key find_edge_by_key
 
       def find_edge_by_from(node)
         edge_collections.each_value do |collection|
@@ -87,7 +78,6 @@ module LucidData
         end
         nil
       end
-      alias find_link_by_from find_edge_by_from
 
       def find_edge_by_to(node)
         edge_collections.each_value do |collection|
@@ -96,7 +86,6 @@ module LucidData
         end
         nil
       end
-      alias find_link_by_to find_edge_by_to
 
       def find_edge_by_target(node)
         edge_collections.each_value do |collection|
@@ -105,7 +94,6 @@ module LucidData
         end
         nil
       end
-      alias find_link_by_target find_edge_by_target
 
       def find_edges_by_from(node)
         found_edges = []
@@ -115,7 +103,6 @@ module LucidData
         end
         found_edges
       end
-      alias find_links_by_from find_edges_by_from
 
       def find_edges_by_to(node)
         found_edges = []
@@ -125,7 +112,6 @@ module LucidData
         end
         found_edges
       end
-      alias find_links_by_to find_edges_by_to
 
       def find_edges_by_target(node)
         found_edges = []
@@ -135,7 +121,6 @@ module LucidData
         end
         found_edges
       end
-      alias find_links_by_target find_edges_by_target
     end
   end
 end

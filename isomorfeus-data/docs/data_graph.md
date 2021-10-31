@@ -1,16 +1,14 @@
 ### LucidData::Graph
 
 allows for isomorphic access to graphs.
-Graph must be build with LucidData::Collection objects which contain the nodes/vertices/vertexes/documents and
-LucidData::EdgeCollection or LucidData::LinkCollection objects which contain the edges/links.
+Graph must be build with LucidData::Collection objects which contain the nodes/documents and LucidData::EdgeCollection objects which contain the edges.
 
 ### Creating a Graph
 
 #### Declaration of collection accessors
 A Graph can have attributes.
 Collection accessors can be declared, but dont have to be.
-In case they are not declared all nodes are available by calling the nodes method on the graph instance, 
-all edges can be accessed with the edges method.
+In case they are not declared all nodes are available by calling the nodes method on the graph instance, all edges can be accessed with the edges method.
 
 Declaring node and edge collection accessors:
 ```
@@ -35,7 +33,7 @@ c = MyGraph.new(key: '1234',
   edges: {
     contractors_important_tasks_edges: ContractorITEdges.new(key: '1'),
     contractors_other_tasks_edges: ContractorOTEdges.new(key: '1')
-  } 
+  }
 })
 ```
 
@@ -52,7 +50,7 @@ class MyGraph < LucidData::Graph::Base
       edges: {
         contractors_important_tasks_edges: ContractorITEdges.new(key: '1'),
         contractors_other_tasks_edges: ContractorOTEdges.new(key: '1')
-      } 
+      }
     )
   end
 end

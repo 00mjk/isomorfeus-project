@@ -12,7 +12,6 @@ module LucidData
           def edges(validate_hash)
             @edge_conditions = validate_hash
           end
-          alias links edges
 
           def edge_conditions
             @edge_conditions ||= {}
@@ -24,7 +23,6 @@ module LucidData
           rescue
             false
           end
-          alias valid_link? valid_edge?
 
           def _validate_edge(edge)
             Isomorfeus::Data::ElementValidator.new(self.to_s, edge, edge_conditions).validate!
@@ -110,7 +108,7 @@ module LucidData
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, graph: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -140,7 +138,7 @@ module LucidData
               @_changed_attributes = {}
             end
 
-            edges = edges || links
+            edges = edges
             if edges && loaded
               _validate_edges(edges)
               raw_edges = _collection_to_sids(edges)
@@ -171,7 +169,6 @@ module LucidData
               edge
             end
           end
-          alias links edges
 
           def edges_as_sids
             return @_changed_collection if @_changed_collection
@@ -194,7 +191,6 @@ module LucidData
             end
             @_node_to_edge_cache[node_sid] = node_edges
           end
-          alias edges_for_vertex edges_for_node
           alias edges_for_document edges_for_node
 
           def each(&block)
@@ -202,7 +198,7 @@ module LucidData
           end
 
           def method_missing(method_name, *args, &block)
-            if method_name.JS.startsWith('find_edge_by_') || method_name.JS.startsWith('find_link_by_')
+            if method_name.JS.startsWith('find_edge_by_')
               attribute = method_name[13..-1] # remove 'find_edge_by_'
               value = args[0]
               attribute_hash = { attribute => value }
@@ -460,7 +456,7 @@ module LucidData
           end
           alias prepend unshift
         else # RUBY_ENGINE
-          Isomorfeus.add_valid_data_class(base) unless base == LucidData::EdgeCollection::Base || base == LucidData::LinkCollection::Base
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::EdgeCollection::Base
 
           base.instance_exec do
             def instance_from_transport(instance_data, included_items_data)
@@ -485,7 +481,7 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil, edges: nil, links: nil, graph: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, edges: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -501,7 +497,7 @@ module LucidData
             _validate_attributes(attributes) if attributes
             @_raw_attributes = attributes
 
-            edges = edges || links
+            edges = edges
             edges = [] unless edges
             _validate_edges(edges) if @_validate_edges
             edges.each { |e| e.collection = self }
@@ -515,7 +511,6 @@ module LucidData
           def edges
             @_raw_collection
           end
-          alias links edges
 
           def edges_as_sids
             @_raw_collection.map(&:to_sid)
@@ -529,7 +524,6 @@ module LucidData
             end
             @_node_to_edge_cache[node_sid] = node_edges
           end
-          alias edges_for_vertex edges_for_node
           alias edges_for_document edges_for_node
 
           def each(&block)

@@ -38,7 +38,7 @@ module LucidData
             def execute_query(_); end
           end
         else
-          unless base == LucidData::Node::Base || base == LucidData::Document::Base || base == LucidData::Vertex::Base
+          unless base == LucidData::Node::Base || base == LucidData::Document::Base
             Isomorfeus.add_valid_data_class(base)
           end
 

@@ -1,9 +1,6 @@
-### LucidData::EdgeCollection, LucidData::LinkCollection
+### LucidData::EdgeCollection
 
-allows for isomorphic access to a collection of LucidData::Edge, LucidData::Link objects.
-
-EdgeCollection and LinkCollection are the same, use whichever term you prefer.
-
+allows for isomorphic access to a collection of LucidData::Edge objects.
 Different edge classes are allowed in a collection.
 
 ### Creating a EdgeCollection
@@ -20,8 +17,6 @@ a = MyEdge.new(key: '1') # also add to and from
 b = MyEdge.new(key: '2') # also add to and from
 
 c = MyEdgeCollection.new(key: '1234', edges: [a, b])
-# or use links:
-c = MyEdgeCollection.new(key: '1234', links: [a, b])
 
 c[0].key # -> '1' - access key of first node
 ```
@@ -32,7 +27,7 @@ class MyEdgeCollection < LucidData::EdgeCollection::Base
   execute_load do |key:|
     a = MyEdge.new(key: '1') # also add to and from
     b = MyEdge.new(key: '2') # also add to and from
-    new(key: key, edges: [a, b]) # also here :links can be used.
+    new(key: key, edges: [a, b])
   end
 end
 

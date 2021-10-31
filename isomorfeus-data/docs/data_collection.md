@@ -1,8 +1,8 @@
 ### LucidData::Collection
 
-allows for isomorphic access to a collection of LucidData::Node, LucidData::Document, LucidData::Vertex objects.
+allows for isomorphic access to a collection of LucidData::Node, LucidData::Document objects.
 
-Node, Document and Vertex are the same, use whichever term you prefer.
+Node, Document are the same, use whichever term you prefer.
 
 Different node classes are allowed in a collection.
 
@@ -20,10 +20,8 @@ a = MyNode.new(key: '1')
 b = MyNode.new(key: '2')
 
 c = MyCollection.new(key: '1234', nodes: [a, b])
-# here also the other terms work:
+# or:
 c = MyCollection.new(key: '1234', documents: [a, b])
-c = MyCollection.new(key: '1234', vertices: [a, b])
-c = MyCollection.new(key: '1234', vertexes: [a, b])
 
 c[0].key # -> '1' - access key of first node
 ```
@@ -34,7 +32,7 @@ class MyCollection < LucidData::Collection::Base
   execute_load do |key:|
     a = MyNode.new(key: '1')
     b = MyNode.new(key: '2')
-    new(key: key, nodes: [a, b]) # also here the other terms work instead of nodes: documents, vertices, vertexes
+    new(key: key, nodes: [a, b]) # or use: documents
   end
 end
 

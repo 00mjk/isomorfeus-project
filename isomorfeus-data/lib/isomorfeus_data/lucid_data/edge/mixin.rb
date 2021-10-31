@@ -163,7 +163,7 @@ module LucidData
             node
           end
         else # RUBY_ENGINE
-          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Edge::Base || base == LucidData::Link::Base
+          Isomorfeus.add_valid_data_class(base) unless base == LucidData::Edge::Base
 
           base.instance_exec do
             def instance_from_transport(instance_data, included_items_data)

@@ -1,8 +1,8 @@
-### LucidData::Node, LucidData::Document, LucidData::Vertex
+### LucidData::Node, LucidData::Document
 
 allows for isomorphic access to Nodes, Documents, Vertices.
 Accessing nodes from the edges only works within a LucidData::Graph and only if the corresponding edges and nodes are included in the Graph.
-LucidData::Node, LucidData::Document and LucidData::Vertex are the same. Use whichever you prefer.
+LucidData::Node, LucidData::Document are the same. Use whichever you prefer.
 
 ### Creating a Node
 

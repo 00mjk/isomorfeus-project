@@ -13,9 +13,6 @@ module LucidData
             @node_conditions = validate_hash
           end
           alias document nodes
-          alias vertices nodes
-          alias vertexes nodes
-          alias vertex nodes
           alias documents nodes
           alias node nodes
 
@@ -29,7 +26,6 @@ module LucidData
           rescue
             false
           end
-          alias valid_vertex? valid_node?
           alias valid_document? valid_node?
 
           def _validate_node(node)
@@ -105,7 +101,7 @@ module LucidData
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, attributes: nil, documents: nil, vertices: nil, vertexes: nil, nodes: nil, graph: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, documents: nil, nodes: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -135,7 +131,7 @@ module LucidData
               @_changed_attributes = {}
             end
 
-            nodes = documents || nodes || vertices || vertexes
+            nodes = documents || nodes
             if nodes && loaded
               _validate_nodes(nodes)
               raw_nodes = _collection_to_sids(nodes)
@@ -166,8 +162,6 @@ module LucidData
               node
             end
           end
-          alias vertices nodes
-          alias vertexes nodes
           alias documents nodes
 
           def nodes_as_sids
@@ -476,7 +470,7 @@ module LucidData
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil, documents: nil, vertexes: nil, vertices: nil, nodes: nil, graph: nil, composition: nil)
+          def initialize(key:, revision: nil, attributes: nil, documents: nil, nodes: nil, graph: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -491,7 +485,7 @@ module LucidData
             _validate_attributes(attributes) if attributes
             @_raw_attributes = attributes
 
-            nodes = documents || nodes || vertices || vertexes
+            nodes = documents || nodes
             nodes = [] unless nodes
             _validate_nodes(nodes) if @_validate_nodes
             nodes.each { |n| n.collection = self }
@@ -506,8 +500,6 @@ module LucidData
           def nodes
             @_raw_collection
           end
-          alias vertices nodes
-          alias vertexes nodes
           alias documents nodes
 
           def nodes_as_sids

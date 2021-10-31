@@ -1,8 +1,7 @@
-### LucidData::Edge, LucidData::Link
+### LucidData::Edge
 
 allows for isomorphic access to Edges. Edges are most useful within a LucidData::Graph but may also be used standalone to work with their attributes.
 Accessing the nodes of the edges from and to only works within a LucidData::Graph and only if the corresponding nodes are included in the Graph.
-LucidData::Edge and LucidData::Link are the same. Use whichever you prefer.
 
 ### Creating a Edge
 
