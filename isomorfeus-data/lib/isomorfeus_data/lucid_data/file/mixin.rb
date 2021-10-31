@@ -4,7 +4,7 @@ module LucidData
       def self.included(base)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
-        
+
         def changed!
           @_composition.changed! if @_composition
           @_changed = true
@@ -97,7 +97,7 @@ module LucidData
           base.instance_exec do
             def files_path
             end
-  
+
             def files_path=(_)
             end
           end
@@ -124,12 +124,12 @@ module LucidData
               self._content_type(content_type) if content_type
             end
           end
-    
+
           def _load_from_store!
             @_changed = false
             @_reload = true
           end
-         
+
           def _reload
             return unless @_reload
             @_reload = false
@@ -154,7 +154,7 @@ module LucidData
             def files_path
               @files_path ||= Isomorfeus.files_path
             end
-  
+
             def files_path=(f)
               @files_path = f
             end
@@ -169,6 +169,7 @@ module LucidData
                 FileUtils.mkdir_p(path) unless Dir.exist?(dir_path)
                 ::File.join(dir_path, file)
               else
+                FileUtils.mkdir_p(files_path) unless Dir.exist?(files_path)
                 ::File.join(files_path, file)
               end
             end
@@ -190,7 +191,7 @@ module LucidData
             end
             @_changed = false
           end
-  
+
           def _reload
           end
 
@@ -198,7 +199,7 @@ module LucidData
             @_data_uri = @_changed_data_uri if @_changed
             @_changed = false
           end
-          
+
           base.execute_create do
             self.save
           end
