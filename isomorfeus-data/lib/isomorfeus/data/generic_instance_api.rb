@@ -12,12 +12,12 @@ module Isomorfeus
       def changed?
         @_changed
       end
-      
+
       def revision
         @_revision
       end
 
-      def to_sid
+      def sid
         [@class_name, @key]
       end
 
