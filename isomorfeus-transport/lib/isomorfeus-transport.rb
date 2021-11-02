@@ -18,6 +18,7 @@ else
   require 'base64'
   require 'digest'
   require 'bcrypt'
+  require 'securerandom'
   require 'ostruct'
   require 'socket'
   require 'sorted_set'
@@ -52,7 +53,7 @@ else
   require 'lucid_channel/base'
 
   require 'isomorfeus/transport/handler/authentication_handler'
-  
+
   require 'iso_opal'
   Opal.append_path(__dir__.untaint) unless IsoOpal.paths_include?(__dir__.untaint)
 
@@ -65,7 +66,7 @@ else
 
   require 'isomorfeus-speednode'
   Isomorfeus.node_paths << File.expand_path(File.join(File.dirname(__FILE__), '..', 'node_modules'))
-  
+
   require 'isomorfeus/transport/imports'
   Isomorfeus::Transport::Imports.add
 end
