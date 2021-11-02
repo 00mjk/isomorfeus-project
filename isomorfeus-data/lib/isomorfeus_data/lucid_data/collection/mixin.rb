@@ -45,15 +45,15 @@ module LucidData
           self.class._validate_nodes(many_nodes)
         end
 
-        def _collection_to_sids(collection)
+        def _collection_sids(collection)
           collection.map do |node|
-            node.respond_to?(:to_sid) ? node.to_sid : node
+            node.respond_to?(:sid) ? node.sid : node
           end
         end
 
         def _node_sid_from_arg(arg)
-          if arg.respond_to?(:to_sid)
-            sid = arg.to_sid
+          if arg.respond_to?(:sid)
+            sid = arg.sid
             node = arg
           else
             sid = arg
@@ -134,7 +134,7 @@ module LucidData
             nodes = documents || nodes
             if nodes && loaded
               _validate_nodes(nodes)
-              raw_nodes = _collection_to_sids(nodes)
+              raw_nodes = _collection_sids(nodes)
               raw_collection = Redux.fetch_by_path(*@_nodes_path)
               if raw_collection != raw_nodes
                 @_changed_collection = raw_nodes
@@ -233,7 +233,7 @@ module LucidData
           def collect!(&block)
             collection = nodes
             collection.collect!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -282,7 +282,7 @@ module LucidData
           def delete_if(&block)
             collection = nodes
             collection.delete_if(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -291,7 +291,7 @@ module LucidData
             collection = nodes
             result = collection.filter!(&block)
             return nil if result.nil?
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -312,7 +312,7 @@ module LucidData
           def keep_if(&block)
             collection = nodes
             collection.keep_if(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -320,7 +320,7 @@ module LucidData
           def map!(&block)
             collection = nodes
             collection.map!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -351,7 +351,7 @@ module LucidData
             collection = nodes
             result = collection.reject!(&block)
             return nil if result.nil?
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -376,7 +376,7 @@ module LucidData
             collection = nodes
             result = collection.select!(&block)
             return nil if result.nil?
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -410,7 +410,7 @@ module LucidData
           def sort!(&block)
             collection = nodes
             collection.sort!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -418,7 +418,7 @@ module LucidData
           def sort_by!(&block)
             collection = nodes
             collection.sort_by!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -426,7 +426,7 @@ module LucidData
           def uniq!(&block)
             collection = nodes
             collection.uniq!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -503,13 +503,13 @@ module LucidData
           alias documents nodes
 
           def nodes_as_sids
-            @_raw_collection.map(&:to_sid)
+            @_raw_collection.map(&:sid)
           end
 
           def node_from_sid(sid)
             return @_sid_to_node_cache[sid] if @_sid_to_node_cache.key?(sid)
             node = nil
-            idx = @_raw_collection.find_index { |node| node.to_sid == sid }
+            idx = @_raw_collection.find_index { |node| node.sid == sid }
             node = @_raw_collection[idx] if idx
             @_sid_to_node_cache[sid] = node
           end
