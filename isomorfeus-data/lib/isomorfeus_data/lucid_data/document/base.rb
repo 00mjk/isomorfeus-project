@@ -2,7 +2,7 @@ module LucidData
   module Document
     class Base
       def self.inherited(base)
-        base.include LucidData::Node::Mixin
+        base.include(LucidData::Document::Mixin)
         if RUBY_ENGINE != 'opal'
           Isomorfeus.add_valid_data_class(base)
         end

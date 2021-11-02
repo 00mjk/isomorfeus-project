@@ -1,4 +1,4 @@
-class SimpleNode < LucidData::Node::Base
+class CustomNode < LucidData::Node::Base
   attribute :one
 
   execute_create do

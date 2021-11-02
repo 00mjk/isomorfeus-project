@@ -2,9 +2,17 @@ module LucidData
   module Document
     module Mixin
       def self.included(base)
-        base.include(Isomorfeus::Data::AttributeSupport)
+        base.include(Isomorfeus::Data::FieldSupport)
         base.extend(Isomorfeus::Data::GenericClassApi)
         base.include(Isomorfeus::Data::GenericInstanceApi)
+
+        def [](name)
+          send(name)
+        end
+
+        def []=(name, val)
+          send(name + '=', val)
+        end
 
         def changed!
           @_collection.changed! if @_collection
@@ -41,7 +49,7 @@ module LucidData
         end
 
         def to_transport
-          hash = { 'attributes' => _get_selected_attributes }
+          hash = { 'fields' => _get_selected_fields }
           hash['revision'] = revision if revision
           result = { @class_name => { @key => hash }}
           result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
@@ -49,7 +57,7 @@ module LucidData
         end
 
         if RUBY_ENGINE == 'opal'
-          def initialize(key:, revision: nil, attributes: nil, collection: nil, composition: nil)
+          def initialize(key:, revision: nil, fields: nil, collection: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -59,51 +67,40 @@ module LucidData
             @_composition = composition
             @_changed = false
             loaded = loaded?
-            if attributes
-              _validate_attributes(attributes)
+            if fields
               if loaded
-                raw_attributes = Redux.fetch_by_path(*@_store_path)
-                if `raw_attributes === null`
-                  @_changed_attributes = !attributes ? {} : attributes
-                elsif raw_attributes && !attributes.nil? && ::Hash.new(raw_attributes) != attributes
-                  @_changed_attributes = attributes
+                raw_fields = Redux.fetch_by_path(*@_store_path)
+                if `raw_fields === null`
+                  @_changed_fields = !fields ? {} : fields
+                elsif raw_fields && !fields.nil? && ::Hash.new(raw_fields) != fields
+                  @_changed_fields = fields
                 end
               else
-                @_changed_attributes = attributes
+                @_changed_fields = fields
               end
             else
-              @_changed_attributes = {}
+              @_changed_fields = {}
             end
           end
 
           def _load_from_store!
-            @_changed_attributes = {}
+            @_changed_fields = {}
             @_changed = false
           end
 
           def _update_paths
-            @_store_path = [:data_state, @class_name, @key, :attributes]
+            @_store_path = [:data_state, @class_name, @key, :fields]
           end
 
           def each(&block)
-            attributes.each(&block)
-          end
-
-          def [](name)
-            _get_attribute(name)
-          end
-
-          def []=(name, val)
-            _validate_attribute(name, val)
-            changed!
-            @_changed_attributes[name] = val
+            fields.each(&block)
           end
 
           def method_missing(method_name, *args, &block)
             if graph
               singular_name = `method_name.endsWith('s')` ? method_name.singularize : method_name
               node_edges = edges
-              sid = to_sid
+              sid = sid
               camelized_singular = singular_name.camelize
 
               if method_name == singular_name
@@ -145,35 +142,51 @@ module LucidData
             def instance_from_transport(instance_data, _included_items_data)
               key = instance_data[self.name].keys.first
               revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
-              attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
-              new(key: key, revision: revision, attributes: attributes)
+              fields = instance_data[self.name][key].key?('fields') ? instance_data[self.name][key]['fields'].transform_keys!(&:to_sym) : nil
+              new(key: key, revision: revision, fields: fields)
+            end
+
+            def setup_index(&block)
+              @_setup_index_block = block
+            end
+
+            def ferret_accelerator
+              return @ferret_accelerator if @ferret_accelerator
+              @ferret_accelerator = if @_setup_index_block
+                                      Isomorfeus::Data::FerretAccelerator.new(self, @_setup_index_block)
+                                    else
+                                      Isomorfeus::Data::FerretAccelerator.new(self)
+                                    end
             end
 
             execute_create do
-              # create index for class unless index exists
-              # open index unless index opened
-              # insert document into index
+              self.key = SecureRandom.uuid
+              doc = self.fields
+              doc[:id] = self.key
+              self.class.ferret_accelerator.create_doc(doc)
               self
             end
 
             execute_destroy do |key:|
-              # open index unless index opened
-              # delete document from index
+              self.ferret_accelerator.destroy_doc(key)
             end
 
             execute_load do |key:|
-              # open index unless index opened
-              # load document from index
+              doc = self.ferret_accelerator.load_doc(key)
+              doc.delete(:id)
+              self.new(key: key, fields: doc)
             end
 
             execute_save do
-              # open index unless index opened
-              # update document
+              self.key = SecureRandom.uuid unless self.key
+              doc = self.fields
+              doc[:id] = self.key
+              self.class.ferret_accelerator.save_doc(self.key, doc)
               self
             end
           end
 
-          def initialize(key:, revision: nil, attributes: nil, collection: nil, composition: nil)
+          def initialize(key:, revision: nil, fields: nil, collection: nil, composition: nil)
             @key = key.to_s
             @class_name = self.class.name
             @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -181,9 +194,8 @@ module LucidData
             @_collection = collection
             @_composition = composition
             @_changed = false
-            attributes = {} unless attributes
-            _validate_attributes(attributes) if attributes
-            @_raw_attributes = attributes
+            fields = {} unless fields
+            @_raw_fields = fields
           end
 
           def _unchange!
@@ -191,17 +203,7 @@ module LucidData
           end
 
           def each(&block)
-            @_raw_attributes.each(&block)
-          end
-
-          def [](name)
-            @_raw_attributes[name]
-          end
-
-          def []=(name, val)
-            _validate_attribute(name, val)
-            changed!
-            @_raw_attributes[name] = val
+            @_raw_fields.each(&block)
           end
 
           def method_missing(method_name, *args, &block)

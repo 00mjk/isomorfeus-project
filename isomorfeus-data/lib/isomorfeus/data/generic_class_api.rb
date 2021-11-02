@@ -104,11 +104,11 @@ module Isomorfeus
         end
       end  # RUBY_ENGINE
 
-      def create(key:, **things)
+      def create(key: nil, **things)
         new(key: key, **things).create
       end
 
-      def promise_create(key:, **things)
+      def promise_create(key: nil, **things)
         new(key: key, **things).promise_create
       end
 

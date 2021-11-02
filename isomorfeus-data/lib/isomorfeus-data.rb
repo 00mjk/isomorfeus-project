@@ -4,6 +4,7 @@ require 'data_uri'
 require 'isomorfeus-transport'
 require 'isomorfeus/data/config'
 require 'isomorfeus/data/attribute_support'
+require 'isomorfeus/data/field_support'
 require 'isomorfeus/data/generic_class_api'
 require 'isomorfeus/data/generic_instance_api'
 require 'isomorfeus/data/element_validator'
@@ -15,12 +16,14 @@ if RUBY_ENGINE == 'opal'
   require_tree 'isomorfeus_data', autoload: true
   Isomorfeus.zeitwerk.push_dir('data')
 else
+  require 'securerandom'
   require 'fileutils'
   require 'uri'
   require 'oj'
   require 'active_support'
   require 'active_support/core_ext/hash'
   require 'isomorfeus-ferret'
+  require 'isomorfeus/data/ferret_accelerator'
 
   require 'isomorfeus_data/lucid_data/query_result'
   require 'isomorfeus_data/lucid_data/array/mixin'

@@ -109,10 +109,6 @@ module Isomorfeus
             hash
           end
 
-          def native_attributes
-            Redux.fetch_by_path(*@_store_path)
-          end
-
           def _get_selected_attributes
             sel_attributes = attributes.dup
             if @_selected_attributes && !@_selected_attributes.empty?
@@ -145,10 +141,6 @@ module Isomorfeus
           end
 
           def attributes
-            @_raw_attributes
-          end
-
-          def native_attributes
             @_raw_attributes
           end
 

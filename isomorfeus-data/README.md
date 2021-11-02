@@ -30,7 +30,8 @@ All classes follow the common principles and the common API above.
 - [LucidData::Array](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_array.md) - A array, easily accessible on client and server
 - [LucidData::Collections](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_collection.md) - A collection of LucidData::Node or LucidData::Document objects
 - [LucidData::Composition](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_composition.md) - A composition of any of those other classes, even graphs, for easy, one request access to arbitrary data
-- [LucidData::Document, LucidData::Node](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_node.md) - A node/document, can be used stand alone, in a collection or in a graph
+- [LucidData::Document](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_document.md) - A document for textual data can be used stand alone, in a collection or in a graph
+- [LucidData::Node](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_node.md) - A node, can be used stand alone, in a collection or in a graph
 - [LucidData::Edge](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_edge.md) - A edge can be used standalone, in a collection or in a graph
 - [LucidData::EdgeCollection](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_edge_collection.md)  - A collection of LucidData::Edge objects
 - [LucidData::Graph](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_graph.md) - A graph, which can be build from several LucidData::Collection objects and LucidData::EdgeCollection objects
