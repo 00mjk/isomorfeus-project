@@ -15,7 +15,7 @@ class MyEdge < LucidData::Edge::Base
 end
 
 a = MyEdge.new(key: '1234', attributes: { color: 'FF0000' }, from: my_node, to: my_other_node)
-a = MyEdge.new(key: '1234', attributes: { color: 'FF0000' }, from: my_node.to_sid, to: my_other_node.to_sid)
+a = MyEdge.new(key: '1234', attributes: { color: 'FF0000' }, from: my_node.sid, to: my_other_node.sid)
 ```
 
 #### Loading

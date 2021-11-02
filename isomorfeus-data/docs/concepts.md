@@ -27,7 +27,7 @@ To identify a data object uniquely each Isomorfeus LucidData Object requires a k
 class MyNode < LucidData::Node::Base
 end
 
-MyNode.new(key: '123456')  # <- key is required 
+MyNode.new(key: '123456')  # <- key is required
 ```
 
 #### Keys are Strings
@@ -69,7 +69,7 @@ Instances a and b provide access to the same data (as long as data is not change
 ```
 a.a_attribute == b.a_attribute # -> true
 a.object_id == b.object_id # -> false
-``` 
+```
 
 ### SID - System wide IDentifier
 To identify a data object uniquely throughout the distributed isomorphic system the SID is used.
@@ -77,13 +77,13 @@ A SID identifies a instances of the LucidData classes in the system.
 A SID is for example used by the system within serialized data and on the client to identify data for instances or instantiate new instances.
 A SID is just a small array consisting of class name and key:
 
-Example: 
+Example:
 ```
 class MyNode < LucidData::Node::Base
 end
 
 n = MyNode.new(key: '231')
-n.to_sid # -> ['MyNode', '231']
+n.sid # -> ['MyNode', '231']
 ```
 
 
