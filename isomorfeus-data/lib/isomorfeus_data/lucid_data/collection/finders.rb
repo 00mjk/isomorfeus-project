@@ -63,7 +63,7 @@ module LucidData
 
       if RUBY_ENGINE == 'opal'
         def find_by_sid(node)
-          node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+          node_sid = node.respond_to?(:sid) ? node.sid : node
           nodes_as_sids.each do |sid|
             return Isomorfeus.instance_from_sid(node_sid) if sid == node_sid
           end
@@ -71,9 +71,9 @@ module LucidData
         end
       else
         def find_by_sid(node)
-          node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+          node_sid = node.respond_to?(:sid) ? node.sid : node
           nodes.each do |node|
-            return node if node.to_sid == node_sid
+            return node if node.sid == node_sid
           end
           nil
         end

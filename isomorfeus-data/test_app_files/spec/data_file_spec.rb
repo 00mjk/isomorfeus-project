@@ -4,7 +4,7 @@ RSpec.describe 'LucidData::File' do
   after do
     SimpleFile.destroy(key: '123')
   end
-  
+
   context 'on the server' do
     it 'can instantiate a file by inheritance' do
       result = on_server do
@@ -70,7 +70,7 @@ RSpec.describe 'LucidData::File' do
         class TestFileMixinC < LucidData::File::Base
         end
         file = TestFileMixinC.new(key: 11)
-        file.to_sid
+        file.sid
       end
       expect(result).to eq(['TestFileMixinC', '11'])
     end
@@ -135,7 +135,7 @@ RSpec.describe 'LucidData::File' do
         class TestFileMixinC < LucidData::File::Base
         end
         file = TestFileMixinC.new(key: 24)
-        file.to_sid
+        file.sid
       end
       expect(result).to eq(['TestFileMixinC', '24'])
     end

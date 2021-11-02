@@ -103,17 +103,17 @@ module LucidData
             if graph
               singular_name = `method_name.endsWith('s')` ? method_name.singularize : method_name
               node_edges = edges
-              sid = to_sid
+              sid = sid
               camelized_singular = singular_name.camelize
 
               if method_name == singular_name
                 # return one node
                 node_edges.each do |edge|
                   from_sid = edge.from_as_sid
-                  to_sid = edge.to_as_sid
-                  node = if from_sid[0] == camelized_singular && to_sid == sid
+                  sid = edge.to_as_sid
+                  node = if from_sid[0] == camelized_singular && sid == sid
                            edge.from
-                         elsif to_sid[0] == camelized_singular && from_sid == sid
+                         elsif sid[0] == camelized_singular && from_sid == sid
                            edge.to
                          end
                   return node if node
@@ -124,10 +124,10 @@ module LucidData
                 nodes = []
                 node_edges.each do |edge|
                   from_sid = edge.from_as_sid
-                  to_sid = edge.to_as_sid
-                  node = if from_sid[0] == camelized_singular && to_sid == sid
+                  sid = edge.to_as_sid
+                  node = if from_sid[0] == camelized_singular && sid == sid
                            edge.from
-                         elsif to_sid[0] == camelized_singular && from_sid == sid
+                         elsif sid[0] == camelized_singular && from_sid == sid
                            edge.to
                          end
                   nodes << node if node
@@ -186,17 +186,17 @@ module LucidData
               method_name_s = method_name.to_s
               singular_name = method_name_s.singularize
               node_edges = edges
-              sid = to_sid
+              sid = sid
               camelized_singular = singular_name.camelize
 
               if method_name_s == singular_name
                 # return one node
                 node_edges.each do |edge|
                   from_sid = edge.from_as_sid
-                  to_sid = edge.to_as_sid
-                  node = if from_sid[0] == camelized_singular && to_sid == sid
+                  sid = edge.to_as_sid
+                  node = if from_sid[0] == camelized_singular && sid == sid
                            edge.from
-                         elsif to_sid[0] == camelized_singular && from_sid == sid
+                         elsif sid[0] == camelized_singular && from_sid == sid
                            edge.to
                          end
                   return node if node
@@ -207,10 +207,10 @@ module LucidData
                 nodes = []
                 node_edges.each do |edge|
                   from_sid = edge.from_as_sid
-                  to_sid = edge.to_as_sid
-                  node = if from_sid[0] == camelized_singular && to_sid == sid
+                  sid = edge.to_as_sid
+                  node = if from_sid[0] == camelized_singular && sid == sid
                            edge.from
-                         elsif to_sid[0] == camelized_singular && from_sid == sid
+                         elsif sid[0] == camelized_singular && from_sid == sid
                            edge.to
                          end
                   nodes << node if node

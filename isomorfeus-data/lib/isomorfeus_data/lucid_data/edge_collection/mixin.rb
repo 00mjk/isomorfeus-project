@@ -41,15 +41,15 @@ module LucidData
           self.class._validate_edges(many_edges)
         end
 
-        def _collection_to_sids(collection)
+        def _collection_sids(collection)
           collection.map do |edge|
-            edge.respond_to?(:to_sid) ? edge.to_sid : edge
+            edge.respond_to?(:sid) ? edge.sid : edge
           end
         end
 
         def _edge_sid_from_arg(arg)
-          if arg.respond_to?(:to_sid)
-            sid = arg.to_sid
+          if arg.respond_to?(:sid)
+            sid = arg.sid
             edge = arg
           else
             sid = arg
@@ -82,11 +82,11 @@ module LucidData
         end
 
         def update_node_to_edge_cache(edge, old_node, new_node)
-          old_node_sid = old_node.to_sid
-          new_node_sid = new_node.to_sid
-          edge_sid = edge.to_sid
+          old_node_sid = old_node.sid
+          new_node_sid = new_node.sid
+          edge_sid = edge.sid
           if @_node_to_edge_cache.key?(old_node_sid)
-            @_node_to_edge_cache[old_node_sid].delete_if { |node_edge| node_edge.to_sid == edge_sid }
+            @_node_to_edge_cache[old_node_sid].delete_if { |node_edge| node_edge.sid == edge_sid }
           end
           @_node_to_edge_cache[new_node_sid].push(edge) if @_node_to_edge_cache.key?(new_node_sid)
         end
@@ -141,7 +141,7 @@ module LucidData
             edges = edges
             if edges && loaded
               _validate_edges(edges)
-              raw_edges = _collection_to_sids(edges)
+              raw_edges = _collection_sids(edges)
               raw_collection = Redux.fetch_by_path(*@_edges_path)
               if raw_collection != raw_edges
                 @_changed_collection = raw_edges
@@ -178,7 +178,7 @@ module LucidData
           end
 
           def edges_for_node(node)
-            node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+            node_sid = node.respond_to?(:sid) ? node.sid : node
             return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
             node_edge_sids = edges_as_sids.select do |edge_sid|
               edge_data = Redux.fetch_by_path(:data_state, edge_sid[0], edge_sid[1])
@@ -245,7 +245,7 @@ module LucidData
           def collect!(&block)
             collection = edges
             collection.collect!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -294,7 +294,7 @@ module LucidData
           def delete_if(&block)
             collection = edges
             collection.delete_if(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -303,7 +303,7 @@ module LucidData
             collection = edges
             result = collection.filter!(&block)
             return nil if result.nil?
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -324,7 +324,7 @@ module LucidData
           def keep_if(&block)
             collection = edges
             collection.keep_if(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -332,7 +332,7 @@ module LucidData
           def map!(&block)
             collection = edges
             collection.map!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -363,7 +363,7 @@ module LucidData
             collection = edges
             result = collection.reject!(&block)
             return nil if result.nil?
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -388,7 +388,7 @@ module LucidData
             collection = edges
             result = collection.select!(&block)
             return nil if result.nil?
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -422,14 +422,14 @@ module LucidData
           def sort!(&block)
             collection = edges
             collection.sort!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             self
           end
 
           def sort_by!(&block)
             collection = edges
             collection.sort_by!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -437,7 +437,7 @@ module LucidData
           def uniq!(&block)
             collection = edges
             collection.uniq!(&block)
-            @_changed_collection = _collection_to_sids(collection)
+            @_changed_collection = _collection_sids(collection)
             changed!
             self
           end
@@ -513,11 +513,11 @@ module LucidData
           end
 
           def edges_as_sids
-            @_raw_collection.map(&:to_sid)
+            @_raw_collection.map(&:sid)
           end
 
           def edges_for_node(node)
-            node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+            node_sid = node.respond_to?(:sid) ? node.sid : node
             return @_node_to_edge_cache[node_sid] if @_node_to_edge_cache.key?(node_sid)
             node_edges = select do |edge|
               (edge.from_as_sid == node_sid || edge.to_as_sid == node_sid) ? true : false

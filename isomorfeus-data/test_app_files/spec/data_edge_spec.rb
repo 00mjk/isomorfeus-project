@@ -145,7 +145,7 @@ RSpec.describe 'LucidData::Edge' do
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 11, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2))
-        document.to_sid
+        document.sid
       end
       expect(result).to eq(['TestEdgeMixinC', '11'])
     end
@@ -355,7 +355,7 @@ RSpec.describe 'LucidData::Edge' do
           attribute :test_attribute
         end
         document = TestEdgeMixinC.new(key: 24, from: TestDocumentBase.new(key: 1), to: TestDocumentBase.new(key: 2))
-        document.to_sid
+        document.sid
       end
       expect(result).to eq(['TestEdgeMixinC', '24'])
     end

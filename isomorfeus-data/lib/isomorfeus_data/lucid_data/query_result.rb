@@ -2,7 +2,7 @@ module LucidData
   class QueryResult
     attr_reader :key
 
-    def to_sid
+    def sid
       [@class_name, @key]
     end
 
@@ -75,7 +75,7 @@ module LucidData
       def to_transport
         sids_hash = {}
         @result_set.each do |key, value|
-          sids_hash[key.to_s] = value.to_sid
+          sids_hash[key.to_s] = value.sid
         end
         { @class_name => { @key => sids_hash }}
       end

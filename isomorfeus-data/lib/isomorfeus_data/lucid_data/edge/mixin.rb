@@ -83,7 +83,7 @@ module LucidData
             else
               @_changed_attributes = {}
             end
-            from = from.to_sid if from.respond_to?(:to_sid)
+            from = from.sid if from.respond_to?(:sid)
             if loaded && from
               @_changed_from = nil
               store_from = Redux.fetch_by_path(*@_from_path)
@@ -91,7 +91,7 @@ module LucidData
             else
               @_changed_from = from
             end
-            to = to.to_sid if to.respond_to?(:to_sid)
+            to = to.sid if to.respond_to?(:sid)
             if loaded && to
               @_changes_to = nil
               store_to = Redux.fetch_by_path(*@_to_path)
@@ -135,8 +135,8 @@ module LucidData
           def from=(node)
             changed!
             old_from = from
-            if node.respond_to?(:to_sid)
-              @_changed_from = node.to_sid
+            if node.respond_to?(:sid)
+              @_changed_from = node.sid
             else
               @_changed_from = node
               node = Isomorfeus.instance_from_sid(node)
@@ -152,8 +152,8 @@ module LucidData
           def to=(node)
             changed!
             old_to = to
-            if node.respond_to?(:to_sid)
-              @_changed_to = node.to_sid
+            if node.respond_to?(:sid)
+              @_changed_to = node.sid
               node
             else
               @_changed_to = node
@@ -204,14 +204,14 @@ module LucidData
             @_raw_attributes = attributes
             @_changed_from = nil
             @_changed_to = nil
-            @_raw_from = if from.respond_to?(:to_sid)
-                           from.to_sid
+            @_raw_from = if from.respond_to?(:sid)
+                           from.sid
                          else
                            from[1] = from[1].to_s
                            from
                          end
-            @_raw_to = if to.respond_to?(:to_sid)
-                         to.to_sid
+            @_raw_to = if to.respond_to?(:sid)
+                         to.sid
                        else
                          to[1] = to[1].to_s
                          to
@@ -244,8 +244,8 @@ module LucidData
             Isomorfeus.raise_error(message: "A invalid 'from' was given") unless node
             changed!
             old_from = from
-            if node.respond_to?(:to_sid)
-              node_sid = node.to_sid
+            if node.respond_to?(:sid)
+              node_sid = node.sid
             else
               node_sid = node
               node_sid[1] = node_sid[1].to_s
@@ -264,8 +264,8 @@ module LucidData
             Isomorfeus.raise_error(message: "A invalid 'to' was given") unless node
             old_to = to
             changed!
-            if node.respond_to?(:to_sid)
-              node_sid = node.to_sid
+            if node.respond_to?(:sid)
+              node_sid = node.sid
             else
               node_sid = node
               node_sid[1] = node_sid[1].to_s

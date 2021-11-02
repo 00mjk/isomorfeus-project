@@ -114,7 +114,7 @@ RSpec.describe 'LucidData::Array' do
         class TestArrayE < LucidData::Array::Base
         end
         array = TestArrayE.new(key: 10)
-        array.to_sid
+        array.sid
       end
       expect(result).to eq(['TestArrayE', '10'])
     end
@@ -290,7 +290,7 @@ RSpec.describe 'LucidData::Array' do
         class TestArrayE < LucidData::Array::Base
         end
         array = TestArrayE.new(key: 10)
-        array.to_sid
+        array.sid
       end
       expect(result).to eq(['TestArrayE', '10'])
     end

@@ -68,7 +68,7 @@ module LucidData
           hash = { 'attributes' => _get_selected_attributes, 'parts' => {} }
           hash['revision'] = revision if revision
           parts.each do |name, instance|
-            hash['parts'][name.to_s] = instance.to_sid if instance
+            hash['parts'][name.to_s] = instance.sid if instance
           end
           result = { @class_name => { @key => hash }}
           result.deep_merge!(@class_name => { @previous_key => { new_key: @key}}) if @previous_key
@@ -119,7 +119,7 @@ module LucidData
               self.class.parts.each_key do |access_name|
                 if parts.key?(access_name)
                   part = parts[access_name]
-                  @_parts[access_name] = if part.respond_to?(:to_sid)
+                  @_parts[access_name] = if part.respond_to?(:sid)
                                            part
                                          else
                                            Isomorfeus.instance_from_sid(part)
@@ -221,7 +221,7 @@ module LucidData
           end
 
           def parts_as_sids
-            parts.map { |part| part.to_sid }
+            parts.map { |part| part.sid }
           end
         end # RUBY_ENGINE
       end

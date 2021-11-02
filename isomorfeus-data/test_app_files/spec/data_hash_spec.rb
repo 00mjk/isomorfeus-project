@@ -114,7 +114,7 @@ RSpec.describe 'LucidData::Hash' do
         class TestHashE < LucidData::Hash::Base
         end
         hash = TestHashE.new(key: 10)
-        hash.to_sid
+        hash.sid
       end
       expect(result).to eq(['TestHashE', '10'])
     end
@@ -279,7 +279,7 @@ RSpec.describe 'LucidData::Hash' do
         class TestHashE < LucidData::Hash::Base
         end
         hash = TestHashE.new(key: 10)
-        hash.to_sid
+        hash.sid
       end
       expect(result).to eq(['TestHashE', '10'])
     end

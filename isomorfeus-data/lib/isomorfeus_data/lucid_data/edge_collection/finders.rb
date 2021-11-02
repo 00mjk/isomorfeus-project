@@ -63,7 +63,7 @@ module LucidData
 
       if RUBY_ENGINE == 'opal'
         def find_by_sid(edge)
-          edge_sid = edge.respond_to?(:to_sid) ? edge.to_sid : edge
+          edge_sid = edge.respond_to?(:sid) ? edge.sid : edge
           edges_as_sids.each do |sid|
             return Isomorfeus.instance_from_sid(edge_sid) if sid == edge_sid
           end
@@ -71,16 +71,16 @@ module LucidData
         end
       else
         def find_by_sid(edge)
-          edge_sid = edge.respond_to?(:to_sid) ? edge.to_sid : edge
+          edge_sid = edge.respond_to?(:sid) ? edge.sid : edge
           edges.each do |edge|
-            return edge if edge.to_sid == edge_sid
+            return edge if edge.sid == edge_sid
           end
           nil
         end
       end
 
       def find_by_from(node)
-        node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+        node_sid = node.respond_to?(:sid) ? node.sid : node
         edges.each do |edge|
           return edge if edge.from_as_sid == node_sid
         end
@@ -88,7 +88,7 @@ module LucidData
       end
 
       def find_all_by_from(node)
-        node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+        node_sid = node.respond_to?(:sid) ? node.sid : node
         found_edges = []
         edges.each do |edge|
           found_edges << edge if edge.from_as_sid == node_sid
@@ -97,7 +97,7 @@ module LucidData
       end
 
       def find_by_to(node)
-        node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+        node_sid = node.respond_to?(:sid) ? node.sid : node
         edges.each do |edge|
           return edge if edge.to_as_sid == node_sid
         end
@@ -105,7 +105,7 @@ module LucidData
       end
 
       def find_all_by_to(node)
-        node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+        node_sid = node.respond_to?(:sid) ? node.sid : node
         found_edges = []
         edges.each do |edge|
           found_edges << edge if edge.to_as_sid == node_sid
@@ -114,7 +114,7 @@ module LucidData
       end
 
       def find_by_target(node)
-        node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+        node_sid = node.respond_to?(:sid) ? node.sid : node
         edges.each do |edge|
           return edge if edge.from_as_sid == node_sid || edge.to_as_sid == node_sid
         end
@@ -122,7 +122,7 @@ module LucidData
       end
 
       def find_all_by_target(node)
-        node_sid = node.respond_to?(:to_sid) ? node.to_sid : node
+        node_sid = node.respond_to?(:sid) ? node.sid : node
         found_edges = []
         edges.each do |edge|
           found_edges << edge if edge.from_as_sid == node_sid || edge.to_as_sid == node_sid

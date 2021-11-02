@@ -147,10 +147,10 @@ module LucidData
         def linked_nodes_for_node(node)
           node_edges = edges_for_node(node)
           nodes = []
-          node_sid = node.to_sid
+          node_sid = node.sid
           node_edges.each do |edge|
-            from_sid = edge.from.to_sid
-            to_sid = edge.to.to_sid
+            from_sid = edge.from.sid
+            to_sid = edge.to.sid
             if to_sid == node_sid
               nodes << edge.from
             elsif from_sid == node_sid
@@ -203,10 +203,10 @@ module LucidData
         def to_transport
           hash = { 'attributes' => _get_selected_attributes, 'nodes' => {}, 'edges' => {} }
           node_collections.each do |name, collection|
-            hash['nodes'][name.to_s] = collection.to_sid if collection
+            hash['nodes'][name.to_s] = collection.sid if collection
           end
           edge_collections.each do |name, collection|
-            hash['edges'][name.to_s] = collection.to_sid if collection
+            hash['edges'][name.to_s] = collection.sid if collection
           end
           hash['revision'] = revision if revision
           result = { @class_name => { @key => hash }}
@@ -268,7 +268,7 @@ module LucidData
                 self.class.node_collections.each_key do |access_name|
                   if nodes.key?(access_name)
                     collection = nodes[access_name]
-                    @_node_collections[access_name] = if collection.respond_to?(:to_sid)
+                    @_node_collections[access_name] = if collection.respond_to?(:sid)
                                                         collection
                                                       else
                                                         Isomorfeus.instance_from_sid(collection)
@@ -276,7 +276,7 @@ module LucidData
                   end
                 end
               else
-                @_node_collections[:nodes] = if nodes.respond_to?(:to_sid)
+                @_node_collections[:nodes] = if nodes.respond_to?(:sid)
                                                nodes
                                              else
                                                Isomorfeus.instance_from_sid(nodes)
@@ -299,7 +299,7 @@ module LucidData
                 self.class.edge_collections.each_key do |access_name|
                   if edges.key?(access_name)
                     collection = edges[access_name]
-                    @_edge_collections[access_name] = if collection.respond_to?(:to_sid)
+                    @_edge_collections[access_name] = if collection.respond_to?(:sid)
                                                         collection
                                                       else
                                                         Isomorfeus.instance_from_sid(collection)
@@ -307,7 +307,7 @@ module LucidData
                   end
                 end
               else
-                @_edge_collections[:edges] = if edges.respond_to?(:to_sid)
+                @_edge_collections[:edges] = if edges.respond_to?(:sid)
                                                edges
                                              else
                                                Isomorfeus.instance_from_sid(edges)
