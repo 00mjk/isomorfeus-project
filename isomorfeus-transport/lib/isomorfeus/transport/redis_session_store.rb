@@ -7,7 +7,7 @@ module Isomorfeus
 
       def add(session_id:, cookie:, user:, accessor:)
         @redis_client.pipelined do
-          @redis_client.set(session_id, Oj.dump(user.to_sid, mode: :strict))
+          @redis_client.set(session_id, Oj.dump(user.sid, mode: :strict))
           @redis_client.set(accessor, cookie)
         end
       end

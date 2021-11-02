@@ -58,7 +58,7 @@ module Isomorfeus
       def set_current_user(user)
         if user
           @current_user = user
-          Isomorfeus.current_user_sid = user.to_sid
+          Isomorfeus.current_user_sid = user.sid
         else
           @current_user = Anonymous.new
         end

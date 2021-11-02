@@ -7,7 +7,7 @@ module Isomorfeus
 
       def add(session_id:, cookie:, user:, accessor:)
         @dalli_client.multi do
-          @dalli_client.set(session_id, Oj.dump(user.to_sid, mode: :strict))
+          @dalli_client.set(session_id, Oj.dump(user.sid, mode: :strict))
           @dalli_client.set(accessor, cookie)
         end
       end
