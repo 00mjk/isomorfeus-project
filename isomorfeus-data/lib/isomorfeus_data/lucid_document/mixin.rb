@@ -89,15 +89,15 @@ module LucidDocument
           def search(query, options = {})
             top_docs = []
             self.ferret_accelerator.search_each(query, options) do |id|
-              top_docs << self.load(key: id)
+              doc = self.ferret_accelerator.load_doc(id)
+              top_docs << self.new(key: doc[:key], fields: doc) if doc
             end
             top_docs
           end
 
           execute_create do
-            self.key = SecureRandom.uuid unless self.key
             doc = self.fields
-            doc[:id] = self.key
+            doc[:key] = self.key.nil? ? SecureRandom.uuid : self.key
             self.class.ferret_accelerator.create_doc(doc)
             self
           end
@@ -108,15 +108,19 @@ module LucidDocument
 
           execute_load do |key:|
             doc = self.ferret_accelerator.load_doc(key)
-            doc.delete(:id)
+            doc.delete(:key)
             self.new(key: key, fields: doc)
           end
 
           execute_save do
-            self.key = SecureRandom.uuid unless self.key
             doc = self.fields
-            doc[:id] = self.key
-            self.class.ferret_accelerator.save_doc(self.key, doc)
+            if self.key.nil?
+              doc[:key] = SecureRandom.uuid
+              self.class.ferret_accelerator.create_doc(doc)
+            else
+              doc[:key] = self.key
+              self.class.ferret_accelerator.save_doc(self.key, doc)
+            end
             self
           end
         end

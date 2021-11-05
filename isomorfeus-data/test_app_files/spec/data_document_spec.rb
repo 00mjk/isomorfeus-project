@@ -67,9 +67,9 @@ RSpec.describe 'LucidDocument' do
         document = SimpleDocument.create(fields: { one: '123' })
         document = SimpleDocument.load(key: document.key)
         document.one = 'changed'
-        before_changed = document.changed?
+        after_changed = document.changed?
         document.save
-        [document.one, before_changed, document.changed?]
+        [document.one, after_changed, document.changed?]
       end
       expect(result).to eq(['changed', true, false])
     end
@@ -94,6 +94,17 @@ RSpec.describe 'LucidDocument' do
         document.to_transport
       end
       expect(result).to eq("TestDocumentMixinC"=>{"12"=>{"fields" => { "test_field" => "test"}}})
+    end
+
+    it 'can search for documents' do
+      result = on_server do
+        SimpleDocument.create(key: '2345', fields: { one: 'one two three' })
+        SimpleDocument.create(fields: { one: 'two three four' })
+        SimpleDocument.create(fields: { one: 'three four five' })
+        top_docs = SimpleDocument.search('one:"one"')
+        [top_docs.size, top_docs.first.one]
+      end
+      expect(result).to eq([1, 'one two three'])
     end
   end
 
@@ -213,10 +224,6 @@ RSpec.describe 'LucidDocument' do
       expect(result).to eq('123456')
     end
 
-    #it 'can query' do
-      #
-    #end
-
     it 'can save and converts field to string' do
       result = @doc.await_ruby do
         SimpleDocument.promise_create(fields: { one: '123' }).then do |doc|
@@ -229,9 +236,5 @@ RSpec.describe 'LucidDocument' do
       end
       expect(result).to eq('654321')
     end
-
-    #it 'can destroy' do
-      #
-    #end
   end
 end

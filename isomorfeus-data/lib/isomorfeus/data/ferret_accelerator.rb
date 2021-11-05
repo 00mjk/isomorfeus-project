@@ -40,16 +40,15 @@ module Isomorfeus
       end
 
       def load_doc(id)
-        @index.doc(id)
+        @index.doc(id)&.load
       end
 
       def save_doc(id, document)
-        document[:id] = id unless document.key?(:id)
         @index.update(id, document)
       end
 
       def search_each(query, options, &block)
-        @index.search_each(query, optons, &block)
+        @index.search_each(query, options, &block)
       end
 
       private
@@ -60,7 +59,7 @@ module Isomorfeus
 
       def open_index
         FileUtils.mkdir_p(Isomorfeus.data_documents_path) unless Dir.exist?(Isomorfeus.data_documents_path)
-        @index = Isomorfeus::Ferret::Index::Index.new(path: index_path)
+        @index = Isomorfeus::Ferret::Index::Index.new(path: index_path, id_field: :key)
       end
     end
   end
