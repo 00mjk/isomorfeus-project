@@ -28,6 +28,7 @@ else
 
   require 'isomorfeus-hamster'
   require 'isomorfeus/data/hamster_storage_expander'
+  require 'isomorfeus/data/hamster_accelerator'
 
   require 'isomorfeus_data/lucid_query_result'
   require 'isomorfeus_data/lucid_object/mixin'

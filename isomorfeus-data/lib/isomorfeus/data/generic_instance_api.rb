@@ -102,9 +102,6 @@ module Isomorfeus
             end
           end
         end
-
-        # TODO update -> only send partial change
-        # included_changed_items
       else # RUBY_ENGINE
         def loaded?
           true

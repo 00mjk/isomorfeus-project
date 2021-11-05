@@ -56,7 +56,7 @@ module Isomorfeus
           base.instance_exec do
             def attribute(name, options = {})
               indexed = options.delete(:index)
-              indexed_attributes[name] = true if indexed
+              indexed_attributes[name] = indexed if indexed
               attribute_conditions[name] = options
 
               define_method(name) do
@@ -133,7 +133,7 @@ module Isomorfeus
           base.instance_exec do
             def attribute(name, options = {})
               indexed = options.delete(:index)
-              indexed_attributes[name] = true if indexed
+              indexed_attributes[name] = indexed if indexed
               attribute_conditions[name] = options
 
               define_method(name) do

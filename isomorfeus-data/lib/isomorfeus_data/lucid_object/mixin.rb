@@ -78,6 +78,10 @@ module LucidObject
             @_setup_environment_block = block
           end
 
+          def setup_index(&block)
+            @_setup_index_block = block
+          end
+
           def hamster_storage_expander
             return @hamster_storage_expander if @hamster_storage_expander
             @hamster_storage_expander = if @_setup_environment_block
@@ -87,15 +91,39 @@ module LucidObject
                                         end
           end
 
-          def search(attr, val)
-            raise "Can only search indexed attributes, but attribute '#{attr}' is not indexed!" unless self.indexed_attributes.key?(attr)
+          def hamster_accelerator
+            return @hamster_accelerator if @hamster_accelerator
+            @hamster_accelerator = if @_setup_index_block
+                                     Isomorfeus::Data::HamsterAccelerator.new(&@_setup_index_block)
+                                   else
+                                     Isomorfeus::Data::HamsterAccelerator.new
+                                   end
+          end
+
+          def search(attr, val, options = {})
+            idx_type = self.indexed_attributes[attr]
+            raise "Can only search indexed attributes, but attribute :#{attr} is not indexed!" unless idx_type
             objs = []
-            attr_s = ":[#{attr}]"
-            accept_all_attr = attr_s == ":[*]" ? true : false
-            self.hamster_storage_expander.search(":[:#{val}:]:") do |sid_s_attr|
-              if accept_all_attr || sid_s_attr.end_with?(attr_s)
-                sid_s = sid_s_attr.split(':|:[', 1)[0]
-                objs << self.load(sid_s)
+            if idx_type == :text
+              query = "+value:#{val} +class_name:#{self.name}"
+              query << " +attribute:#{attr}" if attr != '*'
+              self.hamster_accelerator.search_each(query, options) do |id|
+                doc = self.hamster_accelerator.load_doc(id)
+                if doc
+                  sid_s = doc[:sid_s_attr].split(':|:')[0]
+                  obj = self.load(key: sid_s)
+                  objs << obj if obj
+                end
+              end
+            else
+              attr_s = ":[#{attr}]"
+              accept_all_attr = attr_s == ":[*]" ? true : false
+              self.hamster_storage_expander.search(":[:#{val}:]:") do |sid_s_attr|
+                if accept_all_attr || sid_s_attr.end_with?(attr_s)
+                  sid_s = sid_s_attr.split(':|:[')[0]
+                  obj = self.load(key: sid_s)
+                  objs << obj if obj
+                end
               end
             end
             objs
@@ -104,8 +132,12 @@ module LucidObject
           execute_create do
             self.key = SecureRandom.uuid unless self.key
             self.class.hamster_storage_expander.create_object(self.sid_s, self)
-            self.class.indexed_attributes.each_key do |attr|
-              self._store_indexed_attribute(attr)
+            self.class.indexed_attributes.each do |attr, idx_type|
+              if idx_type == :text
+                self._store_text_indexed_attribute(attr)
+              else
+                self._store_value_indexed_attribute(attr)
+              end
             end
             self
           end
@@ -114,10 +146,14 @@ module LucidObject
             key = key.to_s
             sid_s = key.start_with?('[') ? key : gen_sid_s(key)
             self.hamster_storage_expander.destroy_object(sid_s)
-            self.indexed_attributes.each_key do |attr|
-              old_val = self.hamster_storage_expander.index_get("#{sid_s}:|:[#{attr}]")
-              self.hamster_storage_expander.index_delete("#{sid_s}:|:[#{attr}]", old_val)
-              self.hamster_storage_expander.index_delete(":[:#{old_val}:]:", "#{sid_s}:|:[#{attr}]")
+            self.indexed_attributes.each do |attr, idx_type|
+              if idx_type == :text
+                self.hamster_accelerator.destroy_doc("#{sid_s}:|:[#{attr}]")
+              else
+                old_val = self.hamster_storage_expander.index_get("#{sid_s}:|:[#{attr}]")
+                self.hamster_storage_expander.index_delete("#{sid_s}:|:[#{attr}]", old_val)
+                self.hamster_storage_expander.index_delete(":[:#{old_val}:]:", "#{sid_s}:|:[#{attr}]")
+              end
             end
             true
           end
@@ -131,8 +167,12 @@ module LucidObject
           execute_save do
             self.key = SecureRandom.uuid unless self.key
             self.class.hamster_storage_expander.save_object(self.sid_s, self)
-            self.class.indexed_attributes.each_key do |attr|
-              self._store_indexed_attribute(attr)
+            self.class.indexed_attributes.each do |attr, val|
+              if val == :text
+                self._store_text_indexed_attribute(attr)
+              else
+                self._store_value_indexed_attribute(attr)
+              end
             end
             self
           end
@@ -149,7 +189,12 @@ module LucidObject
           @_raw_attributes = attributes
         end
 
-        def _store_indexed_attribute(attr)
+        def _store_text_indexed_attribute(attr)
+          doc = { sid_s_attr: "#{self.sid_s}:|:[#{attr}]", value: self.send(attr).to_s, attribute: attr.to_s, class_name: @class_name }
+          self.class.hamster_accelerator.save_doc("#{self.sid_s}:|:[#{attr}]", doc)
+        end
+
+        def _store_value_indexed_attribute(attr)
           old_val = self.class.hamster_storage_expander.index_get("#{self.sid_s}:|:[#{attr}]")
           self.class.hamster_storage_expander.index_delete("#{self.sid_s}:|:[#{attr}]", old_val)
           self.class.hamster_storage_expander.index_delete(":[:#{old_val}:]:", "#{self.sid_s}:|:[#{attr}]")

@@ -53,7 +53,7 @@ module Isomorfeus
       end
 
       def destroy_object(sid_s)
-        @db.delete(sid_s)
+        @db.delete(sid_s) rescue nil
         true
       end
 
@@ -66,7 +66,7 @@ module Isomorfeus
       end
 
       def index_delete(key, val)
-        @index_db.delete(key, val)
+        @index_db.delete(key, val) rescue nil
       end
 
       def index_get(key)
