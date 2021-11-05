@@ -2,9 +2,8 @@
 
 Policy for Isomorfeus
 
-
 ### Community and Support
-At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ## Usage
 
@@ -12,9 +11,9 @@ Policy is enforced on the server, however, the same policy rules are also availa
 
 Everything that is not explicitly allowed somewhere is denied.
 
-Place the policy files in your projects `isomorfeus/policies`.
+Place the policy files in your projects `app/policies` directory.
 
-Any class that would like to authorize for accessing a resource needs to include the `LucidAuthorization::Mixin` 
+Any class that would like to authorize for accessing a resource needs to include the `LucidAuthorization::Mixin`
 or inherit from `LucidAuthorization::Base`. Example:
 
 ```ruby
@@ -38,12 +37,12 @@ class MyUserPolicy < LucidPolicy::Base
   # allow access to all methods of a class
   allow BlaBlaGraph
   # class names can be given as strings which benefits autoload performance as the class can be loaded later on
-  allow 'BlaBlaGraph' 
+  allow 'BlaBlaGraph'
 
   # allow access to all methods of multiple classes
   allow BlaBlaGraph, BlaComposition
-  
-  # allow access to a single method of a class 
+
+  # allow access to a single method of a class
   allow BlaBlaGraph, :load
 
   # or allow multiple methods of a class
@@ -51,34 +50,34 @@ class MyUserPolicy < LucidPolicy::Base
 
   # deny access to all methods of multiple classes
   deny BlaGraph, SuperOperation
-    
+
   deny others # or: allow others
-    
-  # in a otherwise empty policy the following can be used too: 
+
+  # in a otherwise empty policy the following can be used too:
   # allow all
   # deny all
-    
+
   # further conditions can be used
   allow BlaBlaGraph, :member_feature, only_if: :registered?
-    # this will call the method registered? on the user instance. The method must return a boolean.  
+    # this will call the method registered? on the user instance. The method must return a boolean.
     # permission is granted if the method returned true
-    # method name must be given as symbol 
-    # other versions: 
+    # method name must be given as symbol
+    # other versions:
     allow BlaBlaGraph, :member_feature, if: :registered?
-    
-  allow BlaBlaGraph, :public_feature, only_if_not: :registered? 
-    # this will call the method registered? on the user instance. The method must return a boolean.  
+
+  allow BlaBlaGraph, :public_feature, only_if_not: :registered?
+    # this will call the method registered? on the user instance. The method must return a boolean.
     # permission is granted if the method returned false
     # method name must be given as symbol
-    # other versions: 
+    # other versions:
     allow BlaBlaGraph, :member_feature, only_unless: :registered?
-    allow BlaBlaGraph, :member_feature, unless: :registered? 
+    allow BlaBlaGraph, :member_feature, unless: :registered?
     allow BlaBlaGraph, :member_feature, if_not: :registered?
-   
-  # a block can be passed directly to a rules condition
+
+  # a proc can be passed directly to a rules condition
   allow BlaBlaGraph, :member_feature, if: proc { |user, props| user.registered? }
   # permission is granted if the block returns true
-  
+
   # similar for deny, though:
   deny BlaBlaGraph, :member_feature, if: proc { |user, props| !user.registered? }
   # permission is denied if the block returns true
@@ -114,10 +113,10 @@ They accept no arguments. Within the block the default is to deny, so any matchi
 
 ### Combining Policies
 Policies can be combined. Across policies, the first Policy rule that permits access wins.
-The local policy is considered first, then the other policies.
-If the local policy allows, then the other policies are not considered.
-If the local policy has a `allow all` or a `allow others` rule, then there is a good chance the other policies are never considered. 
-The recommended default rule for combined policies is `deny others`. 
+The outer policy is considered first, then the other policies.
+If the outer policy allows, then the other policies are not considered.
+If the outer policy has a `allow all` or a `allow others` rule, then there is a good chance the other policies are never considered.
+The recommended default rule for combined policies is `deny others`.
 
 Given a:
 ```ruby
@@ -135,20 +134,20 @@ class MyUserPolicy < LucidPolicy::Base
 
   # conditions as for allow and deny can be used too
   combine_with AdminRolePolicy, if: :admin?
-    # this will call the method admin? on the user instance. The method must return a boolean.  
+    # this will call the method admin? on the user instance. The method must return a boolean.
     # this will execute the AdminRolePolicy rules only if the method returned true
-    # method name must be given as symbol 
- 
-  combine_with AdminRolePolicy, if_not: :normal_guy? 
-    # this will call the method normal_guy?? on the user instance. The method must return a boolean.  
+    # method name must be given as symbol
+
+  combine_with AdminRolePolicy, if_not: :normal_guy?
+    # this will call the method normal_guy?? on the user instance. The method must return a boolean.
     # this will execute the AdminRolePolicy rules only if the method returned false
     # method name must be given as symbol
-    # other versions: 
+    # other versions:
     combine_with AdminRolePolicy, unless: :normal_guy?
 
   # a block can be passed directly to a rules condition
   combine_with AdminRolePolicy, if: proc { |user| user.admin? }
-  # this will execute the AdminRolePolicy rules only if the condition block returns true 
+  # this will execute the AdminRolePolicy rules only if the condition block returns true
 
   deny others
 end
@@ -162,7 +161,7 @@ When then authorizing:
 ```ruby
 my_user.authorized?(BlaGraph, :load)
 ```
-the reason for access or denied access, the winning rule, can be inspected: 
+the reason for access or denied access, the winning rule, can be inspected:
 ```ruby
 my_user.authozation_reason
 ```
