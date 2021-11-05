@@ -19,6 +19,7 @@ else
   require 'digest'
   require 'bcrypt'
   require 'securerandom'
+  require 'fileutils'
   require 'ostruct'
   require 'socket'
   require 'sorted_set'
