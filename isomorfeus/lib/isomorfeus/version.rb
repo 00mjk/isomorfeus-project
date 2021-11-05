@@ -1,3 +1,3 @@
 module Isomorfeus
-  VERSION = '1.99.99.pre.99'
+  VERSION = '2.0.0.rc1'
 end
