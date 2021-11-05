@@ -1,20 +1,14 @@
-### LucidData::Document
+### LucidDocument
 
 allows for isomorphic access to Documents.
 
-Documents consist of set of fields of textual data.
+Documents consist of fields of textual data.
 The fields are indexed by default, thus documents can be easily found by querying text in the fields.
-
-Documents can be part of a LusidData::Graph.
-Accessing documents from edges only works within a LucidData::Graph and only if the corresponding edges and documents are included in the Graph.
-
-### Creating a Document
-
 The documents fields must be declared. :id and :key are reserved and must not be used as field names.
 
 #### New Instantiation
-```
-class MyDocument < LucidData::Document::Base
+```ruby
+class MyDocument < LucidDocument::Base
   field :title
   field :text
 end
@@ -23,13 +17,13 @@ a = MyDocument.new(fields: { title: 'Lets go!', text: 'Lorem ipsum ....' })
 
 # saving the document for later reference may be useful
 a.promise_save.then do
-  a.key # after creating the document, saving it for the first time, the key is known e.g. -> '1234'
+  a.key
 end
 ```
 
 #### Loading
-```
-class MyDocument < LucidData::Document::Base
+```ruby
+class MyDocument < LucidDocument::Base
   field :title
   field :text
 end
@@ -38,13 +32,40 @@ a = MyDocument.load(key: '1234')
 a.title # -> 'Lets go!'
 ```
 
+#### Searching for Documents
+
+Docs can be searched server side using the search method on the class. To make search results isomorphically available a LucidQuery::Base class must be used. The search method returns a array of documents. It accepts as query a isomorfeus-ferret query, see the
+[Tutorial](https://github.com/isomorfeus/isomorfeus-ferret/blob/master/TUTORIAL.md)
+
+```ruby
+class MyDocument < LucidDocument::Base
+  field :name
+end
+
+# example, server side
+top_docs = MyDocument.search('name:"ferret"')
+
+# create query class:
+class MyQuery < LucidQuery::Base
+  execute_query do
+    { top_docs: MyDocument.search('name:"ferret"') }
+  end
+end
+
+# example, client side or everywhere else in the system:
+MyQuery.promise_execute.then do |query_result|
+  query_result.top_docs # The hash key can be accessed with a method.
+end
+```
+
+For more information about Queries and how to pass props see the [query docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/docs/data_query.md).
+
 ### Example and Specs
 - [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_document.rb)
 - [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_document_spec.rb)
 
-
-```
-class MyDocument < LucidData::Document::Base
+```ruby
+class MyDocument < LucidDocument::Base
   field :name
 end
 

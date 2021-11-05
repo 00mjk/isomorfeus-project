@@ -9,12 +9,9 @@ After restricting the default policy, access to data must be explicitly allowed.
 
 The :create method must be allowed. Example:
 
-Given a custom data class with a execute_create block:
+Given a data class:
 ```ruby
-class MyNode < LucidData::Node::Base
-  execute_create do |instance:|
-    # 
-  end
+class MyNode < LucidObject::Base
 end
 ```
 
@@ -29,7 +26,7 @@ MyNode.create(*args)
 The Policy allowing the :create method, for example for MyUser:
 ```ruby
 class MyUserPolicy
-  allow MyNode, :create 
+  allow MyNode, :create
 end
 ```
 
@@ -43,6 +40,7 @@ end
 ```
 
 #### Saving Data
+
 Likewise for saving:
 ```ruby
 class MyUserPolicy
@@ -51,9 +49,27 @@ end
 ```
 
 #### Destroying Data
+
 Likewise for destroying:
 ```ruby
 class MyUserPolicy
   allow MyNode, :destroy
 end
 ```
+
+#### Querying Data
+For a query class:
+```ruby
+class MyQuery < LucidQuery::Base
+end
+```
+use the policy:
+```ruby
+class MyUserPolicy
+  allow MyQuery, :query
+end
+```
+
+### More Options
+
+Please see the [Isomorfeus-Policy docs](https://github.com/isomorfeus/isomorfeus-project/tree/master/isomorfeus-policy) for more information how to further refine the policy.

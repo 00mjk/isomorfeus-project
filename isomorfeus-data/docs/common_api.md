@@ -6,27 +6,23 @@ Loading data from the client must be allowed by policy, see [Data Policy](https:
 
 All LucidData *classes* support the following methods for loading data based on a key:
 - `load(key:)` -> instance
-  Convenience method useful for loading in a component render block. It returns at first a empty object with the key set. After data has been loaded
-  the object will have its data available and a render is triggered. Transport request bundling applies.
+  Convenience method useful for loading in a isomorfeus-preact component render block. It returns at first a empty object with the key set. After data has been loaded the object will have its data available and a render is triggered. Transport request bundling applies.
   This method is optimistic and assumes success. Failure cannot be handled.
-  On the client: Triggers a load only when data is not available.
-  On the server: The same as load!, always loads data.
+  On the client: Triggers a load only when data has not been loaded yet.
+  On the server: The same as load!, always loads data immediately.
 
 - `load!(key:)` -> instance
   The same as load but always triggers a load.
 
 - `promise_load!(key:)` -> promise with instance when resolved
-  This method returns a promise. This method always triggers a load when called, but subject to transport request bundling, the actual request may be
-  delayed, bundled together with other request or fulfilled by another identical request.
-  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
-  but not from within render blocks.
+  This method returns a promise. This method always triggers a load when called, but subject to transport request bundling, the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
+  Typical use is from isomorfeus-preact component callbacks, component preload blocks, component event handlers or outside of components, but not from within component render blocks.
 
 - `promise_load(key:)` -> promise with instance when resolved
-  On the client: This method is the same as promise_load! but triggers load only when data is not available.
+  On the client: This method is the same as promise_load! but triggers load only when data has not been loaded yet.
   On the server: The same as promise_load!, always loads data.
 
-A `execute_load` block must be defined, to execute the actual load of data. This blocks must return a instance if the class.
-Returning nil indicates that the requested item does not exist. Alternatively a exception may be thrown.
+A `execute_load` block can be defined for classes inheriting from LucidData classes, to execute load of data from other sources. This blocks must return a instance if the class. Returning nil indicates that the requested item does not exist. Alternatively a exception may be thrown.
 
 ### Creating Data
 
@@ -34,17 +30,15 @@ Creating is the same as instantiating with new and then saving the object.
 
 All LucidData *classes* support the following methods for creating data:
 - `create(key:, **args)` -> instance
-  Identical to calling `.new.save`
   Optimistic convenience method, assuming success. Failure cannot be handled.
 
 - `promise_create(key:, **args)` -> promise with instance when successful
-  Identical to calling `.new.promise_save`
   This method returns a promise. This method always triggers a create when called, but subject to transport request bundling,
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
 
-For creating the `execute_create` block must be defined, to execute the actual creation of data. This block is executed within the instance und must return self.
+For creating a `execute_create` block can be defined, to execute the actual creation of data in other sources. This block is executed within the instance und must return self.
 Returning nil indicates that the create failed for some reason. Alternatively a exception may be thrown.
 
 ### Saving Data
@@ -54,12 +48,11 @@ All LucidData *instances* support the following methods for saving data:
   Optimistic convenience method, assuming success. Failure cannot be handled.
 
 - `promise_save` -> promise with self when successful
-  This method returns a promise. This method always triggers a save when called, but subject to transport request bundling, the actual request may be
-  delayed, bundled together with other request or fulfilled by another identical request.
+  This method returns a promise. This method always triggers a save when called, but subject to transport request bundling, the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
-  but not from within render blocks.
+  but not from within component render blocks.
 
-A `execute_save` block must be defined, to execute the actual save of data. This block is executed within the instance und must return self.
+A `execute_save` block can be defined, to execute the actual save of data in other sources. This block is executed within the instance und must return self.
 Returning nil indicates that the save failed for some reason. Alternatively a exception may be thrown.
 
 ### Destroying Data
@@ -101,19 +94,6 @@ All LucidData *instances* support the following methods for reloading data from 
 
 ### Attributes
 
-All LucidData classes, except LucidData::Array and LucidData::Query, support attributes, some require them to be useful.
+LucidOject supports and requires attributes.
 Attributes can be declared and validated just like props and the same options as for props apply to attributes. Just instead of `prop` use `attribute`.
-See [the isomorfeus-react props documentation](https://github.com/isomorfeus/isomorfeus-react/blob/master/ruby/docs/props.md#prop-declaration).
-
-The following classes support Attributes:
-- LucidData::Hash
-- LucidData::Edge
-- LucidData::Document
-- LucidData::Collection
-- LucidData::EdgeCollection
-- LucidData::Graph
-- LucidData::Composition
-
-Declaration of attributes for LucidData::Hash is optional.
-
-For all other classes, when attributes are used, they *must* be declared.
+See [the isomorfeus-preact props documentation](https://github.com/isomorfeus/isomorfeus-preact/blob/master/ruby/docs/props.md#prop-declaration).

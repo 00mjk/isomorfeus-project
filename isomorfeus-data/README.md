@@ -9,13 +9,10 @@ At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ### Overview
 
-Isomorfeus Data provides convenient access to all sorts of data for the distributes, isomorphic system.
+Isomorfeus Data provides convenient access to data for the distributed, isomorphic system.
 Data is available in the same way on clients and server.
 
-Isomorfeus Data supports arrays, hashes, collections, graphs, nodes, edges and compositions of any of those which can be loaded with one requests.
-
-All LucidData classes are database agnostic. Any ORM or data source supported by ruby can be used.
-Data must then be shaped (usually in to a Hash or Array) to fit the Isomorfeus Data classes.
+Isomorfeus Data supports documents, objects and files.
 
 ### Core Concepts and Common API
 
@@ -27,14 +24,15 @@ Data must then be shaped (usually in to a Hash or Array) to fit the Isomorfeus D
 
 All classes follow the common principles and the common API above.
 
-- [LucidData::Array](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_array.md) - A array, easily accessible on client and server
-- [LucidData::Collections](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_collection.md) - A collection of LucidData::Node or LucidData::Document objects
-- [LucidData::Composition](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_composition.md) - A composition of any of those other classes, even graphs, for easy, one request access to arbitrary data
-- [LucidData::Document](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_document.md) - A document for textual data can be used stand alone, in a collection or in a graph
-- [LucidData::Node](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_node.md) - A node, can be used stand alone, in a collection or in a graph
-- [LucidData::Edge](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_edge.md) - A edge can be used standalone, in a collection or in a graph
-- [LucidData::EdgeCollection](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_edge_collection.md)  - A collection of LucidData::Edge objects
-- [LucidData::Graph](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_graph.md) - A graph, which can be build from several LucidData::Collection objects and LucidData::EdgeCollection objects
-- [LucidData::Hash](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_hash.md) - A hash, easily accessible on client and server
+- [LucidDocument](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_document.md) - for textual data with fields
+- [LucidObject](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_object.md) - for objects with attributes
+- [LucidFile](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_file.md) - for files like images, pdfs, etc.
+- [LucidQuery](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_query.md) - for isomorphic queries.
 
-(more to come soon)
+### Storage
+
+isomorfeus-data relies on:
+- [isomorfeus-ferret](https://github.com/isomorfeus/isomorfeus-ferret) as storage and index for documents
+- [isomorfeus-hamster](https://github.com/isomorfeus/isomorfeus-hamster) as storage and index for objects
+- the Filesystem for files
+- [Oj](https://github.com/ohler55/oj) for serialization
