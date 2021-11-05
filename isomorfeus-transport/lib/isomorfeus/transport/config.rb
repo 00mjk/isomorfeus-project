@@ -169,7 +169,8 @@ module Isomorfeus
     end
 
     self.session_store_init do
-      Isomorfeus::Transport::SdbmSessionStore.new('cookie') # dont use this one, but we keep it here to have at least something
+      store_path = File.expand_path(File.join(Isomorfeus.root, 'data', Isomorfeus.env), 'session_store')
+      Isomorfeus::Transport::HamsterSessionStore.new(store_path) # dont use this one, but we keep it here to have at least something
     end
   end
 

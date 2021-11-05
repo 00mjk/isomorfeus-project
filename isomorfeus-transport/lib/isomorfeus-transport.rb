@@ -24,11 +24,8 @@ else
   require 'sorted_set'
   require 'oj'
   require 'active_support'
-  require 'sdbm'
   require 'isomorfeus-asset-manager'
-  require 'isomorfeus/transport/sdbm_session_store'
-  require 'isomorfeus/transport/memcached_session_store'
-  require 'isomorfeus/transport/redis_session_store'
+  require 'isomorfeus/transport/hamster_session_store'
   opal_path = Gem::Specification.find_by_name('opal').full_gem_path
   promise_path = File.join(opal_path, 'stdlib', 'promise.rb')
   require promise_path
