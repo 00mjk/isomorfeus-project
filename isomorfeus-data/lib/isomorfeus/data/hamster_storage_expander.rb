@@ -89,14 +89,6 @@ module Isomorfeus
         self.class.environment = Isomorfeus::Hamster.new(Isomorfeus.data_object_env_path)
         self.class.refa
       end
-
-      def ats_key(oc, ky)
-        "#{oc}|#{ky}|attributes"
-      end
-
-      def at_key(oc, ky, at)
-        "#{oc}|#{ky}|:|#{at}"
-      end
     end
   end
 end
