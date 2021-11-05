@@ -70,7 +70,6 @@ module Isomorfeus
       attr_accessor :api_websocket_port
       attr_accessor :api_websocket_path
       attr_accessor :cookie_eater_path
-      attr_accessor :cookie_sdbm_path
       attr_reader :session_store
 
       def valid_channel_class_name?(class_name)
