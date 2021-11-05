@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidData::Query' do
+RSpec.describe 'LucidQuery' do
   context 'on the server' do
     it 'can do inheritance' do
       result = on_server do
-        class TestQueryBase < LucidData::Query::Base
+        class TestQueryBase < LucidQuery::Base
           prop :test_prop
 
           execute_query do
@@ -18,7 +18,7 @@ RSpec.describe 'LucidData::Query' do
     it 'can do mixin' do
       result = on_server do
         class TestQueryMixin
-          include LucidData::Query::Mixin
+          include LucidQuery::Mixin
           prop :test_prop
 
           execute_query do
@@ -31,10 +31,10 @@ RSpec.describe 'LucidData::Query' do
 
     it 'verifies prop class' do
       result = on_server do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
 
           execute_query do
@@ -46,10 +46,10 @@ RSpec.describe 'LucidData::Query' do
       end
       expect(result).to eq('testing')
       result = on_server do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
 
           execute_query do
@@ -65,10 +65,10 @@ RSpec.describe 'LucidData::Query' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
 
           execute_query do
@@ -87,10 +87,10 @@ RSpec.describe 'LucidData::Query' do
 
     it 'verifies if prop is_a' do
       result = on_server do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, is_a: Enumerable
 
           execute_query do
@@ -102,10 +102,10 @@ RSpec.describe 'LucidData::Query' do
       end
       expect(result).to eq('Array')
       result = on_server do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, is_a: Enumerable
 
           execute_query do
@@ -121,10 +121,10 @@ RSpec.describe 'LucidData::Query' do
       end
       expect(result).to eq('exception thrown')
       result = on_server do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, is_a: Enumerable
 
           execute_query do
@@ -143,10 +143,10 @@ RSpec.describe 'LucidData::Query' do
 
     it 'converts result to transport' do
       result = on_server do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop
 
           execute_query do
@@ -157,26 +157,26 @@ RSpec.describe 'LucidData::Query' do
         query_result.instance_variable_set(:@key, '1')
         query_result.to_transport
       end
-      expect(result).to eq("LucidData::QueryResult" => {"1"=>{'node'=>["TestNode", "1"]}})
+      expect(result).to eq("LucidQueryResult" => {"1"=>{'node'=>["TestNode", "1"]}})
     end
 
     it 'can validate a prop' do
       result = on_server do
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
         TestQueryMixinC.valid_prop?(:test_prop, 10)
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
         TestQueryMixinC.valid_prop?(:test, '10')
       end
       expect(result).to eq(false)
       result = on_server do
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
         TestQueryMixinC.valid_prop?(:test_prop, '10')
@@ -200,7 +200,7 @@ RSpec.describe 'LucidData::Query' do
 
     it 'can do inheritance' do
       result = @doc.evaluate_ruby do
-        class TestQueryBase < LucidData::Query::Base
+        class TestQueryBase < LucidQuery::Base
           prop :test_prop
 
           execute_query do
@@ -214,7 +214,7 @@ RSpec.describe 'LucidData::Query' do
     it 'can do mixin' do
       result = @doc.evaluate_ruby do
         class TestQueryMixin
-          include LucidData::Query::Mixin
+          include LucidQuery::Mixin
           prop :test_prop
 
           execute_query do
@@ -227,10 +227,10 @@ RSpec.describe 'LucidData::Query' do
 
     it 'verifies prop class' do
       result = @doc.evaluate_ruby do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
 
           execute_query do
@@ -240,12 +240,12 @@ RSpec.describe 'LucidData::Query' do
         query_result = TestQueryMixinC.execute( test_prop: 'testing' )
         query_result.class.to_s
       end
-      expect(result).to eq('LucidData::QueryResult')
+      expect(result).to eq('LucidQueryResult')
       result = @doc.evaluate_ruby do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
 
           execute_query do
@@ -261,10 +261,10 @@ RSpec.describe 'LucidData::Query' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String, required: true
 
           execute_query do
@@ -283,10 +283,10 @@ RSpec.describe 'LucidData::Query' do
 
     it 'verifies if prop is_a' do
       result = @doc.evaluate_ruby do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, is_a: Enumerable
 
           execute_query do
@@ -296,12 +296,12 @@ RSpec.describe 'LucidData::Query' do
         query_result = TestQueryMixinC.execute( test_prop: ['test_value'] )
         query_result.class.to_s
       end
-      expect(result).to eq('LucidData::QueryResult')
+      expect(result).to eq('LucidQueryResult')
       result = @doc.evaluate_ruby do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, is_a: Enumerable
 
           execute_query do
@@ -317,10 +317,10 @@ RSpec.describe 'LucidData::Query' do
       end
       expect(result).to eq('exception thrown')
       result = @doc.evaluate_ruby do
-        class TestNode < LucidData::Node::Base
+        class TestNode < LucidObject::Base
           attribute :test
         end
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, is_a: Enumerable, required: true
 
           execute_query do
@@ -339,21 +339,21 @@ RSpec.describe 'LucidData::Query' do
 
     it 'can validate a prop' do
       result = @doc.evaluate_ruby do
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
         TestQueryMixinC.valid_prop?(:test_prop, 10)
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
         TestQueryMixinC.valid_prop?(:test, '10')
       end
       expect(result).to eq(false)
       result = @doc.evaluate_ruby do
-        class TestQueryMixinC < LucidData::Query::Base
+        class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
         TestQueryMixinC.valid_prop?(:test_prop, '10')

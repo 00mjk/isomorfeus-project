@@ -58,8 +58,7 @@ module Isomorfeus
       attr_accessor :data_documents_path
 
       attr_accessor :hamster_path
-      attr_accessor :data_nodes_path
-      attr_accessor :data_edges_path
+      attr_accessor :data_object_env_path
     end
   end
 
@@ -73,7 +72,6 @@ module Isomorfeus
 
     # objects, nodes and edges
     self.hamster_path = File.expand_path(File.join(self.data_path, 'hamster'))
-    self.data_nodes_path = File.expand_path(File.join(self.hamster_path, 'nodes'))
-    self.data_edges_path = File.expand_path(File.join(self.hamster_path, 'edges'))
+    self.data_object_env_path = File.expand_path(File.join(self.hamster_path, 'object_env'))
   end
 end

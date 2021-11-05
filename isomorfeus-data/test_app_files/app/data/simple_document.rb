@@ -1,3 +1,3 @@
-class SimpleDocument < LucidData::Document::Base
+class SimpleDocument < LucidDocument::Base
   field :one
 end

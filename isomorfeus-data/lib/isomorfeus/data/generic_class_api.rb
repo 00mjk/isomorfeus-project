@@ -104,6 +104,10 @@ module Isomorfeus
         end
       end  # RUBY_ENGINE
 
+      def gen_sid_s(key)
+        "[#{self.name}|#{key}]"
+      end
+
       def create(key: nil, **things)
         new(key: key, **things).create
       end

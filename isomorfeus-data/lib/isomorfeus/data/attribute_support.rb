@@ -7,6 +7,10 @@ module Isomorfeus
             @attribute_conditions ||= {}
           end
 
+          def indexed_attributes
+            @indexed_attributes ||= {}
+          end
+
           def valid_attribute?(attr_name, attr_value)
             Isomorfeus::Props::Validator.new(self.name, attr_name, attr_value, attribute_conditions[attr_name]).validate!
           rescue
@@ -51,6 +55,8 @@ module Isomorfeus
         if RUBY_ENGINE == 'opal'
           base.instance_exec do
             def attribute(name, options = {})
+              indexed = options.delete(:index)
+              indexed_attributes[name] = true if indexed
               attribute_conditions[name] = options
 
               define_method(name) do
@@ -126,6 +132,8 @@ module Isomorfeus
         else
           base.instance_exec do
             def attribute(name, options = {})
+              indexed = options.delete(:index)
+              indexed_attributes[name] = true if indexed
               attribute_conditions[name] = options
 
               define_method(name) do

@@ -21,6 +21,10 @@ module Isomorfeus
         [@class_name, @key]
       end
 
+      def sid_s
+        "[#{@class_name}|#{@key}]"
+      end
+
       if RUBY_ENGINE == 'opal'
         def loaded?
           Redux.fetch_by_path(*@_store_path) ? true : false

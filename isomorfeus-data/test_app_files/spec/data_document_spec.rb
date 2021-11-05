@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidData::Document' do
+RSpec.describe 'LucidDocument' do
   context 'on the server' do
     it 'can instantiate a document by inheritance' do
       result = on_server do
-        class TestDocumentBase < LucidData::Document::Base
+        class TestDocumentBase < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentBase.new(key: 1, fields: { test_field: 'test_value' })
@@ -16,7 +16,7 @@ RSpec.describe 'LucidData::Document' do
     it 'can instantiate a document by mixin' do
       result = on_server do
         class TestDocumentMixin
-          include LucidData::Document::Mixin
+          include LucidDocument::Mixin
           field :test_field
         end
         document = TestDocumentMixin.new(key: 2, fields: { test_field: 'test_value' })
@@ -27,7 +27,7 @@ RSpec.describe 'LucidData::Document' do
 
     it 'reports a change' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Document::Base
+        class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentMixinC.new(key: 9, fields: { test_field: 10 })
@@ -35,7 +35,7 @@ RSpec.describe 'LucidData::Document' do
       end
       expect(result).to be(false)
       result = on_server do
-        class TestDocumentMixinC < LucidData::Document::Base
+        class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentMixinC.new(key: 10, fields: { test_field: 10 })
@@ -76,7 +76,7 @@ RSpec.describe 'LucidData::Document' do
 
     it 'converts to sid' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Document::Base
+        class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentMixinC.new(key: 11)
@@ -87,7 +87,7 @@ RSpec.describe 'LucidData::Document' do
 
     it 'converts to transport' do
       result = on_server do
-        class TestDocumentMixinC < LucidData::Document::Base
+        class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentMixinC.new(key: 12, fields: { test_field: 'test'})
@@ -104,7 +104,7 @@ RSpec.describe 'LucidData::Document' do
 
     it 'can instantiate a document by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestDocumentBase < LucidData::Document::Base
+        class TestDocumentBase < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentBase.new(key: 14, fields: { test_field: 'test_value' })
@@ -116,7 +116,7 @@ RSpec.describe 'LucidData::Document' do
     it 'can instantiate a document by mixin' do
       result = @doc.evaluate_ruby do
         class TestDocumentMixin
-          include LucidData::Document::Mixin
+          include LucidDocument::Mixin
           field :test_field
         end
         document = TestDocumentMixin.new(key: 15, fields: { test_field: 'test_value' })
@@ -127,7 +127,7 @@ RSpec.describe 'LucidData::Document' do
 
     it 'reports a change' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Document::Base
+        class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentMixinC.new(key: 23, fields: { test_field: 10 })
@@ -135,7 +135,7 @@ RSpec.describe 'LucidData::Document' do
       end
       expect(result).to be(false)
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Document::Base
+        class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentMixinC.new(key: 23, fields: { test_field: 10 })
@@ -182,7 +182,7 @@ RSpec.describe 'LucidData::Document' do
 
     it 'converts to sid' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Document::Base
+        class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentMixinC.new(key: 24)
@@ -193,7 +193,7 @@ RSpec.describe 'LucidData::Document' do
 
     it 'converts to transport' do
       result = @doc.evaluate_ruby do
-        class TestDocumentMixinC < LucidData::Document::Base
+        class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
         document = TestDocumentMixinC.new(key: 28, fields: { test_field: 'test' })

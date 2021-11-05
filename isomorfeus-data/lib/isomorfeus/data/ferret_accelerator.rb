@@ -1,6 +1,10 @@
 module Isomorfeus
   module Data
     class FerretAccelerator
+      def self.finalize(fer_acc)
+        proc { fer_acc.close_index }
+      end
+
       attr_reader :doc_class, :doc_class_name, :doc_class_name_u
       attr_accessor :index
 
@@ -14,6 +18,7 @@ module Isomorfeus
         else
           open_index
         end
+        ObjectSpace.define_finalizer(self, self.class.finalize(self))
       end
 
       def destroy_index
@@ -43,8 +48,8 @@ module Isomorfeus
         @index.update(id, document)
       end
 
-      def doc_id
-        @index.size - 1
+      def search_each(query, options, &block)
+        @index.search_each(query, optons, &block)
       end
 
       private

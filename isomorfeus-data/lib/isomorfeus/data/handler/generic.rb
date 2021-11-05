@@ -5,14 +5,10 @@ module Isomorfeus
     module Handler
       class Generic < LucidHandler::Base
         # responsible for loading:
-        # LucidData::Array
-        # LucidData::Hash
-        # LucidData::Edge
-        # LucidData::Document
-        # LucidData::Collection
-        # LucidData::EdgeCollection
-        # LucidData::Graph
-        # LucidData::Composition
+        # LucidObject
+        # LucidDocument
+        # LucidFile
+        # LucidQuery
 
         def process_request(response_agent)
           # promise_send_path('Isomorfeus::Data::Handler::Generic', self.to_s, action, props_hash)
@@ -23,7 +19,7 @@ module Isomorfeus
                 response_agent.request[type_class_name].each_key do |action|
                   case action
                   when 'load' then process_load(response_agent, type_class, type_class_name)
-                  when 'execute' then process_execute(response_agent, type_class, type_class_name)
+                  when 'query' then process_query(response_agent, type_class, type_class_name)
                   when 'create' then process_create(response_agent, type_class, type_class_name)
                   when 'save' then process_save(response_agent, type_class, type_class_name)
                   when 'destroy' then process_destroy(response_agent, type_class, type_class_name)
@@ -79,11 +75,11 @@ module Isomorfeus
           end
         end
 
-        def process_execute(response_agent, type_class, type_class_name)
-          # 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props_json
-          props = response_agent.request[type_class_name]['execute']
+        def process_query(response_agent, type_class, type_class_name)
+          # 'Isomorfeus::Data::Handler::Generic', self.name, :query, props_json
+          props = response_agent.request[type_class_name]['query']
           props.transform_keys!(&:to_sym)
-          if Isomorfeus.current_user.authorized?(type_class, :execute, props)
+          if Isomorfeus.current_user.authorized?(type_class, :query, props)
             queried_type = type_class.execute(**props)
             if queried_type
               response_agent.outer_result = {} unless response_agent.outer_result

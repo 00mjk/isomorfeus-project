@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidData::File' do
+RSpec.describe 'LucidFile' do
   after do
     SimpleFile.destroy(key: '123')
   end
@@ -8,7 +8,7 @@ RSpec.describe 'LucidData::File' do
   context 'on the server' do
     it 'can instantiate a file by inheritance' do
       result = on_server do
-        class TestFileBase < LucidData::File::Base
+        class TestFileBase < LucidFile::Base
         end
         file = TestFileBase.new(key: 1, data: 'a')
         [file.key, file.data]
@@ -19,7 +19,7 @@ RSpec.describe 'LucidData::File' do
     it 'can instantiate a file by mixin' do
       result = on_server do
         class TestFileMixin
-          include LucidData::File::Mixin
+          include LucidFile::Mixin
         end
         file = TestFileBase.new(key: 2, data: 'b')
         [file.key, file.data]
@@ -67,7 +67,7 @@ RSpec.describe 'LucidData::File' do
 
     it 'converts to sid' do
       result = on_server do
-        class TestFileMixinC < LucidData::File::Base
+        class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 11)
         file.sid
@@ -77,7 +77,7 @@ RSpec.describe 'LucidData::File' do
 
     it 'converts to transport' do
       result = on_server do
-        class TestFileMixinC < LucidData::File::Base
+        class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 12, data: 'a')
         file.to_transport
@@ -93,7 +93,7 @@ RSpec.describe 'LucidData::File' do
 
     it 'can instantiate a file by inheritance' do
       result = @doc.evaluate_ruby do
-        class TestFileBase < LucidData::File::Base
+        class TestFileBase < LucidFile::Base
         end
         file = TestFileBase.new(key: 14)
         file.key
@@ -104,7 +104,7 @@ RSpec.describe 'LucidData::File' do
     it 'can instantiate a file by mixin' do
       result = @doc.evaluate_ruby do
         class TestFileMixin
-          include LucidData::File::Mixin
+          include LucidFile::Mixin
         end
         file = TestFileMixin.new(key: 15)
         file.key
@@ -114,14 +114,14 @@ RSpec.describe 'LucidData::File' do
 
     it 'reports a change' do
       result = @doc.evaluate_ruby do
-        class TestFileMixinC < LucidData::File::Base
+        class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 23)
         file.changed?
       end
       expect(result).to be(false)
       result = @doc.evaluate_ruby do
-        class TestFileMixinC < LucidData::File::Base
+        class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 23)
         file.data = 20
@@ -132,7 +132,7 @@ RSpec.describe 'LucidData::File' do
 
     it 'converts to sid' do
       result = @doc.evaluate_ruby do
-        class TestFileMixinC < LucidData::File::Base
+        class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 24)
         file.sid
@@ -142,7 +142,7 @@ RSpec.describe 'LucidData::File' do
 
     it 'converts to transport' do
       result = @doc.evaluate_ruby do
-        class TestFileMixinC < LucidData::File::Base
+        class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 28, data: 'a')
         file.to_transport.to_n

@@ -1,2 +1,2 @@
-class SimpleFile < LucidData::File::Base
+class SimpleFile < LucidFile::Base
 end

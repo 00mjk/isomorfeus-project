@@ -1,4 +1,4 @@
-class SimpleUser < LucidData::Document::Base
+class SimpleUser < LucidDocument::Base
   include LucidAuthentication::Mixin
 
   execute_load do |key:|
