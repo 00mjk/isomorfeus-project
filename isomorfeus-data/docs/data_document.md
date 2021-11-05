@@ -4,7 +4,7 @@ allows for isomorphic access to Documents.
 
 Documents consist of fields of textual data.
 The fields are indexed by default, thus documents can be easily found by querying text in the fields.
-The documents fields must be declared. :id and :key are reserved and must not be used as field names.
+The documents fields must be declared.
 
 #### New Instantiation
 ```ruby

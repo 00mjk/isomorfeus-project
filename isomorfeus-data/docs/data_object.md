@@ -27,30 +27,39 @@ a.color # -> 'FF0000'
 
 #### Searching for Objects
 
-Objects can be searched server side using the search method on the class. To make search results isomorphically available a LucidQuery::Base class must be used. The search method returns a array of objects. It accepts as query a attribute key and a value. The value must exactly match. All attributes can be searched by using '*'.
+Objects can be searched server side using the search method on the class. To make search results isomorphically available a LucidQuery::Base class must be used. The search method returns a array of objects. It accepts as query a attribute key and a value.
+The value is interpreted differently, depending on which type of indexing is used.
+Two types are supported:
+- value: the value must exactly match
+- text: the value is interpreted as ferret text query
 
 ```ruby
 class MyObject < LucidObject::Base
-  field :name
+  attribute :email, index: :value # the value is indexed as it is, when searching for it, the queried value must exactly match
+  attribute :name, index: :text   # the value is indexed as text, when searching for it, the query allows for variations
 end
 
 # example, server side
-top_docs = MyObject.search(:name, 'hamster')
+top_objects = MyObject.search(:email, 'hamster@isomorfeus.com') # only objects with the exact matching value in the email attribute
+                                                                # will be found, because email is index as value
+top_objects = MyObject.search(:name, '(hamster OR ferret)')     # because :name is indexed as text, isomorfeus ferret field queries
+                                                                # can be used
 
 # create query class:
 class MyQuery < LucidQuery::Base
   execute_query do
-    { hamsters: MyObject.search(:name, 'hamster') }
+    { hamsters_or_ferrets: MyObject.search(:name, '(hamster OR ferret)') }
   end
 end
 
 # example, client side or everywhere else in the system:
 MyQuery.promise_execute.then do |query_result|
-  query_result.hamsters # The hash key can be accessed with a method.
+  query_result.hamsters_or_ferrets # The hash key can be accessed with a method.
 end
 ```
 
-For more information about Queries and how to pass props see the [query docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/docs/data_query.md).
+For more information about LucidQuery and how to pass props see the [query docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/docs/data_query.md).
+See the [Ferret Tutorial](https://github.com/isomorfeus/isomorfeus-ferret/blob/master/TUTORIAL.md) for more information about ferret text queries.
 
 ### Example and Specs
 - [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_object.rb)
