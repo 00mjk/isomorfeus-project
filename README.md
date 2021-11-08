@@ -20,7 +20,11 @@ Source code is available at:
 - [Project Structure](docs/project_structure.md)
 
 ### Isomorfeus modules
-- [Isomorfeus Installer and command execution](isomorfeus/README.md)
+- Isomorfeus Installer -
+[Github](https://github.com/isomorfeus/isomorfeus-project/tree/master/isomorfeus),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-project/-/tree/master/isomorfeus),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-project/src/master/isomorfeus/),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-project/tree/master/isomorfeus)
 - Isomorfeus Preact - Develop Preact Components in Ruby -
 [Github](https://github.com/isomorfeus/isomorfeus-preact),
 [Gitlab](https://gitlab.com/isomorfeus/isomorfeus-preact),
@@ -31,13 +35,41 @@ Source code is available at:
 [Gitlab](https://gitlab.com/isomorfeus/isomorfeus-project/-/tree/master/isomorfeus-data),
 [Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-project/src/master/isomorfeus-data/),
 [Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-project/tree/master/isomorfeus-data)
-- [Isomorfeus I18n - Go international](isomorfeus-i18n/README.md)
-- [Isomorfeus Mailer - Use Preact Components as mail templates](isomorfeus-mailer/README.md)
-- [Isomorfeus Operation - Isomorphic business operations](isomorfeus-operation/README.md)
-- [Isomorfeus Policy - Isomorphic Policy](isomorfeus-policy/README.md)
-- [Isomorfeus Transport - Channels, PubSub and Authentication](isomorfeus-transport/README.md)
-- [Isomorfeus Server Roda Application](docs/roda_app.md)
-- Isomorfeus Puppetmaster - Tests and Specs
+- Isomorfeus I18n - Go international -
+[Github](https://github.com/isomorfeus/isomorfeus-project/tree/master/isomorfeus-i18n),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-project/-/tree/master/isomorfeus-i18n),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-project/src/master/isomorfeus-i18n/),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-project/tree/master/isomorfeus-i18n)
+- Isomorfeus Mailer - Use Preact Components as mail templates -
+[Github](https://github.com/isomorfeus/isomorfeus-project/tree/master/isomorfeus-mailer),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-project/-/tree/master/isomorfeus-mailer),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-project/src/master/isomorfeus-mailer/),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-project/tree/master/isomorfeus-mailer)
+- Isomorfeus Operation - Isomorphic business operations -
+[Github](https://github.com/isomorfeus/isomorfeus-project/tree/master/isomorfeus-operation),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-project/-/tree/master/isomorfeus-operation),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-project/src/master/isomorfeus-operation/),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-project/tree/master/isomorfeus-operation)
+- Isomorfeus Policy - Isomorphic Policy -
+[Github](https://github.com/isomorfeus/isomorfeus-project/tree/master/isomorfeus-policy),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-project/-/tree/master/isomorfeus-policy),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-project/src/master/isomorfeus-policy/),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-project/tree/master/isomorfeus-policy)
+- Isomorfeus Transport - Channels, PubSub and Authentication -
+[Github](https://github.com/isomorfeus/isomorfeus-project/tree/master/isomorfeus-transport),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-project/-/tree/master/isomorfeus-transport),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-project/src/master/isomorfeus-transport/),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-project/tree/master/isomorfeus-transport)
+- Isomorfeus Server Roda Application -
+[Github](https://github.com/isomorfeus/isomorfeus-project/blob/master/docs/roda_app.md),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-project/-/blob/master/docs/roda_app.md),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-project/src/master/docs/roda_app.md),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-project/blob/master/docs/roda_app.md)
+- Isomorfeus Puppetmaster - Tests and Specs -
+[Github](https://github.com/isomorfeus/isomorfeus-puppetmaster),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-puppetmaster),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-puppetmaster/src/master/),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-puppetmaster)
 
 ### Other modules for very advanced usage
 These modules are used internally by Isomorfeus:
