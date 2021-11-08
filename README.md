@@ -14,7 +14,7 @@ At the [Isomorfeus Framework Project](http://isomorfeus.com)
 - [Project Structure](docs/project_structure.md)
 ### Isomorfeus modules
 - [Isomorfeus installer and command execution](isomorfeus/README.md)
-- [Isomorfeus Preact - Develop Preact Components in Ruby](../../../isomorfeus-preact/README.md)
+- [Isomorfeus Preact - Develop Preact Components in Ruby](/isomorfeus/isomorfeus-preact/)
 - [Isomorfeus Data - Isomorphic Documents, Objects, Queries and Files](isomorfeus-data/README.md)
 - [Isomorfeus I18n - Go international](isomorfeus-i18n/README.md)
 - [Isomorfeus Mailer - Use Preact Components as mail templates](isomorfeus-mailer/README.md)
@@ -24,4 +24,4 @@ At the [Isomorfeus Framework Project](http://isomorfeus.com)
 - [Isomorfeus Server Roda Application](docs/roda_app.md)
 
 ### For very advanced usage
-- [Isomorfeus Redux](../../../isomorfeus-redux/README.md)
+- [Isomorfeus Redux](/isomorfeus/isomorfeus-redux/)
