@@ -7,14 +7,23 @@ A easy to use application framework, made for a highly productive development ex
 ### Community and Support
 At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
-## Documentation
+Source code is available at:
+- [Github](https://github.com/isomorfeus)
+- [Gitlab](https://gitlab.com/isomorfeus)
+- [Bitbucket](https://bitbucket.org/isomorfeus/)
+- [custom Gitprep at isomorfeus.com](https://isomorfeus.com/gitprep/jan)
 
+## Documentation
 ### Getting started
-- [Get started](docs/get_started_web.md)
+- [Get started, Installation](docs/get_started_web.md)
 - [Project Structure](docs/project_structure.md)
 ### Isomorfeus modules
 - [Isomorfeus installer and command execution](isomorfeus/README.md)
-- [Isomorfeus Preact - Develop Preact Components in Ruby](/isomorfeus/isomorfeus-preact/)
+- Isomorfeus Preact - Develop Preact Components in Ruby -
+[Github](https://github.com/isomorfeus/isomorfeus-preact),
+[Gitlab](https://gitlab.com/isomorfeus/isomorfeus-preact),
+[Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-preact/src/master/),
+[Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-preact)
 - [Isomorfeus Data - Isomorphic Documents, Objects, Queries and Files](isomorfeus-data/README.md)
 - [Isomorfeus I18n - Go international](isomorfeus-i18n/README.md)
 - [Isomorfeus Mailer - Use Preact Components as mail templates](isomorfeus-mailer/README.md)
@@ -22,6 +31,12 @@ At the [Isomorfeus Framework Project](http://isomorfeus.com)
 - [Isomorfeus Policy - Isomorphic Policy](isomorfeus-policy/README.md)
 - [Isomorfeus Transport - Channels, PubSub and Authentication](isomorfeus-transport/README.md)
 - [Isomorfeus Server Roda Application](docs/roda_app.md)
+- Isomorfeus Puppetmaster - Tests and Specs
 
-### For very advanced usage
-- [Isomorfeus Redux](/isomorfeus/isomorfeus-redux/)
+### Other modules for very advanced usage
+These modules are used internally by the above Isomorfeus modules
+- Isomorfeus Asset Manager - [Github](https://github.com/isomorfeus/isomorfeus-asset-manager), [Gitlab](https://gitlab.com/isomorfeus/isomorfeus-asset-manager), [Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-asset-manager/src/master/), [Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-asset-manager)
+- Isomorfeus Ferret - [Github](https://github.com/isomorfeus/isomorfeus-ferret), [Gitlab](https://gitlab.com/isomorfeus/isomorfeus-ferret), [Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-ferret/src/master/), [Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-ferret)
+- Isomorfeus Hamster - [Github](https://github.com/isomorfeus/isomorfeus-hamster), [Gitlab](https://gitlab.com/isomorfeus/isomorfeus-hamster), [Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-hamster/src/master/), [Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-hamster)
+- Isomorfeus Redux - [Github](https://github.com/isomorfeus/isomorfeus-redux), [Gitlab](https://gitlab.com/isomorfeus/isomorfeus-redux), [Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-redux/src/master/), [Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-redux)
+- Isomorfeus Speednode - [Github](https://github.com/isomorfeus/isomorfeus-speednode), [Gitlab](https://gitlab.com/isomorfeus/isomorfeus-speednode), [Bitbucket](https://bitbucket.org/isomorfeus/isomorfeus-speednode/src/master/), [Gitprep](https://isomorfeus.com/gitprep/jan/isomorfeus-speednode)
