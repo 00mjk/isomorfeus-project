@@ -1,20 +1,33 @@
-## Get started developing web applications
-
+## Get started developing web applications with Isomorfeus
 ### Requirements
 Isomorfeus works on any of the following operating systems:
 - Linux
 - macOS
+- Windows
 
 Further are required:
-- ruby >= 2.6.5 with bundler
+- ruby >= 3.0.0 with bundler
 - node with at least current LTS version
 ### Installation
+Linux:
+make sure ruby >= 3 is installed. Then in a shell:
 ```shell script
-$ gem install isomorfeus -v 1.0.0.zeta19
+$ gem install isomorfeus
 ```
 
-### Creating a project
-Please choose a name in small letters with underscores for your project: 
+macOS:
+make sure ruby >= 3 is installed. Then in a shell:
+```shell script
+$ gem install isomorfeus
+```
+
+Windows:
+make sure ruby is installed. You may get ruby from [https://rubyinstaller.org/](https://rubyinstaller.org/). Then in a cmd window:
+```cmd script
+C:\Users\Jan> gem install isomorfeus
+```
+### Create a project
+Please choose a name in small letters with underscores for your project:
 ```shell script
 $ isomorfeus new my_project
 ```
@@ -24,28 +37,14 @@ The installer will set up the project structure and create several example files
 Cd into the projects folder:
 ```shell script
 $ cd my_project
-$ foreman start -f ProcfileDev
+$ bundle exec iodine
 ```
-and start the application with foreman as shown above.
-It will compile assets and once its ready, continue below with section "Editing your first component"
-
-### Starting the development environment using Docker
-Make sure have Docker and Docker Compose installed.
-
-Cd into the projects folder:
-```shell script
-$ cd my_project
-$ docker-compose up
-```
-and start the build of the containers (takes a while) and after that the containers themselves.
-Once the container are started continue below. 
+and start the application as shown above.
 
 ### Editing your first component
-Then open browser at [http://localhost:5000](http://localhost:5000).
+Then open a browser at [http://localhost:3000](http://localhost:3000).
 By default you will see a simple WelcomeComponent.
 The component is located in the file `my_project/app/components/welcome_component.rb`.
-Open the File your favorite ruby editor or IDE and change the text. After saving, the changed text should appear instantly in the Browser.
+Open the file in your favorite ruby editor or IDE and change the text. After saving, the changed text should appear instantly in the Browser.
 
-Understand the generic project structure [here](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/docs/project_structure.md)
-and to learn more about components may have a look at the
-[isomorfeus-react documentation](https://github.com/isomorfeus/isomorfeus-react/blob/master/ruby/README.md).
+Understand the generic project structure [here](project_structure.md) and to learn more about components have a look at the Isomorfeus Preact documentation.
