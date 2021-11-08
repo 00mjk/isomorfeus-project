@@ -1,3 +1,0 @@
-## Get started developing mobile applications
-
-### coming soon ...
