@@ -14,9 +14,11 @@ Source code is available at:
 - [custom Gitprep at isomorfeus.com](https://isomorfeus.com/gitprep/jan)
 
 ## Documentation
+
 ### Getting started
 - [Get started, Installation](docs/get_started_web.md)
 - [Project Structure](docs/project_structure.md)
+
 ### Isomorfeus modules
 - [Isomorfeus installer and command execution](isomorfeus/README.md)
 - Isomorfeus Preact - Develop Preact Components in Ruby -
