@@ -5,12 +5,12 @@
 A easy to use application framework, made for a highly productive development experience.
 
 ### Community and Support
-At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ## Documentation
 
 ### Getting started
-- [Get started](https://github.com/isomorfeus/isomorfeus-project/blob/master/docs/get_started_web.md)
+- [Get started](docs/get_started_web.md)
 - [Project Structure](https://github.com/isomorfeus/isomorfeus-project/blob/master/docs/project_structure.md)
 ### Isomorfeus modules
 - [Isomorfeus installer and command execution](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus/README.md)
