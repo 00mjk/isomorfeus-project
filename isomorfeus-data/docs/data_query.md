@@ -45,18 +45,14 @@ end
 ```
 
 ### Props
-Props are used by queries and *must* be declared.
+Props are used by queries and *must* be declared when used.
 See [the isomorfeus-react props documentation](https://github.com/isomorfeus/isomorfeus-react/blob/master/ruby/docs/props.md#prop-declaration).
 
 Example:
 ```ruby
 class MyQuery < LucidQuery::Base
-  def some_other_method
-    # do soemthing else
-  end
-
-  # for style and readability it is recommended to keep props and execute_query close:
   prop :count, class: Integer
+
   execute_query do
     c = props.count # access props as usual
     # etc. ...
