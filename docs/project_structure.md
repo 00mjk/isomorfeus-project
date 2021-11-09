@@ -10,6 +10,7 @@
 - spec - directory for rspec files
 
 optional:
+- config - directory for *.rb files to be loaded before application start, usually used to configure various things
 - node_modules - directory for additional node modules used by the app
 - package.json - for npm to install and load additional npm packages
 
