@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-ferret', '~> 0.12.0'
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.1'
   s.add_dependency 'isomorfeus-preact', '~> 10.5.11'
-  s.add_dependency 'isomorfeus-redux', '~> 4.1.8'
+  s.add_dependency 'isomorfeus-redux', '~> 4.1.9'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Data::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Data::VERSION
   s.add_development_dependency 'rake'

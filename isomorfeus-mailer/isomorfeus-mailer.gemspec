@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.2'
   s.add_dependency 'isomorfeus-preact', '~> 10.5.11'
-  s.add_dependency 'isomorfeus-redux', '~> 4.1.8'
+  s.add_dependency 'isomorfeus-redux', '~> 4.1.9'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'rake'
