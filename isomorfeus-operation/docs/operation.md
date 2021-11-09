@@ -1,6 +1,6 @@
 ### LucidOperation and LucidLocalOperation
 
-LucidOperation too is always executed on the Server. It allows to define Operations in gherkin human language style:
+LucidOperation can be triggerend from the client but is always executed on the Server. It allows to define Operations in gherkin human language style:
 ```ruby
 class MyOperation < LucidOperation::Base
   prop :a_prop

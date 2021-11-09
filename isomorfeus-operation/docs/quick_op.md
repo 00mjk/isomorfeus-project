@@ -1,5 +1,6 @@
 ### LucidQuickOp
 
+LucidQuickOp can be triggerend from the client but is always executed on the Server.
 ```ruby
 class MyQuickOp < LucidQuickOp::Base
   prop :a_prop
@@ -8,7 +9,7 @@ class MyQuickOp < LucidQuickOp::Base
     if RUBY_ENGINE != 'opal' # keep asset size low and guard code against inclusion in client side assets
       props.a_prop == 'a_value'
       # do something
-    end 
+    end
   end
 end
 

@@ -3,7 +3,7 @@
 Build mails with components and send them with [Mailhandler](https://github.com/wildbit/mailhandler#email-sending).
 
 ### Community and Support
-At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ### Configuration
 
@@ -28,8 +28,8 @@ Inline styles work in Mail Components too.
 Example component:
 ```ruby
 class EmailComponent < LucidApp::Base
-  # the toplevel component must be a App component
-  # then oder LucidComponent's can be used in the render block 
+  # the top level component must be a App component
+  # then other LucidComponent's can be used in the render block
 
   prop :name
 
@@ -41,11 +41,11 @@ end
 
 #### Sending Mail
 
-One class is provided to actually build and send the mail: LucidMail. This class is only available on the server.
+One class is provided to actually build and send the mail: LucidMail. This class is only available on the server to prevent abuse.
 
-Sending mail with the rendered component:
+Sending mail with the rendered component from the server:
 ```ruby
-mail = LucidMail.new(component: 'EmailComponent', 
+mail = LucidMail.new(component: 'EmailComponent',
                      props: { name: 'Siegfried' }, # are passed to the component
                      from: 'me@test.com',
                      to: 'you@test.com',
@@ -62,7 +62,7 @@ html = mail.rendered_component
 
 #### Accessing the mail before sending
 
-It is possible to access the actual mail object after building it for further inspection or modification:  
+It is possible to access the actual mail object after building it for further inspection or modification:
 ```ruby
 mail.build
 mail_object = mail.mail
@@ -70,11 +70,11 @@ mail_object = mail.mail
 For documentation about the Mail Object see the [Mail Documentation](https://github.com/mikel/mail).
 
 #### Triggering mail from a client
-LucidMail is available only on the server. It can be wrapped in a operation to allow triggering the sending of mail from a client. Example:
+LucidMail is available only on the server to prevent abuse. It can be wrapped in a operation to allow triggering the sending of mail from a client. Example:
 ```ruby
 class MailOp < LucidQuickOp::Base
   op do
-    LucidMail.new(component: 'EmailComponent', 
+    LucidMail.new(component: 'EmailComponent',
                   from: 'me@test.com',
                   to: current_user.email,
                   subject: 'Welcome')

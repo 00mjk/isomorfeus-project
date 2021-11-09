@@ -11,17 +11,17 @@ end
 ```
 For more information about policy see [the policy docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-policy/README.md).
 
-A class representing a user should be a LucidNode and include LucidAuthentication::Mixin (for login) and LucidAuthorization::Mixin (for policy)
+A class representing a user should be a LucidObject and include LucidAuthentication::Mixin (for login) and LucidAuthorization::Mixin (for policy)
 ```ruby
-class User < LucidGenericDocument::Base
+class User < LucidObject::Base
   include LucidAuthentication::Mixin
   include LucidAuthorization::Mixin
 
   execute_login do |user:, pass:|
     if RUBY_ENGINE != 'opal' # guard to prevent inclusion of code client side to keep asset size low
       # should return either a User instance or a Promise which resolves to a User instance
-      # The returned instance must be instance of a LucidData class  
-    end 
+      # The returned instance must be instance of a LucidData class
+    end
   end
 end
 ```
@@ -31,16 +31,16 @@ User.promise_login(user: user_identifier, pass: user_password_or_token)
 # or
 User.promise_login(user: user_identifier, pass: user_password_or_token) do |user|
   # return a path for redirection
-  # user is the instance of the logged in user, but current_user has not been set 
+  # user is the instance of the logged in user, but current_user has not been set
   # current_user will be set and globally available after the redirect.
   # If this block is used it must return a path starting with '/', it will be the path the system redirects the
-  # user to, the path the user will land on after successful login 
+  # user to, the path the user will land on after successful login
   '/dashboard'
 end
 ```
 
-> *ATTENTION:* The standard isomorfeus authentication scheme accepts a *block* -> `promise_login() do` and *NOT* a `promise_login().then do`. 
-Other authentication though schemes may accept a `promise_login().then` (see the facebook scheme example below).
+> *ATTENTION:* The standard isomorfeus authentication scheme accepts a *block* -> `promise_login() do` and *NOT* a `promise_login().then do`.
+Other authentication schemes may accept a `promise_login().then` (see the facebook scheme example below).
 
 or later on:
 ```ruby
@@ -93,7 +93,7 @@ end
 The general :isomorfeus scheme login procedure is as follows:
 - client, over a (secure in production) socket authenticates *successfully* using promise_login
 - the server creates cookie eater and session cookie and session
-- server returns over (secure) socket the user (for inspection in the `do` block of promise_login) and the cookie eater cookie 
+- server returns over (secure) socket the user (for inspection in the `do` block of promise_login) and the cookie eater cookie
 - client engages cookie eater, that means:
     - page load with cookie eater cookie
     - that sets session cookie securely HttpOnly (and Secure in production)
@@ -108,8 +108,7 @@ Login with the :isomorfeus scheme may create 3 situations:
 1. *Login successful*: promise_login -> do engage cookie eater -> redirect -> current_user is the logged in user
 2. *Login failed*: promise_login -> .fail block
 3. *Login successful and cookie eater cookie stolen*: promise_login -> do engage cookie eater -> destroy existing session -> redirect -> current_user is Anonymous
-(This is theoretical. Stealing the cookie eater cookie is virtually impossible. It is consumed (eaten) immediately after creation and as cookies
-in real life, can only be eaten once.)
+(This is theoretical. Stealing the cookie eater cookie is virtually impossible. It is consumed (eaten) immediately after creation and as cookies in real life, can only be eaten once.)
 
 ### Convenience methods
 
