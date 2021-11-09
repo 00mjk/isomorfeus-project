@@ -76,8 +76,9 @@ DESC
     desc "versions", "Show versions of important Isomorfeus gems"
     def versions
       output = ''
-      %w[isomorfeus-asset-manager isomorfeus-redux isomorfeus-preact isomorfeus-data isomorfeus-i18n isomorfeus-mailer isomorfeus-operation
-         isomorfeus-policy isomorfeus-transport isomorfeus].each do |gem|
+      %w[isomorfeus-asset-manager isomorfeus-ferret isomorfeus-hamster isomorfeus-redux isomorfeus-preact
+         isomorfeus-puppetmaster isomorfeus-speednode isomorfeus-data isomorfeus-i18n isomorfeus-mailer
+         isomorfeus-operation isomorfeus-policy isomorfeus-transport isomorfeus iodine opal-zeitwerk opal].each do |gem|
         o = `bundle info #{gem} 2>&1`
         o.each_line do |line|
           output << line if line.include?('*') && line.include?(gem)

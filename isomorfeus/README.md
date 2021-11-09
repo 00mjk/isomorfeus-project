@@ -3,7 +3,7 @@
 Create new isomorfeus applications with ease.
 
 ### Community and Support
-At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ## Installation
 ```shell script
@@ -20,7 +20,8 @@ isomorfeus new my_application
 ```shell script
 $ isomorfeus help
 Commands:
-    isomorfeus console                       # Open console for current project.
-    isomorfeus help [COMMAND]                # Describe available commands or one specific command
-    isomorfeus new project_name              # Create a new isomorfeus project with project_name.
+    isomorfeus console            # Open application console within the project directory.
+    isomorfeus help [COMMAND]     # Describe available commands or one specific command
+    isomorfeus new project_name   # Create a new isomorfeus project with project_name.
+    isomorfeus versions           # Show versions of isomorfeus gems within the project directory.
 ```
