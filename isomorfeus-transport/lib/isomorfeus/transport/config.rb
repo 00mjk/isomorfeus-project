@@ -175,7 +175,7 @@ module Isomorfeus
 
   # defaults
   self.api_websocket_host = 'localhost'
-  self.api_websocket_port = '5000'
+  self.api_websocket_port = '3000'
   self.api_websocket_path = '/isomorfeus/api/websocket'
 
   self.cookie_eater_path = '/isomorfeus/cookie/eat'
