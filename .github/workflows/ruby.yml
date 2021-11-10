@@ -19,4 +19,6 @@ jobs:
       with:
         ruby-version: 3.0
     - name: Build and test with Rake
-      run: rake
+      run: |
+        gem install cowsay
+        rake
