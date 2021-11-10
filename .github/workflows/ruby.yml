@@ -7,46 +7,17 @@ on:
     branches: [ '*' ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  specs:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
+    - name: Set up Ruby 3.0
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 3.0
+        bundler-cache: true
     - name: Build and test with Rake
-      run: |
-        curl https://download.arangodb.com/arangodb36/DEBIAN/Release.key | sudo apt-key add -
-        wget https://download.arangodb.com/arangodb36/Community/Linux/arangodb3_3.6.0-1_amd64.deb
-        echo arangodb3 arangodb3/password password root | sudo debconf-set-selections
-        echo arangodb3 arangodb3/password_again password root | sudo debconf-set-selections
-        sudo dpkg -i arangodb3_3.6.0-1_amd64.deb
-        sudo systemctl start arangodb3
-        sudo apt-get install libdb-dev
-        gem install bundler
-        gem install builder
-        gem install dbm
-        rake
-    - name: Success
-      if: success()
-      uses: janbiedermann/github-action-slack-notify-build@aa719d3
-      with:
-        channel: ci
-        status: SUCCESS
-        color: good
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-    - name: Failure
-      if: failure()
-      uses: janbiedermann/github-action-slack-notify-build@aa719d3
-      with:
-        channel: ci
-        status: FAILED
-        color: danger
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-
-
+      run: bundle exec rake
