@@ -15,10 +15,10 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'activesupport', '~> 6.1'
   s.add_dependency 'bcrypt', '~> 3.1.16'
-  s.add_dependency 'iodine', '~> 0.7.44'
+  s.add_dependency 'isomorfeus-iodine', '~> 0.7.45'
   s.add_dependency 'oj', '~> 3.13.9'
   s.add_dependency 'opal', '~> 1.3.0'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.2'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.3'
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.1'
   s.add_dependency 'isomorfeus-preact', '~> 10.5.11'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
