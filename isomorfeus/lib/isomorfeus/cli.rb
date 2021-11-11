@@ -2,7 +2,7 @@ module Isomorfeus
   class CLI < Thor
 
     desc "new project_name", "Create a new isomorfeus project with project_name."
-    option :rack_server, default: 'iodine', aliases: '-r',
+    option :rack_server, default: 'isomorfeus-iodine', aliases: '-r',
            desc: "Select rack server, one of: #{Isomorfeus::Installer.sorted_rack_servers.join(', ')}."
     option :targets, default: 'web', required: false, type: :string, aliases: '-t', desc: <<~DESC
 Select targets to install.
@@ -94,7 +94,7 @@ DESC
            desc: "Recursively copy files from source dir into app. (optional)"
     option :targets, default: 'web', required: false, type: :string, aliases: '-t',
            desc: 'Select targets to install.'
-    option :rack_server, default: 'iodine', aliases: '-r',
+    option :rack_server, default: 'isomorfeus-iodine', aliases: '-r',
            desc: "Select rack server, one of: #{Isomorfeus::Installer.sorted_rack_servers.join(', ')}. (optional, default: iodine)"
     option :yarn_and_bundle, default: 'yes', required: false, type: :string, aliases: '-y',
            desc: "Execute bundle install: -y or -y yes, do not execute: -y no"

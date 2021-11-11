@@ -108,7 +108,7 @@ RSpec.describe 'isomorfeus installer' do
       FileUtils.rm_rf('test_app') if Dir.exist?('test_app')
     end
 
-    it 'iodine' do
+    it 'isomorfeus-iodine' do
       Isomorfeus::CLI.start(%w[new test_app -r iodine -y no])
       Dir.chdir('test_app')
       expect(File.exist?(File.join('config', 'iodine.rb'))).to be true
