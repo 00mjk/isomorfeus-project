@@ -86,7 +86,7 @@ module Isomorfeus
       def open_environment
         return self.class.refa if self.class.environment
         FileUtils.mkdir_p(Isomorfeus.data_object_env_path) unless Dir.exist?(Isomorfeus.data_object_env_path)
-        self.class.environment = Isomorfeus::Hamster.new(Isomorfeus.data_object_env_path)
+        self.class.environment = Isomorfeus::Hamster.new(Isomorfeus.data_object_env_path, mapsize: Isomorfeus.hamster_mapsize)
         self.class.refa
       end
     end
