@@ -17,9 +17,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'html2text', '~> 0.3.1'
   s.add_dependency 'mailhandler', '~> 1.0.59'
   s.add_dependency 'oj', '~> 3.13.9'
-  s.add_dependency 'opal', '~> 1.3.0'
+  s.add_dependency 'opal', '~> 1.3.2'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.3'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.8'
   s.add_dependency 'isomorfeus-preact', '~> 10.5.11'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.9'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Mailer::VERSION
