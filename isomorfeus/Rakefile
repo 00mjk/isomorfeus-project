@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'bundler'
 require 'bundler/cli'
+require 'bundler/cli/exec'
 require 'cowsay'
 
 task :specs do
