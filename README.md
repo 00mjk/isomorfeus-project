@@ -1,4 +1,8 @@
-# Isomorfeus Ruby
+<h1 align="center">
+  <img src="https://github.com/isomorfeus/isomorfeus-project/blob/master/Isomorfeus-Logo.png?raw=true" align="center" width="123" height="123" />
+  <br/>
+  Isomorfeus<br/>
+</h1>
 
 -> Make your dreams come true :)
 
