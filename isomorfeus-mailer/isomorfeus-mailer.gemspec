@@ -25,5 +25,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec', '~> 3.8.0'
+  s.add_development_dependency 'rspec', '~> 3.10.0'
 end
