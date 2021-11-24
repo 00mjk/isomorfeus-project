@@ -73,9 +73,9 @@ DESC
       Isomorfeus::Installer::Bundle.execute
     end
 
-    desc "versions", "Show versions of important Isomorfeus gems"
+    desc "versions", "Show versions of important Isomorfeus gems, to be executed within the project root."
     def versions
-      output = ''
+      output = "isomorfeus command version #{Isomorfeus::VERSION}\nProject gem versions:\n"
       %w[isomorfeus-asset-manager isomorfeus-ferret isomorfeus-hamster isomorfeus-redux isomorfeus-preact
          isomorfeus-puppetmaster isomorfeus-speednode isomorfeus-data isomorfeus-i18n isomorfeus-mailer
          isomorfeus-operation isomorfeus-policy isomorfeus-transport isomorfeus iodine opal-zeitwerk opal].each do |gem|
