@@ -7,7 +7,13 @@ task :create_test_app do
   system('ruby -- ../isomorfeus/bin/isomorfeus test_app -m mailer -s test_app_files')
 end
 
-task :specs => :create_test_app do
+task :html2text_specs do
+  Bundler.with_original_env do
+    system('bundle exec rspec')
+  end
+end
+
+task :specs => [:html2text_specs, :create_test_app] do
   puts Cowsay.say "Testing #{File.dirname(__FILE__).split('/').last.upcase}. NO chance for bugs!", "Ghostbusters"
   pwd = Dir.pwd
   Dir.chdir('test_app')

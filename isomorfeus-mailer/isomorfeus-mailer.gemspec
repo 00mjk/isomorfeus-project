@@ -14,7 +14,6 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 6.1'
-  s.add_dependency 'html2text', '~> 0.3.1'
   s.add_dependency 'mailhandler', '~> 1.0.59'
   s.add_dependency 'oj', '~> 3.13.9'
   s.add_dependency 'opal', '~> 1.3.2'
@@ -26,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'isomorfeus', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.10.0'
+  s.add_development_dependency 'rspec-collection_matchers', '~> 1.2.0'
 end
