@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'opal', '~> 1.3.2'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.9'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.0'
   s.add_dependency 'isomorfeus-preact', '~> 10.6.0'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.9'
   s.add_development_dependency 'isomorfeus', Isomorfeus::Policy::VERSION

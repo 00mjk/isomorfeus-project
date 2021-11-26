@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'oj', '~> 3.13.9'
   s.add_dependency 'opal', '~> 1.3.2'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.13.9'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.0'
   s.add_dependency 'isomorfeus-ferret', '~> 0.12.2'
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.1'
   s.add_dependency 'isomorfeus-preact', '~> 10.6.0'
