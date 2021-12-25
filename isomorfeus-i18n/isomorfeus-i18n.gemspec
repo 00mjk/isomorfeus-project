@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   s.require_paths = ['lib']
 
-  s.add_dependency 'activesupport', '~> 6.1'
+  s.add_dependency 'activesupport', '~> 7.0.0'
   s.add_dependency 'fast_gettext', '~> 2.1.0'
   s.add_dependency 'http_accept_language', '~> 2.1.1'
   s.add_dependency 'oj', '~> 3.13.10'

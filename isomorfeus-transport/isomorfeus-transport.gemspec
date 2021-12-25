@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.files        = `git ls-files -- lib LICENSE README.md node_modules package.json`.split("\n")
   s.require_paths = ['lib']
 
-  s.add_dependency 'activesupport', '~> 6.1'
+  s.add_dependency 'activesupport', '~> 7.0.0'
   s.add_dependency 'bcrypt', '~> 3.1.16'
   s.add_dependency 'isomorfeus-iodine', '~> 0.7.45'
   s.add_dependency 'oj', '~> 3.13.10'
