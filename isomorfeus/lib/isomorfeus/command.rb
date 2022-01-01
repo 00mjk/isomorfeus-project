@@ -8,6 +8,7 @@ else
   require 'bundler'
   require 'fileutils'
   require 'erb'
+  require 'active_support/isolated_execution_state'
   require 'active_support/core_ext/string'
   require 'oj'
   require_relative '../isomorfeus/version'
