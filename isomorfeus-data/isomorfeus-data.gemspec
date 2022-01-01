@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 7.0.0'
-  s.add_dependency 'data_uri', '~> 0.1.0'
   s.add_dependency 'oj', '~> 3.13.10'
   s.add_dependency 'opal', '~> 1.4.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'

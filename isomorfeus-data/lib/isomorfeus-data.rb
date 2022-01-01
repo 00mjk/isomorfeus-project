@@ -47,9 +47,6 @@ else
   uri_path = File.expand_path(File.join(__dir__.untaint, '..', 'opal'))
   Opal.append_path(uri_path) unless IsoOpal.paths.include?(uri_path)
 
-  data_uri_path = File.join(Gem::Specification.find_by_name('data_uri').gem_dir, 'lib')
-  Opal.append_path(data_uri_path) unless IsoOpal.paths.include?(data_uri_path)
-
   path = File.expand_path(File.join('app', 'data'))
 
   Isomorfeus.zeitwerk.push_dir(path)
