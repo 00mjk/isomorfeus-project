@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'activesupport', '~> 7.0.0'
   s.add_dependency 'mailhandler', '~> 1.0.59'
+  s.add_dependency 'nokogiri', '~> 1.12.5'
   s.add_dependency 'oj', '~> 3.13.10'
   s.add_dependency 'opal', '~> 1.4.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
