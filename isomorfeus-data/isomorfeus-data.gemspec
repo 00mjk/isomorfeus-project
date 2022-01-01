@@ -19,10 +19,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'oj', '~> 3.13.10'
   s.add_dependency 'opal', '~> 1.4.0'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.2'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.3'
   s.add_dependency 'isomorfeus-ferret', '~> 0.12.2'
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.1'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.4'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.5'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.11'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Data::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Data::VERSION
