@@ -1,5 +1,5 @@
 module Isomorfeus
   module I18n
-    VERSION = '2.0.0.rc8'
+    VERSION = '2.0.0.rc9'
   end
 end
