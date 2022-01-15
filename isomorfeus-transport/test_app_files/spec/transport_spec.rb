@@ -2,18 +2,18 @@ require 'spec_helper'
 
 RSpec.describe 'isomorfeus-transport' do
   before :all do
-    @doc = visit('/')
+    @page = visit('/')
   end
 
   it 'is loaded' do
-    result = @doc.evaluate_ruby do
+    result = @page.eval_ruby do
       defined? Isomorfeus::Transport
     end
     expect(result).to eq 'constant'
   end
 
   it 'configuration is accessible on the client' do
-    result = @doc.evaluate_ruby do
+    result = @page.eval_ruby do
       Isomorfeus.api_websocket_path
     end
     expect(result).to eq '/isomorfeus/api/websocket'
@@ -32,7 +32,7 @@ RSpec.describe 'isomorfeus-transport' do
     socket_state = nil
     start = Time.now
     while socket_state != OPEN do
-      socket_state = @doc.evaluate_ruby do
+      socket_state = @page.eval_ruby do
         Isomorfeus::Transport.socket.ready_state
       end
       if socket_state != OPEN
@@ -85,8 +85,8 @@ RSpec.describe 'isomorfeus-transport' do
     end
 
     it 'the sample handler processes a request from the client' do
-      doc = visit('/')
-      result = doc.await_ruby do
+      page = visit('/')
+      result = page.await_ruby do
         Isomorfeus::Transport.promise_send_request('TestHandler' => {test: true}).then do |agent|
           { 'agent_response' => agent.response }
         end

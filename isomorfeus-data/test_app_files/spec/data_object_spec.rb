@@ -224,11 +224,11 @@ RSpec.describe 'LucidObject' do
 
   context 'on the client' do
     before :each do
-      @doc = visit('/')
+      @page = visit('/')
     end
 
     it 'can instantiate a object by inheritance' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectBase < LucidObject::Base
           attribute :test_attribute
         end
@@ -239,7 +239,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'can instantiate a object by mixin' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixin
           include LucidObject::Mixin
           attribute :test_attribute
@@ -251,7 +251,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'verifies attribute class' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, class: String
         end
@@ -259,7 +259,7 @@ RSpec.describe 'LucidObject' do
         object.test_attribute.class.name
       end
       expect(result).to eq('String')
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, class: String
         end
@@ -270,7 +270,7 @@ RSpec.describe 'LucidObject' do
         end
       end
       expect(result).to eq('exception thrown')
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, class: String
         end
@@ -285,7 +285,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'verifies if attribute is_a' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, is_a: Enumerable
         end
@@ -293,7 +293,7 @@ RSpec.describe 'LucidObject' do
         object.test_attribute.class.name
       end
       expect(result).to eq('Array')
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, is_a: Enumerable
         end
@@ -304,7 +304,7 @@ RSpec.describe 'LucidObject' do
         end
       end
       expect(result).to eq('exception thrown')
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, is_a: Enumerable
         end
@@ -319,7 +319,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'reports a change' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute
         end
@@ -327,7 +327,7 @@ RSpec.describe 'LucidObject' do
         object.changed?
       end
       expect(result).to be(false)
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute
         end
@@ -339,7 +339,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'can load a simple object' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleObject.promise_create(key: '234', attributes: { one: '123' }).then do |object|
           SimpleObject.promise_load(key: '234').then do |object|
             object.one
@@ -350,7 +350,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'can destroy a simple object' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleObject.promise_create(key: '2345', attributes: { one: '123' }).then do |object|
           SimpleObject.promise_destroy(key: '2345').then { |result| result }
         end
@@ -359,7 +359,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'can save a simple object' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleObject.promise_create(key: '23456', attributes: { one: '123' }).then do |object|
           SimpleObject.promise_load(key: '23456').then do |object|
             object.one = 'changed'
@@ -374,7 +374,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'converts to sid' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute
         end
@@ -385,21 +385,21 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'can validate a attribute' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, class: String
         end
         TestObjectMixinC.valid_attribute?(:test_attribute, 10)
       end
       expect(result).to eq(false)
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, class: String
         end
         TestObjectMixinC.valid_attribute?(:test, '10')
       end
       expect(result).to eq(false)
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute, class: String
         end
@@ -409,7 +409,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'converts to transport' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestObjectMixinC < LucidObject::Base
           attribute :test_attribute
         end
@@ -420,7 +420,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'can load' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleObject.promise_create(key: '234567', attributes: { one: '123456' }).then do |object|
           SimpleObject.promise_load(key: '234567').then do |object|
             object.one
@@ -431,7 +431,7 @@ RSpec.describe 'LucidObject' do
     end
 
     it 'can save' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         object = SimpleObject.new(key: '123456')
         object.one = 654321
         object.promise_save.then do |object|

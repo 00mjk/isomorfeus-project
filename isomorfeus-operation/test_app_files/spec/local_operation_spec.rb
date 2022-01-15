@@ -105,11 +105,11 @@ RSpec.describe 'LucidLocalOperation' do
 
   context 'on client' do
     before :each do
-      @doc = visit('/')
+      @page = visit('/')
     end
 
     it 'can instantiate by inheritance' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestLocalOperation < LucidLocalOperation::Base
         end
         o = TestLocalOperation.new()
@@ -119,7 +119,7 @@ RSpec.describe 'LucidLocalOperation' do
     end
 
     it 'can instantiate by mixin' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestLocalOperation
           include LucidLocalOperation::Mixin
         end
@@ -130,14 +130,14 @@ RSpec.describe 'LucidLocalOperation' do
     end
 
     it 'can run the simple operation' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleLocalOperation.promise_run()
       end
       expect(result).to eq('a bird')
     end
 
     it 'executes the then block on success' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleLocalOperation.promise_run.then do |result|
           'i see ' + result
         end
@@ -147,7 +147,7 @@ RSpec.describe 'LucidLocalOperation' do
 
     it 'executes the fail block on failure' do
       # the global vars are a workaround
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleLocalOperation.promise_run(fail_op: true).fail do |_|
           $promise_resolved = true
           $promise_result = 'fail called'

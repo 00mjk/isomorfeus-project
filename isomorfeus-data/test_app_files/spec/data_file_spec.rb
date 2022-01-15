@@ -88,11 +88,11 @@ RSpec.describe 'LucidFile' do
 
   context 'on the client' do
     before :each do
-      @doc = visit('/')
+      @page = visit('/')
     end
 
     it 'can instantiate a file by inheritance' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestFileBase < LucidFile::Base
         end
         file = TestFileBase.new(key: 14)
@@ -102,7 +102,7 @@ RSpec.describe 'LucidFile' do
     end
 
     it 'can instantiate a file by mixin' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestFileMixin
           include LucidFile::Mixin
         end
@@ -113,14 +113,14 @@ RSpec.describe 'LucidFile' do
     end
 
     it 'reports a change' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 23)
         file.changed?
       end
       expect(result).to be(false)
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 23)
@@ -131,7 +131,7 @@ RSpec.describe 'LucidFile' do
     end
 
     it 'converts to sid' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 24)
@@ -141,7 +141,7 @@ RSpec.describe 'LucidFile' do
     end
 
     it 'converts to transport' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestFileMixinC < LucidFile::Base
         end
         file = TestFileMixinC.new(key: 28, data: 'a')
@@ -151,7 +151,7 @@ RSpec.describe 'LucidFile' do
     end
 
     it 'can save' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         file = SimpleFile.new(key: '123')
         file.data = 654321
         file.promise_save.then do |file|
@@ -165,11 +165,11 @@ RSpec.describe 'LucidFile' do
   context 'on the client with existing file' do
     before :each do
       SimpleFile.create(key: '123', data: 'a')
-      @doc = visit('/')
+      @page = visit('/')
     end
 
     it 'can load a simple file' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleFile.promise_load(key: '123').then do |file|
           file.data
         end
@@ -178,14 +178,14 @@ RSpec.describe 'LucidFile' do
     end
 
     it 'can destroy a simple file' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleFile.promise_destroy(key: '123').then { |result| result }
       end
       expect(result).to eq(true)
     end
 
     it 'can save a simple file' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleFile.promise_load(key: '123').then do |file|
           file.data = 'changed'
           before_changed = file.changed?

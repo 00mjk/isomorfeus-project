@@ -74,8 +74,8 @@ RSpec.describe 'Isomorfeus::Gherkin' do
     end
 
     it 'client benchmark 1000 executions' do
-      doc = visit('/')
-      time, result = doc.evaluate_ruby do
+      page = visit('/')
+      time, result = page.eval_ruby do
         EXAMPLE_TWO = <<~TEXT
 Operation: Can drink beer when thirsty
   As a drinker

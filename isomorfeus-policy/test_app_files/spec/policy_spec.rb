@@ -402,11 +402,11 @@ RSpec.describe 'LucidPolicy' do
 
   context 'on client' do
     before :each do
-      @doc = visit('/')
+      @page = visit('/')
     end
 
     it 'can mixin' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestClass
           include LucidPolicy::Mixin
         end
@@ -416,7 +416,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can be inherited from' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestClassI < LucidPolicy::Base
         end
         TestClassI.ancestors.map(&:to_s)
@@ -426,7 +426,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use policy and by default deny authorization' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserA
           include LucidAuthorization::Mixin
         end
@@ -449,7 +449,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use policy and allow for class and any method' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserB
           include LucidAuthorization::Mixin
         end
@@ -474,7 +474,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use policy and deny for class and a specified method' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserC
           include LucidAuthorization::Mixin
         end
@@ -500,7 +500,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use policy and deny for class and a specified method and allow for others' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserD
           include LucidAuthorization::Mixin
         end
@@ -531,7 +531,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use a policy with a condition that denies' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserF
           include LucidAuthorization::Mixin
 
@@ -560,7 +560,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use a policy with a condition that allows as proc' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserG
           include LucidAuthorization::Mixin
 
@@ -589,7 +589,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use a policy with a condition that allows as symbol' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserG
           include LucidAuthorization::Mixin
 
@@ -618,7 +618,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use a policy and define a custom rule tha allows' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserH
           include LucidAuthorization::Mixin
 
@@ -650,7 +650,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use a policy and define a custom rule that denies' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserI
           include LucidAuthorization::Mixin
 
@@ -682,7 +682,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can use a policy and refine a rule with a custom rule that denies' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserJ
           include LucidAuthorization::Mixin
 
@@ -715,7 +715,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can combine Policies that allow' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserK
           include LucidAuthorization::Mixin
 
@@ -748,7 +748,7 @@ RSpec.describe 'LucidPolicy' do
     end
 
     it 'can record the winning rule' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class UserL
           include LucidAuthorization::Mixin
 

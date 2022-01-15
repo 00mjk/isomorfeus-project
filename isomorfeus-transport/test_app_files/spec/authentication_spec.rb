@@ -40,11 +40,11 @@ RSpec.describe 'LucidAuthentication::Mixin' do
 
   context 'on client' do
     before :each do
-      @doc = visit('/')
+      @page = visit('/')
     end
 
     it 'can mixin' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class MyUser < LucidDocument::Base
           include LucidAuthentication::Mixin
         end
@@ -55,19 +55,22 @@ RSpec.describe 'LucidAuthentication::Mixin' do
     end
 
     it 'can authenticate successfully and current_user is available' do
-      @doc.evaluate_ruby do
-        SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pass')
+      @page.wait_for_navigation do
+        @page.eval_ruby do
+          SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pass')
+          nil
+        end
       end
-      sleep 10 # wait for page redirect
-      @doc.visit('/') # make sure we get proper execution context, so load page again
-      result = @doc.evaluate_ruby do
+      # sleep 10 # wait for page redirect
+      @page.visit('/') # make sure we get proper execution context, so load page again
+      result = @page.eval_ruby do
         Isomorfeus.current_user.key
       end
       expect(result).to eq('123')
     end
 
     it 'can authenticate to failure, password' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleUser.promise_login(user: 'joe_simple', pass: 'my_pas').fail do
           true
         end
@@ -76,7 +79,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
     end
 
     it 'can authenticate to failure, user_id' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleUser.promise_login(user: 'joe_simpl', pass: 'my_pass').fail do
           true
         end

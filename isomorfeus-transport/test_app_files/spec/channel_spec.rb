@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe 'isomorfeus-transport' do
   before :all do
-    @doc = visit('/')
+    @page = visit('/')
   end
 
   it 'registers a channel class as valid channel class name when inherited' do
@@ -26,12 +26,12 @@ RSpec.describe 'isomorfeus-transport' do
 
   context 'simple class name based channel' do
     it 'can subscribe and unsubscribe' do
-      sub_result = @doc.await_ruby do
+      sub_result = @page.await_ruby do
         SimpleChannel.promise_subscribe
       end
       expect(sub_result).to have_key('success')
       expect(sub_result['success']).to eq('SimpleChannel')
-      unsub_result = @doc.await_ruby do
+      unsub_result = @page.await_ruby do
         SimpleChannel.promise_unsubscribe
       end
       expect(unsub_result).to have_key('success')
@@ -39,11 +39,11 @@ RSpec.describe 'isomorfeus-transport' do
     end
 
     it 'can send and receive messages' do
-      @doc.await_ruby do
+      @page.await_ruby do
         $simple_message = nil
         SimpleChannel.promise_subscribe
       end
-      @doc.evaluate_ruby do
+      @page.eval_ruby do
         SimpleChannel.send_message('cake')
       end
       have_message = false
@@ -51,14 +51,14 @@ RSpec.describe 'isomorfeus-transport' do
       until have_message
         break if (Time.now - start) > 10
         sleep 0.1
-        have_message = @doc.evaluate_ruby do
+        have_message = @page.eval_ruby do
           $simple_message != nil
         end
       end
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         $simple_message
       end
-      @doc.await_ruby do
+      @page.await_ruby do
         SimpleChannel.promise_unsubscribe
       end
       expect(result).to eq('cake')
@@ -67,7 +67,7 @@ RSpec.describe 'isomorfeus-transport' do
 
   context 'custom channel' do
     it 'can subscribe and unsubscribe' do
-      sub_result = @doc.await_ruby do
+      sub_result = @page.await_ruby do
         Promise.when(
           CustomChannel.promise_subscribe,
           CustomChannel.promise_subscribe('one'),
@@ -76,7 +76,7 @@ RSpec.describe 'isomorfeus-transport' do
       end
       expect(sub_result[1]).to have_key('success')
       expect(sub_result[1]['success']).to eq('one')
-      unsub_result = @doc.await_ruby do
+      unsub_result = @page.await_ruby do
         Promise.when(
           CustomChannel.promise_unsubscribe,
           CustomChannel.promise_unsubscribe('one'),
@@ -88,7 +88,7 @@ RSpec.describe 'isomorfeus-transport' do
     end
 
     it 'can send and receive messages' do
-      @doc.await_ruby do
+      @page.await_ruby do
         $simple_message = nil
         $custom_message = nil
         $custom_message_one = nil
@@ -100,7 +100,7 @@ RSpec.describe 'isomorfeus-transport' do
           CustomChannel.promise_subscribe('two')
         )
       end
-      @doc.evaluate_ruby do
+      @page.eval_ruby do
         CustomChannel.send_message('custom')
         CustomChannel.send_message('cat', :one)
         CustomChannel.send_message('dog', 'two')
@@ -110,14 +110,14 @@ RSpec.describe 'isomorfeus-transport' do
       until have_message
         break if (Time.now - start) > 10
         sleep 0.1
-        have_message = @doc.evaluate_ruby do
+        have_message = @page.eval_ruby do
           $simple_message != nil
         end
       end
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         [$custom_message, $custom_message_one, $custom_message_two, $simple_message]
       end
-      @doc.await_ruby do
+      @page.await_ruby do
         Promise.when(
           SimpleChannel.promise_unsubscribe,
           CustomChannel.promise_unsubscribe,

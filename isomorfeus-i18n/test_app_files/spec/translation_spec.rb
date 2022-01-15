@@ -56,15 +56,15 @@ RSpec.describe 'LucidTranslation::Mixin' do
 
   context 'Server Side Rendering' do
     before do
-      @doc = visit('/ssr')
+      @page = visit('/ssr')
     end
 
     it 'renders on the server' do
-      expect(@doc.html).to include('Rendered!')
+      expect(@page.inner_text).to include('Rendered!')
     end
 
     it 'translates' do
-      expect(@doc.html).to include('einfach')
+      expect(@page.inner_text).to include('einfach')
     end
   end
 end

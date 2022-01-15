@@ -195,11 +195,11 @@ RSpec.describe 'LucidQuery' do
 
   context 'on the client' do
     before :each do
-      @doc = visit('/')
+      @page = visit('/')
     end
 
     it 'can do inheritance' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestQueryBase < LucidQuery::Base
           prop :test_prop
 
@@ -212,7 +212,7 @@ RSpec.describe 'LucidQuery' do
     end
 
     it 'can do mixin' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestQueryMixin
           include LucidQuery::Mixin
           prop :test_prop
@@ -226,7 +226,7 @@ RSpec.describe 'LucidQuery' do
     end
 
     it 'verifies prop class' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestNode < LucidObject::Base
           attribute :test
         end
@@ -241,7 +241,7 @@ RSpec.describe 'LucidQuery' do
         query_result.class.to_s
       end
       expect(result).to eq('LucidQueryResult')
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestNode < LucidObject::Base
           attribute :test
         end
@@ -260,7 +260,7 @@ RSpec.describe 'LucidQuery' do
         end
       end
       expect(result).to eq('exception thrown')
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestNode < LucidObject::Base
           attribute :test
         end
@@ -282,7 +282,7 @@ RSpec.describe 'LucidQuery' do
     end
 
     it 'verifies if prop is_a' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestNode < LucidObject::Base
           attribute :test
         end
@@ -297,7 +297,7 @@ RSpec.describe 'LucidQuery' do
         query_result.class.to_s
       end
       expect(result).to eq('LucidQueryResult')
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestNode < LucidObject::Base
           attribute :test
         end
@@ -316,7 +316,7 @@ RSpec.describe 'LucidQuery' do
         end
       end
       expect(result).to eq('exception thrown')
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestNode < LucidObject::Base
           attribute :test
         end
@@ -338,21 +338,21 @@ RSpec.describe 'LucidQuery' do
     end
 
     it 'can validate a prop' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
         TestQueryMixinC.valid_prop?(:test_prop, 10)
       end
       expect(result).to eq(false)
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
         TestQueryMixinC.valid_prop?(:test, '10')
       end
       expect(result).to eq(false)
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestQueryMixinC < LucidQuery::Base
           prop :test_prop, class: String
         end
@@ -362,7 +362,7 @@ RSpec.describe 'LucidQuery' do
     end
 
     it 'can execute a simple query' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleQuery.promise_execute(simple_prop: 'simple_text').then do |query_result|
           query_result.node.one
         end

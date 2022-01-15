@@ -110,11 +110,11 @@ RSpec.describe 'LucidDocument' do
 
   context 'on the client' do
     before :each do
-      @doc = visit('/')
+      @page = visit('/')
     end
 
     it 'can instantiate a document by inheritance' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestDocumentBase < LucidDocument::Base
           field :test_field
         end
@@ -125,7 +125,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'can instantiate a document by mixin' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestDocumentMixin
           include LucidDocument::Mixin
           field :test_field
@@ -137,7 +137,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'reports a change' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
@@ -145,7 +145,7 @@ RSpec.describe 'LucidDocument' do
         document.changed?
       end
       expect(result).to be(false)
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
@@ -157,7 +157,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'can load a simple document' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleDocument.promise_create(fields: { one: '123' }).then do |doc|
           SimpleDocument.promise_load(key: doc.key).then do |document|
             document.one
@@ -168,7 +168,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'can destroy a simple document' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleDocument.promise_create(fields: { one: '123' }).then do |doc|
           SimpleDocument.promise_destroy(key: doc.key).then { |result| result }
         end
@@ -177,7 +177,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'can save a simple document' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleDocument.promise_create(fields: { one: '123' }).then do |doc|
           SimpleDocument.promise_load(key: doc.key).then do |document|
             document.one = 'changed'
@@ -192,7 +192,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'converts to sid' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
@@ -203,7 +203,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'converts to transport' do
-      result = @doc.evaluate_ruby do
+      result = @page.eval_ruby do
         class TestDocumentMixinC < LucidDocument::Base
           field :test_field
         end
@@ -214,7 +214,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'can load' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleDocument.promise_create(fields: { one: '123456' }).then do |doc|
           SimpleDocument.promise_load(key: doc.key).then do |document|
             document.one
@@ -225,7 +225,7 @@ RSpec.describe 'LucidDocument' do
     end
 
     it 'can save and converts field to string' do
-      result = @doc.await_ruby do
+      result = @page.await_ruby do
         SimpleDocument.promise_create(fields: { one: '123' }).then do |doc|
           document = SimpleDocument.new(key: doc.key)
           document.one = 654321
