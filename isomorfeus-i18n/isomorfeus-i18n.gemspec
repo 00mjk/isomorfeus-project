@@ -13,14 +13,14 @@ Gem::Specification.new do |s|
   s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   s.require_paths = ['lib']
 
-  s.add_dependency 'activesupport', '~> 7.0.0'
+  s.add_dependency 'activesupport', '~> 7.0.1'
   s.add_dependency 'fast_gettext', '~> 2.1.0'
   s.add_dependency 'http_accept_language', '~> 2.1.1'
-  s.add_dependency 'oj', '~> 3.13.10'
-  s.add_dependency 'opal', '~> 1.4.0'
+  s.add_dependency 'oj', '~> 3.13.11'
+  s.add_dependency 'opal', '~> 1.4.1'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.3'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.5'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.4'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.6'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.11'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::I18n::VERSION
   s.add_dependency 'isomorfeus-data', Isomorfeus::I18n::VERSION
