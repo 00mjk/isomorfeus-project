@@ -3,7 +3,7 @@
 Transport and PubSub for Isomorfeus.
 
 ### Community and Support
-At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+At the [Isomorfeus Framework Project](http://isomorfeus.com)
 
 ## Installation
 isomorfeus-transport is usually installed with the installer.
@@ -23,5 +23,5 @@ Server only:
 
 ## Usage
 
-- [Authentication and Current User](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-transport/docs/authentication.md)
-- [Channels (PubSub)](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-transport/docs/channels.md)
+- [Authentication and Current User](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-transport/docs/authentication.md)
+- [Channels (PubSub)](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-transport/docs/channels.md)

@@ -61,8 +61,8 @@ end
 For more information about Queries and how to pass props see the [query docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/docs/data_query.md).
 
 ### Example and Specs
-- [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/isomorfeus/data/simple_document.rb)
-- [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/test_app_files/spec/data_document_spec.rb)
+- [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/test_app_files/isomorfeus/data/simple_document.rb)
+- [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/test_app_files/spec/data_document_spec.rb)
 
 ```ruby
 class MyDocument < LucidDocument::Base

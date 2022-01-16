@@ -2,7 +2,7 @@
 
 Permission must be granted for current user to allow access to data.
 The default user within Isomorfeus is Anonymous with a default policy to allow everything,
-see [Policy Docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-policy/README.md)
+see [Policy Docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-policy/README.md)
 After restricting the default policy, access to data must be explicitly allowed.
 
 #### Creating Data

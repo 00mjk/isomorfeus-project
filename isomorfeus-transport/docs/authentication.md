@@ -9,7 +9,7 @@ class AnonymousPolicy < LucidPolicy::Base
  deny all
 end
 ```
-For more information about policy see [the policy docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-policy/README.md).
+For more information about policy see [the policy docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-policy/README.md).
 
 A class representing a user should be a LucidObject and include LucidAuthentication::Mixin (for login) and LucidAuthorization::Mixin (for policy)
 ```ruby

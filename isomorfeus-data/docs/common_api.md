@@ -1,6 +1,6 @@
 ## Common API
 
-Loading data from the client must be allowed by policy, see [Data Policy](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-data/docs/data_policy.md)
+Loading data from the client must be allowed by policy, see [Data Policy](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/docs/data_policy.md)
 
 ### Loading Data
 
@@ -96,4 +96,4 @@ All LucidData *instances* support the following methods for reloading data from 
 
 LucidOject supports and requires attributes.
 Attributes can be declared and validated just like props and the same options as for props apply to attributes. Just instead of `prop` use `attribute`.
-See [the isomorfeus-preact props documentation](https://github.com/isomorfeus/isomorfeus-preact/blob/master/ruby/docs/props.md#prop-declaration).
+See [the isomorfeus-preact props documentation](https://github.com/isomorfeus/isomorfeus-preact/blob/master/docs/props.md#prop-declaration).

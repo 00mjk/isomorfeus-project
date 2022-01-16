@@ -32,4 +32,4 @@ class MyUserPolicy
   allow MyOperation, :promise_run
 end
 ```
-For more information see see [Policy Docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/ruby/isomorfeus-policy/README.md).
+For more information see see [Policy Docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-policy/README.md).
