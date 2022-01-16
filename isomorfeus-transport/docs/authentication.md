@@ -65,7 +65,7 @@ which would have to be implemented.
 `promise_login` accepts 3 keyword args:
 - user: the user name or email or whatever is used for login
 - pass: the password or token used for login
-- scheme: the authentication scheme to use. With this other authentication schemes can be implmented and accessed, like :facebook. The default
+- scheme: the authentication scheme to use. With this other authentication schemes can be implemented and accessed, like :facebook. The default
 scheme is :isomorfeus, the standard isomorfeus login procedure as described below.
 
 prommise_login accepts a block, example:

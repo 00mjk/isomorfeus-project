@@ -4,7 +4,7 @@ allows for isomorphic access to Objects.
 Objects have attributes. Object attributes must be declared.
 
 #### New Instantiation
-```
+```ruby
 class MyObject < LucidObject::Base
   attribute :color
 end
@@ -16,7 +16,7 @@ end
 ```
 
 #### Loading
-```
+```ruby
 class MyObject < LucidObject::Base
   attribute :color
 end
@@ -65,7 +65,7 @@ See the [Ferret Tutorial](https://github.com/isomorfeus/isomorfeus-ferret/blob/m
 - [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/test_app_files/isomorfeus/data/simple_object.rb)
 - [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/test_app_files/spec/data_object_spec.rb)
 
-```
+```ruby
 class MyObject < LucidObject::Base
   attribute :name
   attribute :pass, server_only: true
