@@ -69,7 +69,6 @@ class MyDocument < LucidDocument::Base
   field :name
 end
 
-
 # api
 # class:
 #   field :my_field, default: value
