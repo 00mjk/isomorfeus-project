@@ -80,10 +80,9 @@ module Isomorfeus
 
         def load(key:)
           data = instance_exec(key: key, &@_load_block)
-          return nil unless data
-          return data if data.class == self
-          Isomorfeus.raise_error(message: "#{self.to_s}: execute_load must return a instance of #{self.to_s} or nil. Returned was: #{data.class}.") if data.class != self
-          data
+          return nil if data.nil?
+          return data if data.class.to_s == self.to_s
+          Isomorfeus.raise_error(message: "#{self}: execute_load must return a instance of #{self} or nil. Returned was: #{data.class}.")
         end
         alias load! load
 
