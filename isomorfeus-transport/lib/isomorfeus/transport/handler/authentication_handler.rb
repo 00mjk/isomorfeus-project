@@ -6,8 +6,8 @@ module Isomorfeus
 
         on_request do |response_agent|
           # promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'login', user_class_name, user_identifier, user_password)
-          response_agent.request.each_key do |login_or_logout|
-            if login_or_logout == 'login'
+          response_agent.request.each_key do |login_or_ssr_login|
+            if login_or_ssr_login == 'login'
               response_agent.agent_result = { error: 'Authentication failed' }
               tries = pub_sub_client.instance_variable_get(:@isomorfeus_authentication_tries)
               tries = 0 unless tries
@@ -40,7 +40,7 @@ module Isomorfeus
                   response_agent.agent_result = { success: 'ok', data: user.to_transport, session_cookie_accessor: session_cookie_accessor }
                 end
               end
-            elsif login_or_logout == 'ssr_login'
+            elsif login_or_ssr_login == 'ssr_login'
               response_agent.agent_result = { error: 'Authentication failed' }
               session_id = response_agent.request['ssr_login']
               user = Isomorfeus.session_store.get_user(session_id: session_id)
@@ -49,17 +49,6 @@ module Isomorfeus
                 Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
                 Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, nil)
                 response_agent.agent_result = { success: 'ok', data: user.to_transport }
-              end
-            elsif login_or_logout == 'logout'
-              begin
-                # bogus
-                session_cookie = nil
-              ensure
-                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_user, nil)
-                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
-                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, nil)
-                Isomorfeus.session_store.remove(cookie: session_cookie)
-                response_agent.agent_result = { success: 'ok' }
               end
             end
           end

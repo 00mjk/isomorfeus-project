@@ -27,6 +27,27 @@ module Isomorfeus
           else
             [404, {}, ["Must specify relative path!"]]
           end
+        elsif env['PATH_INFO'] == Isomorfeus.api_logout_path
+          cookies = env['HTTP_COOKIE']
+          if cookies
+            cookies = cookies.split('; ')
+            cookie = cookies.detect { |c| c.start_with?('session=') }
+            if cookie
+              session_id = cookie[8..-1]
+              user = Isomorfeus.session_store.get_user(session_id: session_id)
+              if user
+                begin
+                  Isomorfeus.session_store.remove(session_id: session_id)
+                  cookie = "session=#{session_id}; SameSite=Strict; HttpOnly; Path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC#{'; Secure' if Isomorfeus.production?}"
+                  return [302, { 'Location' => '/', 'Set-Cookie' => cookie }, ["Logged out!"]]
+                ensure
+                  Thread.current[:isomorfeus_user] = nil
+                  Thread.current[:isomorfeus_session_id] = nil
+                end
+              end
+            end
+          end
+          return [302, { 'Location' => '/', 'Set-Cookie' => cookie }, ["Tried to log out!"]]
         else
           cookies = env['HTTP_COOKIE']
           if cookies

@@ -30,6 +30,7 @@ module Isomorfeus
     add_client_option(:api_websocket_host)
     add_client_option(:api_websocket_port)
     add_client_option(:api_websocket_path)
+    add_client_option(:api_logout_path)
     add_client_option(:cookie_eater_path)
     add_client_option(:transport_init_class_names, [])
 
@@ -69,6 +70,7 @@ module Isomorfeus
       attr_accessor :api_websocket_host
       attr_accessor :api_websocket_port
       attr_accessor :api_websocket_path
+      attr_accessor :api_logout_path
       attr_accessor :cookie_eater_path
       attr_reader :session_store
 
@@ -177,6 +179,6 @@ module Isomorfeus
   self.api_websocket_host = 'localhost'
   self.api_websocket_port = '3000'
   self.api_websocket_path = '/isomorfeus/api/websocket'
-
-  self.cookie_eater_path = '/isomorfeus/cookie/eat'
+  self.api_logout_path    = '/isomorfeus/api/logout'
+  self.cookie_eater_path  = '/isomorfeus/cookie/eat'
 end

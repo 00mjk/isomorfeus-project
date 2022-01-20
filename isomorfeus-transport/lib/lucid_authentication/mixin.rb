@@ -60,12 +60,13 @@ module LucidAuthentication
       end
 
       def promise_deauthentication_with_isomorfeus
-        Isomorfeus::Transport.promise_send_path('Isomorfeus::Transport::Handler::AuthenticationHandler', 'logout', 'logout').then do |agent|
-          `document.cookie = "session="`
-          Isomorfeus.set_current_user(nil)
-          Isomorfeus.force_init_store!
-          agent.processed = true
-          agent.response.key?(:success) ? true : raise('Logout failed!')
+        cookie = `document.cookie`
+        p = Promise.new
+        begin
+          logout_query = Isomorfeus.api_logout_path
+          `window.location = logout_query`
+        rescue
+          p.reject
         end
       end
     else
