@@ -1,5 +1,6 @@
 class SimpleUser < LucidDocument::Base
   include LucidAuthentication::Mixin
+  include LucidAuthorization::Mixin
 
   execute_load do |key:|
     if RUBY_ENGINE != 'opal'
