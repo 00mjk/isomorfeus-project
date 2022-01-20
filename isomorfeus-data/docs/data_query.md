@@ -7,12 +7,12 @@ parsed and paramaters checked to make sure that only allowed data is returned. I
 with policy applied and able to check the passed props is way more secure and reducing complexity.
 
 It supports the following methods for querying data:
-- `execute(props:)` -> LucidQueryResult
+- `execute(**props)` -> LucidQueryResult
   Convenience method useful for querying in a component render block. It returns at first a LucidQueryResult. After data has been loaded
   the LucidQueryResult will have its data available and a render is triggered. Transport request bundling applies.
   This method is optimistic and assumes success. Failure cannot be handled.
 
-- `promise_execute(props:)` -> promise with LucidQueryResult when resolved
+- `promise_execute(**props)` -> promise with LucidQueryResult when resolved
   This method returns a promise. This method always triggers a query when called, but subject to transport request bundling, the actual request may be
   delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
@@ -61,7 +61,7 @@ end
 ```
 Later on the client:
 ```ruby
-MyQuery.promise_execute(props: { count: 12 }).then do |query_result|
+MyQuery.promise_execute(count: 12).then do |query_result|
   # etc. ...
 end
 ```
