@@ -3,6 +3,10 @@ module Isomorfeus
     class ServerSocketProcessor
       include Isomorfeus::Transport::ServerProcessor
 
+      def initialize(user)
+        @user = user
+      end
+
       def on_message(client, data)
         if Isomorfeus.development?
           write_lock = Isomorfeus.zeitwerk_lock.try_write_lock
@@ -45,9 +49,7 @@ module Isomorfeus
       end
 
       def user(client)
-        current_user = client.instance_variable_get(:@isomorfeus_user)
-        return current_user if current_user
-        Anonymous.new
+        @user ||= Anonymous.new
       end
     end
   end

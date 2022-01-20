@@ -33,9 +33,7 @@ module Isomorfeus
                   session_id = SecureRandom.uuid
                   session_cookie = "session=#{session_id}; SameSite=Strict; HttpOnly; Path=/; Max-Age=2592000#{'; Secure' if Isomorfeus.production?}"
                   session_cookie_accessor = SecureRandom.uuid
-                  Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_user, user)
                   Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
-                  Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, session_cookie)
                   Isomorfeus.session_store.add(session_id: session_id, cookie: session_cookie, user: user, accessor: session_cookie_accessor)
                   response_agent.agent_result = { success: 'ok', data: user.to_transport, session_cookie_accessor: session_cookie_accessor }
                 end
@@ -45,9 +43,7 @@ module Isomorfeus
               session_id = response_agent.request['ssr_login']
               user = Isomorfeus.session_store.get_user(session_id: session_id)
               if user
-                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_user, user)
                 Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_authentication_tries, nil)
-                Isomorfeus.pub_sub_client.instance_variable_set(:@isomorfeus_session_cookie, nil)
                 response_agent.agent_result = { success: 'ok', data: user.to_transport }
               end
             end
