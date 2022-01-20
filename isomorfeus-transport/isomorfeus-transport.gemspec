@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'opal', '~> 1.4.1'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.5'
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.1'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.7'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.11'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
   s.add_dependency 'isomorfeus-redux', '~> 4.1.11'
   s.add_dependency 'sorted_set', '~> 1.0.3'
