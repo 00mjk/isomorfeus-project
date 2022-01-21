@@ -6,23 +6,23 @@ Isomorfeus works on any of the following operating systems:
 - Windows
 
 Further are required:
-- ruby >= 3.0.0 with bundler
+- ruby >= 3.1.0 with bundler
 - node with at least current LTS version
 ### Installation
 Linux:
-make sure ruby >= 3 and node are installed. Then in a shell:
+make sure ruby >= 3.1 and node are installed. Then in a shell:
 ```shell script
 $ gem install isomorfeus
 ```
 
 macOS:
-make sure ruby >= 3 and node are installed. Then in a shell:
+make sure ruby >= 3.1 and node are installed. Then in a shell:
 ```shell script
 $ gem install isomorfeus
 ```
 
 Windows:
-make sure ruby >= 3 and node are installed. You may get ruby from [https://rubyinstaller.org/](https://rubyinstaller.org/). Then in a cmd window:
+make sure ruby >= 3.1 and node are installed. You may get ruby from [https://rubyinstaller.org/](https://rubyinstaller.org/). Then in a cmd window:
 ```cmd script
 C:\Users\Jan> gem install isomorfeus
 ```
