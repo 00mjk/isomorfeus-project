@@ -1,3 +1,3 @@
 class SimpleUserPolicy < LucidPolicy::Base
-  allow :all
+  allow all
 end
