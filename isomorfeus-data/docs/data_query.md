@@ -46,7 +46,7 @@ end
 
 ### Props
 Props are used by queries and *must* be declared when used.
-See [the isomorfeus-react props documentation](https://github.com/isomorfeus/isomorfeus-react/blob/master/docs/props.md#prop-declaration).
+See [the isomorfeus-preact props documentation](https://github.com/isomorfeus/isomorfeus-preact/blob/master/docs/props.md#prop-declaration).
 
 Example:
 ```ruby
