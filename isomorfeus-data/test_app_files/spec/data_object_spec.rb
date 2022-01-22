@@ -126,6 +126,13 @@ RSpec.describe 'LucidObject' do
       expect(result).to eq('123')
     end
 
+    it 'returns nil if a simple object doesnt exist when loading by key' do
+      result = on_server do
+        SimpleObject.load(key: '555555555555')
+      end
+      expect(result).to be(nil)
+    end
+
     it 'can destroy a simple object' do
       on_server do
         obj = SimpleObject.new(key: '1234')
