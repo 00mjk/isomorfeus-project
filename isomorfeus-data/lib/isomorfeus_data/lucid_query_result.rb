@@ -1,6 +1,10 @@
 class LucidQueryResult
   attr_reader :key
 
+  def [](accessor_name)
+    self.send(accessor_name.to_sym)
+  end
+
   def sid
     [@class_name, @key]
   end

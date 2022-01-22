@@ -378,5 +378,14 @@ RSpec.describe 'LucidQuery' do
       end
       expect(result).to eq(['simple_text', '43'])
     end
+
+    it 'allow hash like access to results' do
+      result = @page.await_ruby do
+        SimpleQuery.promise_execute(simple_prop: 'simple_text').then do |query_result|
+          query_result[:node].one
+        end
+      end
+      expect(result).to eq('simple_text')
+    end
   end
 end
