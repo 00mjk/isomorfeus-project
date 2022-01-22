@@ -111,8 +111,6 @@ module LucidDocument
             if doc
               doc.delete(:key)
               self.new(key: key, fields: doc)
-            else
-              nil
             end
           end
 
