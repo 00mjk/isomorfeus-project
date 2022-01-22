@@ -108,9 +108,12 @@ module LucidDocument
 
           execute_load do |key:|
             doc = self.ferret_accelerator.load_doc(key)
-            return nil unless doc
-            doc.delete(:key)
-            self.new(key: key, fields: doc)
+            if doc
+              doc.delete(:key)
+              self.new(key: key, fields: doc)
+            else
+              nil
+            end
           end
 
           execute_save do
