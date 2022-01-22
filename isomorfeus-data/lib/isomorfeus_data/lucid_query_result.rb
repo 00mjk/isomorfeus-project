@@ -40,14 +40,18 @@ class LucidQueryResult
     end
 
     def method_missing(accessor_name, *args, &block)
-      sid = if @result_set
+      sid_or_array = if @result_set
               @result_set[accessor_name]
             else
               stored_results = Redux.fetch_by_path(:data_state, @class_name, @key)
               stored_results.JS[accessor_name] if stored_results
             end
-      Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}' in the results!") unless sid
-      Isomorfeus.instance_from_sid(sid)
+      Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}' in the results!") unless sid_or_array
+      if stored_results.JS['_is_array_']
+        sid_or_array.map { |sid| Isomorfeus.instance_from_sid(sid) }
+      else
+        Isomorfeus.instance_from_sid(sid_or_array)
+      end
     end
   else
     def initialize(key: nil, result_set: {})
@@ -77,8 +81,13 @@ class LucidQueryResult
 
     def to_transport
       sids_hash = {}
-      @result_set.each do |key, value|
-        sids_hash[key.to_s] = value.sid
+      @result_set.each do |key, value_or_array|
+        if value_or_array.class == Array
+          sids_hash[key.to_s] = value_or_array.map(&:sid)
+          sids_hash[:_is_array_] = true
+        else
+          sids_hash[key.to_s] = value_or_array.sid
+        end
       end
       { @class_name => { @key => sids_hash }}
     end
@@ -86,9 +95,18 @@ class LucidQueryResult
     def included_items_to_transport
       data_hash = {}
       @result_set.each_value do |value|
-        data_hash.deep_merge!(value.to_transport)
-        if value.respond_to?(:included_items_to_transport)
-          data_hash.deep_merge!(value.included_items_to_transport)
+        if value.class == Array
+          value.each do |v|
+            data_hash.deep_merge!(v.to_transport)
+            if v.respond_to?(:included_items_to_transport)
+              data_hash.deep_merge!(v.included_items_to_transport)
+            end
+          end
+        else
+          data_hash.deep_merge!(value.to_transport)
+          if value.respond_to?(:included_items_to_transport)
+            data_hash.deep_merge!(value.included_items_to_transport)
+          end
         end
       end
       data_hash

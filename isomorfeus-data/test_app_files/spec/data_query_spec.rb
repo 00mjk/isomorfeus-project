@@ -369,5 +369,14 @@ RSpec.describe 'LucidQuery' do
       end
       expect(result).to eq('simple_text')
     end
+
+    it 'can execute a simple array query' do
+      result = @page.await_ruby do
+        SimpleArrayQuery.promise_execute(simple_prop: 'simple_text').then do |query_result|
+          [ query_result.nodes[0].one, query_result.nodes[1].key ]
+        end
+      end
+      expect(result).to eq(['simple_text', '43'])
+    end
   end
 end

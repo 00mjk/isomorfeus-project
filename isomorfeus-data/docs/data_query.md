@@ -4,7 +4,7 @@ Allows for isomorphically querying data.
 
 It may at first seem practical to isomorpfivally use a compley query api, but that imposes several security issues, as each query will have to
 parsed and paramaters checked to make sure that only allowed data is returned. Instead using a query class, that executes the query server side
-with policy applied and able to check the passed props is way more secure and reducing complexity.
+with policy applied and is able to check the passed props is way more secure and reducing complexity.
 
 It supports the following methods for querying data:
 - `execute(**props)` -> LucidQueryResult
@@ -20,12 +20,13 @@ It supports the following methods for querying data:
 
 The allowed props *must* be declared. See section Props belows.
 
-A `execute_query` block must be defined. This block must return a hash of LucidData objects,
+A `execute_query` block must be defined. This block must return a hash with LucidData objects or arrays of LucidData objects as values,
 which get then wrapped in a LucidQueryResult. Example:
 ```ruby
 class MyQuery < LucidQuery::Base
   execute_query do
-    { queried_object: MyObject.new(key: '2') } # supply object as instance
+    { queried_object: MyObject.new(key: '2'), # supply LucidData object as instance
+      queried_array: [MyOtherObject.new(key: '3'), MyOtherObject.new(key: '4')] } # supply array of LucidData object instances
   end
 end
 ```
