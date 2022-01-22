@@ -54,7 +54,7 @@ RSpec.describe 'LucidDocument' do
       expect(result).to eq('123')
     end
 
-    it 'returns nil if a simple document doesnt exist when loading be key' do
+    it 'returns nil if a simple document doesnt exist when loading by key' do
       result = on_server do
         SimpleDocument.load(key: '555555555555')
       end
