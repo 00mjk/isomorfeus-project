@@ -54,6 +54,16 @@ RSpec.describe 'LucidDocument' do
       expect(result).to eq('123')
     end
 
+    it 'can create and load a simple document with a given key' do
+      result = on_server do
+        key = '42424242-abcdefg'
+        document = SimpleDocument.create(key: key, fields: { one: '123' })
+        document = SimpleDocument.load(key: key)
+        [document.one, document.key]
+      end
+      expect(result).to eq(['123', '42424242-abcdefg'])
+    end
+
     it 'returns nil if a simple document doesnt exist when loading by key' do
       result = on_server do
         SimpleDocument.load(key: '555555555555')
