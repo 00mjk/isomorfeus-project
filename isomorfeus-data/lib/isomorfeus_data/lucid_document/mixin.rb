@@ -34,19 +34,17 @@ module LucidDocument
           @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
           @_changed = false
           loaded = loaded?
-          if fields
-            if loaded
-              raw_fields = Redux.fetch_by_path(*@_store_path)
-              if `raw_fields === null`
-                @_changed_fields = !fields ? {} : fields
-              elsif raw_fields && !fields.nil? && ::Hash.new(raw_fields) != fields
-                @_changed_fields = fields
-              end
-            else
+          fields = {} unless fields
+          _validate_fields(fields)
+          if loaded
+            raw_fields = Redux.fetch_by_path(*@_store_path)
+            if `raw_fields === null`
+              @_changed_fields = !fields ? {} : fields
+            elsif raw_fields && !fields.nil? && ::Hash.new(raw_fields) != fields
               @_changed_fields = fields
             end
           else
-            @_changed_fields = {}
+            @_changed_fields = fields
           end
         end
 
@@ -89,15 +87,24 @@ module LucidDocument
           def search(query, options = {})
             top_docs = []
             self.ferret_accelerator.search_each(query, options) do |id|
-              doc = self.ferret_accelerator.load_doc(id)
-              top_docs << self.new(key: doc[:key], fields: doc) if doc
+              doc = self.ferret_accelerator.index.doc(id)&.load
+              if doc
+                key = doc.delete(:key)
+                top_docs << self.new(key: key, fields: doc)
+              end
             end
             top_docs
           end
 
           execute_create do
-            doc = self.fields
-            doc[:key] = self.key.nil? ? SecureRandom.uuid : self.key
+            doc = self.fields.dup
+            if self.key.nil?
+              u = SecureRandom.uuid
+              doc[:key] = u
+              self.key = u
+            else
+              doc[:key] = self.key
+            end
             self.class.ferret_accelerator.create_doc(doc)
             self
           end
@@ -115,9 +122,11 @@ module LucidDocument
           end
 
           execute_save do
-            doc = self.fields
+            doc = self.fields.dup
             if self.key.nil?
-              doc[:key] = SecureRandom.uuid
+              u = SecureRandom.uuid
+              doc[:key] = u
+              self.key = u
               self.class.ferret_accelerator.create_doc(doc)
             else
               doc[:key] = self.key
@@ -134,6 +143,7 @@ module LucidDocument
           @_revision = revision
           @_changed = false
           fields = {} unless fields
+          _validate_fields(fields)
           @_raw_fields = fields
         end
 
