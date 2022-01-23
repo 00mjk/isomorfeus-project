@@ -27,7 +27,7 @@ module Isomorfeus
           def _validate_fields(fields)
             field_conditions.each_key do |field|
               if field_conditions[field].key?(:required) && field_conditions[field][:required] && !fields.key?(field)
-                Isomorfeus.raise_error(message: "Required field #{fields} not given!")
+                Isomorfeus.raise_error(message: "Required field #{field} not given!")
               end
             end
             fields.each { |field, val| _validate_field(field, val) }
