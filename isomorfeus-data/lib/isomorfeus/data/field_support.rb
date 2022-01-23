@@ -3,6 +3,10 @@ module Isomorfeus
     module FieldSupport
       def self.included(base)
         base.instance_exec do
+          def field_options
+            @field_options ||= {}
+          end
+
           def field_conditions
             @field_conditions ||= {}
           end
@@ -49,8 +53,13 @@ module Isomorfeus
         if RUBY_ENGINE == 'opal'
           base.instance_exec do
             def field(name, options = {})
+              field_options[name] = {}
+              field_options[name][:default_boost] = options.delete(:default_boost) if options.key?(:default_boost)
+              field_options[name][:default_boost] = options.delete(:default_boost) if options.key?(:boost)
+              field_options[name][:index] = options.delete(:index) if options.key?(:index)
+              field_options[name][:store] = options.delete(:store) if options.key?(:store)
+              field_options[name][:term_vector] = options.delete(:term_vector) if options.key?(:term_vector)
               field_conditions[name] = options
-              field_conditions[name].merge!(ensure: proc { |v| v.to_s }) unless options.key?(:ensure)
 
               define_method(name) do
                 _get_field(name)
