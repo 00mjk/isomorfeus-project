@@ -11,8 +11,8 @@ module Isomorfeus
             @indexed_attributes ||= {}
           end
 
-          def valid_attribute?(attr_name, attr_value)
-            Isomorfeus::Props::Validator.new(self.name, attr_name, attr_value, attribute_conditions[attr_name]).validate!
+          def valid_attribute?(attr_name, val)
+            Isomorfeus::Props::Validator.new(self.name, attr_name, val, attribute_conditions[attr_name]).validate!
           rescue
             false
           end
@@ -21,9 +21,9 @@ module Isomorfeus
             Isomorfeus::Props::ValidateHashProxy.new
           end
 
-          def _validate_attribute(attr_name, attr_val)
+          def _validate_attribute(attr_name, val)
             Isomorfeus.raise_error(message: "#{self.name}: No such attribute declared: '#{attr_name}'!") unless attribute_conditions.key?(attr_name)
-            Isomorfeus::Props::Validator.new(self.name, attr_name, attr_val, attribute_conditions[attr_name]).validate!
+            Isomorfeus::Props::Validator.new(self.name, attr_name, val, attribute_conditions[attr_name]).validate!
           end
 
           def _validate_attributes(attrs)
@@ -36,8 +36,8 @@ module Isomorfeus
           end
         end
 
-        def _validate_attribute(attr_name, value)
-          self.class._validate_attribute(attr_name, value)
+        def _validate_attribute(attr_name, val)
+          self.class._validate_attribute(attr_name, val)
         end
 
         def _validate_attributes(attrs)
@@ -55,8 +55,7 @@ module Isomorfeus
         if RUBY_ENGINE == 'opal'
           base.instance_exec do
             def attribute(name, options = {})
-              indexed = options.delete(:index)
-              indexed_attributes[name] = indexed if indexed
+              indexed_attributes[name] = options.delete(:index) if options.key?(:index)
               attribute_conditions[name] = options
 
               define_method(name) do
