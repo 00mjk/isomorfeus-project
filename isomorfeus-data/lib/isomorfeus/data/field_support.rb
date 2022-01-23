@@ -3,13 +3,39 @@ module Isomorfeus
     module FieldSupport
       def self.included(base)
         base.instance_exec do
-          def field_options
-            @field_options ||= {}
+          def field_conditions
+            @field_conditions ||= {}
           end
 
-          def valid_field?(field_name, field_value)
-            field_options.key?(field_name)
+          def valid_field?(field_name, val)
+            Isomorfeus::Props::Validator.new(self.name, field_name, val, field_conditions[field_name]).validate!
           end
+
+          def validate
+            Isomorfeus::Props::ValidateHashProxy.new
+          end
+
+          def _validate_field(field_name, val)
+            Isomorfeus.raise_error(message: "#{self.name}: No such field declared: '#{field_name}'!") unless field_conditions.key?(field_name)
+            Isomorfeus::Props::Validator.new(self.name, field_name, val, field_conditions[field_name]).validate!
+          end
+
+          def _validate_fields(fields)
+            field_conditions.each_key do |field|
+              if field_conditions[field].key?(:required) && field_conditions[field][:required] && !fields.key?(field)
+                Isomorfeus.raise_error(message: "Required field #{fields} not given!")
+              end
+            end
+            fields.each { |field, val| _validate_field(field, val) }
+          end
+        end
+
+        def _validate_field(field_name, val)
+          self.class._validate_field(field_name, val)
+        end
+
+        def _validate_fields(fields)
+          self.class._validate_fields(fields)
         end
 
         def exclude_fields(*flds)
@@ -22,8 +48,9 @@ module Isomorfeus
 
         if RUBY_ENGINE == 'opal'
           base.instance_exec do
-            def field(name, options = nil)
-              field_options[name] = options
+            def field(name, options = {})
+              field_conditions[name] = options
+              field_conditions[name].merge!(ensure: proc { |v| v.to_s }) unless options.key?(:ensure)
 
               define_method(name) do
                 _get_field(name)
@@ -31,10 +58,36 @@ module Isomorfeus
 
               define_method("#{name}=") do |val|
                 val = val.to_s unless val.class == String
+                _validate_field(name, val)
                 changed!
                 @_changed_fields[name] = val
               end
             end
+          end
+
+          def validate_fields_function
+            %x{
+              if (typeof self.validate_fields_function === 'undefined') {
+                self.validate_fields_function = function(fields_object) {
+                  try { self.$_validate_fields(Opal.Hash.$new(fields_object)) }
+                  catch (e) { return e.message; }
+                }
+              }
+              return self.validate_fields_function;
+            }
+          end
+
+          def validate_field_function(field)
+            function_name = "validate_field_#{field}_function"
+            %x{
+              if (typeof self[function_name] === 'undefined') {
+                self[function_name] = function(value) {
+                  try { self.$_validate_field(field, value); }
+                  catch (e) { return e.message; }
+                }
+              }
+              return self[function_name];
+            }
           end
 
           def _get_field(name)
@@ -71,7 +124,7 @@ module Isomorfeus
         else
           base.instance_exec do
             def field(name, options = {})
-              field_options[name] = options
+              field_conditions[name] = options
 
               define_method(name) do
                 @_raw_fields[name]
