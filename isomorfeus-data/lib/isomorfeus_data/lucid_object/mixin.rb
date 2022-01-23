@@ -5,16 +5,16 @@ module LucidObject
       base.extend(Isomorfeus::Data::GenericClassApi)
       base.include(Isomorfeus::Data::GenericInstanceApi)
 
-      def changed!
-        @_changed = true
-      end
-
       def [](name)
         send(name)
       end
 
       def []=(name, val)
         send("#{name}=".to_sym, val)
+      end
+
+      def changed!
+        @_changed = true
       end
 
       def to_transport
@@ -34,20 +34,17 @@ module LucidObject
           @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
           @_changed = false
           loaded = loaded?
-          if attributes
-            _validate_attributes(attributes)
-            if loaded
-              raw_attributes = Redux.fetch_by_path(*@_store_path)
-              if `raw_attributes === null`
-                @_changed_attributes = !attributes ? {} : attributes
-              elsif raw_attributes && !attributes.nil? && ::Hash.new(raw_attributes) != attributes
-                @_changed_attributes = attributes
-              end
-            else
+          attributes = {} unless attributes
+          _validate_attributes(attributes)
+          if loaded
+            raw_attributes = Redux.fetch_by_path(*@_store_path)
+            if `raw_attributes === null`
+              @_changed_attributes = !attributes ? {} : attributes
+            elsif raw_attributes && !attributes.nil? && ::Hash.new(raw_attributes) != attributes
               @_changed_attributes = attributes
             end
           else
-            @_changed_attributes = {}
+            @_changed_attributes = attributes
           end
         end
 
