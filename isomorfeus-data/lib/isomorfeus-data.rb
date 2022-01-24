@@ -8,7 +8,6 @@ require 'isomorfeus/data/attribute_support'
 require 'isomorfeus/data/field_support'
 require 'isomorfeus/data/generic_class_api'
 require 'isomorfeus/data/generic_instance_api'
-require 'isomorfeus/data/element_validator'
 
 if RUBY_ENGINE == 'opal'
   require 'isomorfeus/data/reducer'
