@@ -21,16 +21,16 @@ module Isomorfeus
 
           def _validate_field(field_name, val)
             Isomorfeus.raise_error(message: "#{self.name}: No such field declared: '#{field_name}'!") unless field_conditions.key?(field_name)
-            Isomorfeus::Props::Validator.new(self.name, field_name, val, field_conditions[field_name]).validate!
+            Isomorfeus::Props::Validator.new(self.name, field_name, val, field_conditions[field_name]).validated_value
           end
 
           def _validate_fields(fields)
-            field_conditions.each_key do |field|
-              if field_conditions[field].key?(:required) && field_conditions[field][:required] && !fields.key?(field)
-                Isomorfeus.raise_error(message: "Required field #{field} not given!")
+            field_conditions.each_key do |field_name|
+              if field_conditions[field_name].key?(:required) && field_conditions[field_name][:required] && !fields.key?(field_name)
+                Isomorfeus.raise_error(message: "Required field #{field_name} not given!")
               end
+              fields[field_name] = _validate_field(field_name, fields[field_name])
             end
-            fields.each { |field, val| _validate_field(field, val) }
           end
         end
 
@@ -66,8 +66,7 @@ module Isomorfeus
               end
 
               define_method("#{name}=") do |val|
-                val = val.to_s unless val.class == String
-                _validate_field(name, val)
+                val = _validate_field(name, val)
                 changed!
                 @_changed_fields[name] = val
               end
@@ -86,12 +85,12 @@ module Isomorfeus
             }
           end
 
-          def validate_field_function(field)
-            function_name = "validate_field_#{field}_function"
+          def validate_field_function(field_name)
+            function_name = "validate_field_#{field_name}_function"
             %x{
               if (typeof self[function_name] === 'undefined') {
                 self[function_name] = function(value) {
-                  try { self.$_validate_field(field, value); }
+                  try { self.$_validate_field(field_name, value); }
                   catch (e) { return e.message; }
                 }
               }
@@ -133,6 +132,12 @@ module Isomorfeus
         else
           base.instance_exec do
             def field(name, options = {})
+              field_options[name] = {}
+              field_options[name][:default_boost] = options.delete(:default_boost) if options.key?(:default_boost)
+              field_options[name][:default_boost] = options.delete(:default_boost) if options.key?(:boost)
+              field_options[name][:index] = options.delete(:index) if options.key?(:index)
+              field_options[name][:store] = options.delete(:store) if options.key?(:store)
+              field_options[name][:term_vector] = options.delete(:term_vector) if options.key?(:term_vector)
               field_conditions[name] = options
 
               define_method(name) do
@@ -140,7 +145,7 @@ module Isomorfeus
               end
 
               define_method("#{name}=") do |val|
-                val = val.to_s unless val.class == String
+                val = _validate_field(name, val)
                 changed!
                 @_raw_fields[name] = val
               end
