@@ -26,7 +26,7 @@ module LucidObject
       end
 
       if RUBY_ENGINE == 'opal'
-        def initialize(key: nil, revision: nil, attributes: nil)
+        def initialize(key: nil, revision: nil, attributes: nil, _loading: false)
           @key = key.nil? ? SecureRandom.uuid : key.to_s
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -34,16 +34,24 @@ module LucidObject
           @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
           @_changed = false
           loaded = loaded?
-          attributes = {} unless attributes
-          _validate_attributes(attributes)
           if loaded
             raw_attributes = Redux.fetch_by_path(*@_store_path)
             if `raw_attributes === null`
-              @_changed_attributes = !attributes ? {} : attributes
-            elsif raw_attributes && !attributes.nil? && ::Hash.new(raw_attributes) != attributes
+              if attributes
+                _validate_attributes(attributes)
+                @_changed_attributes = attributes
+              else
+                @_changed_attributes = {}
+              end
+            elsif raw_attributes && attributes && ::Hash.new(raw_attributes) != attributes
+              _validate_attributes(attributes)
               @_changed_attributes = attributes
+            else
+              @_changed_attributes = {}
             end
           else
+            attributes = {} unless attributes
+            _validate_attributes(attributes) unless _loading
             @_changed_attributes = attributes
           end
         end
