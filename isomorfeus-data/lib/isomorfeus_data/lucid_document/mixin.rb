@@ -5,6 +5,12 @@ module LucidDocument
       base.extend(Isomorfeus::Data::GenericClassApi)
       base.include(Isomorfeus::Data::GenericInstanceApi)
 
+      base.instance_exec do
+        def escape_string(s)
+          s.gsub(/([\\\&\:\(\)\[\]\{\}\!\"\~\^\|\<\>\=\*\?\+\-\s])/, '\\\\\1')
+        end
+      end
+
       def [](name)
         send(name)
       end
@@ -26,7 +32,7 @@ module LucidDocument
       end
 
       if RUBY_ENGINE == 'opal'
-        def initialize(key: nil, revision: nil, fields: nil)
+        def initialize(key: nil, revision: nil, fields: nil, _loading: false)
           @key = key.nil? ? SecureRandom.uuid : key.to_s
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
@@ -34,16 +40,24 @@ module LucidDocument
           @_revision = revision ? revision : Redux.fetch_by_path(:data_state, :revision, @class_name, @key)
           @_changed = false
           loaded = loaded?
-          fields = {} unless fields
-          _validate_fields(fields)
           if loaded
             raw_fields = Redux.fetch_by_path(*@_store_path)
             if `raw_fields === null`
-              @_changed_fields = !fields ? {} : fields
-            elsif raw_fields && !fields.nil? && ::Hash.new(raw_fields) != fields
+              if fields
+                _validate_fields(fields)
+                @_changed_fields = fields
+              else
+                @_changed_fields = {}
+              end
+            elsif raw_fields && fields && ::Hash.new(raw_fields) != fields
+              _validate_fields(fields)
               @_changed_fields = fields
+            else
+              @_changed_fields = {}
             end
           else
+            fields = {} unless fields
+            _validate_fields(fields) unless _loading
             @_changed_fields = fields
           end
         end
