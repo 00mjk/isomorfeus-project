@@ -23,16 +23,16 @@ module Isomorfeus
 
           def _validate_attribute(attr_name, val)
             Isomorfeus.raise_error(message: "#{self.name}: No such attribute declared: '#{attr_name}'!") unless attribute_conditions.key?(attr_name)
-            Isomorfeus::Props::Validator.new(self.name, attr_name, val, attribute_conditions[attr_name]).validate!
+            Isomorfeus::Props::Validator.new(self.name, attr_name, val, attribute_conditions[attr_name]).validated_value
           end
 
           def _validate_attributes(attrs)
-            attribute_conditions.each_key do |attr|
-              if attribute_conditions[attr].key?(:required) && attribute_conditions[attr][:required] && !attrs.key?(attr)
-                Isomorfeus.raise_error(message: "Required attribute #{attr} not given!")
+            attribute_conditions.each_key do |attr_name|
+              if attribute_conditions[attr_name].key?(:required) && attribute_conditions[attr_name][:required] && !attrs.key?(attr_name)
+                Isomorfeus.raise_error(message: "Required attribute #{attr_name} not given!")
               end
+              attrs[attr_name] = _validate_attribute(attr_name, attrs[attr_name])
             end
-            attrs.each { |attr, val| _validate_attribute(attr, val) }
           end
         end
 
@@ -63,7 +63,7 @@ module Isomorfeus
               end
 
               define_method("#{name}=") do |val|
-                _validate_attribute(name, val)
+                val = _validate_attribute(name, val)
                 changed!
                 @_changed_attributes[name] = val
               end
@@ -131,8 +131,7 @@ module Isomorfeus
         else
           base.instance_exec do
             def attribute(name, options = {})
-              indexed = options.delete(:index)
-              indexed_attributes[name] = indexed if indexed
+              indexed_attributes[name] = options.delete(:index) if options.key?(:index)
               attribute_conditions[name] = options
 
               define_method(name) do
@@ -140,7 +139,7 @@ module Isomorfeus
               end
 
               define_method("#{name}=") do |val|
-                _validate_attribute(name, val)
+                val = _validate_attribute(name, val)
                 changed!
                 @_raw_attributes[name] = val
               end
