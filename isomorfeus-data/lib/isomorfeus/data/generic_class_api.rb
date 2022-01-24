@@ -23,13 +23,13 @@ module Isomorfeus
         end
 
         def load(key:)
-          instance = self.new(key: key)
+          instance = self.new(key: key, _loading: true)
           promise_load(key: key, instance: instance) unless instance.loaded?
           instance
         end
 
         def promise_load(key:, instance: nil)
-          instance = self.new(key: key) unless instance
+          instance = self.new(key: key, _loading: true) unless instance
           if instance.loaded?
             Promise.new.resolve(instance)
           else
@@ -38,13 +38,13 @@ module Isomorfeus
         end
 
         def load!(key:)
-          instance = self.new(key: key)
+          instance = self.new(key: key, _loading: true)
           promise_load!(key: key, instance: instance) unless instance.loaded?
           instance
         end
 
         def promise_load!(key:, instance: nil)
-          instance = self.new(key: key) unless instance
+          instance = self.new(key: key, _loading: true) unless instance
           Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key).then do |agent|
             if agent.processed
               agent.result

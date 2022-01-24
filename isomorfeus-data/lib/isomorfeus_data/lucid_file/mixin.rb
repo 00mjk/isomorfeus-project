@@ -92,7 +92,7 @@ module LucidFile
           end
         end
 
-        def initialize(key: nil, content_type: nil, data: nil, data_uri: nil, revision: nil)
+        def initialize(key: nil, content_type: nil, data: nil, data_uri: nil, revision: nil, _loading: false)
           @key = key.nil? ? SecureRandom.uuid : key.to_s
           @class_name = self.class.name
           @class_name = @class_name.split('>::').last if @class_name.start_with?('#<')
