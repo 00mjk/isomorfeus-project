@@ -42,7 +42,9 @@ class <%= roda_app_class %> < Roda
       render('web', locals: { content: content, script_tag: script_tag('web.js'), ssr_styles: ssr_styles, title: 'Welcome to <%= app_class %>' })
     end
 
-    r.public
+    r.on 'public' do
+      r.public
+    end
 
     r.get 'favicon.ico' do
       r.public
