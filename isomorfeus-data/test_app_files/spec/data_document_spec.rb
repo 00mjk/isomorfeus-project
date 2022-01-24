@@ -241,7 +241,7 @@ RSpec.describe 'LucidDocument' do
       expect(result).to eq('123456')
     end
 
-    it 'can save and converts field to string' do
+    it 'can save and does not convert numeric field to string' do
       result = @page.await_ruby do
         SimpleDocument.promise_create(fields: { one: '123' }).then do |doc|
           document = SimpleDocument.new(key: doc.key)
@@ -251,7 +251,7 @@ RSpec.describe 'LucidDocument' do
           end
         end
       end
-      expect(result).to eq('654321')
+      expect(result).to eq(654321)
     end
   end
 end
