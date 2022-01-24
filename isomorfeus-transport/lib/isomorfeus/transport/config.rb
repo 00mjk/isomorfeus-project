@@ -153,7 +153,7 @@ module Isomorfeus
       end
 
       def current_user
-        Thread.current[:isomorfeus_user]
+        Thread.current[:isomorfeus_user] ||= Anonymous.new
       end
 
       def pub_sub_client
