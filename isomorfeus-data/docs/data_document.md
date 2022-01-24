@@ -47,8 +47,13 @@ top_docs = MyDocument.search('name:"ferret"')
 
 # create query class:
 class MyQuery < LucidQuery::Base
+  prop :name_string, default: 'Jane'
+
   execute_query do
-    { top_docs: MyDocument.search('name:"ferret"') }
+    # user supplied input string for predetermined queries
+    # should be escaped to prevent query injection
+    esacped_name = MyDocument.escape_string(props.name_string)
+    { top_docs: MyDocument.search("name:\"#{escaped_name}\"") }
   end
 end
 
