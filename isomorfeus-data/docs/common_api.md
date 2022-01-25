@@ -19,7 +19,7 @@ All LucidData *classes* support the following methods for loading data based on 
   Typical use is from isomorfeus-preact component callbacks, component preload blocks, component event handlers or outside of components, but not from within component render blocks.
 
 - `promise_load(key:)` -> promise with instance when resolved
-  On the client: This method is the same as promise_load! but triggers load only when data has not been loaded yet.
+  On the client: This method is the same as promise_load! but triggers a load only when data has not been loaded yet.
   On the server: The same as promise_load!, always loads data.
 
 A `execute_load` block can be defined for classes inheriting from LucidData classes, to execute load of data from other sources. This blocks must return a instance if the class. Returning nil indicates that the requested item does not exist. Alternatively a exception may be thrown.
@@ -33,6 +33,16 @@ All LucidData *classes* support the following methods for creating data:
   Optimistic convenience method, assuming success. Failure cannot be handled.
 
 - `promise_create(key:, **args)` -> promise with instance when successful
+  This method returns a promise. This method always triggers a create when called, but subject to transport request bundling,
+  the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
+  Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
+  but not from within render blocks.
+
+All LucidData *instances* support the following methods for creating data:
+- `create` -> instance
+  Optimistic convenience method, assuming success. Failure cannot be handled.
+
+- `promise_create` -> promise with instance when successful
   This method returns a promise. This method always triggers a create when called, but subject to transport request bundling,
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
@@ -67,9 +77,6 @@ All LucidData *classes* support the following methods for destroying data:
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
 
-A `execute_destroy` block must be defined, to execute the actual load of data. These blocks must return `true` if the destroy succeeded or `false`
-otherwise.
-
 All LucidData *instances* support the following methods for destroying data:
 - `destroy` -> true
   Optimistic convenience method, assuming success. Failure cannot be handled.
@@ -79,6 +86,9 @@ All LucidData *instances* support the following methods for destroying data:
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
+
+A `execute_destroy` block must be defined, to execute the actual load of data. These blocks must return `true` if the destroy succeeded or `false`
+otherwise.
 
 ### Reloading Data
 
@@ -91,9 +101,3 @@ All LucidData *instances* support the following methods for reloading data from 
   the actual request may be delayed, bundled together with other request or fulfilled by another identical request.
   Typical use is from component callbacks, component preload blocks, component event handlers or outside of components,
   but not from within render blocks.
-
-### Attributes
-
-LucidOject supports and requires attributes.
-Attributes can be declared and validated just like props and the same options as for props apply to attributes. Just instead of `prop` use `attribute`.
-See [the isomorfeus-preact props documentation](https://github.com/isomorfeus/isomorfeus-preact/blob/master/docs/props.md#prop-declaration).
