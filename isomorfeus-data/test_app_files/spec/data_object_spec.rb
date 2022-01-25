@@ -365,7 +365,7 @@ RSpec.describe 'LucidObject' do
       expect(result).to eq(true)
     end
 
-    it 'can save a simple object' do
+    it 'can promise_save a simple object' do
       result = @page.await_ruby do
         SimpleObject.promise_create(key: '23456', attributes: { one: '123' }).then do |object|
           SimpleObject.promise_load(key: '23456').then do |object|
@@ -378,6 +378,20 @@ RSpec.describe 'LucidObject' do
         end
       end
       expect(result).to eq(['changed', true, false])
+    end
+
+    it 'can save a simple object' do
+      @page.await_ruby do
+        SimpleObject.promise_create(key: '23456', attributes: { one: '123' }).then do |object|
+          SimpleObject.promise_load(key: '23456').then do |object|
+            object.one = 'changed'
+            object.save
+          end
+        end
+      end
+      sleep 5 # needs a better way
+      result = SimpleObject.load(key: '23456').one
+      expect(result).to eq('changed')
     end
 
     it 'converts to sid' do

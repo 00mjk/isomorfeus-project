@@ -193,7 +193,7 @@ RSpec.describe 'LucidDocument' do
       expect(result).to eq(true)
     end
 
-    it 'can save a simple document' do
+    it 'can promise_save a simple document' do
       result = @page.await_ruby do
         SimpleDocument.promise_create(fields: { one: '123' }).then do |doc|
           SimpleDocument.promise_load(key: doc.key).then do |document|
@@ -206,6 +206,21 @@ RSpec.describe 'LucidDocument' do
         end
       end
       expect(result).to eq(['changed', true, false])
+    end
+
+    it 'can save a simple doument' do
+     key =  @page.await_ruby do
+        SimpleDocument.promise_create(fields: { one: '123' }).then do |doc|
+          SimpleDocument.promise_load(key: doc.key).then do |document|
+            document.one = 'changed'
+            document.save
+            document.key
+          end
+        end
+      end
+      sleep 5 # needs a better way
+      result = SimpleDocument.load(key: key).one
+      expect(result).to eq('changed')
     end
 
     it 'converts to sid' do

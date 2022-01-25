@@ -78,6 +78,11 @@ module Isomorfeus
           self.class.promise_load!(@key, self)
         end
 
+        def save
+          promise_save
+          self
+        end
+
         def promise_save
           data_hash = { instance: to_transport }
           data_hash.deep_merge!(included_items: included_items_to_transport) if respond_to?(:included_items_to_transport)
