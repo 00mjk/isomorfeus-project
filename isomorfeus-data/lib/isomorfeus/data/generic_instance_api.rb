@@ -66,16 +66,16 @@ module Isomorfeus
         end
 
         def promise_destroy
-          self.class.promise_destroy(@key)
+          self.class.promise_destroy(key: @key)
         end
 
         def reload
-          self.class.promise_load!(@key, self)
+          self.class.promise_load!(key: @key, instance: self)
           self
         end
 
         def promise_reload
-          self.class.promise_load!(@key, self)
+          self.class.promise_load!(key: @key, instance: self)
         end
 
         def save
@@ -125,6 +125,20 @@ module Isomorfeus
         def promise_create
           promise = Promise.new
           promise.resolve(create)
+        end
+
+        def destroy
+          self.class.destroy(key: @key)
+        end
+
+        def promise_destroy
+          self.class.promise_destroy(key: @key)
+        end
+
+        # reload must be implemented by mixin
+
+        def promise_reload
+          Promise.new.resolve(reload)
         end
 
         def save

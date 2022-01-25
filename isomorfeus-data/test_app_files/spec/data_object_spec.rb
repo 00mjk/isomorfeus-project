@@ -113,7 +113,7 @@ RSpec.describe 'LucidObject' do
       expect(result).to be(true)
     end
 
-    it 'can load a simple object' do
+    it 'can create and load a simple object' do
       on_server do
         obj = SimpleObject.new(key: '123')
         obj.one = '123'
@@ -126,6 +126,19 @@ RSpec.describe 'LucidObject' do
       expect(result).to eq('123')
     end
 
+    it 'can promise_create and promise_load a simple object' do
+      on_server do
+        obj = SimpleObject.new(key: '1234')
+        obj.one = '1234'
+        obj.promise_create
+      end
+      result = on_server do
+        object = SimpleObject.promise_load(key: '1234').value
+        object.one
+      end
+      expect(result).to eq('1234')
+    end
+
     it 'returns nil if a simple object doesnt exist when loading by key' do
       result = on_server do
         SimpleObject.load(key: '555555555555')
@@ -135,25 +148,81 @@ RSpec.describe 'LucidObject' do
 
     it 'can destroy a simple object' do
       on_server do
-        obj = SimpleObject.new(key: '1234')
-        obj.create
-      end
-      result = on_server do
-        SimpleObject.destroy(key: '1234')
-      end
-      expect(result).to eq(true)
-    end
-
-    it 'can save a simple object' do
-      on_server do
         obj = SimpleObject.new(key: '12345')
         obj.create
       end
       result = on_server do
-        object = SimpleObject.load(key: '12345')
+        SimpleObject.destroy(key: '12345')
+      end
+      expect(result).to eq(true)
+    end
+
+    it 'can promise_destroy a simple object' do
+      on_server do
+        obj = SimpleObject.new(key: '123456')
+        obj.create
+      end
+      result = on_server do
+        SimpleObject.promise_destroy(key: '123456').value
+      end
+      expect(result).to eq(true)
+    end
+
+    it 'can reload a simple object' do
+      on_server do
+        obj = SimpleObject.new(key: '1234567')
+        obj.create
+      end
+      result = on_server do
+        object = SimpleObject.load(key: '1234567')
+        object.one = 'changed'
+        before_changed = object.changed?
+        object.reload
+        [object.one, before_changed, object.changed?]
+      end
+      expect(result).to eq([nil, true, false])
+    end
+
+    it 'can promise_reload a simple object' do
+      on_server do
+        obj = SimpleObject.new(key: '1234567')
+        obj.create
+      end
+      result = on_server do
+        object = SimpleObject.load(key: '1234567')
+        object.one = 'changed'
+        before_changed = object.changed?
+        object.promise_reload
+        [object.one, before_changed, object.changed?]
+      end
+      expect(result).to eq([nil, true, false])
+    end
+
+    it 'can save a simple object' do
+      on_server do
+        obj = SimpleObject.new(key: '12345678')
+        obj.create
+      end
+      result = on_server do
+        object = SimpleObject.load(key: '12345678')
         object.one = 'changed'
         before_changed = object.changed?
         object.save
+        [object.one, before_changed, object.changed?]
+      end
+      expect(result).to eq(['changed', true, false])
+    end
+
+    it 'can promise_save a simple object' do
+      on_server do
+        obj = SimpleObject.new(key: '123456789')
+        obj.create
+      end
+      result = on_server do
+        object = SimpleObject.load(key: '123456789')
+        object.one = 'changed'
+        before_changed = object.changed?
+        object.promise_save
         [object.one, before_changed, object.changed?]
       end
       expect(result).to eq(['changed', true, false])
@@ -345,10 +414,26 @@ RSpec.describe 'LucidObject' do
       expect(result).to be(true)
     end
 
-    it 'can load a simple object' do
+    it 'can execute load for a simple object' do
       result = @page.await_ruby do
         SimpleObject.promise_create(key: '234', attributes: { one: '123' }).then do |object|
-          SimpleObject.promise_load(key: '234').then do |object|
+          SimpleObject.load(key: '234').one
+        end
+      end
+      expect(result).to eq('123')
+    end
+
+    it 'can execute create for a simple object' do
+      result = @page.eval_ruby do
+        SimpleObject.create(key: '234', attributes: { one: '123' }).one
+      end
+      expect(result).to eq('123')
+    end
+
+    it 'can promise_ceate and promise_load a simple object' do
+      result = @page.await_ruby do
+        SimpleObject.promise_create(key: '2345', attributes: { one: '123' }).then do |object|
+          SimpleObject.promise_load(key: '2345').then do |object|
             object.one
           end
         end
@@ -358,17 +443,68 @@ RSpec.describe 'LucidObject' do
 
     it 'can destroy a simple object' do
       result = @page.await_ruby do
-        SimpleObject.promise_create(key: '2345', attributes: { one: '123' }).then do |object|
-          SimpleObject.promise_destroy(key: '2345').then { |result| result }
+        SimpleObject.promise_create(key: '23456', attributes: { one: '123' }).then do |object|
+          SimpleObject.destroy(key: '23456')
         end
       end
       expect(result).to eq(true)
     end
 
+    it 'can promise_destroy a simple object' do
+      result = @page.await_ruby do
+        SimpleObject.promise_create(key: '234567', attributes: { one: '123' }).then do |object|
+          SimpleObject.promise_destroy(key: '234567').then { |result| result }
+        end
+      end
+      expect(result).to eq(true)
+    end
+
+    it 'can call reload on a simple object' do
+      result = @page.await_ruby do
+        SimpleObject.promise_create(key: '2345678', attributes: { one: '123' }).then do |object|
+          SimpleObject.promise_load(key: '2345678').then do |object|
+            object.one = 'changed'
+            object.reload
+            object.one
+          end
+        end
+      end
+      expect(['changed', '123']).to include(result)
+    end
+
+    it 'can promise_reload a simple object' do
+      result = @page.await_ruby do
+        SimpleObject.promise_create(key: '23456789', attributes: { one: '123' }).then do |object|
+          SimpleObject.promise_load(key: '23456789').then do |object|
+            object.one = 'changed'
+            before_changed = object.changed?
+            object.promise_reload.then do |object|
+              [object.one, before_changed, object.changed?]
+            end
+          end
+        end
+      end
+      expect(result).to eq(['123', true, false])
+    end
+
+    it 'can save a simple object' do
+      @page.await_ruby do
+        SimpleObject.promise_create(key: '234567890', attributes: { one: '123' }).then do |obj|
+          SimpleObject.promise_load(key: '234567890').then do |object|
+            obj.one = 'changed'
+            obj.save
+          end
+        end
+      end
+      sleep 5 # needs a better way
+      result = SimpleObject.load(key: '234567890').one
+      expect(result).to eq('changed')
+    end
+
     it 'can promise_save a simple object' do
       result = @page.await_ruby do
-        SimpleObject.promise_create(key: '23456', attributes: { one: '123' }).then do |object|
-          SimpleObject.promise_load(key: '23456').then do |object|
+        SimpleObject.promise_create(key: '2345678901', attributes: { one: '123' }).then do |object|
+          SimpleObject.promise_load(key: '2345678901').then do |object|
             object.one = 'changed'
             before_changed = object.changed?
             object.promise_save.then do |object|
@@ -378,20 +514,6 @@ RSpec.describe 'LucidObject' do
         end
       end
       expect(result).to eq(['changed', true, false])
-    end
-
-    it 'can save a simple object' do
-      @page.await_ruby do
-        SimpleObject.promise_create(key: '23456', attributes: { one: '123' }).then do |object|
-          SimpleObject.promise_load(key: '23456').then do |object|
-            object.one = 'changed'
-            object.save
-          end
-        end
-      end
-      sleep 5 # needs a better way
-      result = SimpleObject.load(key: '23456').one
-      expect(result).to eq('changed')
     end
 
     it 'converts to sid' do
@@ -438,28 +560,6 @@ RSpec.describe 'LucidObject' do
         object.to_transport.to_n
       end
       expect(result).to eq("TestObjectMixinC" => {"28"=>{"attributes" => {"test_attribute" => "test"}}})
-    end
-
-    it 'can load' do
-      result = @page.await_ruby do
-        SimpleObject.promise_create(key: '234567', attributes: { one: '123456' }).then do |object|
-          SimpleObject.promise_load(key: '234567').then do |object|
-            object.one
-          end
-        end
-      end
-      expect(result).to eq('123456')
-    end
-
-    it 'can save' do
-      result = @page.await_ruby do
-        object = SimpleObject.new(key: '123456')
-        object.one = 654321
-        object.promise_save.then do |object|
-          object.one
-        end
-      end
-      expect(result).to eq(654321)
     end
   end
 end

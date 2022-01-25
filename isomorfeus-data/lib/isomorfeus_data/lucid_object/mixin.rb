@@ -215,6 +215,13 @@ module LucidObject
         def each(&block)
           @_raw_attributes.each(&block)
         end
+
+        def reload
+          new_instance = self.class.load(key: @key)
+          @_raw_attributes = new_instance.attributes
+          _unchange!
+          self
+        end
       end # RUBY_ENGINE
     end
   end

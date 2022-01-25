@@ -70,13 +70,9 @@ module Isomorfeus
           !!instance_exec(key: key, &@_destroy_block)
         end
 
-        def promise_load(key:)
-          instance = self.load(key: key)
-          result_promise = Promise.new
-          result_promise.resolve(instance)
-          result_promise
+        def promise_destroy(key:)
+          Promise.new.resolve(destroy(key: key))
         end
-        alias promise_load! promise_load
 
         def load(key:)
           data = instance_exec(key: key, &@_load_block)
@@ -85,6 +81,14 @@ module Isomorfeus
           Isomorfeus.raise_error(message: "#{self}: execute_load must return a instance of #{self} or nil. Returned was: #{data.class}.")
         end
         alias load! load
+
+        def promise_load(key:)
+          instance = self.load(key: key)
+          result_promise = Promise.new
+          result_promise.resolve(instance)
+          result_promise
+        end
+        alias promise_load! promise_load
 
         def execute_create(&block)
           @_create_block = block
@@ -113,14 +117,6 @@ module Isomorfeus
 
       def promise_create(key: nil, **things)
         new(key: key, **things).promise_create
-      end
-
-      def save(instance:)
-        instance.save
-      end
-
-      def promise_save(instance:)
-        instance.promise_save
       end
 
       def current_user

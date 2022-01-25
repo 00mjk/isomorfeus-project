@@ -168,6 +168,13 @@ module LucidDocument
         def each(&block)
           @_raw_fields.each(&block)
         end
+
+        def reload
+          new_instance = self.class.load(key: @key)
+          @_raw_fields = new_instance.fields
+          _unchange!
+          self
+        end
       end # RUBY_ENGINE
     end
   end
