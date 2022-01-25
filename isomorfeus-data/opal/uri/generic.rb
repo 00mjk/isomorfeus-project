@@ -12,7 +12,7 @@ module URI
       :path, :opaque,
       :query,
       :fragment
-    ].freeze
+    ]
 
     def initialize(scheme,
                    userinfo, host, port, registry,
