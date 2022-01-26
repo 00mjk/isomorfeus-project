@@ -24,7 +24,7 @@ module Isomorfeus
           else
             ws_url = "#{Isomorfeus::TopLevel.transport_ws_url}"
           end
-          headers = session_id ? { 'Cookie': "session=#{session_id}" } : nil
+          headers = (session_id.nil? || session_id.empty?) ? nil : { 'Cookie': "session=#{session_id}" }
           @socket = Isomorfeus::Transport::WebsocketClient.new(ws_url, nil, headers)
           @socket.on_error do |error|
             if Isomorfeus.on_browser?

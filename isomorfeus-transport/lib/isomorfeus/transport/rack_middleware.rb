@@ -16,6 +16,7 @@ module Isomorfeus
           cookie = cookies.detect { |c| c.start_with?('session=') }
           if cookie
             session_id = cookie[8..-1]
+            return [Anonymous.new, nil] if session_id.nil? || session_id.empty?
             user = Isomorfeus.session_store.get_user(session_id: session_id)
             [user, session_id]
           end
