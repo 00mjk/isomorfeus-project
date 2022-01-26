@@ -14,7 +14,7 @@ class LucidQueryResult
   end
 
   if RUBY_ENGINE == 'opal'
-    def initialize(key: nil, result_set: {})
+    def initialize(key: nil, result_set: nil)
       @class_name = 'LucidQueryResult'
       @key = key ? key.to_s : self.object_id.to_s
       @result_set = result_set
@@ -39,17 +39,13 @@ class LucidQueryResult
     end
     alias has_key? key?
 
-    def result_set=(r)
-      @result_set = r
-    end
-
     def method_missing(accessor_name, *args, &block)
       sid_or_array = if @result_set
-              @result_set[accessor_name]
-            else
-              stored_results = Redux.fetch_by_path(:data_state, @class_name, @key)
-              stored_results.JS[accessor_name] if stored_results
-            end
+                       @result_set[accessor_name]
+                     else
+                       stored_results = Redux.fetch_by_path(:data_state, @class_name, @key)
+                       stored_results.JS[accessor_name] if stored_results
+                     end
       Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}' in the results!") unless sid_or_array
       if stored_results.JS['_is_array_']
         sid_or_array.map { |sid| Isomorfeus.instance_from_sid(sid) }
@@ -58,7 +54,7 @@ class LucidQueryResult
       end
     end
   else
-    def initialize(key: nil, result_set: {})
+    def initialize(key: nil, result_set: nil)
       @class_name = 'LucidQueryResult'
       @key = key ? key.to_s : self.object_id.to_s
       @result_set = result_set.nil? ? {} : result_set
@@ -73,10 +69,6 @@ class LucidQueryResult
       @result_set.key?(k)
     end
     alias has_key? key?
-
-    def result_set=(r)
-      @result_set = r
-    end
 
     def method_missing(accessor_name, *args, &block)
       Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}' in the results!") unless @result_set.key?(accessor_name)
