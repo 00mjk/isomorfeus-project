@@ -14,6 +14,9 @@ module LucidQuery
           def promise_execute(key: nil, **props)
             query_result_instance = props.delete(:query_result_instance)
             query_result_instance = LucidQueryResult.new(key: key) unless query_result_instance
+
+            return Promise.new.resolve(query_result_instance) if query_result_instance.loaded?
+
             props.each_key do |prop_name|
               Isomorfeus.raise_error(message: "#{self.to_s} No such query prop declared: '#{prop_name}'!") unless declared_props.key?(prop_name)
             end
@@ -51,9 +54,8 @@ module LucidQuery
 
           def execute(**props)
             key = props.delete(:key)
-            query_result = LucidQueryResult.new(key: key)
-            query_result.result_set = self.new(**props).instance_exec(&@_query_block)
-            query_result
+            result_set = self.new(**props).instance_exec(&@_query_block)
+            LucidQueryResult.new(key: key, result_set: result_set)
           end
 
           def execute_query(&block)
