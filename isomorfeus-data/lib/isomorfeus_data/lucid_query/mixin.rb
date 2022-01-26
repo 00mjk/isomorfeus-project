@@ -5,20 +5,20 @@ module LucidQuery
 
       if RUBY_ENGINE == 'opal'
         base.instance_exec do
-          def execute(**props)
-            props[:query_result_instance] = LucidQueryResult.new
+          def execute(key: nil, **props)
+            props[:query_result_instance] = LucidQueryResult.new(key: key)
             promise_execute(props) unless props[:query_result_instance].loaded?
             props[:query_result_instance]
           end
 
-          def promise_execute(**props)
+          def promise_execute(key: nil, **props)
             query_result_instance = props.delete(:query_result_instance)
-            query_result_instance = LucidQueryResult.new unless query_result_instance
+            query_result_instance = LucidQueryResult.new(key: key) unless query_result_instance
             props.each_key do |prop_name|
               Isomorfeus.raise_error(message: "#{self.to_s} No such query prop declared: '#{prop_name}'!") unless declared_props.key?(prop_name)
             end
             props = validated_props(props)
-            props[:query_result_instance_key] = query_result_instance.key
+            props[:key] = query_result_instance.key
             Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :query, props).then do |agent|
               if agent.processed
                 agent.result
@@ -50,8 +50,8 @@ module LucidQuery
           end
 
           def execute(**props)
-            query_result_instance_key = props.delete(:query_result_instance_key)
-            query_result = LucidQueryResult.new(key: query_result_instance_key)
+            key = props.delete(:key)
+            query_result = LucidQueryResult.new(key: key)
             query_result.result_set = self.new(**props).instance_exec(&@_query_block)
             query_result
           end
