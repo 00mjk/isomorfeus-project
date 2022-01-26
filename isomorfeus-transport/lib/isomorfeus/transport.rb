@@ -11,7 +11,7 @@ module Isomorfeus
           true
         end
 
-        def promise_connect
+        def promise_connect(session_id = nil)
           promise = Promise.new
           if @socket && @socket.ready_state < 2
             promise.resolve(true)
@@ -24,7 +24,8 @@ module Isomorfeus
           else
             ws_url = "#{Isomorfeus::TopLevel.transport_ws_url}"
           end
-          @socket = Isomorfeus::Transport::WebsocketClient.new(ws_url)
+          headers = session_id ? { 'Cookie': "session=#{session_id}" } : nil
+          @socket = Isomorfeus::Transport::WebsocketClient.new(ws_url, nil, headers)
           @socket.on_error do |error|
             if Isomorfeus.on_browser?
               `console.warn('Isomorfeus::Transport: Will try again, but so far error connecting:', error)`
