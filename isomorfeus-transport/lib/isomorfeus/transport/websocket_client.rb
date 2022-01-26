@@ -11,10 +11,14 @@ module Isomorfeus
 
         class SendError < StandardError; end
 
-        def initialize(url, protocols = nil)
+        def initialize(url, protocols = nil, headers = nil)
           @url = url
-          @native_websocket = if protocols
+          @native_websocket = if protocols && headers
+                                `new Opal.global.WebSocket(url, protocols, {headers: #{headers.to_n}})`
+                              elsif protocols
                                 `new Opal.global.WebSocket(url, protocols)`
+                              elsif headers
+                                `new Opal.global.WebSocket(url, {headers: #{headers.to_n}})`
                               else
                                 `new Opal.global.WebSocket(url)`
                               end
