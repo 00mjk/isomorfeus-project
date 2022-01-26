@@ -1,6 +1,6 @@
 {
   "name": "isomorfeus-transport",
   "dependencies": {
-    "ws": "8.2.1"
+    "ws": "8.4.2"
   }
 }
