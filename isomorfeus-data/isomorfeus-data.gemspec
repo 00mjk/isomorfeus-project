@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.6'
   s.add_dependency 'isomorfeus-ferret', '~> 0.12.3'
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.1'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.14'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.16'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.11'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Data::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Data::VERSION
