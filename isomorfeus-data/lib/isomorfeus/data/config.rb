@@ -1,12 +1,12 @@
 module Isomorfeus
   # available settings
   class << self
-    def instance_from_sid(sid)
-      data_class = cached_data_class(sid[0])
-      data_class.new(key: sid[1])
-    end
-
     if RUBY_ENGINE == 'opal'
+      def instance_from_sid(sid)
+        data_class = cached_data_class(sid[0])
+        data_class.new(key: sid[1], _loading: true)
+      end
+
       def cached_data_classes
         @cached_data_classes ||= `{}`
       end
@@ -17,6 +17,11 @@ module Isomorfeus
         cached_data_classes.JS[class_name] = "::#{class_name}".constantize
       end
     else
+      def instance_from_sid(sid)
+        data_class = cached_data_class(sid[0])
+        data_class.new(key: sid[1])
+      end
+
       def cached_data_classes
         @cached_data_classes ||= {}
       end
