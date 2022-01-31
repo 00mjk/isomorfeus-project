@@ -14,7 +14,7 @@ class LucidQueryResult
   end
 
   if RUBY_ENGINE == 'opal'
-    def initialize(key: nil, result_set: nil)
+    def initialize(key: nil, result_set: nil, _loading: false)
       @class_name = 'LucidQueryResult'
       @key = key ? key.to_s : self.object_id.to_s
       @result_set = result_set
