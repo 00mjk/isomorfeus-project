@@ -5,13 +5,6 @@ module LucidTranslation
     NIL_BLOCK = -> { nil }
     TRANSLATION_METHODS = [:_, :n_, :np_, :ns_, :p_, :s_]
 
-    if RUBY_ENGINE != 'opal'
-      class InternalTranslationProxy
-        extend FastGettext::Translation
-        extend FastGettext::TranslationMultidomain
-      end
-    end
-
     if RUBY_ENGINE == 'opal'
       def _(*keys, &block)
         domain = Isomorfeus.i18n_domain
@@ -19,19 +12,7 @@ module LucidTranslation
         Isomorfeus.raise_error(message: "I18n _(): no key given!") if keys.empty?
         result = Redux.fetch_by_path(:i18n_state, domain, locale, '_', keys)
         return result if result
-        if Isomorfeus::I18n::Init.initialized?
-          Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, '_', keys).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
-              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
-            end
-          end
-        end
+        _promise_send_i18n_method(domain, locale, '_', keys)
         block_given? ? block.call : keys.first
       end
 
@@ -41,19 +22,7 @@ module LucidTranslation
         Isomorfeus.raise_error(message: "I18n n_(): no key given!") if keys.empty?
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 'n_', keys + [count])
         return result if result
-        if Isomorfeus::I18n::Init.initialized?
-          Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, 'n_', keys + [count]).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
-              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
-            end
-          end
-        end
+        _promise_send_i18n_method(domain, locale, 'n_', keys + [count])
         block_given? ? block.call : keys.last
       end
 
@@ -61,7 +30,6 @@ module LucidTranslation
         nargs = ["#{context}#{separator || CONTEXT_SEPARATOR}#{plural_one}"] + args
         translation = n_(*nargs, &NIL_BLOCK)
         return translation if translation
-
         block_given? ? block.call : n_(plural_one, *args)
       end
 
@@ -71,19 +39,7 @@ module LucidTranslation
         Isomorfeus.raise_error(message: "I18n ns_(): no args given!") if args.empty?
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 'ns_', args)
         return result if result
-        if Isomorfeus::I18n::Init.initialized?
-          Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, 'ns_', args).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
-              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
-            end
-          end
-        end
+        _promise_send_i18n_method(domain, locale, 'ns_', args)
         block_given? ? block.call : n_(*args).split(NAMESPACE_SEPARATOR).last
       end
 
@@ -93,19 +49,7 @@ module LucidTranslation
         args = separator ? [namespace, key, separator] : [namespace, key]
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 'p_', args)
         return result if result
-        if Isomorfeus::I18n::Init.initialized?
-          Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, 'p_', args).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
-              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
-            end
-          end
-        end
+        _promise_send_i18n_method(domain, locale, 'p_', args)
         block_given? ? block.call : key
       end
 
@@ -115,19 +59,7 @@ module LucidTranslation
         args = separator ? [key, separator] : [key]
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 's_', args)
         return result if result
-        if Isomorfeus::I18n::Init.initialized?
-          Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, 's_', args).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
-              Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
-            end
-          end
-        end
+        _promise_send_i18n_method(domain, locale, 's_', args)
         block_given? ? block.call : key.split(separator || NAMESPACE_SEPARATOR).last
       end
 
@@ -156,23 +88,50 @@ module LucidTranslation
           Isomorfeus.raise_error(message: "I18n D#{method}(): no args given!") if args.empty?
           result = Redux.fetch_by_path(:i18n_state, domain, locale, "D#{method}", args)
           return result if result
-          if Isomorfeus::I18n::Init.initialized?
-            Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, "D#{method}", args).then do |agent|
-              if agent.processed
-                agent.result
-              else
-                agent.processed = true
-                if agent.response.key?(:error)
-                  Isomorfeus.raise_error(message: agent.response[:error])
-                end
-                Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
-              end
-            end
-          end
+          _promise_send_i18n_method(domain, locale, "D#{method}", args)
           block_given? ? block.call : send(method, *args, &block)
         end
       end
+
+      private
+
+      def _promise_send_i18n_method(domain, locale, method, args)
+        if Isomorfeus::I18n::Init.initialized?
+          _promise_send_i18n_request(domain, locale, method, args)
+        else
+          Isomorfeus::I18n::Init.init_promise.then do
+            _promise_send_i18n_request(domain, locale, method, args)
+          end
+        end
+      end
+
+      def _promise_send_i18n_request(domain, locale, method, args)
+        Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', domain, locale, method, args).then do |agent|
+          _handle_i18n_response(agent, domain)
+        end
+      end
+
+      def _handle_i18n_response(agent, domain)
+        if agent.processed
+          agent.result
+        else
+          agent.processed = true
+          if agent.response.key?(:error)
+            Isomorfeus.raise_error(message: agent.response[:error])
+          end
+          if on_browser?
+            Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
+          else
+            Isomorfeus.store.dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
+          end
+        end
+      end
     else
+      class InternalTranslationProxy
+        extend FastGettext::Translation
+        extend FastGettext::TranslationMultidomain
+      end
+
       TRANSLATION_METHODS.each do |method|
         define_method(method) do |domain, *args, &block|
           Isomorfeus::I18n::Init.init unless Thread.current[:isomorfeus_i18n_initialized] == true
