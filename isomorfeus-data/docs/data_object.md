@@ -39,9 +39,12 @@ class MyObject < LucidObject::Base
   attribute :name, index: :text   # the value is indexed as text, when searching for it, the query allows for variations
 end
 
-# example, server side
+# example, server side, searching by :value index
 top_objects = MyObject.search(:email, 'hamster@isomorfeus.com') # only objects with the exact matching value in the email attribute
                                                                 # will be found, because email is index as value
+top_objects = MyObject.search(:email, '*')                      # using the '*' wildcard will find all objects of the MyObject class
+
+# example, server side, searching by :text index
 top_objects = MyObject.search(:name, '(hamster OR ferret)')     # because :name is indexed as text, isomorfeus ferret field queries
                                                                 # can be used
 
