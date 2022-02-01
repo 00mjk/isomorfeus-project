@@ -77,6 +77,12 @@ module Isomorfeus
         @index_db.put(key, val)
       end
 
+      def each(&block)
+        @db.each do |key, obj|
+          block.call(Isomorfeus::Hamster::Marshal.unserialize(obj))
+        end
+      end
+
       def search(val_key, &block)
         @index_db.each_value(val_key, &block)
       end
