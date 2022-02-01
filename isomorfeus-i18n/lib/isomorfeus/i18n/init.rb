@@ -32,6 +32,20 @@ module Isomorfeus
             end
           end
 
+          def reload_from_server
+            Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', :init, Isomorfeus.negotiated_locale).then do |agent|
+              if agent.processed
+                agent.result
+              else
+                agent.processed = true
+                if agent.response.key?(:error)
+                  Isomorfeus.raise_error(message: agent.response[:error])
+                end
+                Isomorfeus.store.dispatch(type: 'I18N_STATE', set_state: agent.response[:data])
+              end
+            end
+          end
+
           def initialized?
             @initialized
           end
