@@ -121,13 +121,19 @@ module LucidObject
                 end
               end
             else
-              attr_s = ":[#{attr}]"
-              accept_all_attr = attr_s == ":[*]" ? true : false
-              self.hamster_storage_expander.search(":[:#{val}:]:") do |sid_s_attr|
-                if accept_all_attr || sid_s_attr.end_with?(attr_s)
-                  sid_s = sid_s_attr.split(':|:[')[0]
-                  obj = self.load(key: sid_s)
+              if val == '*'
+                self.hamster_storage_expander.each do |obj|
                   objs << obj if obj
+                end
+              else
+                attr_s = ":[#{attr}]"
+                accept_all_attr = attr_s == ":[*]" ? true : false
+                self.hamster_storage_expander.search(":[:#{val}:]:") do |sid_s_attr|
+                  if accept_all_attr || sid_s_attr.end_with?(attr_s)
+                    sid_s = sid_s_attr.split(':|:[')[0]
+                    obj = self.load(key: sid_s)
+                    objs << obj if obj
+                  end
                 end
               end
             end
