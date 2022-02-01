@@ -18,12 +18,13 @@ module Isomorfeus
                                                       'domain' => FastGettext.text_domain }
               response_agent.agent_result['data']['locale'] = if Isomorfeus.available_locales.include?(locale)
                                                                 locale
-                                                             else
-                                                               FastGettext.locale
-                                                             end
+                                                              else
+                                                                FastGettext.locale
+                                                              end
             else
               response_agent.agent_result[domain] = {}
               begin
+                Isomorfeus::I18n::Init.init if Isomorfeus.development?
                 FastGettext.with_domain(domain) do
                   response_agent.request[domain].each_key do |locale|
                     response_agent.agent_result[domain][locale] = {}
