@@ -285,7 +285,7 @@ RSpec.describe 'LucidObject' do
       expect(result).to eq("TestObjectMixinC"=>{"13"=>{"attributes" =>{}}})
     end
 
-    it 'can search for objects' do
+    it 'can search for specific objects' do
       result = on_server do
         SimpleObject.create(attributes: { two: 'two', three: 'one two three' })
         SimpleObject.create(attributes: { two: 'one', three: 'two three four' })
@@ -295,6 +295,17 @@ RSpec.describe 'LucidObject' do
         [top_objs_v.size, top_objs_v.first&.two, top_objs_t.size]
       end
       expect(result).to eq([1, 'one', 2])
+    end
+
+    it 'can search for all object' do
+      result = on_server do
+        SimpleObject.create(attributes: { two: 'two', three: 'one two three' })
+        SimpleObject.create(attributes: { two: 'one', three: 'two three four' })
+        SimpleObject.create(attributes: { two: 'three', three: 'three four five' })
+        top_objs_v = SimpleObject.search(:two, "*")
+        top_objs_v.size
+      end
+      expect(result >= 3).to be true
     end
   end
 
