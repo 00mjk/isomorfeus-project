@@ -1,16 +1,18 @@
 module Isomorfeus
   module Transport
     class RequestAgent
-      def self.agents
-        @_agents ||= {}
-      end
+      class << self
+        def agents
+          @_agents ||= {}
+        end
 
-      def self.get(object_id)
-        agents[object_id]
-      end
+        def get(object_id)
+          agents[object_id]
+        end
 
-      def self.get!(object_id)
-        agents.delete(object_id.to_s)
+        def get!(object_id)
+          agents.delete(object_id.to_s)
+        end
       end
 
       attr_accessor :processed
@@ -28,6 +30,13 @@ module Isomorfeus
         @promise = Promise.new
         @request = request
         @sent = false
+      end
+
+      def process(&block)
+        return self.result if self.processed
+        self.processed = true
+        Isomorfeus.raise_error(message: agent.response[:error]) if self.response.key?(:error)
+        self.result = block.call(self)
       end
     end
   end
