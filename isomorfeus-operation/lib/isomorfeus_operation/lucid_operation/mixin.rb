@@ -39,12 +39,8 @@ module LucidOperation
           def promise_run(**props_hash)
             props = validated_props(props_hash)
             Isomorfeus::Transport.promise_send_path('Isomorfeus::Operation::Handler::OperationHandler', self.name, props).then do |agent|
-              unless agent.processed
-                agent.processed = true
-                if agent.response.key?(:error)
-                  Isomorfeus.raise_error(message: agent.response[:error])
-                end
-                agent.result = agent.response[:result]
+              agent.process do |agnt|
+                agnt.response[:result]
               end
               if agent.result.key?(:rejected)
                 if agent.result.key?(:error)

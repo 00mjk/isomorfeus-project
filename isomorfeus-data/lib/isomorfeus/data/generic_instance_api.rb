@@ -40,14 +40,8 @@ module Isomorfeus
           data_hash.deep_merge!(included_items: included_items_to_transport) if respond_to?(:included_items_to_transport)
           class_name = self.class.name
           Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', class_name, :create, data_hash).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
-              data = agent.full_response[:data]
+            agent.process do |agnt|
+              data = agnt.full_response[:data]
               if data.key?(class_name) && data[class_name].key?(@key) && data[class_name][@key].key?('new_key')
                 @key = data[class_name][@key]['new_key']
                 @revision = data[class_name][@key]['revision'] if data[class_name][@key].key?('revision')
@@ -55,7 +49,7 @@ module Isomorfeus
               end
               _load_from_store!
               Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: data)
-              agent.result = self
+              self
             end
           end
         end
@@ -88,14 +82,8 @@ module Isomorfeus
           data_hash.deep_merge!(included_items: included_items_to_transport) if respond_to?(:included_items_to_transport)
           class_name = self.class.name
           Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', class_name, :save, data_hash).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
-              data = agent.full_response[:data]
+            agent.process do |agnt|
+              data = agnt.full_response[:data]
               if data.key?(class_name) && data[class_name].key?(@key) && data[class_name][@key].key?('new_key')
                 @key = data[class_name][@key]['new_key']
                 @revision = data[class_name][@key]['revision'] if data[class_name][@key].key?('revision')
@@ -103,7 +91,7 @@ module Isomorfeus
               end
               _load_from_store!
               Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: data)
-              agent.result = self
+              self
             end
           end
         end

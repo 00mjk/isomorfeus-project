@@ -112,13 +112,7 @@ module LucidTranslation
       end
 
       def _handle_i18n_response(agent, domain)
-        if agent.processed
-          agent.result
-        else
-          agent.processed = true
-          if agent.response.key?(:error)
-            Isomorfeus.raise_error(message: agent.response[:error])
-          end
+        agent.process do
           if on_browser?
             Isomorfeus.store.collect_and_defer_dispatch(type: 'I18N_LOAD', data: { domain => agent.response[domain] })
           else

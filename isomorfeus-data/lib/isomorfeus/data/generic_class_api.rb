@@ -9,15 +9,9 @@ module Isomorfeus
 
         def promise_destroy(key:)
           Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :destroy, key: key).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
+            agent.process do
               Isomorfeus.store.dispatch(type: 'DATA_DESTROY', data: [self.name, key])
-              agent.result = true
+              true
             end
           end
         end
@@ -46,16 +40,10 @@ module Isomorfeus
         def promise_load!(key:, instance: nil)
           instance = self.new(key: key, _loading: true) unless instance
           Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key).then do |agent|
-            if agent.processed
-              agent.result
-            else
-              agent.processed = true
-              if agent.response.key?(:error)
-                Isomorfeus.raise_error(message: agent.response[:error])
-              end
+            agent.process do
               instance._load_from_store!
               Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
-              agent.result = instance
+              instance
             end
           end
         end

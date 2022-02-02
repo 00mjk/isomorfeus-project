@@ -18,13 +18,7 @@ module Isomorfeus
 
           def init_from_server
             Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', :init, Isomorfeus.negotiated_locale).then do |agent|
-              if agent.processed
-                agent.result
-              else
-                agent.processed = true
-                if agent.response.key?(:error)
-                  Isomorfeus.raise_error(message: agent.response[:error])
-                end
+              agent.process do
                 @initializing = false
                 Isomorfeus.store.dispatch(type: 'I18N_LOAD', data: agent.response[:data])
                 @initialized = true
@@ -34,13 +28,7 @@ module Isomorfeus
 
           def reload_from_server
             Isomorfeus::Transport.promise_send_path('Isomorfeus::I18n::Handler::LocaleHandler', :init, Isomorfeus.negotiated_locale).then do |agent|
-              if agent.processed
-                agent.result
-              else
-                agent.processed = true
-                if agent.response.key?(:error)
-                  Isomorfeus.raise_error(message: agent.response[:error])
-                end
+              agent.process do
                 Isomorfeus.store.dispatch(type: 'I18N_STATE', set_state: agent.response[:data])
               end
             end
