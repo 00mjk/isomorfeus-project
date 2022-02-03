@@ -35,7 +35,7 @@ module Isomorfeus
       def process(&block)
         return self.result if self.processed
         self.processed = true
-        Isomorfeus.raise_error(message: agent.response[:error]) if self.response.key?(:error)
+        Isomorfeus.raise_error(message: self.response[:error]) if self.response.key?(:error)
         self.result = block.call(self)
       end
     end
