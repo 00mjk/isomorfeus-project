@@ -11,7 +11,7 @@ module LucidPolicy
         end
 
         def all
-          :others
+          :all
         end
 
         def allow(*classes_and_methods_and_options)
@@ -37,7 +37,7 @@ module LucidPolicy
         def _allow_or_deny(thing, *classes_methods_options, &block)
           rules = authorization_rules
 
-          if %i[allow deny].include?(thing) && classes_methods_options.first == :others
+          if %i[allow deny].include?(thing) && %i[others all].include?(classes_methods_options.first)
             rules[:others] = thing
             return
           end
