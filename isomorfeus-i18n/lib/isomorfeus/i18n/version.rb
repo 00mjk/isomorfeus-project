@@ -1,5 +1,5 @@
 module Isomorfeus
   module I18n
-    VERSION = '2.0.15'
+    VERSION = '2.0.16'
   end
 end
