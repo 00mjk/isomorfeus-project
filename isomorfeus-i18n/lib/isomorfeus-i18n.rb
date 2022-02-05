@@ -15,6 +15,7 @@ else
   require 'active_support'
   require 'oj'
   require 'fast_gettext'
+  require 'isomorfeus/fast_gettext_cache'
   require 'http_accept_language/parser'
   require 'http_accept_language/middleware'
   require 'isomorfeus-data'
