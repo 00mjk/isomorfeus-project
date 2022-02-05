@@ -24,7 +24,10 @@ module Isomorfeus
             else
               response_agent.agent_result[domain] = {}
               begin
-                Isomorfeus::I18n::Init.init if Isomorfeus.development?
+                if Isomorfeus.development?
+                  Isomorfeus::I18n::Init.init
+                  FastGettext.cache.reload_all!
+                end
                 FastGettext.with_domain(domain) do
                   response_agent.request[domain].each_key do |locale|
                     response_agent.agent_result[domain][locale] = {}
