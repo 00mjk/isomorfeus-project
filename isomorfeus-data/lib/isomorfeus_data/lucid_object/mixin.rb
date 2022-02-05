@@ -123,12 +123,12 @@ module LucidObject
             else
               if val == '*'
                 self.hamster_storage_expander.each do |obj|
-                  objs << obj if obj
+                  objs << obj if obj.class.name == self.name
                 end
               else
                 attr_s = ":[#{attr}]"
                 accept_all_attr = attr_s == ":[*]" ? true : false
-                self.hamster_storage_expander.search(":[:#{val}:]:") do |sid_s_attr|
+                self.hamster_storage_expander.search(":[#{self.name}]:|:[:#{val}:]:") do |sid_s_attr|
                   if accept_all_attr || sid_s_attr.end_with?(attr_s)
                     sid_s = sid_s_attr.split(':|:[')[0]
                     obj = self.load(key: sid_s)
@@ -163,7 +163,7 @@ module LucidObject
               else
                 old_val = self.hamster_storage_expander.index_get("#{sid_s}:|:[#{attr}]")
                 self.hamster_storage_expander.index_delete("#{sid_s}:|:[#{attr}]", old_val)
-                self.hamster_storage_expander.index_delete(":[:#{old_val}:]:", "#{sid_s}:|:[#{attr}]")
+                self.hamster_storage_expander.index_delete(":[#{self.name}]:|:[:#{old_val}:]:", "#{sid_s}:|:[#{attr}]")
               end
             end
             true
@@ -208,10 +208,10 @@ module LucidObject
         def _store_value_indexed_attribute(attr)
           old_val = self.class.hamster_storage_expander.index_get("#{self.sid_s}:|:[#{attr}]")
           self.class.hamster_storage_expander.index_delete("#{self.sid_s}:|:[#{attr}]", old_val)
-          self.class.hamster_storage_expander.index_delete(":[:#{old_val}:]:", "#{self.sid_s}:|:[#{attr}]")
+          self.class.hamster_storage_expander.index_delete(":[#{self.class.name}]:|:[:#{old_val}:]:", "#{self.sid_s}:|:[#{attr}]")
           val = "#{self.send(attr)}"[0..300]
           self.class.hamster_storage_expander.index_put("#{self.sid_s}:|:[#{attr}]", val)
-          self.class.hamster_storage_expander.index_put(":[:#{val}:]:", "#{self.sid_s}:|:[#{attr}]")
+          self.class.hamster_storage_expander.index_put(":[#{self.class.name}]:|:[:#{val}:]:", "#{self.sid_s}:|:[#{attr}]")
         end
 
         def _unchange!
