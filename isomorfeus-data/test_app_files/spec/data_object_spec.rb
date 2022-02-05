@@ -290,8 +290,8 @@ RSpec.describe 'LucidObject' do
         SimpleObject.create(attributes: { two: 'two', three: 'one two three' })
         SimpleObject.create(attributes: { two: 'one', three: 'two three four' })
         SimpleObject.create(attributes: { two: 'three', three: 'three four five' })
-        top_objs_v = SimpleObject.search(:two, "one")
-        top_objs_t = SimpleObject.search(:three, '"two"')
+        top_objs_v = SimpleObject.search(:two, 'one')
+        top_objs_t = SimpleObject.search(:three, 'two')
         [top_objs_v.size, top_objs_v.first&.two, top_objs_t.size]
       end
       expect(result).to eq([1, 'one', 2])
@@ -302,7 +302,7 @@ RSpec.describe 'LucidObject' do
         SimpleObject.create(attributes: { two: 'two', three: 'one two three' })
         SimpleObject.create(attributes: { two: 'one', three: 'two three four' })
         SimpleObject.create(attributes: { two: 'three', three: 'three four five' })
-        top_objs_v = SimpleObject.search(:two, "*")
+        top_objs_v = SimpleObject.search(:two, '*')
         top_objs_v.size
       end
       expect(result >= 3).to be true
