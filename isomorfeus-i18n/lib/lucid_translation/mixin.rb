@@ -13,7 +13,7 @@ module LucidTranslation
         result = Redux.fetch_by_path(:i18n_state, domain, locale, '_', keys)
         return result if result
         _promise_send_i18n_method(domain, locale, '_', keys)
-        block_given? ? block.call : keys.first
+        block_given? ? block.call : ''
       end
 
       def n_(*keys, count, &block)
@@ -23,7 +23,7 @@ module LucidTranslation
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 'n_', keys + [count])
         return result if result
         _promise_send_i18n_method(domain, locale, 'n_', keys + [count])
-        block_given? ? block.call : keys.last
+        block_given? ? block.call : ''
       end
 
       def np_(context, plural_one, *args, separator: nil, &block)
@@ -50,7 +50,7 @@ module LucidTranslation
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 'p_', args)
         return result if result
         _promise_send_i18n_method(domain, locale, 'p_', args)
-        block_given? ? block.call : key
+        block_given? ? block.call : ''
       end
 
       def s_(key, separator = nil, &block)
@@ -60,7 +60,7 @@ module LucidTranslation
         result = Redux.fetch_by_path(:i18n_state, domain, locale, 's_', args)
         return result if result
         _promise_send_i18n_method(domain, locale, 's_', args)
-        block_given? ? block.call : key.split(separator || NAMESPACE_SEPARATOR).last
+        block_given? ? block.call : ''
       end
 
       def N_(translate)
