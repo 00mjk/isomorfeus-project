@@ -45,11 +45,12 @@ module Isomorfeus
         end
         @db = self.class.environment.database('objects', create: true)
         @index_db = self.class.environment.database('index', create: true, dupsort: true)
+        @use_class_cache = !Isomorfeus.development?
         ObjectSpace.define_finalizer(self, self.class.finalize(self.class))
       end
 
       def create_object(sid_s, obj)
-        Isomorfeus::Hamster::Marshal.dump(@db, sid_s, obj)
+        Isomorfeus::Hamster::Marshal.dump(@db, sid_s, obj, class_cache: @use_class_cache)
       end
 
       def destroy_object(sid_s)
@@ -58,11 +59,11 @@ module Isomorfeus
       end
 
       def load_object(sid_s)
-        Isomorfeus::Hamster::Marshal.load(@db, sid_s)
+        Isomorfeus::Hamster::Marshal.load(@db, sid_s, class_cache: @use_class_cache)
       end
 
       def save_object(sid_s, obj)
-        Isomorfeus::Hamster::Marshal.dump(@db, sid_s, obj)
+        Isomorfeus::Hamster::Marshal.dump(@db, sid_s, obj, class_cache: @use_class_cache)
       end
 
       def index_delete(key, val)
@@ -79,7 +80,7 @@ module Isomorfeus
 
       def each(&block)
         @db.each do |key, obj|
-          block.call(Isomorfeus::Hamster::Marshal.unserialize(obj))
+          block.call(Isomorfeus::Hamster::Marshal.unserialize(obj, class_cache: @use_class_cache))
         end
       end
 
