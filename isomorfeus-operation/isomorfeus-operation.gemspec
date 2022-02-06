@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'opal', '~> 1.4.1'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.8'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.27'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.30'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.11'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Operation::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Operation::VERSION

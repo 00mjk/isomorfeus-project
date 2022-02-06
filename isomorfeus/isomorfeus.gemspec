@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'thor', '>= 0.19.4'
   s.add_dependency 'isomorfeus-speednode', '~> 0.4.8'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.8'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.27'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.30'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.11'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-transport', Isomorfeus::VERSION
