@@ -123,7 +123,7 @@ module LucidObject
             else
               if val == '*'
                 self.hamster_storage_expander.each do |obj|
-                  objs << obj if obj.class.name == self.name
+                  objs << obj if obj.class == self
                 end
               else
                 attr_s = ":[#{attr}]"
