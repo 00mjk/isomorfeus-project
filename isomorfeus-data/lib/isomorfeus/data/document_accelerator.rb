@@ -1,6 +1,6 @@
 module Isomorfeus
   module Data
-    class FerretAccelerator
+    class DocumentAccelerator
       def self.finalize(fer_acc)
         proc { fer_acc.close_index }
       end

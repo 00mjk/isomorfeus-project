@@ -92,9 +92,9 @@ module LucidDocument
           def ferret_accelerator
             return @ferret_accelerator if @ferret_accelerator
             @ferret_accelerator = if @_setup_index_block
-                                    Isomorfeus::Data::FerretAccelerator.new(self, &@_setup_index_block)
+                                    Isomorfeus::Data::DocumentAccelerator.new(self, &@_setup_index_block)
                                   else
-                                    Isomorfeus::Data::FerretAccelerator.new(self)
+                                    Isomorfeus::Data::DocumentAccelerator.new(self)
                                   end
           end
 
