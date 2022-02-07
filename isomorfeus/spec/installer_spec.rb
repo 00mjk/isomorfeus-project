@@ -92,7 +92,9 @@ RSpec.describe 'isomorfeus installer' do
 
     it 'can execute tests' do
       test_result = Bundler.with_unbundled_env do
-        `bundle exec rspec`
+        FileUtils.rm_f('out.log')
+        system('bundle exec rspec > out.log')
+        File.read('out.log')
       end
       expect(test_result).to include('1 example, 0 failures')
     end
@@ -114,8 +116,10 @@ RSpec.describe 'isomorfeus installer' do
       expect(File.exist?(File.join('config', 'iodine.rb'))).to be true
 
       test_result = Bundler.with_unbundled_env do
+        FileUtils.rm_f('out.log')
         system('bundle install')
-        `bundle exec rspec`
+        system('bundle exec rspec > out.log')
+        File.read('out.log')
       end
       expect(test_result).to include('1 example, 0 failures')
     end
