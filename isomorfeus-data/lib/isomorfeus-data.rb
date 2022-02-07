@@ -23,11 +23,11 @@ else
   require 'active_support/core_ext/hash'
 
   require 'isomorfeus-ferret'
-  require 'isomorfeus/data/ferret_accelerator'
+  require 'isomorfeus/data/document_accelerator'
 
   require 'isomorfeus-hamster'
-  require 'isomorfeus/data/hamster_storage_expander'
-  require 'isomorfeus/data/hamster_accelerator'
+  require 'isomorfeus/data/object_expander'
+  require 'isomorfeus/data/object_accelerator'
 
   require 'isomorfeus_data/lucid_query_result'
   require 'isomorfeus_data/lucid_object/mixin'
