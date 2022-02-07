@@ -73,7 +73,7 @@ module Isomorfeus
       def open_index
         FileUtils.mkdir_p(Isomorfeus.data_documents_path) unless Dir.exist?(Isomorfeus.data_documents_path)
         field_infos = Isomorfeus::Ferret::Index::FieldInfos.new(store: :yes, index: :yes, term_vector: :with_positions_offsets)
-        @index = Isomorfeus::Ferret::Index::Index.new(path: index_path, key: :key, auto_flush: true, lock_retry_time: 5)
+        @index = Isomorfeus::Ferret::Index::Index.new(path: index_path, key: :key, auto_flush: true, lock_retry_time: 5, field_infos: field_infos)
         @index.field_infos.add_field(:key, store: :yes, index: :yes, term_vector: :no) unless @index.field_infos[:key]
         @doc_class.field_options.each do |field, options|
           @index.field_infos.add_field(field, options) unless @index.field_infos[field]
