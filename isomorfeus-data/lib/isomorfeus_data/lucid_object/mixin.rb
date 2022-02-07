@@ -90,18 +90,18 @@ module LucidObject
           def hamster_storage_expander
             return @hamster_storage_expander if @hamster_storage_expander
             @hamster_storage_expander = if @_setup_environment_block
-                                          Isomorfeus::Data::HamsterStorageExpander.new(&@_setup_index_block)
+                                          Isomorfeus::Data::ObjectExpander.new(&@_setup_index_block)
                                         else
-                                          Isomorfeus::Data::HamsterStorageExpander.new
+                                          Isomorfeus::Data::ObjectExpander.new
                                         end
           end
 
           def hamster_accelerator
             return @hamster_accelerator if @hamster_accelerator
             @hamster_accelerator = if @_setup_index_block
-                                     Isomorfeus::Data::HamsterAccelerator.new(&@_setup_index_block)
+                                     Isomorfeus::Data::ObjectAccelerator.new(&@_setup_index_block)
                                    else
-                                     Isomorfeus::Data::HamsterAccelerator.new
+                                     Isomorfeus::Data::ObjectAccelerator.new
                                    end
           end
 
@@ -113,7 +113,7 @@ module LucidObject
               query = "+value:#{val} +class_name:#{self.name}"
               query << " +attribute:#{attr}" if attr != '*'
               self.hamster_accelerator.search_each(query, options) do |id|
-                doc = self.hamster_accelerator.load_doc(id)
+                doc = self.hamster_accelerator.index.doc(id)&.load
                 if doc
                   sid_s = doc[:sid_s_attr].split(':|:')[0]
                   obj = self.load(key: sid_s)
@@ -145,7 +145,7 @@ module LucidObject
             self.class.hamster_storage_expander.create_object(self.sid_s, self)
             self.class.indexed_attributes.each do |attr, idx_type|
               if idx_type == :text
-                self._store_text_indexed_attribute(attr)
+                self._create_text_indexed_attribute(attr)
               else
                 self._store_value_indexed_attribute(attr)
               end
@@ -198,6 +198,11 @@ module LucidObject
           attributes = {} unless attributes
           _validate_attributes(attributes) if attributes
           @_raw_attributes = attributes
+        end
+
+        def _create_text_indexed_attribute(attr)
+          doc = { sid_s_attr: "#{self.sid_s}:|:[#{attr}]", value: self.send(attr).to_s, attribute: attr.to_s, class_name: @class_name }
+          self.class.hamster_accelerator.create_doc(doc)
         end
 
         def _store_text_indexed_attribute(attr)

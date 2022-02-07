@@ -1,6 +1,6 @@
 module Isomorfeus
   module Data
-    class HamsterStorageExpander
+    class ObjectExpander
       class << self
         def environment
           @environment
