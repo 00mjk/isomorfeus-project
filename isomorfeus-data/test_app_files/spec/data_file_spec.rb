@@ -21,7 +21,7 @@ RSpec.describe 'LucidFile' do
         class TestFileMixin
           include LucidFile::Mixin
         end
-        file = TestFileBase.new(key: 2, data: 'b')
+        file = TestFileMixin.new(key: 2, data: 'b')
         [file.key, file.data]
       end
       expect(result).to eq(['2', 'b'])
