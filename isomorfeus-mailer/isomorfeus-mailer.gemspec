@@ -28,5 +28,4 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'isomorfeus', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.10.0'
-  s.add_development_dependency 'rspec-collection_matchers', '~> 1.2.0'
 end
