@@ -3,7 +3,7 @@
 Internationalization for Isomorfeus.
 
 ### Community and Support
-At the [Isomorfeus Framework Project](http://isomorfeus.com) 
+At the [Isomorfeus Framework Project](https://isomorfeus.com)
 
 ### Usage
 Locale files go in my_app/isomorfeus/locales.

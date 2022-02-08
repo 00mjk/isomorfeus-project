@@ -3,7 +3,7 @@
 Build mails with components and send them with [Mailhandler](https://github.com/wildbit/mailhandler#email-sending).
 
 ### Community and Support
-At the [Isomorfeus Framework Project](http://isomorfeus.com)
+At the [Isomorfeus Framework Project](https://isomorfeus.com)
 
 ### Configuration
 
