@@ -1,5 +1,5 @@
 module Isomorfeus
   module Policy
-    VERSION = '2.0.20'
+    VERSION = '2.0.21'
   end
 end
