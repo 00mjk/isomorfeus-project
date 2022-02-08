@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.license      = 'MIT'
   s.homepage     = 'https://isomorfeus.com'
   s.summary      = 'Reactive objects, documents, files and queries for isomorfeus.'
-  s.description  = "Develop apps with powerfule reactive data access and queries."
+  s.description  = "Develop apps with powerful reactive data access and queries."
   s.metadata     = {
                      "github_repo" => "ssh://github.com/isomorfeus/gems",
                      "source_code_uri" => "https://github.com/isomorfeus/isomorfeus-project/isomorfeus-data"
