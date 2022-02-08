@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.license      = 'MIT'
   s.homepage     = 'https://isomorfeus.com'
   s.summary      = 'Command line utilities and installer for isomorfeus projects.'
-  s.description  = 'Command line utilities (console, yandle) and installer for isomorfeus projects.'
+  s.description  = 'Command line utilities and installer for isomorfeus projects.'
   s.metadata     = {
                      "github_repo" => "ssh://github.com/isomorfeus/gems",
                      "source_code_uri" => "https://github.com/isomorfeus/isomorfeus-project/isomorfeus"
