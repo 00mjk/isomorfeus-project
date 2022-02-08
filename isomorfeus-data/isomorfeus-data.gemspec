@@ -6,10 +6,13 @@ Gem::Specification.new do |s|
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
   s.license      = 'MIT'
-  s.homepage     = 'http://isomorfeus.com'
-  s.summary      = 'Compose Graphs and Collections of data just as needed for a isomorfeus app.'
-  s.description  = "Write Browser Apps that transparently access server side data with Graphs and Collections with ease."
-  s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
+  s.homepage     = 'https://isomorfeus.com'
+  s.summary      = 'Reactive objects, documents, files and queries for isomorfeus.'
+  s.description  = "Develop apps with powerfule reactive data access and queries."
+  s.metadata     = {
+                     "github_repo" => "ssh://github.com/isomorfeus/gems",
+                     "source_code_uri" => "https://github.com/isomorfeus/isomorfeus-project/isomorfeus-data"
+                   }
   s.files        = `git ls-files -- lib opal LICENSE README.md`.split("\n")
   # s.test_files   = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']

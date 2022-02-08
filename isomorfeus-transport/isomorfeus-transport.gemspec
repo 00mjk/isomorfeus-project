@@ -6,10 +6,13 @@ Gem::Specification.new do |s|
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
   s.license      = 'MIT'
-  s.homepage     = 'http://isomorfeus.com'
-  s.summary      = 'Various transport options for Isomorfeus.'
-  s.description  = 'Various transport options for Isomorfeus.'
-  s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
+  s.homepage     = 'https://isomorfeus.com'
+  s.summary      = 'Channels, authetication and various transport options for Isomorfeus.'
+  s.description  = 'Channels, authetication and various transport options for Isomorfeus.'
+  s.metadata     = {
+                     "github_repo" => "ssh://github.com/isomorfeus/gems",
+                     "source_code_uri" => "https://github.com/isomorfeus/isomorfeus-project/isomorfeus-transport"
+                   }
   s.files        = `git ls-files -- lib LICENSE README.md node_modules package.json`.split("\n")
   s.require_paths = ['lib']
 

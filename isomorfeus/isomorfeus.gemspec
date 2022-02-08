@@ -6,10 +6,13 @@ Gem::Specification.new do |s|
   s.author       = 'Jan Biedermann'
   s.email        = 'jan@kursator.de'
   s.license      = 'MIT'
-  s.homepage     = 'http://isomorfeus.com'
+  s.homepage     = 'https://isomorfeus.com'
   s.summary      = 'Command line utilities and installer for isomorfeus projects.'
   s.description  = 'Command line utilities (console, yandle) and installer for isomorfeus projects.'
-  s.metadata     = { "github_repo" => "ssh://github.com/isomorfeus/gems" }
+  s.metadata     = {
+                     "github_repo" => "ssh://github.com/isomorfeus/gems",
+                     "source_code_uri" => "https://github.com/isomorfeus/isomorfeus-project/isomorfeus"
+                   }
   s.bindir       = 'bin'
   s.executables  << 'isomorfeus'
   s.executables  << 'ismos'
