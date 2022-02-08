@@ -18,4 +18,4 @@ before_script:
 
 specs:
   script:
-    - bundle exec rake
+    - rake
