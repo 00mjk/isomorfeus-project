@@ -24,5 +24,4 @@ jobs:
         node-version: 'lts/*'
     - name: Build and test with Rake
       run: |
-        gem install cowsay
         rake

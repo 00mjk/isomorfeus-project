@@ -1,5 +1,4 @@
 require 'bundler'
-require 'cowsay'
 require 'fileutils'
 require 'oj'
 require 'thor'
@@ -21,5 +20,3 @@ require_relative '../lib/isomorfeus/installer/target/web'
 require_relative '../lib/isomorfeus/installer/bundle'
 
 require_relative '../lib/isomorfeus/cli'
-
-puts Cowsay.say "Testing ISOMORFEUS INSTALLER. NO chance for bugs!", "Ghostbusters"

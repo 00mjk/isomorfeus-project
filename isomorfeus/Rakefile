@@ -2,10 +2,15 @@ require 'fileutils'
 require 'bundler'
 require 'bundler/cli'
 require 'bundler/cli/exec'
-require 'cowsay'
 
 task :specs do
-  puts Cowsay.say "Testing #{File.dirname(__FILE__).split('/').last.upcase}. NO chance for bugs!", "Ghostbusters"
+  puts <<~ASCII
+   _                         ___
+  (_)__ ___  __ _  ___  ____/ _/__ __ _____
+ / (_-</ _ \/  ' \/ _ \/ __/ _/ -_) // (_-<
+/_/___/\___/_/_/_/\___/_/ /_/ \__/\_,_/___/
+
+  ASCII
   pwd = Dir.pwd
   system('bundle update')
   options = { keep_file_descriptors: false }
