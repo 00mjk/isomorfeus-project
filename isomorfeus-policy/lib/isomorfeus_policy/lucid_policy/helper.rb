@@ -14,5 +14,9 @@ module LucidPolicy
     def deny
       nil
     end
+
+    def current_user
+      Isomorfeus.current_user
+    end
   end
 end
