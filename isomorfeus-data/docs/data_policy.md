@@ -66,7 +66,7 @@ end
 use the policy:
 ```ruby
 class MyUserPolicy
-  allow MyQuery, :query
+  allow MyQuery, :execute
 end
 ```
 

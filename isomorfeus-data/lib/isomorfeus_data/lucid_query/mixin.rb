@@ -22,7 +22,7 @@ module LucidQuery
             end
             props = validated_props(props)
             props[:key] = query_result_instance.key
-            Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :query, props).then do |agent|
+            Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props).then do |agent|
               agent.process do
                 query_result_instance._load_from_store!
                 Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
