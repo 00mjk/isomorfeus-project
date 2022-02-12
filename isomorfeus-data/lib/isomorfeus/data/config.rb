@@ -56,7 +56,7 @@ module Isomorfeus
         valid_file_classes[raw_class_name(klass)] = true
       end
 
-      attr_accessor :data_path
+      attr_accessor :storage_path
       attr_accessor :files_path
 
       attr_accessor :ferret_path
@@ -70,15 +70,15 @@ module Isomorfeus
   end
 
   if RUBY_ENGINE != 'opal'
-    self.data_path = File.expand_path(File.join(Isomorfeus.root, 'data', Isomorfeus.env))
-    self.files_path = File.expand_path(File.join(self.data_path, 'files'))
+    self.storage_path = File.expand_path(File.join(Isomorfeus.root, 'storage', Isomorfeus.env))
+    self.files_path = File.expand_path(File.join(self.storage_path, 'files'))
 
     # documents and indices
-    self.ferret_path = File.expand_path(File.join(self.data_path, 'ferret'))
+    self.ferret_path = File.expand_path(File.join(self.storage_path, 'ferret'))
     self.data_documents_path = File.expand_path(File.join(self.ferret_path, 'documents'))
 
     # objects, nodes and edges
-    self.hamster_path = File.expand_path(File.join(self.data_path, 'hamster'))
+    self.hamster_path = File.expand_path(File.join(self.storage_path, 'hamster'))
     self.hamster_mapsize = 4294967296
     self.data_object_env_path = File.expand_path(File.join(self.hamster_path, 'object_env'))
     self.data_object_idx_path = File.expand_path(File.join(self.hamster_path, 'object_idx'))
