@@ -1,11 +1,11 @@
-## The Server App
+## The Roda Server App
 
-By default a most simple Roda app gets installed as Server for Isomorfeus Component based pages and other things.
+By default a most simple Roda app gets installed as Server for Isomorfeus.
 To learn more about Roda and how you can further extend its capabilities see the [Roda Documentation](http://roda.jeremyevans.net/documentation.html)
 
 It has 2 major parts and task:
 1. Extend the default Roda App with isomorfeus functionality
-2. the actual Roda app, route requests, assemble pages.
+2. the actual Roda app, route requests, rendering pages.
 
 Routing for pages in Isomorfeus is completely done in the Preact Wouter, no need to modify the Roda App.
 The catch all route at 3. (see below) takes care of it.
@@ -66,7 +66,9 @@ class IsomorfeusWebsiteRodaApp < Roda
       render('web', locals: { content: content, script_tag: script_tag('web.js'), ssr_styles: ssr_styles, title: 'Welcome to IsomorfeusWebsiteApp' })
     end
 
-    r.public
+    r.on 'public' do
+      r.public
+    end
 
     r.get 'favicon.ico' do
       r.public

@@ -4,7 +4,7 @@
 - app - the directory for all application files, components, data classes, etc.
 - app_loader.rb - used by the app internally to set up load paths and load gems
 - config.ru - start up file for Rack
-- data - directory for documents, objects, indices and other data
+- storage - directory for documents, objects, indices and other data
 - Gemfile - for bundler to install and load gems
 - public - directory for public files and assets
 - spec - directory for rspec files
