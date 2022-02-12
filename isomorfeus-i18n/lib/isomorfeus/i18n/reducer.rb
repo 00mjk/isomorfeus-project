@@ -26,7 +26,7 @@ module Isomorfeus
               prev_state
             end
           else
-            prev_state
+            prev_state.nil? ? {} : prev_state
           end
         end
 
