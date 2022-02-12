@@ -1,4 +1,4 @@
-module LucidTranslation
+module LucidI18n
   module Mixin
     CONTEXT_SEPARATOR = "\004"
     NAMESPACE_SEPARATOR = '|'

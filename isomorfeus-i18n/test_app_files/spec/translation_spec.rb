@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-RSpec.describe 'LucidTranslation::Mixin' do
+RSpec.describe 'LucidI18n::Mixin' do
   context 'on server' do
     it 'can mixin' do
       result = on_server do
         class TestClass
-          include LucidTranslation::Mixin
+          include LucidI18n::Mixin
         end
         TestClass.ancestors
       end
-      expect(result).to include(LucidTranslation::Mixin)
+      expect(result).to include(LucidI18n::Mixin)
     end
 
     it 'has available locales' do
@@ -36,7 +36,7 @@ RSpec.describe 'LucidTranslation::Mixin' do
     it 'can translate on class level' do
       result = on_server do
         class TestClass
-          extend LucidTranslation::Mixin
+          extend LucidI18n::Mixin
         end
         TestClass._('simple')
       end
@@ -46,7 +46,7 @@ RSpec.describe 'LucidTranslation::Mixin' do
     it 'can translate on instance level' do
       result = on_server do
         class TestClass
-          include LucidTranslation::Mixin
+          include LucidI18n::Mixin
         end
         TestClass.new._('simple')
       end

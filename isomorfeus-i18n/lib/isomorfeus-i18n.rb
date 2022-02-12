@@ -4,7 +4,7 @@ if RUBY_ENGINE == 'opal'
   require 'isomorfeus/i18n/config'
   require 'isomorfeus/i18n/reducer'
   Isomorfeus::I18n::Reducer.add_reducer_to_store
-  require 'lucid_translation/mixin'
+  require 'lucid_i18n/mixin'
   require 'isomorfeus/i18n/init'
   if Isomorfeus.on_browser?
     Isomorfeus.add_client_init_after_store_class_name('Isomorfeus::I18n::Init')
@@ -21,7 +21,7 @@ else
   require 'isomorfeus-data'
   require 'isomorfeus/i18n/config'
   require 'isomorfeus/i18n/init'
-  require 'lucid_translation/mixin'
+  require 'lucid_i18n/mixin'
   require 'isomorfeus/i18n/handler/locale_handler'
 
   Isomorfeus.add_middleware(HttpAcceptLanguage::Middleware)

@@ -15,7 +15,7 @@ Using fast_gettext internally.
 
 In any class:
 ```
-  include LucidTranslation::Mixin
+  include LucidI18n::Mixin
 ```
 
 after which the _ gettext methods are available for translation.

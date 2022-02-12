@@ -1,5 +1,5 @@
 class AllTypesComponent < LucidComponent::Base
-  include LucidTranslation::Mixin
+  include LucidI18n::Mixin
 
   render do
     DIV 'Rendered!'
