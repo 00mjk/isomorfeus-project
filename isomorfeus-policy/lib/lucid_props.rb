@@ -2,6 +2,9 @@ class LucidProps
   def initialize(props_hash)
     props_hash = {} unless props_hash
     @props_hash = props_hash
+    if RUBY_ENGINE != 'opal'
+      @props_hash.freeze
+    end
   end
 
   def any?
@@ -19,10 +22,6 @@ class LucidProps
   if RUBY_ENGINE == 'opal'
     def [](prop_name)
       @props_hash[prop_name]
-    end
-
-    def []=(prop_name, value)
-      @props_hash[prop_name] = value
     end
 
     def key?(prop_name)
@@ -56,10 +55,6 @@ class LucidProps
       name = prop_name.to_s
       return @props_hash[name] if @props_hash.key?(name)
       nil
-    end
-
-    def []=(prop_name, value)
-      @props_hash[prop_name.to_sym] = value
     end
 
     def key?(prop_name)
