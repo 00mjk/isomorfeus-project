@@ -140,6 +140,13 @@ module LucidFile
             new(key: key, revision: revision, data_uri: data_uri)
           end
 
+          def props_from_data(instance_data)
+            key = instance_data[self.name].keys.first
+            revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+            data_uri = instance_data[self.name][key].key?('data_uri') ? instance_data[self.name][key]['data_uri'] : nil
+            LucidProps.new({ key: key, revision: revision, data_uri: data_uri })
+          end
+
           def files_path
             @files_path ||= Isomorfeus.files_path
           end

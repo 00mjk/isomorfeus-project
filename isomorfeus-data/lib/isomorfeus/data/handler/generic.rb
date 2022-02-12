@@ -40,7 +40,7 @@ module Isomorfeus
           data = response_agent.request[type_class_name]['create']
           instance_data = data['instance']
           included_items_data = data.key?('included_items') ? data['included_items'] : nil
-          if Isomorfeus.current_user.authorized?(type_class, :create, data)
+          if Isomorfeus.current_user.authorized?(type_class, :create, type_class.props_from_data(instance_data))
             instance = type_class.instance_from_transport(instance_data, included_items_data)
             created_type = instance.create
             if created_type
@@ -51,25 +51,6 @@ module Isomorfeus
               end
               response_agent.agent_result = { success: 'ok' }
             else response_agent.error = { error: { type_class_name => 'Create returned nothing!' }}
-            end
-          else response_agent.error = { error: 'Access denied!' }
-          end
-        end
-
-        def process_load(response_agent, type_class, type_class_name)
-          # 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key
-          props = response_agent.request[type_class_name]['load']
-          props.transform_keys!(&:to_sym)
-          if Isomorfeus.current_user.authorized?(type_class, :load, props)
-            loaded_type = type_class.load(**props)
-            if loaded_type
-              response_agent.outer_result = {} unless response_agent.outer_result
-              response_agent.outer_result.deep_merge!(data: loaded_type.to_transport)
-              if loaded_type.respond_to?(:included_items_to_transport)
-                response_agent.outer_result.deep_merge!(data: loaded_type.included_items_to_transport)
-              end
-              response_agent.agent_result = { success: 'ok' }
-            else response_agent.error = { error: { type_class_name => 'Load returned nothing!' }}
             end
           else response_agent.error = { error: 'Access denied!' }
           end
@@ -94,12 +75,31 @@ module Isomorfeus
           end
         end
 
+        def process_load(response_agent, type_class, type_class_name)
+          # 'Isomorfeus::Data::Handler::Generic', self.name, :load, key: key
+          props = response_agent.request[type_class_name]['load']
+          props.transform_keys!(&:to_sym)
+          if Isomorfeus.current_user.authorized?(type_class, :load, props)
+            loaded_type = type_class.load(**props)
+            if loaded_type
+              response_agent.outer_result = {} unless response_agent.outer_result
+              response_agent.outer_result.deep_merge!(data: loaded_type.to_transport)
+              if loaded_type.respond_to?(:included_items_to_transport)
+                response_agent.outer_result.deep_merge!(data: loaded_type.included_items_to_transport)
+              end
+              response_agent.agent_result = { success: 'ok' }
+            else response_agent.error = { error: { type_class_name => 'Load returned nothing!' }}
+            end
+          else response_agent.error = { error: 'Access denied!' }
+          end
+        end
+
         def process_save(response_agent, type_class, type_class_name)
           # 'Isomorfeus::Data::Handler::Generic', self.name, :save, data_hash
           data = response_agent.request[type_class_name]['save']
           instance_data = data['instance']
           included_items_data = data.key?('included_items') ? data['included_items'] : nil
-          if Isomorfeus.current_user.authorized?(type_class, :save, data)
+          if Isomorfeus.current_user.authorized?(type_class, :save, type_class.props_from_data(instance_data))
             instance = type_class.instance_from_transport(instance_data, included_items_data)
             saved_type = instance.save
             if saved_type

@@ -85,6 +85,13 @@ module LucidDocument
             new(key: key, revision: revision, fields: fields)
           end
 
+          def props_from_data(instance_data)
+            key = instance_data[self.name].keys.first
+            revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+            fields = instance_data[self.name][key].key?('fields') ? instance_data[self.name][key]['fields'].transform_keys!(&:to_sym) : nil
+            LucidProps.new({ key: key, revision: revision }.merge!(fields))
+          end
+
           def setup_index(&block)
             @_setup_index_block = block
           end

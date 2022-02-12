@@ -79,6 +79,13 @@ module LucidObject
             new(key: key, revision: revision, attributes: attributes)
           end
 
+          def props_from_data(instance_data)
+            key = instance_data[self.name].keys.first
+            revision = instance_data[self.name][key].key?('revision') ? instance_data[self.name][key]['revision'] : nil
+            attributes = instance_data[self.name][key].key?('attributes') ? instance_data[self.name][key]['attributes'].transform_keys!(&:to_sym) : nil
+            LucidProps.new({ key: key, revision: revision }.merge!(attributes))
+          end
+
           def setup_environment(&block)
             @_setup_environment_block = block
           end
