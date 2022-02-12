@@ -95,4 +95,3 @@ These modules are used internally by Isomorfeus:
 [Github](https://github.com/isomorfeus/opal-zeitwerk),
 [Gitlab](https://gitlab.com/isomorfeus/opal-zeitwerk),
 [Bitbucket](https://bitbucket.org/isomorfeus/opal-zeitwerk/src/master/)
-
