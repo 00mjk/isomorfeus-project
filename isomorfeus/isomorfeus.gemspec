@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   s.require_paths = ['lib']
 
-  s.add_dependency 'activesupport', '~> 7.0.1'
+  s.add_dependency 'activesupport', '~> 7.0.2'
   s.add_dependency 'bundler'
   s.add_dependency 'oj', '~> 3.13.11'
   s.add_dependency 'pry', '~> 0.14.1'
@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-speednode', '~> 0.4.9'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.9'
   s.add_dependency 'isomorfeus-preact', '~> 10.6.31'
-  s.add_dependency 'isomorfeus-redux', '~> 4.1.13'
+  s.add_dependency 'isomorfeus-redux', '~> 4.1.15'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-transport', Isomorfeus::VERSION
   s.add_dependency 'isomorfeus-data', Isomorfeus::VERSION

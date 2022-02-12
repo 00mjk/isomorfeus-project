@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.files        = `git ls-files -- lib LICENSE README.md`.split("\n")
   s.require_paths = ['lib']
 
-  s.add_dependency 'activesupport', '~> 7.0.1'
+  s.add_dependency 'activesupport', '~> 7.0.2'
   s.add_dependency 'mailhandler', '~> 1.0.59'
   s.add_dependency 'net-imap', '~> 0.2.2'
   s.add_dependency 'net-smtp', '~> 0.3.1'
@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.9'
   s.add_dependency 'isomorfeus-preact', '~> 10.6.31'
-  s.add_dependency 'isomorfeus-redux', '~> 4.1.13'
+  s.add_dependency 'isomorfeus-redux', '~> 4.1.15'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Mailer::VERSION
   s.add_development_dependency 'rake'
