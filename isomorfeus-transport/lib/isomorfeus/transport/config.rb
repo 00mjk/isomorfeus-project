@@ -170,7 +170,7 @@ module Isomorfeus
     end
 
     self.session_store_init do
-      store_path = File.expand_path(File.join(Isomorfeus.root, 'data', Isomorfeus.env, 'session_store'))
+      store_path = File.expand_path(File.join(Isomorfeus.root, 'storage', Isomorfeus.env, 'session_store'))
       Isomorfeus::Transport::HamsterSessionStore.new(store_path)
     end
   end

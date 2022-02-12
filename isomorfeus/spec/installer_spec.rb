@@ -15,6 +15,7 @@ RSpec.describe 'isomorfeus installer' do
       Isomorfeus::CLI.start(%w[new test_app -y no])
       Dir.chdir('test_app')
       expect(Dir.exist?('config')).to be true
+      expect(Dir.exist?('storage')).to be true
       expect(Dir.exist?(File.join('app', 'channels'))).to be true
       expect(Dir.exist?(File.join('app', 'components'))).to be true
       expect(Dir.exist?(File.join('app', 'data'))).to be true
@@ -47,6 +48,7 @@ RSpec.describe 'isomorfeus installer' do
       system('bundle exec isomorfeus new test_app -y no')
       Dir.chdir('test_app')
       expect(Dir.exist?('config')).to be true
+      expect(Dir.exist?('storage')).to be true
       expect(Dir.exist?(File.join('app', 'channels'))).to be true
       expect(Dir.exist?(File.join('app', 'components'))).to be true
       expect(Dir.exist?(File.join('app', 'data'))).to be true

@@ -27,7 +27,7 @@ module Isomorfeus
         %w[channels components data layouts locales mail_components operations policies server].each do |isomorfeus_dir|
           create_directory(File.join('app', isomorfeus_dir))
         end
-        create_directory('data')
+        create_directory('storage')
         create_directory('public')
         create_directory('spec')
         create_directory('config')
