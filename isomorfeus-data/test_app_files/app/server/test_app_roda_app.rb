@@ -3,6 +3,7 @@ Isomorfeus.load_configuration(File.expand_path(File.join(__dir__, '..', '..', 'c
 class TestAppRodaApp < Roda
   extend Isomorfeus::Transport::Middlewares
   include Isomorfeus::PreactViewHelper
+  include LucidI18n::Mixin
 
   use_isomorfeus_middlewares
 
@@ -11,12 +12,6 @@ class TestAppRodaApp < Roda
   @@templates = {}
   @@templates_path = File.expand_path(File.join(__dir__, '..', 'layouts'))
 
-  def locale
-    env.http_accept_language.preferred_language_from(Isomorfeus.available_locales) ||
-      env.http_accept_language.compatible_language_from(Isomorfeus.available_locales) ||
-      Isomorfeus.locale
-  end
-
   def page_content(env, location)
     if Isomorfeus.development?
       req = Rack::Request.new(env)
@@ -24,7 +19,7 @@ class TestAppRodaApp < Roda
     else
       skip_ssr = false
     end
-    mount_component('TestAppApp', { location_host: env['HTTP_HOST'], location: location, locale: locale }, 'ssr.js', skip_ssr: skip_ssr)
+    mount_component('TestAppApp', { location_host: env['HTTP_HOST'], location: location, locale: current_locale }, 'ssr.js', skip_ssr: skip_ssr)
   end
 
   def render(template_name, locals: {})
@@ -56,7 +51,7 @@ class TestAppRodaApp < Roda
     unless Isomorfeus.production?
       r.on 'mail_preview', String do |component_name|
         component_class = component_name.camelize
-        props = { location_host: env['HTTP_HOST'], location: '/mail_preview', locale: locale }.merge(r.params)
+        props = { location_host: env['HTTP_HOST'], location: '/mail_preview', locale: current_locale }.merge(r.params)
         content = mount_component(component_class, props, 'mail_components.js')
         response.status = ssr_response_status
         render('web', locals: { content: content, component_class: component_class })
