@@ -22,11 +22,11 @@ Gem::Specification.new do |s|
   s.add_dependency 'oj', '~> 3.13.11'
   s.add_dependency 'opal', '~> 1.4.1'
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.9'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.31'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.10'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.33'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.15'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::I18n::VERSION
-  s.add_dependency 'isomorfeus-data', Isomorfeus::I18n::VERSION
+  s.add_dependency 'r18n-core', '~> 5.0.1'
   s.add_development_dependency 'isomorfeus', Isomorfeus::I18n::VERSION
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.10.0'
