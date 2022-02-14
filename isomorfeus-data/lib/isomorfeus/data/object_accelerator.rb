@@ -7,11 +7,12 @@ module Isomorfeus
 
       attr_accessor :index
 
-      def initialize(&block)
+      def initialize(object_class_name, &block)
         if block_given?
           res = block.call(self)
           @index = res unless @index
         else
+          @index_path = File.expand_path(File.join(Isomorfeus.data_object_idxs_path, object_class_name.underscore))
           open_index
         end
         ObjectSpace.define_finalizer(self, self.class.finalize(self))
@@ -19,7 +20,7 @@ module Isomorfeus
 
       def destroy_index
         close_index
-        FileUtils.rm_rf(Isomorfeus.data_object_idx_path)
+        FileUtils.rm_rf(@index_path)
       end
 
       def close_index
@@ -63,12 +64,12 @@ module Isomorfeus
       end
 
       def open_index
-        FileUtils.mkdir_p(Isomorfeus.data_object_idx_path) unless Dir.exist?(Isomorfeus.data_object_idx_path)
-        @index = Isomorfeus::Ferret::Index::Index.new(path: Isomorfeus.data_object_idx_path, key: :sid_s_attr, auto_flush: true, lock_retry_time: 5)
-        @index.field_infos.add_field(:attribute, store: :no, term_vector: :no) unless index.field_infos[:attribute]
-        @index.field_infos.add_field(:class_name, store: :no, term_vector: :no) unless index.field_infos[:class_name]
-        @index.field_infos.add_field(:value, store: :no) unless index.field_infos[:value]
-        @index.field_infos.add_field(:sid_s_attr, store: :yes, term_vector: :no) unless index.field_infos[:sid_s_attr]
+        FileUtils.mkdir_p(@index_path) unless Dir.exist?(@index_path)
+        @index = Isomorfeus::Ferret::Index::Index.new(path: @index_path, key: :sid_s_attr, auto_flush: true, lock_retry_time: 5)
+        @index.field_infos.add_field(:attribute, store: :no, term_vector: :no) unless @index.field_infos[:attribute]
+        @index.field_infos.add_field(:class_name, store: :no, term_vector: :no) unless @index.field_infos[:class_name]
+        @index.field_infos.add_field(:value, store: :no) unless @index.field_infos[:value]
+        @index.field_infos.add_field(:sid_s_attr, store: :yes, term_vector: :no) unless @index.field_infos[:sid_s_attr]
       end
     end
   end

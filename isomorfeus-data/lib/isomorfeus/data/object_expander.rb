@@ -2,51 +2,25 @@ module Isomorfeus
   module Data
     class ObjectExpander
       class << self
-        def environment
-          @environment
-        end
-
-        def environment=(env)
-          @environment = env
-        end
-
-        def ref
-          @ref ||= 0
-        end
-
-        def ref=(val)
-          @ref = val
-        end
-
-        def refa
-          self.ref += 1
-        end
-
-        def refs
-          self.ref -= 1 if self.ref > 0
-        end
-
-        def finalize(cls)
-          proc do
-            cls.refs
-            if cls.ref == 0
-              cls.environment.close rescue nil
-            end
-          end
+        def finalize(ins)
+          proc { ins.environment.close rescue nil }
         end
       end
 
-      def initialize(&block)
+      attr_accessor :environment
+
+      def initialize(object_class_name, &block)
         if block_given?
           res = block.call(self)
-          self.class.environment = res unless self.class.environment
+          self.environment = res unless self.environment
         else
+          @env_path = File.expand_path(File.join(Isomorfeus.data_object_envs_path, object_class_name.underscore))
           open_environment
         end
-        @db = self.class.environment.database('objects', create: true)
-        @index_db = self.class.environment.database('index', create: true, dupsort: true)
+        @db = self.environment.database('objects', create: true)
+        @index_db = self.environment.database('index', create: true, dupsort: true)
         @use_class_cache = !Isomorfeus.development?
-        ObjectSpace.define_finalizer(self, self.class.finalize(self.class))
+        ObjectSpace.define_finalizer(self, self.class.finalize(self))
       end
 
       def create_object(sid_s, obj)
@@ -91,10 +65,8 @@ module Isomorfeus
       private
 
       def open_environment
-        return self.class.refa if self.class.environment
-        FileUtils.mkdir_p(Isomorfeus.data_object_env_path) unless Dir.exist?(Isomorfeus.data_object_env_path)
-        self.class.environment = Isomorfeus::Hamster.new(Isomorfeus.data_object_env_path, mapsize: Isomorfeus.hamster_mapsize)
-        self.class.refa
+        FileUtils.mkdir_p(@env_path) unless Dir.exist?(@env_path)
+        self.environment = Isomorfeus::Hamster.new(@env_path, mapsize: Isomorfeus.hamster_mapsize)
       end
     end
   end
