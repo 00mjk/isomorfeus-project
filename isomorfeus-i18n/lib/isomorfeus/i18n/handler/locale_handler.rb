@@ -17,9 +17,9 @@ module Isomorfeus
               response_agent.agent_result['data'] = { 'available_locales' => FastGettext.available_locales,
                                                       'domain' => FastGettext.text_domain }
               response_agent.agent_result['data']['locale'] = if Isomorfeus.available_locales.include?(locale)
-                                                                locale
+                                                                Isomorfeus.current_locale = locale
                                                               else
-                                                                FastGettext.locale
+                                                                Isomorfeus.current_locale = Isomorfeus.default_locale
                                                               end
             else
               response_agent.agent_result[domain] = {}
@@ -31,7 +31,13 @@ module Isomorfeus
                 FastGettext.with_domain(domain) do
                   response_agent.request[domain].each_key do |locale|
                     response_agent.agent_result[domain][locale] = {}
-                    Isomorfeus.raise_error(message: "Locale #{locale} not available!") unless Isomorfeus.available_locales.include?(locale)
+                    if Isomorfeus.current_locale != locale
+                      if Isomorfeus.available_locales.include?(locale)
+                        Isomorfeus.current_locale = locale
+                      else
+                        Isomorfeus.raise_error(message: "Locale #{locale} not available!")
+                      end
+                    end
                     FastGettext.with_locale(locale) do
                       response_agent.request[domain][locale].each_key do |locale_method|
                         method_args = response_agent.request[domain][locale][locale_method]
