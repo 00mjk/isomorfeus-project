@@ -52,6 +52,16 @@ RSpec.describe 'LucidI18n::Mixin' do
       end
       expect(result).to eq('einfach')
     end
+
+    it 'can localize' do
+      result = on_server do
+        class TestClass
+          include LucidI18n::Mixin
+        end
+        TestClass.new.l(1.2345)
+      end
+      expect(result).to eq('1,2345')
+    end
   end
 
   context 'Server Side Rendering' do
@@ -65,6 +75,10 @@ RSpec.describe 'LucidI18n::Mixin' do
 
     it 'translates' do
       expect(@page.inner_text).to include('einfach')
+    end
+
+    it 'localizes' do
+      expect(@page.inner_text).to include('localized numbers: 1.000 1,235')
     end
   end
 
@@ -83,6 +97,12 @@ RSpec.describe 'LucidI18n::Mixin' do
       @page.wait_for_selector('#nav_links')
       res = @page.inner_text
       expect(@page.inner_text).to include('einfach')
+    end
+
+    it 'translates' do
+      @page.wait_for_selector('#nav_links')
+      res = @page.inner_text
+      expect(@page.inner_text).to include('localized numbers: 1.000 1,235')
     end
   end
 end

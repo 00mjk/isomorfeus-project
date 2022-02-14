@@ -45,7 +45,7 @@ l(object, format = :standard, options = {})
 Here format can be:
 - :standard or :full, which try to be consistent with r18n options
 and in addition:
-- :custom, which passes the options hash along for formatting to the browser functions.
+- :custom, which passes the options hash along for formatting to the browser or node functions.
 The following options are available for date/time formating:
 - locale: locale string like 'de'
 - time_zone or timeZone: timezone string like 'CET'
