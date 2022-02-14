@@ -1,4 +1,5 @@
 require 'isomorfeus-transport'
+require 'isomorfeus-policy'
 require 'isomorfeus/operation/config'
 
 if RUBY_ENGINE == 'opal'
@@ -17,7 +18,7 @@ else
   require 'isomorfeus_operation/lucid_quick_op/base'
   require 'isomorfeus_operation/lucid_operation/mixin'
   require 'isomorfeus_operation/lucid_operation/base'
-  
+
   require 'iso_opal'
   Opal.append_path(__dir__.untaint) unless IsoOpal.paths.include?(__dir__.untaint)
 
