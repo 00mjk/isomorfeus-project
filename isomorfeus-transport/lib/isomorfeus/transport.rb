@@ -6,7 +6,6 @@ module Isomorfeus
 
         def init
           @socket = nil
-          @initialized = false
           promise_connect if Isomorfeus.on_browser? || Isomorfeus.on_mobile?
           true
         end
@@ -42,23 +41,16 @@ module Isomorfeus
             Isomorfeus::Transport::ClientProcessor.process(json_hash)
           end
           @socket.on_open do |event|
-            if @initialized
-              requests_in_progress[:requests].each_key do |request|
-                agent = get_agent_for_request_in_progress(request)
-                promise_send_request(request) if agent && !agent.sent
-              end
-              promise.resolve(true)
-            else
-              @initialized = true
-              init_promises = []
-              Isomorfeus.transport_init_class_names.each do |constant|
-                result = constant.constantize.send(:init)
-                init_promises << result if result.class == Promise
-              end
-              if init_promises.size > 0
-                Promise.when(*init_promises).then { promise.resolve(true) }
-              end
+            open_promise = Promise.new.resolve(true)
+            Isomorfeus.transport_init_class_names.each do |constant|
+              result_promise = constant.constantize.send(:init)
+              open_promise.then { result_promise } if result_promise.class == Promise
             end
+            requests_in_progress[:requests].each_key do |request|
+              agent = get_agent_for_request_in_progress(request)
+              open_promise.then { promise_send_request(request) } if agent && !agent.sent
+            end
+            open_promise.then { promise.resolve(true) }
           end
           promise
         end
@@ -100,14 +92,15 @@ module Isomorfeus
             begin
               @socket.send(`JSON.stringify(#{{request: { agent_ids: { agent.id => request }}}.to_n})`)
               agent.sent = true
-              after(Isomorfeus.on_ssr? ? 8000 : 20000) do
+              after(Isomorfeus.on_ssr? ? 5000 : 20000) do
                 unless agent.promise.realized?
                   agent.promise.reject({agent_response: { error: 'Request timeout!' }, full_response: {}})
                 end
               end
             rescue
               @socket.close
-              after 5000 do
+              after (Isomorfeus.on_ssr? ? 10 : 3000) do
+                @reconnect = true
                 Isomorfeus::Transport.promise_connect
               end
             end
