@@ -14,6 +14,7 @@ if RUBY_ENGINE == 'opal'
 else
   require 'active_support'
   require 'oj'
+  require 'r18n-core'
   require 'fast_gettext'
   require 'isomorfeus/fast_gettext_cache'
   require 'http_accept_language/parser'
@@ -23,8 +24,10 @@ else
   require 'isomorfeus/i18n/init'
   require 'lucid_i18n/mixin'
   require 'isomorfeus/i18n/handler/locale_handler'
+  require 'isomorfeus/i18n/middleware'
 
   Isomorfeus.add_middleware(HttpAcceptLanguage::Middleware)
+  Isomorfeus.insert_middleware_after(HttpAcceptLanguage::Middleware, Isomorfeus::I18n::Middleware)
 
   require 'iso_opal'
   Opal.append_path(__dir__.untaint) unless IsoOpal.paths.include?(__dir__.untaint)
@@ -62,9 +65,9 @@ else
   Isomorfeus.available_locales = ['en'] if Isomorfeus.available_locales.empty?
 
   if Isomorfeus.available_locales.include?('en')
-    Isomorfeus.locale = 'en'
+    Isomorfeus.default_locale = 'en'
   else
-    Isomorfeus.locale = Isomorfeus.available_locales.first
+    Isomorfeus.default_locale = Isomorfeus.available_locales.first
   end
 
   Isomorfeus.i18n_domain = 'app'
