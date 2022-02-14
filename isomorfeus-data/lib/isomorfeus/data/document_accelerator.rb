@@ -5,17 +5,17 @@ module Isomorfeus
         proc { fer_acc.close_index }
       end
 
-      attr_reader :doc_class, :doc_class_name, :doc_class_name_u
+      attr_reader :doc_class, :doc_class_name
       attr_accessor :index
 
       def initialize(doc_class, &block)
         @doc_class = doc_class
         @doc_class_name = doc_class.name
-        @doc_class_name_u = @doc_class_name.underscore
         if block_given?
           res = block.call(self)
           @index = res unless @index
         else
+          @index_path = File.expand_path(File.join(Isomorfeus.data_documents_path, @doc_class_name.underscore))
           open_index
         end
         ObjectSpace.define_finalizer(self, self.class.finalize(self))
@@ -23,7 +23,7 @@ module Isomorfeus
 
       def destroy_index
         close_index
-        FileUtils.rm_rf(index_path(doc_class_name))
+        FileUtils.rm_rf(@index_path)
       end
 
       def close_index
@@ -66,14 +66,10 @@ module Isomorfeus
         id = top_docs.hits[0].doc if top_docs.total_hits == 1
       end
 
-      def index_path
-        File.expand_path(File.join(Isomorfeus.data_documents_path, @doc_class_name_u))
-      end
-
       def open_index
         FileUtils.mkdir_p(Isomorfeus.data_documents_path) unless Dir.exist?(Isomorfeus.data_documents_path)
         field_infos = Isomorfeus::Ferret::Index::FieldInfos.new(store: :yes, index: :yes, term_vector: :with_positions_offsets)
-        @index = Isomorfeus::Ferret::Index::Index.new(path: index_path, key: :key, auto_flush: true, lock_retry_time: 5, field_infos: field_infos)
+        @index = Isomorfeus::Ferret::Index::Index.new(path: @index_path, key: :key, auto_flush: true, lock_retry_time: 5, field_infos: field_infos)
         @index.field_infos.add_field(:key, store: :yes, index: :yes, term_vector: :no) unless @index.field_infos[:key]
         @doc_class.field_options.each do |field, options|
           @index.field_infos.add_field(field, options) unless @index.field_infos[field]
