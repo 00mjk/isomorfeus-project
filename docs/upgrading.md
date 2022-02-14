@@ -2,8 +2,9 @@
 
 ### from 2.0 to 2.1
 
-Breaking changes:
-- the default storage dirctory has been renamed from your_project_root/data to your_project_root/storage: `mv my_project_root/data my_project_root/storage`
+#### Breaking changes:
+- the default storage dirctory has been renamed from your_project_root/data to your_project_root/storage
+- the layout within the storage directory changed for LucidObject, now there is a directory per LucidObject class
 - isomorfeus-i18n: LucidTranslation has been renamed to LucidI18n
 ```ruby
 # before with isomorfeus 2.0:
@@ -24,3 +25,8 @@ class MyPolicy < LucidPolicy::Base
   allow MyQuery, :execute
 end
 ```
+
+#### Other Changes
+- the LucidI18n::Mixin is automatically included in LucidApp, LucidComponent and LucidFunc components
+- the LucidI18n::Mixin is automatically included in LucidDocument, Lucidfile, LucidObject and LucidQuery data classes
+- the `current_locale` helper is available everywhere, where the LucidI18n::Mixin is included
