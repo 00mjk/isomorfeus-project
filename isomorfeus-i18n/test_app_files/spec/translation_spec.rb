@@ -21,7 +21,7 @@ RSpec.describe 'LucidI18n::Mixin' do
 
     it 'has locale' do
       result = on_server do
-        Isomorfeus.locale
+        Isomorfeus.default_locale
       end
       expect(result).to eq('de')
     end
@@ -64,6 +64,24 @@ RSpec.describe 'LucidI18n::Mixin' do
     end
 
     it 'translates' do
+      expect(@page.inner_text).to include('einfach')
+    end
+  end
+
+  context 'Client Side Rendering' do
+    before do
+      @page = visit('/snc?skip_ssr=true')
+    end
+
+    it 'renders in the browser' do
+      @page.wait_for_selector('#nav_links')
+      res = @page.inner_text
+      expect(@page.inner_text).to include('Rendered!')
+    end
+
+    it 'translates' do
+      @page.wait_for_selector('#nav_links')
+      res = @page.inner_text
       expect(@page.inner_text).to include('einfach')
     end
   end

@@ -1,6 +1,6 @@
 class NavigationLinks < Preact::FunctionComponent::Base
   render do
-    P do
+    P(id: 'nav_links') do
       Link(to: '/') { 'Hello World!' }
       SPAN " | "
       Link(to: '/welcome') { 'Welcome!' }

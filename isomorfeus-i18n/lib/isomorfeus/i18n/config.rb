@@ -19,24 +19,18 @@ module Isomorfeus
         domain
       end
 
-      def locale
+      def default_locale
         result = Redux.fetch_by_path(:i18n_state, :locale)
         result ? result : available_locales.first
       end
 
-      def locale=(loc)
+      def default_locale=(loc)
         Isomorfeus.raise_error(message: "Locale #{loc} not available!") unless available_locales.include?(loc)
-        Isomorfeus.store.dispatch(type: 'I18N_LOAD', data: { locale: locale })
+        Isomorfeus.store.dispatch(type: 'I18N_LOAD', data: { locale: loc })
         loc
       end
 
-      def negotiated_locale
-        @negotiated_locale
-      end
-
-      def negotiated_locale=(l)
-        @negotiated_locale = l
-      end
+      attr_accessor :current_locale
     else
       def available_locales
         @available_locales
@@ -56,14 +50,26 @@ module Isomorfeus
         @i18n_domain = domain
       end
 
-      def locale
-        @locale
+
+      def current_locale
+        Thread.current[:isomorfeus_locale]
       end
 
-      def locale=(loc)
+      def current_locale=(loc)
+        FastGettext.locale = loc
+        R18n.thread_set(loc)
+        Thread.current[:isomorfeus_locale] = loc
+      end
+
+      def default_locale
+        @default_locale
+      end
+
+      def default_locale=(loc)
         Isomorfeus.raise_error(message: "Locale #{loc} not available!") unless available_locales.include?(loc)
         FastGettext.locale = loc
-        @locale = loc
+        R18n.set(loc)
+        @default_locale = loc
       end
 
       def locale_path
