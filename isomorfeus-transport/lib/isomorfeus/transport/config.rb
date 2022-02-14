@@ -78,8 +78,8 @@ module Isomorfeus
         valid_channel_class_names.include?(class_name)
       end
 
-      def add_middleware(middleware)
-        Isomorfeus.middlewares << middleware
+      def add_middleware(new_middleware)
+        Isomorfeus.middlewares.push(new_middleware) unless Isomorfeus.middlewares.include?(new_middleware)
       end
 
       def insert_middleware_after(existing_middleware, new_middleware)
@@ -88,7 +88,7 @@ module Isomorfeus
           if index_of_existing
             Isomorfeus.middlewares.insert(index_of_existing + 1, new_middleware)
           else
-            Isomorfeus.middlewares << new_middleware
+            Isomorfeus.middlewares.push(new_middleware)
           end
         end
       end
@@ -99,13 +99,13 @@ module Isomorfeus
           if index_of_existing
             Isomorfeus.middlewares.insert(index_of_existing, new_middleware)
           else
-            Isomorfeus.middlewares << new_middleware
+            Isomorfeus.middlewares.push(new_middleware)
           end
         end
       end
 
       def middlewares
-        @middlewares ||= Set.new
+        @middlewares ||= []
       end
 
       def valid_handler_class_names
