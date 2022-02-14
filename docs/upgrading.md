@@ -29,4 +29,5 @@ end
 #### Other Changes
 - the LucidI18n::Mixin is automatically included in LucidApp, LucidComponent and LucidFunc components
 - the LucidI18n::Mixin is automatically included in LucidDocument, Lucidfile, LucidObject and LucidQuery data classes
-- the `current_locale` helper is available everywhere, where the LucidI18n::Mixin is included
+- the `current_locale` helper is available everywhere, where the LucidI18n::Mixin is included, everywhere else `Isomorfeus.current_locale` is available
+- the current locale is automatically negotiated and set by a rack handler
