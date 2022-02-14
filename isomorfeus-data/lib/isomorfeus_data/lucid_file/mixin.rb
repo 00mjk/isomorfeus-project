@@ -3,6 +3,7 @@ module LucidFile
     def self.included(base)
       base.extend(Isomorfeus::Data::GenericClassApi)
       base.include(Isomorfeus::Data::GenericInstanceApi)
+      base.include(LucidI18n::Mixin)
 
       def changed!
         @_changed = true

@@ -2,6 +2,7 @@ module LucidQuery
   module Mixin
     def self.included(base)
       base.extend(LucidPropDeclaration::Mixin)
+      base.include(LucidI18n::Mixin)
 
       if RUBY_ENGINE == 'opal'
         base.instance_exec do

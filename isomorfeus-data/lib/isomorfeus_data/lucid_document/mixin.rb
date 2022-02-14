@@ -4,6 +4,7 @@ module LucidDocument
       base.include(Isomorfeus::Data::FieldSupport)
       base.extend(Isomorfeus::Data::GenericClassApi)
       base.include(Isomorfeus::Data::GenericInstanceApi)
+      base.include(LucidI18n::Mixin)
 
       base.instance_exec do
         def escape_string(s)
