@@ -8,12 +8,15 @@ if RUBY_ENGINE == 'opal'
   require 'isomorfeus/transport/client_processor'
   require 'isomorfeus/transport/websocket_client'
   require 'isomorfeus/transport'
-  require 'isomorfeus/transport/ssr_login'
+
   require 'lucid_channel/mixin'
   require 'lucid_channel/base'
   Isomorfeus.zeitwerk.push_dir('channels')
   Isomorfeus.add_client_init_class_name('Isomorfeus::Transport')
-  Isomorfeus.add_transport_init_class_name('Isomorfeus::Transport::SsrLogin') if Isomorfeus.on_ssr?
+  if Isomorfeus.on_ssr?
+    require 'isomorfeus/transport/ssr_login'
+    Isomorfeus.add_transport_init_class_name('Isomorfeus::Transport::SsrLogin')
+  end
 else
   require 'base64'
   require 'digest'
