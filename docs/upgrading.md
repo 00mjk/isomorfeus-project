@@ -25,6 +25,7 @@ class MyPolicy < LucidPolicy::Base
   allow MyQuery, :execute
 end
 ```
+- instance store is gone, instead just use state for Components
 
 #### Other Changes
 - the LucidI18n::Mixin is automatically included in LucidApp, LucidComponent and LucidFunc components
