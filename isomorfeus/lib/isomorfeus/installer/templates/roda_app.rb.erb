@@ -7,7 +7,7 @@ class <%= roda_app_class %> < Roda
 
   use_isomorfeus_middlewares
 
-  plugin :public, root: 'public', gzip: true
+  plugin :public, root: 'public', gzip: true, brotli: true
 
   @@templates = {}
   @@templates_path = File.expand_path(File.join(__dir__, '..', 'layouts'))
