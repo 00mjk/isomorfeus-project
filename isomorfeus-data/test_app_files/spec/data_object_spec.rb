@@ -307,6 +307,15 @@ RSpec.describe 'LucidObject' do
       end
       expect(result >= 3).to be true
     end
+
+    it 'can store and load a compressed object' do
+      result = on_server do
+        so = SimpleCompressedObject.create(attributes: { two: 'two', three: 'one two three' })
+        lo = SimpleCompressedObject.load(key: so.key)
+        lo.two
+      end
+      expect(result).to eq 'two'
+    end
   end
 
   context 'on the client' do

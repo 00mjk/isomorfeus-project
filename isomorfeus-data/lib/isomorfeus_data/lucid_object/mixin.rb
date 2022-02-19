@@ -6,6 +6,16 @@ module LucidObject
       base.include(Isomorfeus::Data::GenericInstanceApi)
       base.include(LucidI18n::Mixin)
 
+      base.instance_exec do
+        def store_compressed(quality: 5)
+          @_store_compressed = quality
+        end
+
+        def _store_compressed
+          @_store_compressed
+        end
+      end
+
       def [](name)
         send(name)
       end
@@ -97,11 +107,13 @@ module LucidObject
 
           def object_expander
             return @object_expander if @object_expander
+            compress = _store_compressed
+            compress = false if compress.nil?
             @object_expander = if @_setup_environment_block
-                                          Isomorfeus::Data::ObjectExpander.new(self.to_s, &@_setup_index_block)
-                                        else
-                                          Isomorfeus::Data::ObjectExpander.new(self.to_s)
-                                        end
+                                 Isomorfeus::Data::ObjectExpander.new(class_name: self.to_s, compress: compress, &@_setup_index_block)
+                               else
+                                 Isomorfeus::Data::ObjectExpander.new(class_name: self.to_s, compress: compress)
+                               end
           end
 
           def object_accelerator

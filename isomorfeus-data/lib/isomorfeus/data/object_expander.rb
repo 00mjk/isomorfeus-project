@@ -9,22 +9,23 @@ module Isomorfeus
 
       attr_accessor :environment
 
-      def initialize(object_class_name, &block)
+      def initialize(class_name:, compress: false, &block)
         if block_given?
           res = block.call(self)
           self.environment = res unless self.environment
         else
-          @env_path = File.expand_path(File.join(Isomorfeus.data_object_envs_path, object_class_name.underscore))
+          @env_path = File.expand_path(File.join(Isomorfeus.data_object_envs_path, class_name.underscore))
           open_environment
         end
         @db = self.environment.database('objects', create: true)
         @index_db = self.environment.database('index', create: true, dupsort: true)
+        @compress = compress
         @use_class_cache = !Isomorfeus.development?
         ObjectSpace.define_finalizer(self, self.class.finalize(self))
       end
 
       def create_object(sid_s, obj)
-        Isomorfeus::Hamster::Marshal.dump(@db, sid_s, obj, class_cache: @use_class_cache)
+        Isomorfeus::Hamster::Marshal.dump(@db, sid_s, obj, class_cache: @use_class_cache, compress: @compress)
       end
 
       def destroy_object(sid_s)
@@ -37,7 +38,7 @@ module Isomorfeus
       end
 
       def save_object(sid_s, obj)
-        Isomorfeus::Hamster::Marshal.dump(@db, sid_s, obj, class_cache: @use_class_cache)
+        Isomorfeus::Hamster::Marshal.dump(@db, sid_s, obj, class_cache: @use_class_cache, compress: @compress)
       end
 
       def index_delete(key, val)
