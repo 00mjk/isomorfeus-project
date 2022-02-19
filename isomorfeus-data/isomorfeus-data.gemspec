@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'opal-activesupport', '~> 0.3.3'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.12'
   s.add_dependency 'isomorfeus-ferret', '~> 0.12.6'
-  s.add_dependency 'isomorfeus-hamster', '~> 0.6.4'
+  s.add_dependency 'isomorfeus-hamster', '~> 0.6.6'
   s.add_dependency 'isomorfeus-i18n', Isomorfeus::Data::VERSION
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Data::VERSION
   s.add_dependency 'isomorfeus-preact', '~> 10.6.36'
