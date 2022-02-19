@@ -21,12 +21,12 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-iodine', '~> 0.7.47'
   s.add_dependency 'oj', '~> 3.13.11'
   s.add_dependency 'opal', '~> 1.4.1'
-  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.12'
+  s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.15'
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.6'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.36'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.38'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
   s.add_dependency 'isomorfeus-redux', '~> 4.1.18'
-  s.add_dependency 'isomorfeus-speednode', '~> 0.5.0'
+  s.add_dependency 'isomorfeus-speednode', '~> 0.5.2'
   s.add_dependency 'sorted_set', '~> 1.0.3'
   s.add_development_dependency 'isomorfeus', Isomorfeus::Transport::VERSION
   s.add_development_dependency 'rake'
