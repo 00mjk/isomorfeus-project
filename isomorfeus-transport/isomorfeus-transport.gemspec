@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-preact', '~> 10.6.36'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
   s.add_dependency 'isomorfeus-redux', '~> 4.1.17'
+  s.add_dependency 'isomorfeus-speednode', '~> 0.5.0'
   s.add_dependency 'sorted_set', '~> 1.0.3'
   s.add_development_dependency 'isomorfeus', Isomorfeus::Transport::VERSION
   s.add_development_dependency 'rake'
