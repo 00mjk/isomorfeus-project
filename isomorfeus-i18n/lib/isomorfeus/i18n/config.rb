@@ -25,7 +25,7 @@ module Isomorfeus
       end
 
       def default_locale=(loc)
-        Isomorfeus.raise_error(message: "Locale #{loc} not available!") unless available_locales.include?(loc)
+        Isomorfeus.raise_error(message: "Locale #{loc} not available as default locale!") unless available_locales.include?(loc)
         Isomorfeus.store.dispatch(type: 'I18N_LOAD', data: { locale: loc })
         loc
       end
@@ -66,7 +66,7 @@ module Isomorfeus
       end
 
       def default_locale=(loc)
-        Isomorfeus.raise_error(message: "Locale #{loc} not available!") unless available_locales.include?(loc)
+        Isomorfeus.raise_error(message: "Locale #{loc} not available as default locale!") unless available_locales.include?(loc)
         FastGettext.locale = loc
         R18n.set(loc)
         @default_locale = loc

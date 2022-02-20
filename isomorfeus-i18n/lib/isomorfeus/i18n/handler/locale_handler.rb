@@ -35,7 +35,7 @@ module Isomorfeus
                       if Isomorfeus.available_locales.include?(locale)
                         Isomorfeus.current_locale = locale
                       else
-                        Isomorfeus.raise_error(message: "Locale #{locale} not available!")
+                        Isomorfeus.raise_error(message: "LocaleHandler: Locale #{locale} not available!")
                       end
                     end
                     FastGettext.with_locale(locale) do
