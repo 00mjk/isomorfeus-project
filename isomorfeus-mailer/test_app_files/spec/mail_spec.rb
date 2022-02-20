@@ -12,7 +12,7 @@ RSpec.describe 'LucidMail' do
     end
 
     it 'asset imports are ok' do
-      result = Isomorfeus.assets['mail.js'].to_s
+      result = Isomorfeus.assets['mail.js'].generate_entry('mail')
       expect(result).to eq <<~JAVASCRIPT
       import * as Redux from "redux";
       global.Redux = Redux;
@@ -38,8 +38,7 @@ RSpec.describe 'LucidMail' do
 
       import WebSocket from "ws";
       global.WebSocket = WebSocket;
-
-      import("./mail_loader.rb.js");
+      import("./mail/mail_loader.rb.js");
       JAVASCRIPT
     end
   end
