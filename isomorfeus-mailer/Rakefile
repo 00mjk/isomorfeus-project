@@ -12,7 +12,7 @@ task :html2text_specs do
   end
 end
 
-task :specs => [:html2text_specs, :create_test_app] do
+task :mailer_specs => [:create_test_app] do
   puts <<~'ASCII'
    _                         ___                           _ __
   (_)__ ___  __ _  ___  ____/ _/__ __ ___________ _  ___ _(_) /__ ____
@@ -37,5 +37,7 @@ task :start_test_app => :create_test_app do
   end
   Dir.chdir(pwd)
 end
+
+task specs: [:mailer_specs, :html2text_specs]
 
 task default: :specs
