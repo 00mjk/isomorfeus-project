@@ -70,10 +70,14 @@ module Isomorfeus
           result
         end
       rescue Exception => e
-        e_text = "#{e.class}: #{e.message}\n #{ebacktrace.join("\n")}"
+        e_text = "#{e.class}: #{e.message}\n #{e.backtrace.join("\n")}"
         STDERR.puts e_text
-        return [500, {}, "<html><head><title>#{e.class}</title></head><body><pre>#{e_text}</pre></body></html>"] unless Isomorfeus.production?
-        return [500, {}, "<html><head><title>Error</title></head><body>Sorry, a error occured!</body></html>"]
+        message = if Isomorfeus.production?
+                    "<html><head><title>Error</title></head><body>Sorry, a error occured!</body></html>"
+                  else
+                    "<html><head><title>#{e.class}</title></head><body><pre>#{e_text}</pre></body></html>"
+                  end
+        return [500, { Rack::CONTENT_TYPE => "text/html", Rack::CONTENT_LENGTH => message.length.to_s }, [message]]
       end
     end
   end
