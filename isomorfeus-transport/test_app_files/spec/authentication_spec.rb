@@ -61,7 +61,7 @@ RSpec.describe 'LucidAuthentication::Mixin' do
           nil
         end
       end
-      # sleep 10 # wait for page redirect
+      sleep 1 # give redirect some time to set cookies
       @page.visit('/') # make sure we get proper execution context, so load page again
       result = @page.eval_ruby do
         Isomorfeus.current_user.key
