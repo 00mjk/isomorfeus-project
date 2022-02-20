@@ -72,7 +72,7 @@ module Isomorfeus
       rescue Exception => e
         e_text = "#{e.class}: #{e.message}\n #{ebacktrace.join("\n")}"
         STDERR.puts e_text
-        return [500, {}, "<html><head><title>#{e.class}</title></head><body><pre>#{e_text}</pre></body></html>"] if Isomorfeus.development?
+        return [500, {}, "<html><head><title>#{e.class}</title></head><body><pre>#{e_text}</pre></body></html>"] unless Isomorfeus.production?
         return [500, {}, "<html><head><title>Error</title></head><body>Sorry, a error occured!</body></html>"]
       end
     end
