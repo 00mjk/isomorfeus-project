@@ -29,5 +29,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'r18n-core', '~> 5.0.1'
   s.add_development_dependency 'isomorfeus', Isomorfeus::I18n::VERSION
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec', '~> 3.10.0'
+  s.add_development_dependency 'rspec', '~> 3.11.0'
 end

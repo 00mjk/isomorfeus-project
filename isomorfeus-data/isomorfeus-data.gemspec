@@ -31,5 +31,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Data::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Data::VERSION
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec', '~> 3.10.0'
+  s.add_development_dependency 'rspec', '~> 3.11.0'
 end
