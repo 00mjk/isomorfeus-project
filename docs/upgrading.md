@@ -1,5 +1,38 @@
 ## Upgrading
 
+### from 2.1 to 2.2
+
+to benefit from improved behavior in development update 'config.ru' to the following pattern,
+changing the 2 occurances of YourAppClass to the class of your app:
+```ruby
+require_relative 'app_loader'
+
+if !Isomorfeus.development?
+  Isomorfeus.zeitwerk.setup
+  Isomorfeus.zeitwerk.eager_load
+
+  run YourAppClass.freeze.app # <- change here
+else
+  Isomorfeus.zeitwerk.enable_reloading
+  Isomorfeus.zeitwerk.setup
+  Isomorfeus.zeitwerk.eager_load
+
+  run ->(env) do
+    if Isomorfeus.server_requires_reload?
+      write_lock = Isomorfeus.zeitwerk_lock.try_write_lock
+      if write_lock
+        Isomorfeus.server_reloaded!
+        Isomorfeus.zeitwerk.reload
+        Isomorfeus.zeitwerk_lock.release_write_lock
+      end
+    end
+    Isomorfeus.zeitwerk_lock.with_read_lock do
+      YourAppClass.call env # <- change here
+    end
+  end
+end
+```
+
 ### from 2.0 to 2.1
 
 #### Breaking changes:
