@@ -26,7 +26,14 @@ else
   require 'ostruct'
   require 'socket'
   require 'sorted_set'
+  require 'time'
+  require 'brotli'
+  require 'zlib'
   require 'oj'
+  require 'rack'
+  require 'rack/body_proxy'
+  require 'rack/request'
+  require 'rack/utils'
   require 'active_support'
   require 'isomorfeus-asset-manager'
   require 'isomorfeus-hamster'
@@ -44,10 +51,12 @@ else
   require 'isomorfeus/transport/websocket_client'
   require 'isomorfeus/transport'
   require 'isomorfeus/transport/rack_middleware'
+  require 'isomorfeus/transport/compressor_rack'
   require 'isomorfeus/transport/middlewares'
 
-  Isomorfeus.add_middleware(Isomorfeus::Transport::RackMiddleware)
   Isomorfeus.add_middleware(Isomorfeus::AssetManager::RackMiddleware)
+  Isomorfeus.add_middleware(Isomorfeus::Transport::CompressorRack)
+  Isomorfeus.add_middleware(Isomorfeus::Transport::RackMiddleware)
 
   require 'lucid_handler/mixin'
   require 'lucid_handler/base'
