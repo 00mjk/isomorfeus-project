@@ -1,5 +1,9 @@
 ## Upgrading
 
+### In general
+
+Just update the isomorfeus version in the Gemfile of your app and `bundle update`
+
 ### from 2.1 to 2.2
 
 to benefit from improved behavior in development update 'config.ru' to the following pattern,
