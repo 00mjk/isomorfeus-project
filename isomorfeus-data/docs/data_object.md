@@ -64,6 +64,17 @@ end
 For more information about LucidQuery and how to pass props see the [query docs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/docs/data_query.md).
 See the [Ferret Tutorial](https://github.com/isomorfeus/isomorfeus-ferret/blob/master/TUTORIAL.md) for more information about ferret text queries.
 
+#### Compression
+
+Objects can be automatically compressed when stored:
+```ruby
+class MyObject < LucidObject:Base
+  store_compressed # enables compression when stored
+  store_compressed quality: 1 # optional quality arg chooses the compression level: 1 (fastest) to 11 (best compression, also very slow)
+  ...
+end
+```
+
 ### Example and Specs
 - [Example](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/test_app_files/isomorfeus/data/simple_object.rb)
 - [Specs](https://github.com/isomorfeus/isomorfeus-project/blob/master/isomorfeus-data/test_app_files/spec/data_object_spec.rb)
