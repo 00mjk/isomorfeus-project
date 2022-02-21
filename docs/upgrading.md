@@ -6,8 +6,8 @@ Just update the isomorfeus version in the Gemfile of your app and `bundle update
 
 ### from 2.1 to 2.2
 
-to benefit from improved behavior in development update 'config.ru' to the following pattern,
-changing the 2 occurances of YourAppClass to the class of your app:
+to benefit from improved behavior in development and server side debugging,
+update 'config.ru' of your app according to the following pattern:
 ```ruby
 require_relative 'app_loader'
 
@@ -27,14 +27,14 @@ else
   Isomorfeus.zeitwerk.eager_load
 
   run ->(env) do
-    if Isomorfeus.server_requires_reload?
+    if Isomorfeus.server_requires_reload? # <- add this line
       write_lock = Isomorfeus.zeitwerk_lock.try_write_lock
       if write_lock
         Isomorfeus.server_reloaded!
         Isomorfeus.zeitwerk.reload
         Isomorfeus.zeitwerk_lock.release_write_lock
       end
-    end
+    end                                  # <- and this line
     Isomorfeus.zeitwerk_lock.with_read_lock do
       YourAppClass.call env # <- change here to your app class
     end
