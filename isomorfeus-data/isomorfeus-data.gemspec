@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.6'
   s.add_dependency 'isomorfeus-i18n', Isomorfeus::Data::VERSION
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Data::VERSION
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.45'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.47'
   s.add_dependency 'isomorfeus-redux', '~> 4.1.18'
   s.add_dependency 'isomorfeus-transport', Isomorfeus::Data::VERSION
   s.add_development_dependency 'isomorfeus', Isomorfeus::Data::VERSION
