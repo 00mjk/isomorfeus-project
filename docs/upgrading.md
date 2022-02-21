@@ -11,11 +11,16 @@ changing the 2 occurances of YourAppClass to the class of your app:
 ```ruby
 require_relative 'app_loader'
 
+if Isomorfeus.development?  # <- add this section, until ...
+  require 'ruby-debug-ide'
+  Debugger.start_server
+end                         # <- ... here
+
 if !Isomorfeus.development?
   Isomorfeus.zeitwerk.setup
   Isomorfeus.zeitwerk.eager_load
 
-  run YourAppClass.freeze.app # <- change here
+  run YourAppClass.freeze.app # <- change here to your app class
 else
   Isomorfeus.zeitwerk.enable_reloading
   Isomorfeus.zeitwerk.setup
@@ -31,9 +36,19 @@ else
       end
     end
     Isomorfeus.zeitwerk_lock.with_read_lock do
-      YourAppClass.call env # <- change here
+      YourAppClass.call env # <- change here to your app class
     end
   end
+end
+```
+and in addition change the Gemfile of the app to add the gems for debugging in the development section:
+```ruby
+group :development do
+  gem 'debase', '0.2.5.beta2'   # <- add this line
+  gem 'ruby-debug-ide', '0.7.3' # <- add this line
+  gem 'pry', '~> 0.14.1'
+  gem 'pry-rescue'
+  gem 'pry-stack_explorer'
 end
 ```
 
