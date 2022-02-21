@@ -1,13 +1,9 @@
 require_relative 'app_loader'
 
-# if Isomorfeus.development? # && !Gem.win_platform?
-#   require 'debug/session'
-#   require 'debug/server'
-#   raise 'no debugger' unless defined?(DEBUGGER__)
-#   port = 2999
-#   host = '127.0.0.1'
-#   DEBUGGER__.initialize_session DEBUGGER__::UI_TcpServer.new(host: host, port: port)
-# end
+if Isomorfeus.development?
+  require 'ruby-debug-ide'
+  Debugger.start_server
+end
 
 if !Isomorfeus.development?
   Isomorfeus.zeitwerk.setup
