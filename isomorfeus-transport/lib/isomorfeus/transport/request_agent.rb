@@ -10,7 +10,7 @@ module Isomorfeus
           agents[object_id]
         end
 
-        def get!(object_id)
+        def del!(object_id)
           agents.delete(object_id.to_s)
         end
       end
@@ -27,7 +27,17 @@ module Isomorfeus
       def initialize(request = nil)
         @id = object_id.to_s
         self.class.agents[@id] = self
+        current_agent = self
         @promise = Promise.new
+        @promise.then do
+                        Isomorfeus::Transport.unregister_request_in_progress(current_agent.id)
+                        Isomorfeus::Transport::RequestAgent.del!(current_agent.id)
+                      end
+        @promise.fail do |e|
+                        STDERR.puts "#{e}"
+                        Isomorfeus::Transport.unregister_request_in_progress(current_agent.id)
+                        Isomorfeus::Transport::RequestAgent.del!(current_agent.id)
+                      end
         @request = request
         @sent = false
       end
@@ -37,6 +47,8 @@ module Isomorfeus
         self.processed = true
         Isomorfeus.raise_error(message: self.response[:error]) if self.response.key?(:error)
         self.result = block.call(self)
+        @promise.resolve(self) unless @promise.realized?
+        self.result
       end
     end
   end
