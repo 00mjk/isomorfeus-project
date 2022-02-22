@@ -1,3 +1,4 @@
+require 'date'
 require 'isomorfeus-transport'
 
 if RUBY_ENGINE == 'opal'
