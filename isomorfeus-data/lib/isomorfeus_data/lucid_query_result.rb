@@ -46,7 +46,7 @@ class LucidQueryResult
                        stored_results = Redux.fetch_by_path(:data_state, @class_name, @key)
                        stored_results.JS[accessor_name] if stored_results
                      end
-      Isomorfeus.raise_error(message: "#{@class_name}: no such thing '#{accessor_name}' in the results!") unless sid_or_array
+      return nil unless sid_or_array
       if stored_results.JS['_is_array_']
         sid_or_array.map { |sid| Isomorfeus.instance_from_sid(sid) }
       else
@@ -82,7 +82,7 @@ class LucidQueryResult
           sids_hash[key.to_s] = value_or_array.map(&:sid)
           sids_hash[:_is_array_] = true
         else
-          sids_hash[key.to_s] = value_or_array.sid
+          sids_hash[key.to_s] = value_or_array.nil? ? nil : value_or_array.sid
         end
       end
       { @class_name => { @key => sids_hash }}
@@ -99,9 +99,11 @@ class LucidQueryResult
             end
           end
         else
-          data_hash.deep_merge!(value.to_transport)
-          if value.respond_to?(:included_items_to_transport)
-            data_hash.deep_merge!(value.included_items_to_transport)
+          unless value.nil?
+            data_hash.deep_merge!(value.to_transport)
+            if value.respond_to?(:included_items_to_transport)
+              data_hash.deep_merge!(value.included_items_to_transport)
+            end
           end
         end
       end
