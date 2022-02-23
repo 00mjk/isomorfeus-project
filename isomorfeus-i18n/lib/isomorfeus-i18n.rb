@@ -1,4 +1,5 @@
-require 'date'
+require 'time' # which requires 'date'
+# require 'datetime' # for opal 1.5
 require 'isomorfeus-transport'
 
 if RUBY_ENGINE == 'opal'
