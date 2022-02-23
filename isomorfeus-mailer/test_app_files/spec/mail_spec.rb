@@ -39,6 +39,10 @@ RSpec.describe 'LucidMail' do
       import WebSocket from "ws";
       global.WebSocket = WebSocket;
       import("./mail/mail_loader.rb.js");
+
+      import("./mail/isomorfeus/top_level_ssr.rb.js");
+
+      import("./mail/isomorfeus/ssr.rb.js");
       JAVASCRIPT
     end
   end
