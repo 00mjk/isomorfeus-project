@@ -13,10 +13,6 @@ if RUBY_ENGINE == 'opal'
   require 'lucid_channel/base'
   Isomorfeus.zeitwerk.push_dir('channels')
   Isomorfeus.add_client_init_class_name('Isomorfeus::Transport')
-  if Isomorfeus.on_ssr?
-    require 'isomorfeus/transport/ssr_login'
-    Isomorfeus.add_transport_init_class_name('Isomorfeus::Transport::SsrLogin')
-  end
 else
   require 'base64'
   require 'digest'
