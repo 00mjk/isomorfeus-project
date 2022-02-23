@@ -26,3 +26,5 @@ module Isomorfeus
     end
   end
 end
+
+Isomorfeus.add_transport_init_class_name('Isomorfeus::Transport::SsrLogin')
