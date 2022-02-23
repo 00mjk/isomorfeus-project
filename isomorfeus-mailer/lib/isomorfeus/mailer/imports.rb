@@ -11,6 +11,8 @@ module Isomorfeus
         Isomorfeus.assets['mail.js'].add_js_import('ws', 'WebSocket')
         if Dir.exist?(Isomorfeus.app_root)
           Isomorfeus.assets['mail.js'].add_ruby_import('mail_loader') if File.exist?(File.join(Isomorfeus.app_root, 'mail_loader.rb'))
+          Isomorfeus.assets['mail.js'].add_ruby_import('isomorfeus/top_level_ssr')
+          Isomorfeus.assets['mail.js'].add_ruby_import('isomorfeus/ssr')
         end
       end
     end
