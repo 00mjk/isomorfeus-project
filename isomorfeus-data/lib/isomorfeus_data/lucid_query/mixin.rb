@@ -6,28 +6,62 @@ module LucidQuery
 
       if RUBY_ENGINE == 'opal'
         base.instance_exec do
+          def _generate_auto_key(props_s)
+            component = nil
+            component_name = '_'
+            %x{
+              let c = Opal.Preact.active_component();
+              if (typeof c?.__ruby_instance !== 'undefined') { component = c.__ruby_instance; }
+            }
+            component_name = component.class.name if component
+            "#{component_name}:_:#{self.name}:#{props_s}"
+          end
+
+          def _should_return?(lqri, gak)
+            if on_ssr?
+              lqri.loaded? && gak
+            else on_browser?
+              if Isomorfeus::TopLevel.hydrated
+                if Isomorfeus::TopLevel.first_pass
+                  lqri.loaded?
+                else
+                  lqri.loaded? && !gak
+                end
+              else
+                lqri.loaded? && !gak
+              end
+            end
+          end
+
           def execute(key: nil, **props)
-            props[:query_result_instance] = LucidQueryResult.new(key: key)
-            promise_execute(props) unless props[:query_result_instance].loaded?
-            props[:query_result_instance]
+            gak = key ? false : true
+            key = _generate_auto_key(`JSON.stringify(props)`) unless key
+
+            lqri = LucidQueryResult.new(key: key)
+            return lqri if _should_return?(lqri, gak)
+            props[:query_result_instance] = lqri
+            promise_execute(key: gak ? nil : key, **props)
+            lqri
           end
 
           def promise_execute(key: nil, **props)
-            query_result_instance = props.delete(:query_result_instance)
-            query_result_instance = LucidQueryResult.new(key: key) unless query_result_instance
+            gak = key ? false : true
+            key = _generate_auto_key(`JSON.stringify(props)`) unless key
 
-            return Promise.new.resolve(query_result_instance) if query_result_instance.loaded?
+            lqri = props.delete(:query_result_instance)
+            lqri = LucidQueryResult.new(key: key) unless lqri
+            return Promise.new.resolve(lqri) if _should_return?(lqri, gak)
 
             props.each_key do |prop_name|
               Isomorfeus.raise_error(message: "#{self.to_s} No such query prop declared: '#{prop_name}'!") unless declared_props.key?(prop_name)
             end
             props = validated_props(props)
-            props[:key] = query_result_instance.key
+            props[:key] = lqri.key
             Isomorfeus::Transport.promise_send_path( 'Isomorfeus::Data::Handler::Generic', self.name, :execute, props).then do |agent|
               agent.process do
-                query_result_instance._load_from_store!
+                lqri._load_from_store!
                 Isomorfeus.store.dispatch(type: 'DATA_LOAD', data: agent.full_response[:data])
-                query_result_instance
+                lqri
               end
             end
           end
