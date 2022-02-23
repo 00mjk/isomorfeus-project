@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'opal', '~> 1.4.1'
   s.add_dependency 'isomorfeus-asset-manager', '~> 0.14.17'
   s.add_dependency 'isomorfeus-hamster', '~> 0.6.6'
-  s.add_dependency 'isomorfeus-preact', '~> 10.6.47'
+  s.add_dependency 'isomorfeus-preact', '~> 10.6.49'
   s.add_dependency 'isomorfeus-policy', Isomorfeus::Transport::VERSION
   s.add_dependency 'isomorfeus-redux', '~> 4.1.18'
   s.add_dependency 'isomorfeus-speednode', '~> 0.5.2'
